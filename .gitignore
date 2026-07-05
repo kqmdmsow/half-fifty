@@ -1,0 +1,19 @@
+# 비밀 정보 (절대 커밋 금지)
+.env
+*.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+build/
+dist/
+
+# 에디터/OS
+.idea/
+.vscode/
+.DS_Store
