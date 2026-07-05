@@ -1,0 +1,7 @@
+langgraph>=0.2
+langchain>=0.3
+langchain-anthropic>=0.3
+python-dotenv>=1.0
+fastapi>=0.115
+uvicorn>=0.30
+pydantic>=2.8
