@@ -36,10 +36,12 @@ half-fifty/
 - 작업 브랜치: `feat/기능이름`, `fix/버그이름`
 - Pull Request → 팀원 1명 이상 리뷰 후 merge
 
-## 역할 분담
+## 역할 분담 (착수보고서 기준 초안)
 
-- **agent** (리드) — 최민제
-- **backend** — 전동훈
-- **frontend + 데이터셋 + 사람 평가** — 김민찬
+아직 팀 전체가 합류 전이라, 우선 혼자 초기 베이스만 잡아둔 상태. 세부 조율은 다음 회의에서 확정 예정.
+
+- agent — 최민제
+- backend — 전동훈
+- frontend + 데이터셋 + 사람 평가 — 김민찬
 
 각 파트 상세 TODO는 해당 폴더의 README(`agent/README.md`, `backend/README.md`, `frontend/README.md`) 참고.
