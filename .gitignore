@@ -13,6 +13,9 @@ node_modules/
 build/
 dist/
 
+# Gradle
+.gradle/
+
 # 에디터/OS
 .idea/
 .vscode/
