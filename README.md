@@ -35,3 +35,11 @@ half-fifty/
 - `main` 직접 push 금지, 항상 동작하는 상태 유지
 - 작업 브랜치: `feat/기능이름`, `fix/버그이름`
 - Pull Request → 팀원 1명 이상 리뷰 후 merge
+
+## 역할 분담
+
+- **agent** (리드) — 최민제
+- **backend** — 전동훈
+- **frontend + 데이터셋 + 사람 평가** — 김민찬
+
+각 파트 상세 TODO는 해당 폴더의 README(`agent/README.md`, `backend/README.md`, `frontend/README.md`) 참고.
