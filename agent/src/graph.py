@@ -16,7 +16,9 @@ from src.state import JUDGE_THRESHOLD, MAX_RETRIES, PipelineState
 
 def _increment_retry(state: PipelineState) -> dict:
     """재실행 직전 retry_count 증가용 보조 노드."""
-    return {"retry_count": state["retry_count"] + 1}
+    new_count = state["retry_count"] + 1
+    print(f"[Retry] Judge 평균 점수 미달 ({JUDGE_THRESHOLD}점 기준) -> {new_count}차 재시도")
+    return {"retry_count": new_count}
 
 
 def _route_after_judge(state: PipelineState) -> str:
@@ -30,9 +32,12 @@ def _route_after_judge(state: PipelineState) -> str:
     avg = sum(scores.values()) / len(scores)
 
     if avg >= JUDGE_THRESHOLD:
+        print(f"[Judge] 평균 {avg:.2f}점 >= {JUDGE_THRESHOLD}점 -> 통과")
         return "pass"
     if state["retry_count"] < MAX_RETRIES:
+        print(f"[Judge] 평균 {avg:.2f}점 < {JUDGE_THRESHOLD}점 (재시도 {state['retry_count']}/{MAX_RETRIES})")
         return "retry"
+    print(f"[Judge] 평균 {avg:.2f}점 < {JUDGE_THRESHOLD}점, 재시도 소진 ({MAX_RETRIES}/{MAX_RETRIES}) -> 주의 필요 플래그")
     return "flag"
 
 

@@ -64,7 +64,9 @@ def split_clauses(raw_text: str) -> List[Clause]:
     special_split = re.split(r"(특약사항|특약\s*사항)", text, maxsplit=1)
     body = special_split[0]
     special = special_split[2] if len(special_split) > 2 else ""
-    # "[특약사항]"처럼 대괄호로 감싼 헤더의 닫는 괄호가 남는 경우 제거
+    # "[특약사항]"처럼 대괄호로 감싼 헤더의 괄호 잔여물 제거
+    # (여는 괄호는 본문 끝에, 닫는 괄호는 특약 텍스트 앞에 남는다)
+    body = re.sub(r"[\[\]\s]+$", "", body)
     special = re.sub(r"^[\[\]\s]+", "", special)
 
     chunks: List[str] = []

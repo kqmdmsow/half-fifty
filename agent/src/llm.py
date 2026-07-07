@@ -15,6 +15,20 @@ load_dotenv()
 DEFAULT_MODEL_WORKER = "claude-haiku-4-5"
 DEFAULT_MODEL_JUDGE = "claude-sonnet-4-6"
 
+# 파이프라인 1회 실행 단위의 대략적 토큰 사용량 누적 (eval.py 등에서 사용).
+_token_usage = {"input_tokens": 0, "output_tokens": 0}
+
+
+def reset_token_usage() -> None:
+    """토큰 사용량 누적치를 0으로 초기화한다."""
+    _token_usage["input_tokens"] = 0
+    _token_usage["output_tokens"] = 0
+
+
+def get_token_usage() -> dict:
+    """마지막 reset_token_usage() 이후 누적된 토큰 사용량을 반환한다."""
+    return dict(_token_usage)
+
 
 @lru_cache(maxsize=None)
 def get_worker_llm() -> ChatAnthropic:
@@ -33,6 +47,11 @@ def get_judge_llm() -> ChatAnthropic:
 def invoke_json(llm: ChatAnthropic, prompt: str) -> dict:
     """LLM을 호출하고 응답 텍스트를 JSON 객체로 파싱해 반환한다."""
     response = llm.invoke(prompt)
+
+    usage = getattr(response, "usage_metadata", None) or {}
+    _token_usage["input_tokens"] += usage.get("input_tokens", 0)
+    _token_usage["output_tokens"] += usage.get("output_tokens", 0)
+
     content = response.content
     if isinstance(content, list):
         content = "".join(

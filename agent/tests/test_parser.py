@@ -69,3 +69,9 @@ def test_byulji2_numbered_list_not_treated_as_clauses():
     text = (DATA_DIR / "contract_05_molit_standard.txt").read_text(encoding="utf-8")
     clauses = split_clauses(text)
     assert not any("임차인이 2기의" in c["text"] and c["text"].startswith("1.") for c in clauses)
+
+
+def test_bracketed_header_leaves_no_residual_bracket():
+    text = (DATA_DIR / "contract_05_molit_standard.txt").read_text(encoding="utf-8")
+    clauses = split_clauses(text)
+    assert not any(c["text"].endswith("[") or c["text"].endswith("]") for c in clauses)
