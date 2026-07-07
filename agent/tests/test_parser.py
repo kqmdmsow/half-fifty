@@ -14,6 +14,7 @@ CONTRACT_CLAUSE_COUNTS = [
     ("contract_02_finance_loan.txt", 7),  # 제1~5조 + 특약 2건
     ("contract_03_lease_normal.txt", 7),  # 제1~7조, 특약 없음
     ("contract_04_gym_membership.txt", 7),  # 제1~5조 + 특약 2건
+    ("contract_05_molit_standard.txt", 16),  # 제1~13조 + 특약(Ÿ 불릿) 3건
 ]
 
 
@@ -54,3 +55,17 @@ def test_multiple_blank_lines_between_articles():
 def test_empty_input_returns_empty_list():
     assert split_clauses("") == []
     assert split_clauses("   ") == []
+
+
+def test_mid_sentence_article_reference_not_split():
+    text = (DATA_DIR / "contract_05_molit_standard.txt").read_text(encoding="utf-8")
+    clauses = split_clauses(text)
+    clause_007 = next(c for c in clauses if c["text"].startswith("제7조"))
+    assert "제4조 제1항을 위반한 경우 계약을 해지할 수 있다" in clause_007["text"]
+    assert not any(c["text"].startswith("제4조 제1항") for c in clauses)
+
+
+def test_byulji2_numbered_list_not_treated_as_clauses():
+    text = (DATA_DIR / "contract_05_molit_standard.txt").read_text(encoding="utf-8")
+    clauses = split_clauses(text)
+    assert not any("임차인이 2기의" in c["text"] and c["text"].startswith("1.") for c in clauses)
