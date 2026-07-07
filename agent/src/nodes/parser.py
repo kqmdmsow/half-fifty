@@ -23,15 +23,18 @@ def split_clauses(raw_text: str) -> List[Clause]:
     if not text:
         return []
 
-    # 1) 특약사항 앞뒤로 분리
+    # 1) 특약사항 앞뒤로 분리 (헤더 자체는 버리고 그 뒤 내용만 취한다)
     special_split = re.split(r"(특약사항|특약\s*사항)", text, maxsplit=1)
     body = special_split[0]
-    special = "".join(special_split[1:]) if len(special_split) > 1 else ""
+    special = special_split[2] if len(special_split) > 2 else ""
 
     chunks: List[str] = []
 
-    # 2) 본문: 제N조 단위 분리
+    # 2) 본문: 제N조 단위 분리 (조항 패턴이 있다면, 첫 조항 앞의 제목/전문은 버린다)
+    has_articles = re.search(r"제\s*\d+\s*조", body) is not None
     body_parts = [p.strip() for p in _ARTICLE_PATTERN.split(body) if p.strip()]
+    if has_articles:
+        body_parts = [p for p in body_parts if _ARTICLE_PATTERN.match(p)]
     chunks.extend(body_parts)
 
     # 3) 특약: 번호 목록 단위 분리
