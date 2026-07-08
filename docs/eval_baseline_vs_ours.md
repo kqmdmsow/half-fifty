@@ -4,20 +4,20 @@
 
 | 문서 | Judge 평균 (Ours/Base) | 위험 리콜 (Ours/Base) | 오탐 FP (Ours/Base) | 실행시간초 (Ours/Base) | 토큰 (Ours/Base) |
 |---|---|---|---|---|---|
-| sample_lease_contract.txt | 4.75 / 4.75 | 4/4 / 4/4 | 0 / 0 | 65.2 / 28.3 | 14808+4846 / 3379+2640 |
-| contract_02_finance_loan.txt | 4.25 / 5.00 | 6/6 / 6/6 | 0 / 0 | 73.3 / 34.3 | 20863+6380 / 4877+3624 |
-| contract_03_lease_normal.txt | 3.50 / 4.25 | - / - | 0 / 2 | 62.2 / 29.8 | 18147+4829 / 3761+2700 |
-| contract_04_gym_membership.txt | 4.50 / 4.50 | 3/4 / 4/4 | 0 / 0 | 65.8 / 32.6 | 19407+5297 / 4118+2987 |
-| contract_05_molit_standard.txt | 4.00 / 4.00 | - / - | 1 / 8 | 142.1 / 62.9 | 49618+12572 / 13385+6932 |
+| sample_lease_contract.txt | 4.75 / 4.50 | 4/4 / 4/4 | 0 / 0 | 58.0 / 26.6 | 14788+4751 / 4040+2376 |
+| contract_02_finance_loan.txt | 3.75 / 4.75 | 6/6 / 6/6 | 0 / 0 | 81.8 / 37.0 | 20897+6527 / 5694+3687 |
+| contract_03_lease_normal.txt | 3.25 / 3.00 | - / - | 0 / 0 | 192.7 / 21.8 | 53865+14338 / 4034+1853 |
+| contract_04_gym_membership.txt | 4.25 / 4.50 | 3/4 / 4/4 | 0 / 0 | 68.1 / 36.7 | 19826+5789 / 5275+3316 |
+| contract_05_molit_standard.txt | 4.00 / 3.25 | - / - | 1 / 0 | 153.2 / 52.8 | 49927+12702 / 13062+5697 |
 
 ## Judge 4 Aspect 상세 (Ours/Base)
 
 | 문서 | clarity | faithfulness | risk_coverage | actionability |
 |---|---|---|---|---|
-| sample_lease_contract.txt | 5.0/5.0 | 4.0/5.0 | 5.0/4.0 | 5.0/5.0 |
-| contract_02_finance_loan.txt | 5.0/5.0 | 4.0/5.0 | 4.0/5.0 | 4.0/5.0 |
-| contract_03_lease_normal.txt | 5.0/5.0 | 3.0/4.0 | 2.0/4.0 | 4.0/4.0 |
-| contract_04_gym_membership.txt | 5.0/5.0 | 4.0/4.0 | 4.0/4.0 | 5.0/5.0 |
-| contract_05_molit_standard.txt | 5.0/5.0 | 4.0/4.0 | 3.0/3.0 | 4.0/4.0 |
+| sample_lease_contract.txt | 5.0/5.0 | 4.0/4.0 | 5.0/5.0 | 5.0/4.0 |
+| contract_02_finance_loan.txt | 4.0/5.0 | 3.0/4.0 | 4.0/5.0 | 4.0/5.0 |
+| contract_03_lease_normal.txt | 5.0/5.0 | 3.0/4.0 | 2.0/2.0 | 3.0/1.0 |
+| contract_04_gym_membership.txt | 5.0/5.0 | 4.0/4.0 | 4.0/4.0 | 4.0/5.0 |
+| contract_05_molit_standard.txt | 5.0/4.0 | 4.0/4.0 | 3.0/2.0 | 4.0/3.0 |
 
 리콜/오탐 기준은 eval.py 상단 주석과 동일한 건수 기준 근사치다.

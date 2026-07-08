@@ -8,7 +8,11 @@ docs/eval_results_v2.md로 저장한다.
 
 같은 5건을 단일 LLM 호출 Baseline(src/baseline.py, 착수보고서 <표 6>)으로도
 실행해 Ours와 나란히 비교한 결과를 docs/eval_baseline_vs_ours.md로 저장한다.
-Judge는 두 경로 모두 동일한 judge_node를 사용해 같은 기준으로 채점한다.
+Judge는 두 경로 모두 동일한 judge_node를 사용해 같은 기준으로 채점하고,
+판단 기준(risk_type 판정 규칙/표준 조항 예외/risk_level 기준)도 analysis.txt와
+baseline.txt에 동일하게 넣어 "판단 기준 차이"가 아니라 "파이프라인 구조 차이"만
+비교되도록 한다. contract_05의 위험/주의 판정 조항 상세는
+docs/eval_baseline_contract05_detail.md로 별도 저장한다.
 
 주의: 여기서 말하는 "리콜"은 조항 단위로 정확히 같은 조항인지까지 대조하는
 것이 아니라, risk_level != "안전"으로 판정된 조항 개수를 정답 위험 건수와
@@ -33,6 +37,8 @@ from src.state import PipelineState
 DATA_DIR = Path(__file__).parent.parent / "data"
 OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_results_v2.md"
 COMPARISON_OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_baseline_vs_ours.md"
+DETAIL_FILENAME = "contract_05_molit_standard.txt"
+DETAIL_OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_baseline_contract05_detail.md"
 
 # data/labels.md 기준 문서별 기대 위험 조항 수
 EXPECTED_RISK_COUNTS = {
@@ -78,6 +84,7 @@ def _measure(runner: Runner, filename: str, expected_risk: int) -> dict:
         "judge_avg": judge_avg,
         "retry_count": result["retry_count"],
         "needs_review": result["needs_review"],
+        "adapted_results": result["adapted_results"],
     }
 
 
@@ -163,6 +170,36 @@ def render_comparison_markdown(ours_rows: list, baseline_rows: list) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _risky_clause_lines(rows: list) -> list:
+    lines = []
+    risky = [r for r in rows if r["risk_level"] != "안전"]
+    if not risky:
+        lines.append("(위험/주의로 판정된 조항 없음)")
+        return lines
+    for r in risky:
+        lines.append(f"- **{r['clause_id']}** [{r['risk_level']} / {r['risk_type']}]")
+        lines.append(f"  - 근거: {r['risk_evidence']}")
+    return lines
+
+
+def render_risky_clause_detail(filename: str, ours_row: dict, baseline_row: dict) -> str:
+    lines = [
+        f"# {filename} — Baseline vs Ours 위험 판정 조항 상세",
+        "",
+        "`data/labels.md` 정답(이 문서는 위험 0건이 정답)과 눈으로 대조해 "
+        "진짜 오탐인지 확인하기 위한 목록.",
+        "",
+        "## Baseline이 위험/주의로 판정한 조항",
+        "",
+        *_risky_clause_lines(baseline_row["adapted_results"]),
+        "",
+        "## Ours가 위험/주의로 판정한 조항",
+        "",
+        *_risky_clause_lines(ours_row["adapted_results"]),
+    ]
+    return "\n".join(lines) + "\n"
+
+
 def main() -> None:
     ours_rows = [evaluate_file(f, expected) for f, expected in EXPECTED_RISK_COUNTS.items()]
     markdown = render_markdown(ours_rows)
@@ -178,6 +215,13 @@ def main() -> None:
     COMPARISON_OUT_PATH.write_text(comparison_markdown, encoding="utf-8")
     print(comparison_markdown)
     print(f"저장 완료: {COMPARISON_OUT_PATH}")
+
+    ours_detail = next(r for r in ours_rows if r["file"] == DETAIL_FILENAME)
+    baseline_detail = next(r for r in baseline_rows if r["file"] == DETAIL_FILENAME)
+    detail_markdown = render_risky_clause_detail(DETAIL_FILENAME, ours_detail, baseline_detail)
+    DETAIL_OUT_PATH.write_text(detail_markdown, encoding="utf-8")
+    print(detail_markdown)
+    print(f"저장 완료: {DETAIL_OUT_PATH}")
 
 
 if __name__ == "__main__":
