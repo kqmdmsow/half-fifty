@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { analyzeContract, type AnalyzeResponse, type Persona } from './api'
+import { analyzeContract, analyzePdf, type AnalyzeResponse, type Persona } from './api'
+
+type InputMode = 'text' | 'pdf'
 
 // 위험도별 배지 색상
 const RISK_STYLE: Record<string, string> = {
@@ -9,21 +11,28 @@ const RISK_STYLE: Record<string, string> = {
 }
 
 export default function App() {
+  const [mode, setMode] = useState<InputMode>('text')
   const [text, setText] = useState('')
+  const [file, setFile] = useState<File | null>(null)
   const [persona, setPersona] = useState<Persona>('adult')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<AnalyzeResponse | null>(null)
 
   const handleAnalyze = async () => {
-    if (!text.trim()) {
+    if (mode === 'text' && !text.trim()) {
       setError('계약서 내용을 입력해 주세요.')
+      return
+    }
+    if (mode === 'pdf' && !file) {
+      setError('PDF 파일을 선택해 주세요.')
       return
     }
     setLoading(true)
     setError(null)
     try {
-      const res = await analyzeContract(text, persona)
+      const res =
+        mode === 'text' ? await analyzeContract(text, persona) : await analyzePdf(file!, persona)
       setData(res)
     } catch (e) {
       setError(e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.')
@@ -48,12 +57,53 @@ export default function App() {
       <main className="mx-auto max-w-4xl px-6 py-8">
         {/* 입력 영역 */}
         <section className="rounded-lg border border-slate-200 bg-white p-5">
-          <textarea
-            className="h-48 w-full resize-y rounded-md border border-slate-300 p-3 text-sm focus:border-slate-500 focus:outline-none"
-            placeholder="계약서 내용을 붙여넣어 주세요. (예: 제1조 ...)"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
+          <div className="mb-3 flex gap-2">
+            {(['text', 'pdf'] as InputMode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => {
+                  setMode(m)
+                  setError(null)
+                }}
+                className={`rounded-full px-4 py-1.5 text-sm ${
+                  mode === m
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {m === 'text' ? '텍스트 붙여넣기' : 'PDF 업로드'}
+              </button>
+            ))}
+          </div>
+
+          {mode === 'text' ? (
+            <textarea
+              className="h-48 w-full resize-y rounded-md border border-slate-300 p-3 text-sm focus:border-slate-500 focus:outline-none"
+              placeholder="계약서 내용을 붙여넣어 주세요. (예: 제1조 ...)"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          ) : (
+            <div className="flex h-48 w-full flex-col items-center justify-center rounded-md border border-dashed border-slate-300 p-3 text-sm">
+              <input
+                id="pdf-input"
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
+              <label
+                htmlFor="pdf-input"
+                className="cursor-pointer rounded-md bg-slate-100 px-4 py-2 text-slate-700 hover:bg-slate-200"
+              >
+                PDF 파일 선택
+              </label>
+              <p className="mt-3 text-slate-500">
+                {file ? file.name : '텍스트 레이어가 있는 디지털 PDF만 지원합니다 (스캔본 제외)'}
+              </p>
+            </div>
+          )}
+
           <div className="mt-4 flex items-center justify-between">
             <div className="flex gap-2">
               {(['adult', 'senior'] as Persona[]).map((p) => (
