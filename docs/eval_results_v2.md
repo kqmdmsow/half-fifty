@@ -4,12 +4,12 @@
 
 | 문서 | 조항 수 | 위험 리콜(찾음/정답) | 오탐(FP) | 실행시간(초) | 토큰(입력/출력) | Judge 평균 | 재시도 | 주의필요 |
 |---|---|---|---|---|---|---|---|---|
-| sample_lease_contract.txt | 5 | 4/4 | 0 | 65.4 | 14783/4898 | 4.75 | 0 | False |
-| contract_02_finance_loan.txt | 7 | 6/6 | 0 | 84.7 | 20956/6448 | 4.50 | 0 | False |
-| contract_03_lease_normal.txt | 7 | - | 0 | 63.4 | 18154/4981 | 4.00 | 0 | False |
-| contract_04_gym_membership.txt | 7 | 3/4 | 0 | 66.0 | 19753/5614 | 4.50 | 0 | False |
-| contract_05_molit_standard.txt | 16 | - | 1 | 145.6 | 49579/12841 | 4.00 | 0 | False |
+| sample_lease_contract.txt | 5 | 4/4 | 0 | 65.2 | 14808/4846 | 4.75 | 0 | False |
+| contract_02_finance_loan.txt | 7 | 6/6 | 0 | 73.3 | 20863/6380 | 4.25 | 0 | False |
+| contract_03_lease_normal.txt | 7 | - | 0 | 62.2 | 18147/4829 | 3.50 | 0 | False |
+| contract_04_gym_membership.txt | 7 | 3/4 | 0 | 65.8 | 19407/5297 | 4.50 | 0 | False |
+| contract_05_molit_standard.txt | 16 | - | 1 | 142.1 | 49618/12572 | 4.00 | 0 | False |
 
-**합계**: 실행시간 425.1초, 토큰 123225/34782 (입력/출력)
+**합계**: 실행시간 408.5초, 토큰 122843/33924 (입력/출력)
 
 리콜은 조항 단위 정답 매칭이 아니라 문서별 위험 판정 건수 대 정답 건수의 근사치다 (자세한 내용은 eval.py 상단 주석 참고).
