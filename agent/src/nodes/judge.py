@@ -6,35 +6,51 @@
 - Risk Coverage  : 위험 조항을 누락 없이 식별했는가
 - Actionability  : 실행 가능한 행동(질문)을 제시하는가
 
-현재는 더미 구현(고정 점수). LLM 연동 시 src/prompts/judge_rubric.txt 사용.
-점수 근거(rationale)도 함께 출력하게 만들 것 — 사람-LLM 상관도 분석 때 필요.
+src/prompts/judge_rubric.txt로 MODEL_JUDGE를 호출해 채점한다.
+점수 근거(rationale)는 사람-LLM 상관도 분석 참고용으로 콘솔에 로그로 남긴다.
 """
 
+import json
 from pathlib import Path
 
+from src.llm import get_judge_llm, invoke_json
 from src.state import JudgeScores, PipelineState
 
 PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "judge_rubric.txt"
+_PROMPT_TEMPLATE = PROMPT_PATH.read_text(encoding="utf-8")
+
+_ASPECTS = ["clarity", "faithfulness", "risk_coverage", "actionability"]
 
 
-def _judge_dummy(state: PipelineState) -> JudgeScores:
-    """더미 채점: 파이프라인 흐름 검증용 고정 점수.
+def _judge(state: PipelineState) -> JudgeScores:
+    original_clauses = "\n".join(
+        f"[{c['clause_id']}] {c['text']}" for c in state["clauses"]
+    )
+    final_output = json.dumps(state["adapted_results"], ensure_ascii=False, indent=2)
 
-    재생성 루프를 눈으로 확인하고 싶으면 아래 점수를 3.0 등으로 낮춰서
-    graph.py 의 조건부 엣지가 analysis 로 되돌아가는지 테스트해 볼 것.
-    """
+    prompt = (
+        _PROMPT_TEMPLATE.replace("{persona}", state["persona"])
+        .replace("{original_clauses}", original_clauses)
+        .replace("{final_output}", final_output)
+    )
+
+    data = invoke_json(get_judge_llm(), prompt)
+
+    scores = {}
+    for aspect in _ASPECTS:
+        aspect_data = data[aspect]
+        scores[aspect] = float(aspect_data["score"])
+        print(f"[Judge] {aspect}: {aspect_data['score']}점 — {aspect_data['rationale']}")
+
     return JudgeScores(
-        clarity=4.0,
-        faithfulness=4.0,
-        risk_coverage=4.0,
-        actionability=4.0,
+        clarity=scores["clarity"],
+        faithfulness=scores["faithfulness"],
+        risk_coverage=scores["risk_coverage"],
+        actionability=scores["actionability"],
     )
 
 
 def judge_node(state: PipelineState) -> dict:
-    """LangGraph 노드: adapted_results -> judge_scores.
-
-    TODO(민제): LLM 연동 시 원본 조항 + 최종 출력을 함께 넣어 Rubric 채점.
-    """
-    scores = _judge_dummy(state)
+    """LangGraph 노드: adapted_results -> judge_scores."""
+    scores = _judge(state)
     return {"judge_scores": scores}

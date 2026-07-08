@@ -4,37 +4,41 @@ MVP 페르소나 2종:
 - adult  : 일반 성인 (표준 설명)
 - senior : 고령층 (짧은 문장, 일상 어휘, 예시 중심)
 
-현재는 더미 구현. LLM 연동 시 persona별 프롬프트 파일 사용:
-- src/prompts/persona_adult.txt
-- src/prompts/persona_senior.txt
+src/prompts/persona_adult.txt / persona_senior.txt로 MODEL_WORKER를 호출해
+explanation만 다시 쓴다. 나머지 필드(위험 여부/근거/질문)는 그대로 유지한다.
 """
 
+import json
 from pathlib import Path
 from typing import List
 
+from src.llm import get_worker_llm, invoke_json
 from src.state import AnalysisResult, PipelineState
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+_TEMPLATES = {
+    "adult": (PROMPTS_DIR / "persona_adult.txt").read_text(encoding="utf-8"),
+    "senior": (PROMPTS_DIR / "persona_senior.txt").read_text(encoding="utf-8"),
+}
 
 
-def _adapt_dummy(result: AnalysisResult, persona: str) -> AnalysisResult:
-    if persona == "senior":
-        prefix = "[고령층 맞춤·더미] 쉽게 말씀드리면, "
-    else:
-        prefix = "[일반 성인·더미] "
+def _adapt(result: AnalysisResult, persona: str) -> AnalysisResult:
+    template = _TEMPLATES.get(persona, _TEMPLATES["adult"])
+    analysis_result_json = json.dumps(dict(result), ensure_ascii=False)
+    prompt = template.replace("{analysis_result}", analysis_result_json)
+
+    llm = get_worker_llm()
+    data = invoke_json(llm, prompt)
 
     adapted = dict(result)
-    adapted["explanation"] = prefix + result["explanation"]
+    adapted["explanation"] = data["explanation"]
     return adapted  # type: ignore[return-value]
 
 
 def persona_node(state: PipelineState) -> dict:
-    """LangGraph 노드: analysis_results + persona -> adapted_results.
-
-    TODO(민제): LLM 연동 시 페르소나별 프롬프트로 재작성 요청.
-    """
+    """LangGraph 노드: analysis_results + persona -> adapted_results."""
     persona = state["persona"]
     adapted: List[AnalysisResult] = [
-        _adapt_dummy(r, persona) for r in state["analysis_results"]
+        _adapt(r, persona) for r in state["analysis_results"]
     ]
     return {"adapted_results": adapted}
