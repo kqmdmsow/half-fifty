@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    word-break: keep-all;
+  }
+
+  body {
+    @apply bg-white font-sans text-ink-900;
+  }
+
+  ::selection {
+    @apply bg-brand-100;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 접근성: 높은 명암 모드 */
+.hc .text-ink-400 {
+  color: #4e5968;
+}
+.hc .text-ink-600 {
+  color: #191f28;
+}
