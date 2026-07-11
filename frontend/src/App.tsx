@@ -1,190 +1,176 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { analyzeContract, analyzePdf, type AnalyzeResponse, type Persona } from './api'
+import { Logo } from './components/ui'
+import { SAMPLE_RESULTS } from './data/sample'
+import { DetailScreen } from './screens/Detail'
+import { DoneScreen } from './screens/Done'
+import { ExtractScreen } from './screens/Extract'
+import { LandingScreen } from './screens/Landing'
+import { PersonaScreen } from './screens/Persona'
+import { ProgressScreen } from './screens/Progress'
+import { SummaryScreen } from './screens/Summary'
+import { UploadScreen } from './screens/Upload'
 
-type InputMode = 'text' | 'pdf'
+type Screen =
+  | 'landing'
+  | 'upload'
+  | 'extract'
+  | 'persona'
+  | 'progress'
+  | 'summary'
+  | 'detail'
+  | 'done'
 
-// 위험도별 배지 색상
-const RISK_STYLE: Record<string, string> = {
-  안전: 'bg-emerald-100 text-emerald-800',
-  주의: 'bg-amber-100 text-amber-800',
-  위험: 'bg-red-100 text-red-800',
-}
+type InputMode = 'pdf' | 'text'
 
 export default function App() {
-  const [mode, setMode] = useState<InputMode>('text')
-  const [text, setText] = useState('')
+  const [screen, setScreen] = useState<Screen>('landing')
+  const [mode, setMode] = useState<InputMode>('pdf')
   const [file, setFile] = useState<File | null>(null)
+  const [text, setText] = useState('')
   const [persona, setPersona] = useState<Persona>('adult')
+
+  // 접근성 설정
+  const [largeText, setLargeText] = useState(false)
+  const [highContrast, setHighContrast] = useState(false)
+  const [voiceGuide, setVoiceGuide] = useState(false)
+
+  // 분석 상태
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<AnalyzeResponse | null>(null)
+  const [selectedClauseId, setSelectedClauseId] = useState<string | null>(null)
 
-  const handleAnalyze = async () => {
-    if (mode === 'text' && !text.trim()) {
-      setError('계약서 내용을 입력해 주세요.')
-      return
-    }
-    if (mode === 'pdf' && !file) {
-      setError('PDF 파일을 선택해 주세요.')
-      return
-    }
-    setLoading(true)
+  const results = data?.results.length ? data.results : SAMPLE_RESULTS
+  const clauseCount = data?.clause_count ?? 16
+  const isSample = !data
+
+  // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
+  useEffect(() => {
+    document.documentElement.style.fontSize = largeText ? '18px' : '16px'
+  }, [largeText])
+
+  const go = (next: Screen) => {
+    setScreen(next)
+    window.scrollTo({ top: 0 })
+  }
+
+  const runAnalysis = async () => {
     setError(null)
+    setLoading(true)
+    go('progress')
+
     try {
-      const res =
-        mode === 'text' ? await analyzeContract(text, persona) : await analyzePdf(file!, persona)
-      setData(res)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.')
+      if (mode === 'text' && text.trim()) {
+        setData(await analyzeContract(text, persona))
+      } else if (mode === 'pdf' && file) {
+        setData(await analyzePdf(file, persona))
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '분석 요청에 실패했어요.')
     } finally {
       setLoading(false)
     }
   }
 
+  const restart = () => {
+    setData(null)
+    setError(null)
+    setFile(null)
+    setText('')
+    setSelectedClauseId(null)
+    go('upload')
+  }
+
+  const openDetail = (clauseId: string) => {
+    setSelectedClauseId(clauseId)
+    go('detail')
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-4xl px-6 py-5">
-          <h1 className="text-xl font-bold text-slate-900">
-            계약서 위험 안내 <span className="font-normal text-slate-400">· 하프피프티</span>
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            계약서를 붙여넣으면 조항별로 쉬운 설명, 위험 여부, 확인할 질문을 알려드립니다.
-          </p>
+    <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
+      <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <Logo onClick={() => go('landing')} />
+          <button
+            type="button"
+            aria-pressed={largeText}
+            onClick={() => setLargeText((value) => !value)}
+            className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+              largeText
+                ? 'bg-ink-900 text-white'
+                : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+            }`}
+          >
+            가 글자 크게
+          </button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-8">
-        {/* 입력 영역 */}
-        <section className="rounded-lg border border-slate-200 bg-white p-5">
-          <div className="mb-3 flex gap-2">
-            {(['text', 'pdf'] as InputMode[]).map((m) => (
-              <button
-                key={m}
-                onClick={() => {
-                  setMode(m)
-                  setError(null)
-                }}
-                className={`rounded-full px-4 py-1.5 text-sm ${
-                  mode === m
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {m === 'text' ? '텍스트 붙여넣기' : 'PDF 업로드'}
-              </button>
-            ))}
-          </div>
-
-          {mode === 'text' ? (
-            <textarea
-              className="h-48 w-full resize-y rounded-md border border-slate-300 p-3 text-sm focus:border-slate-500 focus:outline-none"
-              placeholder="계약서 내용을 붙여넣어 주세요. (예: 제1조 ...)"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-          ) : (
-            <div className="flex h-48 w-full flex-col items-center justify-center rounded-md border border-dashed border-slate-300 p-3 text-sm">
-              <input
-                id="pdf-input"
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              />
-              <label
-                htmlFor="pdf-input"
-                className="cursor-pointer rounded-md bg-slate-100 px-4 py-2 text-slate-700 hover:bg-slate-200"
-              >
-                PDF 파일 선택
-              </label>
-              <p className="mt-3 text-slate-500">
-                {file ? file.name : '텍스트 레이어가 있는 디지털 PDF만 지원합니다 (스캔본 제외)'}
-              </p>
-            </div>
-          )}
-
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex gap-2">
-              {(['adult', 'senior'] as Persona[]).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPersona(p)}
-                  className={`rounded-full px-4 py-1.5 text-sm ${
-                    persona === p
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {p === 'adult' ? '일반 성인' : '고령층'}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={handleAnalyze}
-              disabled={loading}
-              className="rounded-md bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-            >
-              {loading ? '분석 중...' : '계약서 분석하기'}
-            </button>
-          </div>
-          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-        </section>
-
-        {/* 결과 영역 */}
-        {data && (
-          <section className="mt-8">
-            <div className="mb-4 flex items-center gap-3 text-sm text-slate-500">
-              <span>조항 {data.clause_count}개</span>
-              <span>·</span>
-              <span>재생성 {data.retry_count}회</span>
-              {data.needs_review && (
-                <span className="rounded bg-red-100 px-2 py-0.5 text-red-700">
-                  주의 필요: 품질 기준 미달
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              {data.results.map((r) => (
-                <article
-                  key={r.clause_id}
-                  className="rounded-lg border border-slate-200 bg-white p-5"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <p className="text-sm text-slate-400">{r.original_text}</p>
-                    <span
-                      className={`shrink-0 rounded-full px-3 py-0.5 text-xs font-medium ${
-                        RISK_STYLE[r.risk_level] ?? 'bg-slate-100 text-slate-600'
-                      }`}
-                    >
-                      {r.risk_level}
-                      {r.risk_type !== '해당 없음' && ` · ${r.risk_type}`}
-                    </span>
-                  </div>
-
-                  <p className="mt-3 text-sm leading-relaxed text-slate-800">
-                    {r.explanation}
-                  </p>
-                  <p className="mt-2 text-xs text-slate-500">근거: {r.risk_evidence}</p>
-
-                  {r.check_questions.length > 0 && (
-                    <div className="mt-3 rounded-md bg-slate-50 p-3">
-                      <p className="text-xs font-medium text-slate-600">확인해 보세요</p>
-                      <ul className="mt-1 space-y-1">
-                        {r.check_questions.map((q, i) => (
-                          <li key={i} className="text-sm text-slate-700">
-                            · {q}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </article>
-              ))}
-            </div>
-          </section>
+      <main>
+        {screen === 'landing' && <LandingScreen onStart={() => go('upload')} />}
+        {screen === 'upload' && (
+          <UploadScreen
+            mode={mode}
+            file={file}
+            text={text}
+            onModeChange={setMode}
+            onFileChange={setFile}
+            onTextChange={setText}
+            onNext={() => go('extract')}
+          />
         )}
+        {screen === 'extract' && (
+          <ExtractScreen
+            file={file}
+            mode={mode}
+            text={text}
+            onPrev={() => go('upload')}
+            onNext={() => go('persona')}
+          />
+        )}
+        {screen === 'persona' && (
+          <PersonaScreen
+            persona={persona}
+            largeText={largeText}
+            highContrast={highContrast}
+            voiceGuide={voiceGuide}
+            onPersonaChange={setPersona}
+            onToggleLargeText={() => setLargeText((value) => !value)}
+            onToggleHighContrast={() => setHighContrast((value) => !value)}
+            onToggleVoiceGuide={() => setVoiceGuide((value) => !value)}
+            onPrev={() => go('extract')}
+            onStartAnalysis={runAnalysis}
+          />
+        )}
+        {screen === 'progress' && (
+          <ProgressScreen
+            loading={loading}
+            error={error}
+            onCancel={() => go('persona')}
+            onShowResult={() => go('summary')}
+          />
+        )}
+        {screen === 'summary' && (
+          <SummaryScreen
+            clauseCount={clauseCount}
+            results={results}
+            isSample={isSample}
+            onSelectClause={openDetail}
+            onDone={() => go('done')}
+          />
+        )}
+        {screen === 'detail' && (
+          <DetailScreen
+            clauseId={selectedClauseId ?? results[0].clause_id}
+            results={results}
+            voiceGuide={voiceGuide}
+            onSelectClause={setSelectedClauseId}
+            onBack={() => go('summary')}
+            onDone={() => go('done')}
+          />
+        )}
+        {screen === 'done' && <DoneScreen results={results} onRestart={restart} />}
       </main>
     </div>
   )
