@@ -99,6 +99,14 @@ Val이 3문서/21조항, Test는 아직 미확보 상태라 지금 당장 통계
 최소 30건 이상 확보하는 것이 다음 단계의 실질적 병목**이다 — 우선순위 1번이 왜
 "골드데이터셋 확보"인지와 직결.
 
+> **[2026-07-27 코드 반영 완료]** 이 문서의 배정을 `data/clause_level_labels.csv`와
+> `data/real_clause_labels.csv`에 실제 `split` 컬럼(train/val/test)으로 넣었다.
+> `agent/eval_real_labels.py`가 이 컬럼을 읽어 **Test 서브셋만 공식 베이스라인으로
+> 집계**하고 Train/Val은 참고용으로만 병기한다 — 첫 실행(2026-07-26)에서 이 분리를
+> 빠뜨려 Train/Val 지정 4건이 섞인 오염된 수치(Precision 0.79/Recall 0.81)를 냈던 것을
+> 다음날 발견해 수정, 정정된 공식 베이스라인은 Precision 0.73/Recall 0.83/Accuracy 0.72
+> (Test 40건). 자세한 내용은 `docs/eval_real_labels.md` 참고.
+
 ## 4. eval.py 연동 (제안, 아직 미구현)
 
 지금 `agent/eval.py`의 `EXPECTED_RISK_COUNTS`는 문서당 "위험 조항 개수"만 비교하는

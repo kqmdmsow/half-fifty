@@ -48,20 +48,11 @@ def run_eval() -> list:
     return results
 
 
-def render_report(results: list) -> str:
+def _confusion(results: list) -> dict:
     tp = fp = fn = tn = 0
-    risk_type_confusion = defaultdict(Counter)  # gold_risk_type -> Counter(pred_risk_type)
-    mismatches = []
-
     for r in results:
-        gold_level = r["row"]["gold_risk_level"]
-        gold_type = r["row"]["gold_risk_type"]
-        pred_level = r["prediction"]["risk_level"]
-        pred_type = r["prediction"]["risk_type"]
-
-        gold_risk = gold_level != "안전"
-        pred_risk = pred_level != "안전"
-
+        gold_risk = r["row"]["gold_risk_level"] != "안전"
+        pred_risk = r["prediction"]["risk_level"] != "안전"
         if gold_risk and pred_risk:
             tp += 1
         elif gold_risk and not pred_risk:
@@ -70,16 +61,46 @@ def render_report(results: list) -> str:
             fp += 1
         else:
             tn += 1
+    precision = tp / (tp + fp) if (tp + fp) else None
+    recall = tp / (tp + fn) if (tp + fn) else None
+    accuracy = (tp + tn) / len(results) if results else None
+    return {"tp": tp, "fp": fp, "fn": fn, "tn": tn, "precision": precision, "recall": recall, "accuracy": accuracy}
 
-        if gold_risk:
+
+def _confusion_row(label: str, c: dict) -> str:
+    if c["precision"] is None:
+        return f"| {label} | {c['tp']} | {c['fp']} | {c['fn']} | {c['tn']} | - | - | - |"
+    return (
+        f"| {label} | {c['tp']} | {c['fp']} | {c['fn']} | {c['tn']} | "
+        f"{c['precision']:.2f} | {c['recall']:.2f} | {c['accuracy']:.2f} |"
+    )
+
+
+def render_report(results: list) -> str:
+    # docs/clause_level_dataset_and_split.md 3.2절 배정: 광고대행/신발도매/즉시연금2017-17=train,
+    # 바로연금보험(즉시연금)2018-8=val, 나머지(hldcc/LBox/AI Hub)=test(신규 확보, 한 번도 안 본 데이터).
+    test_results = [r for r in results if r["row"]["split"] == "test"]
+    train_results = [r for r in results if r["row"]["split"] == "train"]
+    val_results = [r for r in results if r["row"]["split"] == "val"]
+
+    risk_type_confusion = defaultdict(Counter)  # gold_risk_type -> Counter(pred_risk_type), test만
+    mismatches = []
+
+    for r in results:
+        gold_level = r["row"]["gold_risk_level"]
+        gold_type = r["row"]["gold_risk_type"]
+        pred_level = r["prediction"]["risk_level"]
+        pred_type = r["prediction"]["risk_type"]
+        gold_risk = gold_level != "안전"
+        pred_risk = pred_level != "안전"
+
+        if r["row"]["split"] == "test" and gold_risk:
             risk_type_confusion[gold_type][pred_type] += 1
 
         if gold_risk != pred_risk or (gold_risk and gold_type != pred_type):
             mismatches.append((r, gold_level, gold_type, pred_level, pred_type))
 
-    precision = tp / (tp + fp) if (tp + fp) else None
-    recall = tp / (tp + fn) if (tp + fn) else None
-    accuracy = (tp + tn) / len(results) if results else None
+    test_c = _confusion(test_results)
 
     lines = [
         "# 실물 조항 정답지(real_clause_labels.csv) 평가 결과",
@@ -88,15 +109,26 @@ def render_report(results: list) -> str:
         "AI Hub 자연발생 템플릿)에 대해 `analysis._analyze_clause()`를 직접 호출한 결과. "
         "Parser/Persona/Judge 없이 Analysis 로직만 단독 평가.",
         "",
-        "## risk_level 이진 판정 (위험 vs 안전)",
+        "**중요**: 이 중 4건(광고대행/신발도매/즉시연금2017-17/바로연금보험2018-8, "
+        "`data/real_labels.md` 출처)은 `docs/clause_level_dataset_and_split.md`에서 이미 "
+        "Train/Val로 지정된, 프롬프트 튜닝 이력이 있는 데이터다. 이 4건을 섞어서 낸 수치는 "
+        "공정한 held-out 평가가 아니므로, **아래 'Test 전용(40건)' 표만 공식 베이스라인으로 "
+        "취급**한다. Train/Val 결과는 참고용으로만 병기.",
         "",
-        f"| TP | FP | FN | TN | Precision | Recall | Accuracy |",
-        f"|---|---|---|---|---|---|---|",
-        f"| {tp} | {fp} | {fn} | {tn} | "
-        f"{precision:.2f} | {recall:.2f} | {accuracy:.2f} |"
-        if precision is not None else "| - | - | - | - | - | - | - |",
+        "## Test 전용 (신규 확보 데이터 40건 — 공식 베이스라인)",
         "",
-        "## risk_type 혼동행렬 (정답이 '위험'인 경우만, gold_type -> predicted_type 분포)",
+        "| 구분 | TP | FP | FN | TN | Precision | Recall | Accuracy |",
+        "|---|---|---|---|---|---|---|---|",
+        _confusion_row("test", test_c),
+        "",
+        "## 참고: Train/Val 서브셋 (튜닝 이력 있음, 공식 수치 아님)",
+        "",
+        "| 구분 | TP | FP | FN | TN | Precision | Recall | Accuracy |",
+        "|---|---|---|---|---|---|---|---|",
+        _confusion_row("train (3건)", _confusion(train_results)),
+        _confusion_row("val (1건)", _confusion(val_results)),
+        "",
+        "## risk_type 혼동행렬 (Test 전용, 정답이 '위험'인 경우만, gold_type -> predicted_type 분포)",
         "",
         "| 정답 risk_type | 예측 분포 |",
         "|---|---|",
@@ -107,17 +139,19 @@ def render_report(results: list) -> str:
 
     lines += [
         "",
-        f"## 불일치 사례 ({len(mismatches)}건)",
+        f"## 불일치 사례 (전체 {len(mismatches)}건, split 포함)",
         "",
-        "| 출처 | 정답(level/type) | 예측(level/type) | 조항 발췌 |",
-        "|---|---|---|---|",
+        "| 출처 | split | 정답(level/type) | 예측(level/type) | 조항 발췌 |",
+        "|---|---|---|---|---|",
     ]
     for r, gl, gt, pl, pt in mismatches:
         excerpt = r["row"]["clause_text"][:40].replace("|", "/")
-        lines.append(f"| {r['row']['case_id']} | {gl}/{gt} | {pl}/{pt} | {excerpt}... |")
+        lines.append(
+            f"| {r['row']['case_id']} | {r['row']['split']} | {gl}/{gt} | {pl}/{pt} | {excerpt}... |"
+        )
 
     if not mismatches:
-        lines.append("| (없음) | | | |")
+        lines.append("| (없음) | | | | |")
 
     return "\n".join(lines) + "\n"
 
