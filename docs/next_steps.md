@@ -42,7 +42,7 @@
 **정밀 평가 인프라**
 - ✅ 조항 단위 라벨 66개 확보 (`data/clause_level_labels.csv`, 자작 5문서 기준)
 - ✅ `eval.py`에 조항 단위 정밀 recall/precision 추가 완료 — `parser.split_clauses()`의 `clause_id`(`clause_NNN`, 결정적)를 `clause_level_labels.csv`와 직접 매칭해 TP/FP/FN/TN 계산, `docs/eval_clause_precision.md`로 저장(`render_clause_precision_markdown`). 기존 문서 단위 근사 리콜은 하위호환용으로 유지(교체가 아니라 병기)
-- ✅ **`data/real_clause_labels.csv` 신설 (44건) + `agent/eval_real_labels.py` 신설** — 지금까지 `eval.py`는 자작 5문서만 평가했는데(정작 이번 세션에 그렇게 많이 모은 hldcc/LBox/AI Hub 골든데이터는 전혀 안 쓰이고 있었음), real_labels.md 4건 + hldcc 14건(id=24 포함) + LBox 13건(90237의 5개 포함) + AI Hub 13건을 조항 단위 정답지로 통합. 이 데이터는 완전한 계약서가 아니라 판결문/조정문에서 이미 추출된 개별 조항이라 Parser가 필요 없음 — `analysis._analyze_clause()`를 조항 단위로 직접 호출해 risk_level 이진판정(TP/FP/FN/TN/precision/recall) + risk_type 혼동행렬 + 불일치 사례를 `docs/eval_real_labels.md`로 저장. **미실행**(API 키 필요, `eval_pairwise.py`와 함께 실행 대상)
+- ✅ **`data/real_clause_labels.csv` 신설 (44건) + `agent/eval_real_labels.py` 신설 + 실행 완료** — real_labels.md 4건 + hldcc 14건(id=24 포함) + LBox 13건(90237의 5개 포함) + AI Hub 13건을 조항 단위 정답지로 통합해 `analysis._analyze_clause()`를 직접 검증. **베이스라인 확정(2026-07-26, gemini-flash-lite-latest)**: Precision 0.79 / Recall 0.81 / Accuracy 0.75 — 순진한 베이스라인("항상 위험" 예측시 accuracy 0.61)은 넘지만 아직 낮은 편. **의도적으로 지금은 프롬프트 개선 안 함** — 이 44건의 실패 사례를 보고 고치면 테스트셋 오염(시험문제로 공부하고 그 문제로 시험 본 것과 동일 문제) → 다음 개선 시 Train/Val 자작문서로 튜닝 후 이 44건엔 딱 1회만 재실행 원칙 준수(`docs/eval_real_labels.md` 상단 메모 참고, 모델 교체는 오염 아니므로 예외)
 
 **사람 평가**
 - ✅ **설계 재작업 완료**: `docs/human_llm_judge_agreement_design.md` 11절 — 비교/선호 판단(선호일치율·Cohen's κ·**정답 일치율**)을 주 실험으로 채택, 기존 QWK 설계는 실시간 게이팅 검증용 보조 트랙으로 격하
