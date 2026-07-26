@@ -32,6 +32,15 @@ class JudgeScores(TypedDict):
     faithfulness: float     # 충실성 (환각 여부)
     risk_coverage: float    # 위험 식별
     actionability: float    # 행동 지침
+    rationale: dict[str, str]  # aspect별 채점 근거 (사람-LLM 상관도 분석용)
+
+
+JUDGE_ASPECT_KEYS = ("clarity", "faithfulness", "risk_coverage", "actionability")
+
+
+def judge_score_avg(scores: "JudgeScores") -> float:
+    """rationale을 제외한 4개 수치 aspect의 평균 (재시도 임계값 판정용)."""
+    return sum(scores[k] for k in JUDGE_ASPECT_KEYS) / len(JUDGE_ASPECT_KEYS)
 
 
 class PipelineState(TypedDict):

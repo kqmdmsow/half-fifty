@@ -1,0 +1,67 @@
+document,clause_id,position,label,risk_type,source_note
+sample_lease_contract.txt,clause_001,제1조(목적),안전,,정의 조항 (labels.md 미기재 = 안전)
+sample_lease_contract.txt,clause_002,제2조(보증금),위험,보증금 반환 지연,labels.md
+sample_lease_contract.txt,clause_003,제3조(계약 해지),위험,일방적 계약 해지,labels.md
+sample_lease_contract.txt,clause_004,특약1,위험,과도한 위약금,labels.md
+sample_lease_contract.txt,clause_005,특약2,위험,책임 면제,labels.md
+contract_02_finance_loan.txt,clause_001,제1조(목적),안전,,정의 조항 (labels.md 미기재 = 안전)
+contract_02_finance_loan.txt,clause_002,제2조(대출금액 및 이자),위험,불명확한 수수료·이자 조건,labels.md
+contract_02_finance_loan.txt,clause_003,제3조(수수료),위험,불명확한 수수료·이자 조건,labels.md
+contract_02_finance_loan.txt,clause_004,제4조(기한의 이익 상실),위험,일방적 계약 해지,labels.md
+contract_02_finance_loan.txt,clause_005,제5조(상환),위험,과도한 위약금,labels.md
+contract_02_finance_loan.txt,clause_006,특약1,위험,일방적 계약 해지,labels.md
+contract_02_finance_loan.txt,clause_007,특약2,위험,책임 면제,labels.md
+contract_03_lease_normal.txt,clause_001,제1조(목적),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_03_lease_normal.txt,clause_002,제2조(임대차 기간),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_03_lease_normal.txt,clause_003,제3조(보증금 및 차임),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_03_lease_normal.txt,clause_004,제4조(보증금의 반환),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_03_lease_normal.txt,clause_005,제5조(계약의 해지),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_03_lease_normal.txt,clause_006,제6조(수선의무),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_03_lease_normal.txt,clause_007,제7조(원상회복),안전,,정상 대조군 - labels.md (전 조항 안전)
+contract_04_gym_membership.txt,clause_001,제1조(목적),안전,,정의 조항 (labels.md 미기재 = 안전)
+contract_04_gym_membership.txt,clause_002,제2조(이용 기간 및 요금),안전,,labels.md 미기재 = 안전
+contract_04_gym_membership.txt,clause_003,제3조(중도 해지),위험,과도한 위약금,labels.md
+contract_04_gym_membership.txt,clause_004,제4조(시설 이용),위험,일방적 계약 해지(유사),labels.md
+contract_04_gym_membership.txt,clause_005,제5조(휴회),안전,,labels.md 미기재 = 안전
+contract_04_gym_membership.txt,clause_006,특약1,위험,책임 면제,labels.md
+contract_04_gym_membership.txt,clause_007,특약2,위험,일방적 계약 해지,labels.md
+contract_05_molit_standard.txt,clause_001,제1조(보증금과 차임),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_002,제2조(임대차기간),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_003,제3조(입주 전 수리),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_004,제4조(임차주택의 사용·관리·수선),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_005,제5조(계약의 해제),안전,,정상 대조군(정부 공식 양식) - labels.md, 민법 제565조 해약금 표준조항
+contract_05_molit_standard.txt,clause_006,제6조(채무불이행과 손해배상),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_007,제7조(계약의 해지),안전,,정상 대조군(정부 공식 양식) - labels.md, 2기 연체 시 해지 표준조항
+contract_05_molit_standard.txt,clause_008,제8조(갱신요구와 거절),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_009,제9조(계약의 종료),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_010,제10조(비용의 정산),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_011,제11조(분쟁의 해결),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_012,제12조(중개보수 등),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_013,제13조(중개대상물확인설명서 교부),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_014,특약(분쟁 관련 유의사항),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_015,특약(철거·재건축 계획),안전,,정상 대조군(정부 공식 양식) - labels.md
+contract_05_molit_standard.txt,clause_016,특약(상세주소 신청 안내),안전,,정상 대조군(정부 공식 양식) - labels.md
+normal_deposit_terms.txt,clause_001,제1조(적용범위),안전,,공정위 표준약관 제10012호 - 전 조항 안전 (real_labels.md)
+normal_deposit_terms.txt,clause_002,제2조(실명거래),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_003,제3조(거래장소),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_004,제4조(거래방법),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_005,제5조(인감·비밀번호 신고),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_006,제6조(입금),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_007,제7조(예금이 되는 시기),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_008,제8조(증권의 부도),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_009,제9조(이자),안전,,공정위 표준약관 제10012호 - 원문 제9조의2 포함 (Parser가 제9조에 병합, real_labels.md 기재된 알려진 한계)
+normal_deposit_terms.txt,clause_010,제10조(지급·해지청구),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_011,제11조(지급시기),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_012,제12조(양도 및 질권설정),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_013,제13조(사고·변경사항의 신고),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_014,제14조(통장·카드 재발급),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_015,제15조(통지방법 및 효력),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_016,제16조(면책),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_017,제17조(수수료),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_018,제18조(오류처리 등),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_019,제19조(예금의 비밀보장),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_020,제20조(약관의 변경),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_021,제21조(약관적용의 순서),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_022,제22조(기타),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_023,제23조(이의제기),안전,,공정위 표준약관 제10012호
+normal_deposit_terms.txt,clause_024,제24조(위법계약의 해지),안전,,공정위 표준약관 제10012호

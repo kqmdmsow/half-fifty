@@ -11,7 +11,7 @@ from src.nodes.analysis import analysis_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
 from src.nodes.persona import persona_node
-from src.state import JUDGE_THRESHOLD, MAX_RETRIES, PipelineState
+from src.state import JUDGE_THRESHOLD, MAX_RETRIES, PipelineState, judge_score_avg
 
 
 def _increment_retry(state: PipelineState) -> dict:
@@ -28,8 +28,7 @@ def _route_after_judge(state: PipelineState) -> str:
     - 미달 & 재시도 여유 있음 -> analysis 재실행
     - 미달 & 재시도 소진     -> needs_review 플래그 세우고 종료
     """
-    scores = state["judge_scores"]
-    avg = sum(scores.values()) / len(scores)
+    avg = judge_score_avg(state["judge_scores"])
 
     if avg >= JUDGE_THRESHOLD:
         print(f"[Judge] 평균 {avg:.2f}점 >= {JUDGE_THRESHOLD}점 -> 통과")

@@ -55,8 +55,9 @@ uvicorn main:app --reload --port 8000
 cp .env.example .env   # 실제 키 입력. .env는 깃에 올라가지 않음
 ```
 
-`.env`에 `ANTHROPIC_API_KEY` 외에 `MODEL_WORKER`, `MODEL_JUDGE`를 지정할 수
-있다 (미지정 시 각각 `claude-haiku-4-5`, `claude-sonnet-4-6` 기본값 사용).
+`.env`에 `GOOGLE_API_KEY`(Google AI Studio에서 무료 발급) 외에 `MODEL_WORKER`,
+`MODEL_JUDGE`를 지정할 수 있다 (미지정 시 각각 `gemini-2.0-flash`,
+`gemini-2.5-flash` 기본값 사용, 둘 다 무료 티어).
 
 ## 재생성 루프
 
