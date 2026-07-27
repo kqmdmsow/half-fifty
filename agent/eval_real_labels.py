@@ -25,7 +25,7 @@ from pathlib import Path
 from src.nodes.analysis import _analyze_clause
 
 LABELS_PATH = Path(__file__).parent.parent / "data" / "real_clause_labels.csv"
-OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_real_labels.md"
+OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_real_labels_claude.md"
 
 
 def _load_labels() -> list:
@@ -82,6 +82,8 @@ def render_report(results: list) -> str:
     test_results = [r for r in results if r["row"]["split"] == "test"]
     train_results = [r for r in results if r["row"]["split"] == "train"]
     val_results = [r for r in results if r["row"]["split"] == "val"]
+    # label_grade: A=정부/법원 판정(hldcc/lbox), C=AI Hub 자체판단. Test 내에서만 분리.
+    test_a_results = [r for r in test_results if r["row"].get("label_grade") == "A"]
 
     risk_type_confusion = defaultdict(Counter)  # gold_risk_type -> Counter(pred_risk_type), test만
     mismatches = []
@@ -91,6 +93,10 @@ def render_report(results: list) -> str:
         gold_type = r["row"]["gold_risk_type"]
         pred_level = r["prediction"]["risk_level"]
         pred_type = r["prediction"]["risk_type"]
+        # 방어 처리: risk_type이 TypedDict라 런타임 검증이 없어, LLM이 간혹 문자열
+        # 대신 리스트를 반환한다(예: 다중 위험유형). 집계용으로만 문자열화한다.
+        if not isinstance(pred_type, str):
+            pred_type = ", ".join(pred_type) if isinstance(pred_type, (list, tuple)) else str(pred_type)
         gold_risk = gold_level != "안전"
         pred_risk = pred_level != "안전"
 
@@ -101,6 +107,7 @@ def render_report(results: list) -> str:
             mismatches.append((r, gold_level, gold_type, pred_level, pred_type))
 
     test_c = _confusion(test_results)
+    test_a_c = _confusion(test_a_results)
 
     lines = [
         "# 실물 조항 정답지(real_clause_labels.csv) 평가 결과",
@@ -119,7 +126,11 @@ def render_report(results: list) -> str:
         "",
         "| 구분 | TP | FP | FN | TN | Precision | Recall | Accuracy |",
         "|---|---|---|---|---|---|---|---|",
-        _confusion_row("test", test_c),
+        _confusion_row("test 전체 (40건)", test_c),
+        _confusion_row("test A등급만 (27건, 정부·법원 판정)", test_a_c),
+        "",
+        "A등급은 hldcc·LBox(정부/법원 판정), C등급은 AI Hub(자체 판단) 출처다. "
+        "\"정부 판정 기반이라 신뢰도 높다\"는 주장을 인용할 땐 A등급만 뗀 수치를 써야 한다.",
         "",
         "## 참고: Train/Val 서브셋 (튜닝 이력 있음, 공식 수치 아님)",
         "",
