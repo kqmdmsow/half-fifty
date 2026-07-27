@@ -14,10 +14,12 @@ baseline.txt에 동일하게 넣어 "판단 기준 차이"가 아니라 "파이�
 비교되도록 한다. contract_05의 위험/주의 판정 조항 상세는
 docs/eval_baseline_contract05_detail.md로 별도 저장한다.
 
-주의: 여기서 말하는 "리콜"은 조항 단위로 정확히 같은 조항인지까지 대조하는
-것이 아니라, risk_level != "안전"으로 판정된 조항 개수를 정답 위험 건수와
-비교하는 건수 기준 근사치다. 조항 단위 정답 매칭으로 정교화하는 건 이번
-범위 밖이다.
+주의: 메인 표의 "리콜"은 조항 단위로 정확히 같은 조항인지까지 대조하는 것이
+아니라, risk_level != "안전"으로 판정된 조항 개수를 정답 위험 건수와 비교하는
+건수 기준 근사치다(하위 호환용으로 유지). data/clause_level_labels.csv가
+커버하는 문서(현재 5건 전부)는 clause_id 단위로 정확히 매칭한 정밀
+recall/precision을 별도 표(render_clause_precision_markdown)로 함께 낸다 —
+parser.split_clauses()가 만드는 clause_id(clause_NNN)가 결정적이라는 전제.
 
 사용법:
     cd agent
@@ -25,20 +27,25 @@ docs/eval_baseline_contract05_detail.md로 별도 저장한다.
     python eval.py
 """
 
+import csv
 import time
+from collections import defaultdict
 from pathlib import Path
 from typing import Callable
 
 from src.baseline import run_baseline
 from src.graph import run_pipeline
 from src.llm import get_token_usage, reset_token_usage
-from src.state import PipelineState
+from src.nodes.analysis import STRUCTURAL_RISK_CLAUSE_ID
+from src.state import PipelineState, judge_score_avg
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_results_v2.md"
 COMPARISON_OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_baseline_vs_ours.md"
 DETAIL_FILENAME = "contract_05_molit_standard.txt"
 DETAIL_OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_baseline_contract05_detail.md"
+CLAUSE_LABELS_PATH = Path(__file__).parent.parent / "data" / "clause_level_labels.csv"
+CLAUSE_PRECISION_OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_clause_precision.md"
 
 # data/labels.md 기준 문서별 기대 위험 조항 수
 EXPECTED_RISK_COUNTS = {
@@ -52,6 +59,45 @@ EXPECTED_RISK_COUNTS = {
 Runner = Callable[..., PipelineState]
 
 
+def _load_clause_labels() -> dict:
+    """data/clause_level_labels.csv -> {document: {clause_id: "위험"|"안전"}}."""
+    labels: dict = defaultdict(dict)
+    with open(CLAUSE_LABELS_PATH, encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            labels[row["document"]][row["clause_id"]] = row["label"]
+    return dict(labels)
+
+
+CLAUSE_LABELS = _load_clause_labels()
+
+
+def _clause_precision_recall(filename: str, adapted_results: list) -> dict | None:
+    """clause_level_labels.csv에 있는 문서만 조항 단위 TP/FP/FN/정밀도/리콜 계산."""
+    labels = CLAUSE_LABELS.get(filename)
+    if not labels:
+        return None
+
+    tp = fp = fn = tn = 0
+    for r in adapted_results:
+        gold = labels.get(r["clause_id"])
+        if gold is None:
+            continue  # 라벨 없는 조항(파서 결과가 골든셋 작성 시점과 달라진 경우)은 집계에서 제외
+        predicted_risk = r["risk_level"] != "안전"
+        gold_risk = gold == "위험"
+        if gold_risk and predicted_risk:
+            tp += 1
+        elif gold_risk and not predicted_risk:
+            fn += 1
+        elif not gold_risk and predicted_risk:
+            fp += 1
+        else:
+            tn += 1
+
+    precision = tp / (tp + fp) if (tp + fp) else None
+    recall = tp / (tp + fn) if (tp + fn) else None
+    return {"tp": tp, "fp": fp, "fn": fn, "tn": tn, "precision": precision, "recall": recall}
+
+
 def _measure(runner: Runner, filename: str, expected_risk: int) -> dict:
     text = (DATA_DIR / filename).read_text(encoding="utf-8")
 
@@ -61,7 +107,10 @@ def _measure(runner: Runner, filename: str, expected_risk: int) -> dict:
     elapsed = time.perf_counter() - start
     tokens = get_token_usage()
 
-    found_risk = sum(1 for r in result["adapted_results"] if r["risk_level"] != "안전")
+    # STRUCTURAL_RISK_CLAUSE_ID(구조적 위험 체크리스트)는 조항 판정이 아니라 항상
+    # 고정 추가되는 안내문이라 리콜/오탐 집계에서 제외한다 (docs/jeonse_fraud_causes_research.md).
+    scored_results = [r for r in result["adapted_results"] if r["clause_id"] != STRUCTURAL_RISK_CLAUSE_ID]
+    found_risk = sum(1 for r in scored_results if r["risk_level"] != "안전")
 
     if expected_risk == 0:
         recall_display = "-"
@@ -70,7 +119,7 @@ def _measure(runner: Runner, filename: str, expected_risk: int) -> dict:
         recall_display = f"{min(found_risk, expected_risk)}/{expected_risk}"
         false_positive = max(found_risk - expected_risk, 0)
 
-    judge_avg = sum(result["judge_scores"].values()) / len(result["judge_scores"])
+    judge_avg = judge_score_avg(result["judge_scores"])
 
     return {
         "file": filename,
@@ -85,6 +134,7 @@ def _measure(runner: Runner, filename: str, expected_risk: int) -> dict:
         "retry_count": result["retry_count"],
         "needs_review": result["needs_review"],
         "adapted_results": result["adapted_results"],
+        "clause_precision_recall": _clause_precision_recall(filename, result["adapted_results"]),
     }
 
 
@@ -125,6 +175,45 @@ def render_markdown(rows: list) -> str:
         "",
         "리콜은 조항 단위 정답 매칭이 아니라 문서별 위험 판정 건수 대 정답 건수의 "
         "근사치다 (자세한 내용은 eval.py 상단 주석 참고).",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def render_clause_precision_markdown(rows: list) -> str:
+    """clause_level_labels.csv 기반 조항 단위 정밀 recall/precision 표."""
+    lines = [
+        "# 조항 단위 정밀 recall/precision",
+        "",
+        "`data/clause_level_labels.csv`(66개 라벨)와 `parser.split_clauses()`의 "
+        "clause_id를 직접 매칭한 결과. 문서 단위 근사치(`eval_results_v2.md`)와 달리 "
+        "TP/FP/FN을 조항 단위로 정확히 센다.",
+        "",
+        "| 문서 | TP | FP | FN | TN | Precision | Recall |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    total_tp = total_fp = total_fn = total_tn = 0
+    for r in rows:
+        cpr = r.get("clause_precision_recall")
+        if cpr is None:
+            continue
+        total_tp += cpr["tp"]
+        total_fp += cpr["fp"]
+        total_fn += cpr["fn"]
+        total_tn += cpr["tn"]
+        p = f"{cpr['precision']:.2f}" if cpr["precision"] is not None else "-"
+        r_ = f"{cpr['recall']:.2f}" if cpr["recall"] is not None else "-"
+        lines.append(
+            f"| {r['file']} | {cpr['tp']} | {cpr['fp']} | {cpr['fn']} | {cpr['tn']} | {p} | {r_} |"
+        )
+
+    overall_p = total_tp / (total_tp + total_fp) if (total_tp + total_fp) else None
+    overall_r = total_tp / (total_tp + total_fn) if (total_tp + total_fn) else None
+    lines += [
+        "",
+        f"**전체 합계**: TP={total_tp} FP={total_fp} FN={total_fn} TN={total_tn} | "
+        f"Precision={overall_p:.2f} Recall={overall_r:.2f}"
+        if overall_p is not None and overall_r is not None
+        else "**전체 합계**: 라벨된 위험/안전 조항이 없어 계산 불가",
     ]
     return "\n".join(lines) + "\n"
 
@@ -172,7 +261,10 @@ def render_comparison_markdown(ours_rows: list, baseline_rows: list) -> str:
 
 def _risky_clause_lines(rows: list) -> list:
     lines = []
-    risky = [r for r in rows if r["risk_level"] != "안전"]
+    risky = [
+        r for r in rows
+        if r["risk_level"] != "안전" and r["clause_id"] != STRUCTURAL_RISK_CLAUSE_ID
+    ]
     if not risky:
         lines.append("(위험/주의로 판정된 조항 없음)")
         return lines
@@ -207,6 +299,11 @@ def main() -> None:
     OUT_PATH.write_text(markdown, encoding="utf-8")
     print(markdown)
     print(f"저장 완료: {OUT_PATH}")
+
+    clause_precision_markdown = render_clause_precision_markdown(ours_rows)
+    CLAUSE_PRECISION_OUT_PATH.write_text(clause_precision_markdown, encoding="utf-8")
+    print(clause_precision_markdown)
+    print(f"저장 완료: {CLAUSE_PRECISION_OUT_PATH}")
 
     baseline_rows = [
         evaluate_file_baseline(f, expected) for f, expected in EXPECTED_RISK_COUNTS.items()

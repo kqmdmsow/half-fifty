@@ -1,0 +1,18 @@
+금 전 차 용 계 약 서
+제1조(당사자)
+채권자 ○○○(이하 "갑"이라고 함.)는 20○○년 ○월 ○일 금○○ ○원을 채무자◎◎◎(이하 "을"이라고 함.)에게 대여하고 을은 이를 차용한다.
+제2조(변제기)
+차용금의 변제기한은 20○○년 ○월 ○일로 한다.
+제3조(이자 및 지연손해금)
+① 이자는 연 ○%의 비율로 한다.
+② 원리금의 변제를 지체했을 때에는 을은 연 ○○%의 비율에 의한 지연손해금을 가산해서 지불해야 한다.
+제4조(변제방법)
+채무의 변제는 갑의 주소 또는 갑이 지정하는 지정장소에 지참 또는 송금해서 지불한다.
+제5조(기한이익의상실)
+을이 다음 각호의 1에 해당하는 경우에 있어서는 갑으로부터 기한의 이익을 상실하고 채무전부를 즉시 변제하여야 한다.
+1. 본 건 이자의 지불을 ○개월 분 이상 지체했을 때
+2. 다른 채무 때문에 강제집행, 집행보전처분을 받거나, 파산 또는 경매의 신청이 있었을 때
+3. 을이 주소를 변경하고, 그 사실을 갑에게 고지하지 않았을 때
+갑과 을은 상기 계약을 증명하기 위하여 본 계약서 2통을 작성하고, 각자 서명 날인한 후 1통씩을 보관한다.
+20○○년 ○월 ○일
+<table><tbody><tr><td rowspan="2">채<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;권<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;자</td><td>주 소</td><td colspan="5">　&nbsp;&nbsp;&nbsp;&nbsp;</td></tr><tr><td>성 명</td><td>인</td><td>주민등록번호</td><td>_</td><td>전&nbsp;&nbsp;&nbsp;화<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;번 호</td><td>　</td></tr><tr><td rowspan="2">채<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;무<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;자</td><td>주 소</td><td colspan="5">　&nbsp;&nbsp;&nbsp;&nbsp;</td></tr><tr><td>성 명</td><td>인</td><td>주민등록번호</td><td>_</td><td>전&nbsp;&nbsp;&nbsp;화<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;번 호</td><td>　</td></tr></tbody></table>
