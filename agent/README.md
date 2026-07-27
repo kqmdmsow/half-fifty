@@ -55,9 +55,13 @@ uvicorn main:app --reload --port 8000
 cp .env.example .env   # 실제 키 입력. .env는 깃에 올라가지 않음
 ```
 
-`.env`에 `GOOGLE_API_KEY`(Google AI Studio에서 무료 발급) 외에 `MODEL_WORKER`,
-`MODEL_JUDGE`를 지정할 수 있다 (미지정 시 각각 `gemini-2.0-flash`,
-`gemini-2.5-flash` 기본값 사용, 둘 다 무료 티어).
+`.env`에 `ANTHROPIC_API_KEY` 외에 `MODEL_WORKER`, `MODEL_JUDGE`를 지정할 수
+있다 (미지정 시 각각 `claude-haiku-4-5`, `claude-sonnet-4-6` 기본값 사용).
+
+(2026-07 한때 비용 절감을 위해 Gemini 무료 티어로 전환을 시도했으나, 팀 리뷰
+결과 Claude로 복원했다 — 무료 티어 모델명이 자주 바뀌고 일일 호출 한도가 낮아
+실험 재현성에 부담이 됐다. `docs/eval_real_labels.md` 등 일부 결과 문서는
+그 실험 당시 Gemini flash-lite 기준으로 측정된 기록이니 인용 시 유의.)
 
 ## 재생성 루프
 
