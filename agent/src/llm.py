@@ -1,10 +1,6 @@
 """LLM 클라이언트 생성 및 JSON 응답 파싱 공통 유틸.
 
 Analysis/Persona/Judge 세 노드가 이 모듈을 통해서만 LLM을 호출한다.
-
-2026-07-26: 비용 절감을 위해 Claude(Anthropic)에서 Gemini 무료 티어(Google AI
-Studio)로 전환. GOOGLE_API_KEY만 있으면 과금 없이 실행 가능 — 무료 티어 호출량
-한도는 https://ai.google.dev/gemini-api/docs/rate-limits 참고.
 """
 
 import json
@@ -12,12 +8,12 @@ import os
 from functools import lru_cache
 
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_anthropic import ChatAnthropic
 
 load_dotenv()
 
-DEFAULT_MODEL_WORKER = "gemini-2.0-flash"
-DEFAULT_MODEL_JUDGE = "gemini-2.5-flash"
+DEFAULT_MODEL_WORKER = "claude-haiku-4-5"
+DEFAULT_MODEL_JUDGE = "claude-sonnet-4-6"
 
 # 파이프라인 1회 실행 단위의 대략적 토큰 사용량 누적 (eval.py 등에서 사용).
 _token_usage = {"input_tokens": 0, "output_tokens": 0}
@@ -35,20 +31,20 @@ def get_token_usage() -> dict:
 
 
 @lru_cache(maxsize=None)
-def get_worker_llm() -> ChatGoogleGenerativeAI:
-    """Analysis/Persona 등 생성 작업용 LLM (.env의 MODEL_WORKER, 기본 Gemini Flash)."""
+def get_worker_llm() -> ChatAnthropic:
+    """Analysis/Persona 등 생성 작업용 LLM (.env의 MODEL_WORKER, 기본 Haiku)."""
     model = os.getenv("MODEL_WORKER", DEFAULT_MODEL_WORKER)
-    return ChatGoogleGenerativeAI(model=model, temperature=0)
+    return ChatAnthropic(model=model, temperature=0)
 
 
 @lru_cache(maxsize=None)
-def get_judge_llm() -> ChatGoogleGenerativeAI:
-    """Judge 채점용 LLM (.env의 MODEL_JUDGE, 기본 Gemini Flash)."""
+def get_judge_llm() -> ChatAnthropic:
+    """Judge 채점용 LLM (.env의 MODEL_JUDGE, 기본 Sonnet)."""
     model = os.getenv("MODEL_JUDGE", DEFAULT_MODEL_JUDGE)
-    return ChatGoogleGenerativeAI(model=model, temperature=0)
+    return ChatAnthropic(model=model, temperature=0)
 
 
-def invoke_json(llm: ChatGoogleGenerativeAI, prompt: str) -> dict:
+def invoke_json(llm: ChatAnthropic, prompt: str) -> dict:
     """LLM을 호출하고 응답 텍스트를 JSON 객체로 파싱해 반환한다."""
     response = llm.invoke(prompt)
 

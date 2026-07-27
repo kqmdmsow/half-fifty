@@ -8,9 +8,14 @@ JSON 파싱 실패 시 1회 재시도하고, 그래도 실패하면 "주의" + �
 docs/jeonse_fraud_causes_research.md 리서치 결론(전세사기의 대부분은 계약서 조항이
 아니라 임대인 재무상태·시세조작·이중계약 등 계약서 밖 구조적 요인에서 발생)에 따라,
 조항 분석과 별개로 항상 노출되는 구조적 위험 체크리스트(_STRUCTURAL_RISK_CHECKLIST)를
-결과 목록 끝에 고정 추가한다. LLM 호출 없이 결정적으로 생성되며, 조항 원문에 대응하지
-않는 항목이라 eval.py의 clause_level_labels.csv 매칭에서는 자동으로 제외된다(라벨이
-없는 clause_id는 집계에서 건너뜀).
+결과 목록 끝에 고정 추가하는 기능을 준비해뒀다. LLM 호출 없이 결정적으로 생성되며,
+조항 원문에 대응하지 않는 항목이라 eval.py의 clause_level_labels.csv 매칭에서는
+자동으로 제외되게 설계돼 있다(라벨이 없는 clause_id는 집계에서 건너뜀).
+
+2026-07 팀 리뷰 결정: 모든 계약서에 도메인 무관하게 고정 부착되는 현재 방식은 이번
+PR에서는 비활성화한다(_ENABLE_STRUCTURAL_CHECKLIST=False). 노출 위치·조건(예: 임대차
+계약에서만 노출할지)에 대한 설계는 다음 PR에서 다룬다. 코드는 지우지 않고 그대로
+남겨 다음 작업에서 이어갈 수 있게 한다.
 """
 
 from pathlib import Path
@@ -26,6 +31,10 @@ _PARSE_ATTEMPTS = 2  # 최초 시도 + 재시도 1회
 _FALLBACK_EVIDENCE = "분석 실패 (수동 확인 필요)"
 
 STRUCTURAL_RISK_CLAUSE_ID = "checklist_structural_risk"
+
+# 2026-07 팀 리뷰: 도메인 무관 고정 부착 방식은 이번 PR에서는 비활성화.
+# 노출 위치/조건 설계는 다음 PR 과제 (코드는 유지).
+_ENABLE_STRUCTURAL_CHECKLIST = False
 
 _STRUCTURAL_RISK_CHECKLIST = AnalysisResult(
     clause_id=STRUCTURAL_RISK_CLAUSE_ID,
@@ -84,5 +93,6 @@ def analysis_node(state: PipelineState) -> dict:
     results: List[AnalysisResult] = [
         _analyze_clause(c["clause_id"], c["text"]) for c in state["clauses"]
     ]
-    results.append(_STRUCTURAL_RISK_CHECKLIST)
+    if _ENABLE_STRUCTURAL_CHECKLIST:
+        results.append(_STRUCTURAL_RISK_CHECKLIST)
     return {"analysis_results": results}

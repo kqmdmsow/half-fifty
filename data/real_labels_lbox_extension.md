@@ -1,6 +1,6 @@
 # LBox Open 판례 기반 조항 단위 정답지 (real_labels 확장 2)
 
-> `data/real_labels.md`(공정위·금융분쟁조정위 4건), `data/real_labels_hldcc_extension.md`(대한법률구조공단 12건)와
+> `data/real_labels.md`(공정위·금융분쟁조정위 4건), `data/real_labels_hldcc_extension.md`(대한법률구조공단 14건)와
 > 별개로, **LBox Open 판례 코퍼스**(`data/raw/sources_research/lbox_open/`, 3,247건 필터링)에서 실제
 > 계약서/특약 원문이 그대로 인용된 사건을 추출·분석한 정답지.
 >
