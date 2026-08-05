@@ -592,34 +592,6 @@
     }
   },
   {
-    "id": "lbox_2488",
-    "source": "data/real_clause_labels.csv (case_id=2488, source=lbox_2488)",
-    "gold_risk_level": "위험",
-    "gold_risk_type": "신탁관계·소유권 불안정 고지",
-    "clause": {
-      "clause_id": "clause_001",
-      "text": "당사는 상기 부동산담보신탁계약의 수탁자로서 임대차보증금 반환책임 및 임대부동산의 수선의무 등에 대하여 당사는 이에 대하여 일체의 책임이 없으며"
-    },
-    "correct_output": {
-      "clause_id": "clause_001",
-      "explanation": "이 조항은 신탁관계·소유권 불안정 고지 문제가 있는 것으로 판단됩니다. 신탁물건 임대차 — 소유권 구조 불안정으로 구조적 위험 신호(전세사기 핵심 패턴)",
-      "risk_level": "위험",
-      "risk_type": "신탁관계·소유권 불안정 고지",
-      "risk_evidence": "신탁물건 임대차 — 소유권 구조 불안정으로 구조적 위험 신호(전세사기 핵심 패턴)",
-      "check_questions": [
-        "이 조항이 실제로 적용될 경우 어떤 불이익이 있는지 상대방에게 명확히 확인하세요."
-      ]
-    },
-    "wrong_output": {
-      "clause_id": "clause_001",
-      "explanation": "통상적이고 문제없는 조항입니다.",
-      "risk_level": "안전",
-      "risk_type": "해당 없음",
-      "risk_evidence": "일반적인 계약 조항으로 보임",
-      "check_questions": []
-    }
-  },
-  {
     "id": "lbox_62108",
     "source": "data/real_clause_labels.csv (case_id=62108, source=lbox_62108)",
     "gold_risk_level": "안전",
