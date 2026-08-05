@@ -2,6 +2,14 @@
 
 `data/real_clause_labels.csv`(정부/법원 판정 기반 44건 — hldcc·LBox·AI Hub 자연발생 템플릿)에 대해 `analysis._analyze_clause()`를 직접 호출한 결과. Parser/Persona/Judge 없이 Analysis 로직만 단독 평가.
 
+> **⚠️ [실행 시 이 문서가 덮어써짐 — 2026-08-05 발견]** `eval_real_labels.py`의
+> `OUT_PATH`가 이 파일로 하드코딩되어 있어, 스크립트를 실행하면 **아래 베이스라인
+> 기록이 통째로 새 결과로 교체된다.** 2026-08-05 PR#18 재실행 때 실제로 덮어써져서
+> `git checkout`으로 복원했다. 재실행할 일이 있으면 실행 전에 `OUT_PATH`를 별도
+> 파일(예: `eval_real_labels_claude_<날짜또는PR>.md`)로 바꾸거나, 실행 후 이 파일을
+> 복원하고 결과를 새 문서로 옮길 것. (근본 해결: OUT_PATH에 날짜/브랜치를 붙여
+> 자동으로 새 파일에 쓰도록 스크립트 수정 — 별도 PR 과제)
+
 > **[2026-07-27 Claude 복원 후 첫 공식 베이스라인]** Claude 기준(worker
 > `claude-haiku-4-5` / judge는 이 스크립트에서 미사용), 프롬프트·임계값 튜닝 없이
 > **1회 실행**한 결과다. `docs/eval_real_labels.md`(Gemini `gemini-flash-lite-latest`
