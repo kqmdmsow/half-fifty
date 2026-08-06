@@ -21,3 +21,9 @@ dist/
 .idea/
 .vscode/
 .DS_Store
+
+# 데이터 수집 스프린트 원자료 (용량 문제로 gitignore)
+data/raw/sources_research/hldcc_casebooks/*.pdf
+data/raw/sources_research/hldcc_casebooks/*.txt
+data/raw/sources_research/hldcc_board_new_cases.txt
+data/raw/sources_research/fss_mediation/
