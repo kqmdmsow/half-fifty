@@ -30,8 +30,13 @@ def compare(
     persona: str,
     output_a: list[AnalysisResult],
     output_b: list[AnalysisResult],
+    llm=None,
 ) -> dict[str, PairwiseVerdict]:
-    """A/B 위치는 호출자가 미리 정한 그대로 판단한다 (위치 편향 통제는 compare_debiased 사용)."""
+    """A/B 위치는 호출자가 미리 정한 그대로 판단한다 (위치 편향 통제는 compare_debiased 사용).
+
+    llm을 넘기면 기본 judge(MODEL_JUDGE) 대신 그 클라이언트로 판단한다 — 판사 패밀리 간
+    교차검증(self-preference bias 통제, eval_pairwise.py --judge gemini)용.
+    """
     clauses_text = "\n".join(f"[{c['clause_id']}] {c['text']}" for c in original_clauses)
     a_text = json.dumps(output_a, ensure_ascii=False, indent=2)
     b_text = json.dumps(output_b, ensure_ascii=False, indent=2)
@@ -43,7 +48,7 @@ def compare(
         .replace("{output_b}", b_text)
     )
 
-    data = invoke_json(get_judge_llm(), prompt)
+    data = invoke_json(llm if llm is not None else get_judge_llm(), prompt)
     return {
         aspect: PairwiseVerdict(winner=data[aspect]["winner"], rationale=data[aspect]["rationale"])
         for aspect in _ASPECTS
@@ -55,6 +60,7 @@ def compare_debiased(
     persona: str,
     output_a: list[AnalysisResult],
     output_b: list[AnalysisResult],
+    llm=None,
 ) -> dict:
     """같은 쌍을 A/B 위치를 뒤집어 2회 호출 -> 위치 편향(position bias) 여부를 확인하고
     최종 승자를 결정한다. 정방향/역방향 판단이 일치하면 그 결과를 채택하고,
@@ -62,8 +68,8 @@ def compare_debiased(
 
     반환값의 "final"이 11.5절 지표(선호 일치율, Cohen's kappa) 계산에 쓰인다.
     """
-    forward = compare(original_clauses, persona, output_a, output_b)
-    backward_raw = compare(original_clauses, persona, output_b, output_a)
+    forward = compare(original_clauses, persona, output_a, output_b, llm=llm)
+    backward_raw = compare(original_clauses, persona, output_b, output_a, llm=llm)
 
     flip = {"A": "B", "B": "A", "tie": "tie"}
     backward = {

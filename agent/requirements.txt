@@ -8,3 +8,6 @@ pydantic>=2.8
 pytest>=8.0
 pdfplumber>=0.11
 python-multipart>=0.0.9
+
+# eval_pairwise.py --judge {solar,nim}용 (OpenAI 호환 엔드포인트, 평가 전용)
+langchain-openai>=0.2

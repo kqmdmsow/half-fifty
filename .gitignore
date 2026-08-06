@@ -27,3 +27,6 @@ data/raw/sources_research/hldcc_casebooks/*.pdf
 data/raw/sources_research/hldcc_casebooks/*.txt
 data/raw/sources_research/hldcc_board_new_cases.txt
 data/raw/sources_research/fss_mediation/
+
+# pairwise judge 재실행 체크포인트 (중단 안전용, 로컬 재현 상태)
+docs/eval_pairwise_anchor_*_checkpoint.jsonl
