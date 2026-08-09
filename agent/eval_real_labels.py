@@ -24,17 +24,38 @@ from pathlib import Path
 
 from src.nodes.analysis import _analyze_clause
 
+# EVAL_WORKER=solar — 크레딧 소진 시 무료 워커로 대체 실행 (평가 전용 주입).
+# 주의: _analyze_clause 폴백이 오류를 은폐하므로, 실행 후 출력에서
+# "분석 실패" 라인이 0건임을 반드시 확인할 것.
+import os
+if os.getenv("EVAL_WORKER") == "solar":
+    from langchain_openai import ChatOpenAI
+
+    import src.nodes.analysis as _an
+
+    _an.get_worker_llm = lambda: ChatOpenAI(
+        model=os.getenv("MODEL_WORKER_SOLAR", "solar-pro3"), temperature=0,
+        base_url="https://api.upstage.ai/v1",
+        api_key=os.getenv("UPSTAGE_API_KEY"), max_retries=0)
+
+
 LABELS_PATH = Path(__file__).parent.parent / "data" / "real_clause_labels.csv"
 # 기본 출력은 베이스라인 문서 — 덮어쓰기 사고 방지를 위해 인자로 출력 파일명을 받는다.
 # 사용: python eval_real_labels.py [출력파일명.md]  (재실행 시 반드시 새 파일명 지정)
 import sys
 _out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_real_labels_claude.md"
 OUT_PATH = Path(__file__).parent.parent / "docs" / _out_name
+# 선택 인자 2: 실행할 split 목록(쉼표 구분, 예: "train,val").
+# 오염 방지 — 프롬프트 튜닝 중에는 test를 돌리지 않기 위한 필터. 기본은 전체.
+_splits = set(sys.argv[2].split(",")) if len(sys.argv) > 2 else None
 
 
 def _load_labels() -> list:
     with open(LABELS_PATH, encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+        rows = list(csv.DictReader(f))
+    if _splits:
+        rows = [r for r in rows if r["split"] in _splits]
+    return rows
 
 
 def run_eval() -> list:
