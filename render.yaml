@@ -1,0 +1,41 @@
+# Render Blueprint — half-fifty 3-tier 배포 (2026 금융 AI Challenge MVP)
+# 배포 순서: agent → backend → frontend (URL을 다음 서비스 env에 주입)
+services:
+  - type: web
+    name: halffifty-agent
+    runtime: docker
+    rootDir: agent
+    plan: starter          # 콜드스타트 방지 (심사 기간 9/7~9/11 상시 접근 필수)
+    healthCheckPath: /health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false        # 대시보드에서 직접 입력
+      - key: MODEL_WORKER
+        value: claude-haiku-4-5
+      - key: MODEL_JUDGE
+        value: claude-sonnet-4-6
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://halffifty.onrender.com
+
+  - type: web
+    name: halffifty-backend
+    runtime: docker
+    rootDir: backend
+    plan: starter
+    envVars:
+      - key: AGENT_BASE_URL
+        value: https://halffifty-agent.onrender.com
+      - key: CORS_ALLOWED_ORIGIN
+        value: https://halffifty.onrender.com
+
+  - type: web
+    name: halffifty
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://halffifty-backend.onrender.com
+      - key: VITE_AGENT_URL
+        value: https://halffifty-agent.onrender.com
