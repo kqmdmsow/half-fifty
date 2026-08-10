@@ -6,16 +6,19 @@
 2. 각 점수의 rationale에는 반드시 [원본 조항]의 어느 clause_id/문장을 근거로 그 점수를
    줬는지 직접 인용하세요. 인용 없이 "전반적으로 괜찮음" 같은 추상적 서술만 쓰지 마세요.
 3. 애매하면 중간값(3점)으로 도피하지 말고, 아래 앵커 예시 중 가장 가까운 점수를 고르세요.
+4. 각 aspect마다 반드시 rationale을 먼저 작성한 뒤, 그 근거에 따라 score를 결정하세요.
+   (점수를 먼저 정해놓고 근거를 끼워맞추지 마세요 — 출력 JSON에서도 rationale 필드가
+   score보다 앞에 옵니다.)
 
 [Rubric — 5점 척도, 앵커 예시 포함]
 {rubric_block}
 
 [출력 JSON 스키마]
 {
-  "clarity": {"score": 1~5, "rationale": "근거 (원문 인용 포함)"},
-  "faithfulness": {"score": 1~5, "rationale": "근거 (원문 인용 포함)"},
-  "risk_coverage": {"score": 1~5, "rationale": "근거 (원문 인용 포함)"},
-  "actionability": {"score": 1~5, "rationale": "근거 (원문 인용 포함)"}
+  "clarity": {"rationale": "근거 (원문 인용 포함)", "score": 1~5},
+  "faithfulness": {"rationale": "근거 (원문 인용 포함)", "score": 1~5},
+  "risk_coverage": {"rationale": "근거 (원문 인용 포함)", "score": 1~5},
+  "actionability": {"rationale": "근거 (원문 인용 포함)", "score": 1~5}
 }
 
 [원본 조항]
