@@ -30,18 +30,26 @@ def get_token_usage() -> dict:
     return dict(_token_usage)
 
 
+# API 응답이 멈춘 채 안 돌아오는 경우(2026-08-05/06 각각 3.5시간/2시간 관측)를
+# 막기 위한 호출당 타임아웃. langchain-anthropic은 max_retries 기본값이 2라
+# timeout과 함께 두면 한 번 멈춰도 최대 REQUEST_TIMEOUT_SEC * 3초 내에
+# 타임아웃 예외로 끝나고, 호출부(analysis.py 등)의 기존 재시도/폴백 로직으로
+# 넘어간다.
+REQUEST_TIMEOUT_SEC = 90
+
+
 @lru_cache(maxsize=None)
 def get_worker_llm() -> ChatAnthropic:
     """Analysis/Persona 등 생성 작업용 LLM (.env의 MODEL_WORKER, 기본 Haiku)."""
     model = os.getenv("MODEL_WORKER", DEFAULT_MODEL_WORKER)
-    return ChatAnthropic(model=model, temperature=0)
+    return ChatAnthropic(model=model, temperature=0, timeout=REQUEST_TIMEOUT_SEC)
 
 
 @lru_cache(maxsize=None)
 def get_judge_llm() -> ChatAnthropic:
     """Judge 채점용 LLM (.env의 MODEL_JUDGE, 기본 Sonnet)."""
     model = os.getenv("MODEL_JUDGE", DEFAULT_MODEL_JUDGE)
-    return ChatAnthropic(model=model, temperature=0)
+    return ChatAnthropic(model=model, temperature=0, timeout=REQUEST_TIMEOUT_SEC)
 
 
 def invoke_json(llm: ChatAnthropic, prompt: str) -> dict:
