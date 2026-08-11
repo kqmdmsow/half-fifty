@@ -51,6 +51,7 @@ class PipelineState(TypedDict):
     persona: Literal["adult", "senior"]
 
     # 각 단계 출력
+    parse_warnings: List[str]  # Parser 추출 경고 (별지 제외, 커버리지 미달 등)
     domain: str             # 문서 유형 (도메인 감지 실패 시 "알 수 없음")
     domain_evidence: str    # 판별 근거 (원문 인용)
     clauses: List[Clause]
