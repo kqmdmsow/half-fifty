@@ -51,6 +51,7 @@ class PipelineState(TypedDict):
     persona: Literal["adult", "senior"]
 
     # 각 단계 출력
+    parse_warnings: List[str]  # Parser 추출 경고 (별지 제외, 커버리지 미달 등)
     clauses: List[Clause]
     analysis_results: List[AnalysisResult]
     adapted_results: List[AnalysisResult]  # 페르소나 적응 후

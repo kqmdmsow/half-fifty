@@ -56,6 +56,7 @@ class ClauseResult(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     clause_count: int
+    parse_warnings: List[str] = []  # 추출 누락 가능성 고지 (자문 §2)
     retry_count: int
     needs_review: bool
     judge_scores: dict
@@ -79,6 +80,7 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
 
     return AnalyzeResponse(
         clause_count=len(state["clauses"]),
+        parse_warnings=state.get("parse_warnings", []),
         retry_count=state["retry_count"],
         needs_review=state["needs_review"],
         judge_scores=dict(state["judge_scores"]),

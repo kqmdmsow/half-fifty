@@ -84,6 +84,7 @@ def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
     initial_state: PipelineState = {
         "raw_text": raw_text,
         "persona": persona,  # type: ignore[typeddict-item]
+        "parse_warnings": [],
         "clauses": [],
         "analysis_results": [],
         "adapted_results": [],
