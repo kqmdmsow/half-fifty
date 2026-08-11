@@ -17,6 +17,8 @@ PDF 업로드(/analyze-pdf)는 프론트에서 직접 호출한다 (CORS 허용)
       -F "file=@contract.pdf" -F "persona=adult"
 """
 
+import os
+
 from typing import List, Literal
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
@@ -31,7 +33,7 @@ app = FastAPI(title="Half-Fifty Agent Service", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
