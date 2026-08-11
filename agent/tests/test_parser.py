@@ -75,3 +75,18 @@ def test_bracketed_header_leaves_no_residual_bracket():
     text = (DATA_DIR / "contract_05_molit_standard.txt").read_text(encoding="utf-8")
     clauses = split_clauses(text)
     assert not any(c["text"].endswith("[") or c["text"].endswith("]") for c in clauses)
+
+
+def test_branch_article_heading_splits():
+    # 중간보고서 버그: "제9조의2" 표제가 앞 조항에 병합되던 문제 (자문 §2)
+    text = "제9조(수리비) 임차인이 부담한다.\n제9조의2(계약갱신 요구) 임차인은 갱신을 요구할 수 있다.\n제10조(반환) 보증금을 반환한다."
+    clauses = split_clauses(text)
+    assert len(clauses) == 3
+    assert clauses[1]["text"].startswith("제9조의2")
+
+
+def test_line_start_article_citation_with_josa_not_split():
+    # "제6조의3에 따라"처럼 조사가 붙은 법령 인용은 줄 시작이어도 표제가 아니다
+    text = "제1조(목적) 본 계약의 목적.\n제6조의3에 따라 갱신 요구권이 인정된다. 이하 내용."
+    clauses = split_clauses(text)
+    assert len(clauses) == 1  # 인용 줄은 제1조에 병합
