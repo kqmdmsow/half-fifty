@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import List
 
 from src.llm import get_worker_llm, invoke_json
+from src.schemas import AnalysisOutput
 from src.state import AnalysisResult, PipelineState
 
 PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "analysis.txt"
@@ -73,16 +74,19 @@ def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
 
     for attempt in range(_PARSE_ATTEMPTS):
         try:
-            data = invoke_json(llm, text + _PROMPT_SUFFIX, cached_prefix=_PROMPT_PREFIX)
+            # Pydantic 검증: 스키마 이탈은 예외 → 재시도. 사소한 이탈(리스트
+            # risk_type, 번호 접두사)은 스키마 정규화가 흡수한다 (src/schemas.py).
+            data = AnalysisOutput.model_validate(
+                invoke_json(llm, text + _PROMPT_SUFFIX, cached_prefix=_PROMPT_PREFIX))
             return AnalysisResult(
                 clause_id=clause_id,
-                explanation=data["explanation"],
-                risk_level=data["risk_level"],
-                risk_type=data["risk_type"],
-                risk_evidence=data["risk_evidence"],
-                check_questions=data["check_questions"],
+                explanation=data.explanation,
+                risk_level=data.risk_level,
+                risk_type=data.risk_type,
+                risk_evidence=data.risk_evidence,
+                check_questions=data.check_questions,
             )
-        except Exception as exc:  # JSON 파싱 실패, 키 누락 등
+        except Exception as exc:  # JSON 파싱 실패, 키 누락, 스키마 검증 실패 등
             if attempt + 1 == _PARSE_ATTEMPTS:
                 print(f"[Analysis] {clause_id} 분석 실패, 폴백 처리: {exc}")
 

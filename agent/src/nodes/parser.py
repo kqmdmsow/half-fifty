@@ -13,10 +13,13 @@ from typing import List
 
 from src.state import Clause, PipelineState
 
-# "제1조", "제 1 조", "제1조(목적)" 등을 줄 시작에서만 잡는다.
-# "제6조의3"처럼 "조" 뒤에 "의N"이 붙는 법령 인용 패턴은 조항 시작으로 취급하지 않는다.
+# "제1조", "제 1 조", "제1조(목적)", "제9조의2(계약갱신)" 등을 줄 시작에서만 잡는다.
+# 실제 계약서는 "제9조의2" 형태의 가지조문 표제를 쓰므로 "조의N"도 조항 시작이다
+# (중간보고서에서 제9조의2가 앞 조항에 병합되던 버그 — 자문 §2 지적 사항).
+# 단, 표제는 뒤에 "("나 공백/개행이 오고, "제6조의3에 따라" 같은 법령 인용은
+# 조사(에/를/과…)가 바로 붙으므로 [\s(] 요구로 구분한다.
 _ARTICLE_PATTERN = re.compile(
-    r"(?=^[ \t]*제\s*\d+\s*조(?!\s*의\s*\d))",
+    r"(?=^[ \t]*제\s*\d+\s*조(?:\s*의\s*\d+)?(?=[\s(]))",
     re.MULTILINE,
 )
 
@@ -36,13 +39,23 @@ _BYULJI_HEADER_PATTERN = re.compile(r"^[ \t]*별지\s*\d+\s*\)?[ \t]*$", re.MULT
 _SIGNATURE_BLOCK_MARKER = "본 계약을 증명하기 위하여"
 
 
-def _truncate_boilerplate(text: str) -> str:
-    """별지 첨부문서, 서명란 등 계약 조항이 아닌 꼬리 텍스트를 잘라낸다."""
+def _truncate_boilerplate(text: str) -> tuple[str, List[str]]:
+    """별지 첨부문서, 서명란 등 계약 조항이 아닌 꼬리 텍스트를 잘라낸다.
+
+    자문 §2("추출 실패나 누락 가능성을 사용자에게 알리는지") 반영: 무엇을
+    제외했는지 경고로 수집해 사용자에게 노출한다 — 조용한 누락 금지.
+    """
     cut_points = []
+    warnings: List[str] = []
 
     byulji_match = _BYULJI_HEADER_PATTERN.search(text)
     if byulji_match:
         cut_points.append(byulji_match.start())
+        warnings.append(
+            "별지(첨부 문서) 이후 내용은 조항 분석에서 제외했습니다. "
+            "별지에 수수료율·특약 등 중요한 내용이 있다면 해당 부분만 "
+            "따로 붙여넣어 다시 분석해 보세요."
+        )
 
     sig_idx = text.find(_SIGNATURE_BLOCK_MARKER)
     if sig_idx != -1:
@@ -51,14 +64,21 @@ def _truncate_boilerplate(text: str) -> str:
     if cut_points:
         text = text[: min(cut_points)]
 
-    return text
+    return text, warnings
 
 
 def split_clauses(raw_text: str) -> List[Clause]:
-    """원문 텍스트 -> 조항 리스트."""
-    text = _truncate_boilerplate(raw_text.strip()).strip()
+    """원문 텍스트 -> 조항 리스트 (하위 호환 래퍼)."""
+    clauses, _ = split_clauses_with_warnings(raw_text)
+    return clauses
+
+
+def split_clauses_with_warnings(raw_text: str) -> tuple[List[Clause], List[str]]:
+    """원문 텍스트 -> (조항 리스트, 추출 경고 리스트)."""
+    text, warnings = _truncate_boilerplate(raw_text.strip())
+    text = text.strip()
     if not text:
-        return []
+        return [], warnings
 
     # 1) 특약사항 앞뒤로 분리 (헤더 자체는 버리고 그 뒤 내용만 취한다)
     special_split = re.split(r"(특약사항|특약\s*사항)", text, maxsplit=1)
@@ -83,13 +103,26 @@ def split_clauses(raw_text: str) -> List[Clause]:
         special_parts = [p.strip() for p in _SPECIAL_ITEM_PATTERN.split(special) if p.strip()]
         chunks.extend(special_parts)
 
-    return [
+    clauses = [
         Clause(clause_id=f"clause_{i + 1:03d}", text=chunk)
         for i, chunk in enumerate(chunks)
     ]
 
+    # 커버리지 점검: 분리된 조항이 (보일러플레이트 제거 후) 본문의 70% 미만이면
+    # 형식 문제로 누락이 의심되는 상황 — 조용히 넘기지 않고 경고한다 (자문 §2).
+    covered = sum(len(c["text"]) for c in clauses)
+    if text and covered / len(text) < 0.7:
+        warnings.append(
+            "문서의 일부가 조항으로 분리되지 않았습니다 (형식이 표준 계약서와 "
+            "다를 수 있습니다). 분석 결과에 빠진 조항이 없는지 원문과 대조해 "
+            "확인하세요."
+        )
+    return clauses, warnings
+
 
 def parser_node(state: PipelineState) -> dict:
-    """LangGraph 노드: raw_text -> clauses."""
-    clauses = split_clauses(state["raw_text"])
-    return {"clauses": clauses}
+    """LangGraph 노드: raw_text -> clauses, parse_warnings."""
+    clauses, warnings = split_clauses_with_warnings(state["raw_text"])
+    if warnings:
+        print(f"[Parser] 추출 경고 {len(warnings)}건: {warnings}")
+    return {"clauses": clauses, "parse_warnings": warnings}

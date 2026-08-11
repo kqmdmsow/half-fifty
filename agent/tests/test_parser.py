@@ -75,3 +75,41 @@ def test_bracketed_header_leaves_no_residual_bracket():
     text = (DATA_DIR / "contract_05_molit_standard.txt").read_text(encoding="utf-8")
     clauses = split_clauses(text)
     assert not any(c["text"].endswith("[") or c["text"].endswith("]") for c in clauses)
+
+
+def test_branch_article_heading_splits():
+    # 중간보고서 버그: "제9조의2" 표제가 앞 조항에 병합되던 문제 (자문 §2)
+    text = "제9조(수리비) 임차인이 부담한다.\n제9조의2(계약갱신 요구) 임차인은 갱신을 요구할 수 있다.\n제10조(반환) 보증금을 반환한다."
+    clauses = split_clauses(text)
+    assert len(clauses) == 3
+    assert clauses[1]["text"].startswith("제9조의2")
+
+
+def test_line_start_article_citation_with_josa_not_split():
+    # "제6조의3에 따라"처럼 조사가 붙은 법령 인용은 줄 시작이어도 표제가 아니다
+    text = "제1조(목적) 본 계약의 목적.\n제6조의3에 따라 갱신 요구권이 인정된다. 이하 내용."
+    clauses = split_clauses(text)
+    assert len(clauses) == 1  # 인용 줄은 제1조에 병합
+
+
+def test_byulji_removal_produces_warning():
+    from src.nodes.parser import split_clauses_with_warnings
+    text = "제1조(목적) 계약의 목적을 정한다.\n별지1)\n첨부 수수료율 표"
+    clauses, warnings = split_clauses_with_warnings(text)
+    assert len(clauses) == 1
+    assert any("별지" in w for w in warnings)
+
+
+def test_normal_document_no_warnings():
+    from src.nodes.parser import split_clauses_with_warnings
+    text = "제1조(목적) 계약의 목적.\n제2조(기간) 계약 기간은 2년으로 한다."
+    _, warnings = split_clauses_with_warnings(text)
+    assert warnings == []
+
+
+def test_low_coverage_produces_warning():
+    from src.nodes.parser import split_clauses_with_warnings
+    preamble = "표지 문구와 안내문이 아주 길게 이어진다. " * 30
+    text = preamble + "\n제1조(목적) 짧은 조항."
+    _, warnings = split_clauses_with_warnings(text)
+    assert any("분리되지 않았습니다" in w for w in warnings)
