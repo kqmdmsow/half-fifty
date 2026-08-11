@@ -14,11 +14,47 @@ from src.nodes.persona import persona_node
 from src.state import FAITHFULNESS_MIN, JUDGE_THRESHOLD, MAX_RETRIES, PipelineState, judge_score_avg
 
 
+def _failing_aspects(scores) -> list[str]:
+    """임계 미달 aspect 목록 (JUDGE_ASPECT_KEYS 순서 유지)."""
+    from src.state import JUDGE_ASPECT_KEYS
+
+    return [k for k in JUDGE_ASPECT_KEYS if scores[k] < JUDGE_THRESHOLD]
+
+
+def _format_feedback(scores) -> str:
+    """미달 aspect의 점수·채점 근거를 재생성 프롬프트 주입용 텍스트로 정리."""
+    rationale = scores.get("rationale") or {}
+    lines = [
+        f"- {k} {scores[k]:.0f}점: {rationale.get(k, '근거 미기록')}"
+        for k in _failing_aspects(scores)
+    ]
+    return "\n".join(lines)
+
+
 def _increment_retry(state: PipelineState) -> dict:
-    """재실행 직전 retry_count 증가용 보조 노드."""
+    """재실행 직전 retry_count 증가 + 채점 피드백 구성 (재생성 프롬프트 주입용).
+
+    자문 §3 반영: 동일 프롬프트 단순 반복은 "우연히 다른 답"을 기대하는
+    구조 — 무엇이 미달이었는지를 다음 시도에 전달해야 재생성이 개선이 된다.
+    """
     new_count = state["retry_count"] + 1
-    print(f"[Retry] Judge 평균 점수 미달 ({JUDGE_THRESHOLD}점 기준) -> {new_count}차 재시도")
-    return {"retry_count": new_count}
+    feedback = _format_feedback(state["judge_scores"])
+    print(f"[Retry] Judge 미달 -> {new_count}차 재시도. 피드백:\n{feedback}")
+    return {"retry_count": new_count, "judge_feedback": feedback}
+
+
+def _route_retry_target(state: PipelineState) -> str:
+    """재생성 대상 분기 (자문 §3): 미달 원인에 맞는 단계로만 돌아간다.
+
+    - faithfulness(왜곡)·risk_coverage(누락)·actionability(질문 품질)는
+      Analysis 산출물의 문제 → analysis부터 재실행
+    - clarity(눈높이)만 미달이면 판정은 유효하고 표현만 문제 → persona만 재실행
+    """
+    failing = _failing_aspects(state["judge_scores"])
+    if failing and set(failing) <= {"clarity"}:
+        print("[Retry] clarity만 미달 -> persona만 재실행")
+        return "persona"
+    return "analysis"
 
 
 def _route_after_judge(state: PipelineState) -> str:
@@ -79,7 +115,11 @@ def build_graph():
             "flag": "flag_review",
         },
     )
-    graph.add_edge("increment_retry", "analysis")  # 재생성 루프
+    graph.add_conditional_edges(  # 재생성 루프: 미달 원인별 대상 분기 (자문 §3)
+        "increment_retry",
+        _route_retry_target,
+        {"analysis": "analysis", "persona": "persona"},
+    )
     graph.add_edge("flag_review", END)
 
     return graph.compile()
@@ -105,6 +145,7 @@ def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
             "actionability": 0.0,
         },
         "retry_count": 0,
+        "judge_feedback": "",
         "needs_review": False,
     }
     return pipeline.invoke(initial_state)  # type: ignore[return-value]

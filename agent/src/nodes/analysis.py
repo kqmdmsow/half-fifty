@@ -70,7 +70,17 @@ _PROMPT_PREFIX, _PROMPT_SUFFIX = _PROMPT_TEMPLATE.split("{clause_text}")
 _MAX_CONCURRENCY = 5
 
 
-def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
+def _feedback_block(feedback: str) -> str:
+    """재생성 시 이전 채점 피드백을 조항 뒤에 붙인다 — 캐시 프리픽스는 불변."""
+    if not feedback:
+        return ""
+    return (
+        "\n\n[이전 시도에 대한 채점자 피드백 — 아래 미달 사항을 이번 출력에서 반드시 개선하세요]\n"
+        + feedback
+    )
+
+
+def _analyze_clause(clause_id: str, text: str, feedback: str = "") -> AnalysisResult:
     llm = get_worker_llm()
 
     for attempt in range(_PARSE_ATTEMPTS):
@@ -78,7 +88,8 @@ def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
             # Pydantic 검증: 스키마 이탈은 예외 → 재시도. 사소한 이탈(리스트
             # risk_type, 번호 접두사)은 스키마 정규화가 흡수한다 (src/schemas.py).
             data = AnalysisOutput.model_validate(
-                invoke_json(llm, text + _PROMPT_SUFFIX, cached_prefix=_PROMPT_PREFIX))
+                invoke_json(llm, text + _PROMPT_SUFFIX + _feedback_block(feedback),
+                            cached_prefix=_PROMPT_PREFIX))
             # 인용 원문 존재 검사 (자문 §5, 규칙 기반): 창작 인용은 스키마
             # 위반과 동급으로 취급 → 재시도, 소진 시 폴백.
             fabricated = find_fabricated_quotes(data.risk_evidence, text)
@@ -111,9 +122,11 @@ def analysis_node(state: PipelineState) -> dict:
 
     조항별 분석은 독립이므로 스레드 풀로 병렬 호출한다 (순서 보존).
     """
+    feedback = state.get("judge_feedback", "")
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
         results: List[AnalysisResult] = list(
-            pool.map(lambda c: _analyze_clause(c["clause_id"], c["text"]), state["clauses"])
+            pool.map(lambda c: _analyze_clause(c["clause_id"], c["text"], feedback),
+                     state["clauses"])
         )
     if _ENABLE_STRUCTURAL_CHECKLIST:
         results.append(_STRUCTURAL_RISK_CHECKLIST)

@@ -25,10 +25,15 @@ _TEMPLATES = {
 }
 
 
-def _adapt(result: AnalysisResult, persona: str) -> AnalysisResult:
+def _adapt(result: AnalysisResult, persona: str, feedback: str = "") -> AnalysisResult:
     template = _TEMPLATES.get(persona, _TEMPLATES["adult"])
     analysis_result_json = json.dumps(dict(result), ensure_ascii=False)
     prompt = template.replace("{analysis_result}", analysis_result_json)
+    if feedback:
+        prompt += (
+            "\n\n[이전 시도에 대한 채점자 피드백 — 아래 미달 사항을 이번 설명에서 반드시 개선하세요]\n"
+            + feedback
+        )
 
     llm = get_worker_llm()
     data = invoke_json(llm, prompt)
@@ -45,8 +50,9 @@ def persona_node(state: PipelineState) -> dict:
     템플릿이 캐시 최소 토큰에 못 미쳐 프롬프트 캐싱은 적용하지 않는다.
     """
     persona = state["persona"]
+    feedback = state.get("judge_feedback", "")
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
         adapted: List[AnalysisResult] = list(
-            pool.map(lambda r: _adapt(r, persona), state["analysis_results"])
+            pool.map(lambda r: _adapt(r, persona, feedback), state["analysis_results"])
         )
     return {"adapted_results": adapted}

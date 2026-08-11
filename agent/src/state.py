@@ -59,6 +59,7 @@ class PipelineState(TypedDict):
 
     # 재생성 루프 제어 (착수보고서: 최대 2회 재실행)
     retry_count: int
+    judge_feedback: str  # 재생성 시 이전 채점의 미달 aspect·근거 (프롬프트 주입용)
     needs_review: bool  # 재시도 소진 후에도 기준 미달이면 True ("주의 필요" 플래그)
 
 
