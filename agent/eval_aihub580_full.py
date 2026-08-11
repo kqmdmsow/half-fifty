@@ -60,14 +60,22 @@ def main() -> None:
     global CKPT, OUT_CSV, OUT_MD
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", choices=["claude", "solar", "gemini"], default="claude")
+    ap.add_argument("--subset", choices=["all", "strong"], default="all",
+                    help="strong: 공정위 심결 인정 행만 실행 (프롬프트 개선 재측정용)")
+    ap.add_argument("--tag", default="", help="결과 파일 태그 (예: v2) — 이전 실행과 분리")
     args = ap.parse_args()
     suffix = "" if args.model == "claude" else f"_{args.model}"
+    if args.tag:
+        suffix += f"_{args.tag}"
     CKPT = BASE / f"aihub580_full_run_checkpoint{suffix}.jsonl"
     OUT_CSV = BASE / f"aihub580_full_run_results{suffix}.csv"
     OUT_MD = Path(__file__).parent.parent / "docs" / f"eval_aihub580_full_run{suffix}.md"
-    print(f"worker 모델: {args.model}")
+    print(f"worker 모델: {args.model} / subset: {args.subset} / tag: {args.tag or '(없음)'}")
 
     rows = list(csv.DictReader(open(IN_CSV, encoding="utf-8")))
+    if args.subset == "strong":
+        rows = [r for r in rows if r["label_tier"] == "strong"]
+        print(f"strong 서브셋만: {len(rows)}행")
     uniq: dict[str, str] = {}
     for r in rows:
         uniq.setdefault(norm_key(r["clause_text"]), r["clause_text"])

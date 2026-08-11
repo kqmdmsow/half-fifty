@@ -19,6 +19,21 @@ from pathlib import Path
 
 from src.nodes.analysis import _analyze_clause
 
+# EVAL_WORKER=solar — 크레딧 소진 시 무료 워커로 대체 실행 (평가 전용 주입).
+# 주의: _analyze_clause 폴백이 오류를 은폐하므로, 실행 후 출력에서
+# "분석 실패" 라인이 0건임을 반드시 확인할 것.
+import os
+if os.getenv("EVAL_WORKER") == "solar":
+    from langchain_openai import ChatOpenAI
+
+    import src.nodes.analysis as _an
+
+    _an.get_worker_llm = lambda: ChatOpenAI(
+        model=os.getenv("MODEL_WORKER_SOLAR", "solar-pro3"), temperature=0,
+        base_url="https://api.upstage.ai/v1",
+        api_key=os.getenv("UPSTAGE_API_KEY"), max_retries=0)
+
+
 DATA = Path(__file__).parent.parent / "data"
 import sys
 _out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_ext_sets_transfer.md"
@@ -30,11 +45,16 @@ SETS = [
 ]
 
 
+# 선택 인자 2: split 필터(쉼표 구분). 기본 "test"(공식 집계).
+# 프롬프트 튜닝 중 회귀 확인은 "train,val"로 실행해 test 오염을 피한다.
+_splits = set(sys.argv[2].split(",")) if len(sys.argv) > 2 else {"test"}
+
+
 def run_set(name, path):
     # 공식 집계는 held-out(test)만 — train/val 행은 프롬프트 튜닝용이라 제외
     # (오염 방지: 튜닝에 쓴 사례를 성능 수치에 섞지 않는다)
     all_rows = list(csv.DictReader(open(path, encoding="utf-8")))
-    rows = [r for r in all_rows if r["split"] == "test"]
+    rows = [r for r in all_rows if r["split"] in _splits]
     if len(all_rows) != len(rows):
         print(f"({name}: train/val {len(all_rows) - len(rows)}행은 집계 제외)")
     results = []
