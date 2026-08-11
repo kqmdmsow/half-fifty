@@ -9,6 +9,9 @@
    인용하세요.
 4. A/B 중 어느 쪽이 Baseline인지, Ours인지, 먼저 만들어졌는지 등 출처 정보는 주어지지
    않습니다 — 오직 내용만으로 비교하세요.
+5. 각 aspect마다 반드시 rationale을 먼저 작성한 뒤, 그 근거에 따라 winner를 결정하세요.
+   (승자를 먼저 정해놓고 근거를 끼워맞추지 마세요 — 출력 JSON에서도 rationale 필드가
+   winner보다 앞에 옵니다.)
 
 [Aspect별 판단 기준]
 1. clarity (이해용이성): 페르소나({persona})가 더 이해하기 쉬운 쪽은?
@@ -25,10 +28,10 @@
 
 [출력 JSON 스키마]
 {
-  "clarity": {"winner": "A|B|tie", "rationale": "근거 (원문 인용 포함)"},
-  "faithfulness": {"winner": "A|B|tie", "rationale": "근거 (원문 인용 포함)"},
-  "risk_coverage": {"winner": "A|B|tie", "rationale": "근거 (원문 인용 포함)"},
-  "actionability": {"winner": "A|B|tie", "rationale": "근거 (원문 인용 포함)"}
+  "clarity": {"rationale": "근거 (원문 인용 포함)", "winner": "A|B|tie"},
+  "faithfulness": {"rationale": "근거 (원문 인용 포함)", "winner": "A|B|tie"},
+  "risk_coverage": {"rationale": "근거 (원문 인용 포함)", "winner": "A|B|tie"},
+  "actionability": {"rationale": "근거 (원문 인용 포함)", "winner": "A|B|tie"}
 }
 
 [원본 조항]
