@@ -8,7 +8,17 @@
 
 실패 시 "알 수 없음"으로 폴백 — Analysis는 기존처럼 조항 문언만으로 판단하므로
 이 노드의 실패가 파이프라인을 깨지 않는다 (감지 실패 = v2.1 기존 동작).
+
+유형 값의 출처 (팀 회의 안건 D 반영):
+1) 사용자 선택 (기본) — 업로드 시 사용자가 고른 유형이 state["domain"]으로
+   들어오면 그대로 사용. LLM 호출 없음. "자동분류는 검증 대상이 하나 더
+   늘어난다"는 팀 정리에 따라 이것이 기본 경로다.
+2) LLM 자동 판별 (opt-in) — DOMAIN_DETECTION=llm 환경변수를 켠 경우에만,
+   사용자 선택이 없을 때 보조로 동작. 기본값은 꺼짐.
+사용자 선택도 없고 자동 판별도 꺼져 있으면 "알 수 없음" → 기존 동작.
 """
+
+import os
 
 from pathlib import Path
 
@@ -53,7 +63,15 @@ def _detect_domain(raw_text: str) -> tuple[str, str]:
 
 
 def domain_node(state: PipelineState) -> dict:
-    """LangGraph 노드: raw_text -> domain, domain_evidence."""
+    """LangGraph 노드: (사용자 선택 도메인 | 자동 판별 | 알 수 없음) -> domain."""
+    user_domain = state.get("domain", "")
+    if user_domain and user_domain in ALLOWED_DOMAINS:
+        print(f"[Domain] 사용자 선택 유형 사용: {user_domain}")
+        return {"domain": user_domain, "domain_evidence": "사용자 선택"}
+
+    if os.getenv("DOMAIN_DETECTION", "").lower() != "llm":
+        return {"domain": DOMAIN_UNKNOWN, "domain_evidence": "사용자 선택 없음 (자동 판별 비활성)"}
+
     domain, evidence = _detect_domain(state["raw_text"])
-    print(f"[Domain] 문서 유형: {domain}" + (f" (근거: {evidence[:60]})" if domain != DOMAIN_UNKNOWN else ""))
+    print(f"[Domain] 자동 판별 유형: {domain}" + (f" (근거: {evidence[:60]})" if domain != DOMAIN_UNKNOWN else ""))
     return {"domain": domain, "domain_evidence": evidence}

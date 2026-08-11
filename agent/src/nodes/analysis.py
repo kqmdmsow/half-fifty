@@ -63,10 +63,12 @@ _FALLBACK_EVIDENCE = "분석 실패 (수동 확인 필요)"
 
 STRUCTURAL_RISK_CLAUSE_ID = "checklist_structural_risk"
 
-# 2026-07 팀 리뷰에서 요청한 "노출 조건 설계": 도메인 감지 도입으로 임대차
-# 문서에만 조건부 부착한다 (전세사기 구조 위험은 임대차에만 유효한 안내).
-# 최종 활성화 여부는 이 PR 리뷰에서 팀 확정.
-_ENABLE_STRUCTURAL_CHECKLIST = True
+# 팀 결정 대기(회의 안건 C)로 비활성 유지. 켜기 위한 선행조건 두 가지:
+# 1) judge.py가 이 체크리스트 항목을 채점에서 제외해야 함 (고정 문구가 Judge
+#    점수를 오염시키므로) — 아직 미구현.
+# 2) 노출 조건: 도메인이 임대차일 때만 부착 (_CHECKLIST_DOMAINS, 구현 완료).
+# 두 조건이 갖춰지고 팀이 회의에서 확정하면 True로 전환한다.
+_ENABLE_STRUCTURAL_CHECKLIST = False
 _CHECKLIST_DOMAINS = ("주택임대차", "상가임대차", "임대차(구분불명)")
 
 _STRUCTURAL_RISK_CHECKLIST = AnalysisResult(

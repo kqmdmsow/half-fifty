@@ -86,12 +86,12 @@ def build_graph():
 pipeline = build_graph()
 
 
-def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
-    """파이프라인 1회 실행 헬퍼."""
+def run_pipeline(raw_text: str, persona: str = "adult", domain: str = "") -> PipelineState:
+    """파이프라인 1회 실행 헬퍼. domain은 사용자가 선택한 문서 유형(없으면 빈 값)."""
     initial_state: PipelineState = {
         "raw_text": raw_text,
         "persona": persona,  # type: ignore[typeddict-item]
-        "domain": "",
+        "domain": domain,
         "domain_evidence": "",
         "clauses": [],
         "analysis_results": [],

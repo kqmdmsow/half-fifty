@@ -42,6 +42,7 @@ app.add_middleware(
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., description="계약서 원문 텍스트")
     persona: Literal["adult", "senior"] = Field("adult", description="사용자 페르소나")
+    domain: str = Field("", description="사용자가 선택한 문서 유형 (선택 입력, 예: 주택임대차)")
 
 
 class ClauseResult(BaseModel):
@@ -93,7 +94,7 @@ def health() -> dict:
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
-    state = run_pipeline(req.text, persona=req.persona)
+    state = run_pipeline(req.text, persona=req.persona, domain=req.domain)
     return _state_to_response(state)
 
 
