@@ -29,13 +29,45 @@ PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "analysis.txt"
 _PROMPT_TEMPLATE = PROMPT_PATH.read_text(encoding="utf-8")
 
 _PARSE_ATTEMPTS = 2  # 최초 시도 + 재시도 1회
+
+_DOMAIN_CONTEXT_KNOWN = (
+    '[문서 유형] 이 조항이 속한 문서는 "{domain}"으로 판별되었습니다{evidence_part}. '
+    "유형에 따라 판정이 갈리는 규칙(차임 연체 해지의 주택/상가 구분 등)은 "
+    "이 문서 유형을 우선 적용하세요."
+)
+# 도메인 미상이면 컨텍스트 줄을 아예 넣지 않는다 — 무도메인 프롬프트가 v2.1과
+# 바이트 단위로 동일해져 평가·폴백 경로의 회귀가 원천 차단된다 (문구 실험 결과
+# 어떤 안내문이든 넣으면 train/val 판정이 미세하게 흔들렸다).
+
+
+def _build_prompt_parts(domain: str = "", domain_evidence: str = "") -> tuple[str, str]:
+    """(cached_prefix, suffix) 조립 — 도메인 컨텍스트는 프리픽스에 주입.
+
+    도메인은 문서당 상수이므로 같은 문서의 조항들끼리 캐시가 히트한다
+    (도메인 미주입 시에는 전 문서 공유 프리픽스라 기존 캐싱과 동일).
+    """
+    if domain and domain != "알 수 없음":
+        ev = f"(근거: {domain_evidence[:80]})" if domain_evidence else ""
+        ctx = _DOMAIN_CONTEXT_KNOWN.format(domain=domain, evidence_part=ev)
+        prefix = _PROMPT_PREFIX.replace("{domain_context}", ctx)
+    else:
+        prefix = _PROMPT_PREFIX.replace("{domain_context}\n\n", "").replace("{domain_context}", "")
+    return prefix, _PROMPT_SUFFIX
+
+
+def build_prompt(text: str, domain: str = "", domain_evidence: str = "") -> str:
+    """전체 프롬프트 문자열 (평가 하네스용 — 캐싱 없이 단일 문자열이 필요할 때)."""
+    prefix, suffix = _build_prompt_parts(domain, domain_evidence)
+    return prefix + text + suffix
 _FALLBACK_EVIDENCE = "분석 실패 (수동 확인 필요)"
 
 STRUCTURAL_RISK_CLAUSE_ID = "checklist_structural_risk"
 
-# 2026-07 팀 리뷰: 도메인 무관 고정 부착 방식은 이번 PR에서는 비활성화.
-# 노출 위치/조건 설계는 다음 PR 과제 (코드는 유지).
-_ENABLE_STRUCTURAL_CHECKLIST = False
+# 2026-07 팀 리뷰에서 요청한 "노출 조건 설계": 도메인 감지 도입으로 임대차
+# 문서에만 조건부 부착한다 (전세사기 구조 위험은 임대차에만 유효한 안내).
+# 최종 활성화 여부는 이 PR 리뷰에서 팀 확정.
+_ENABLE_STRUCTURAL_CHECKLIST = True
+_CHECKLIST_DOMAINS = ("주택임대차", "상가임대차", "임대차(구분불명)")
 
 _STRUCTURAL_RISK_CHECKLIST = AnalysisResult(
     clause_id=STRUCTURAL_RISK_CLAUSE_ID,
@@ -61,19 +93,22 @@ _STRUCTURAL_RISK_CHECKLIST = AnalysisResult(
 
 
 # 프롬프트 캐싱: {clause_text} 앞의 정적 부분(위험 유형 정의·규칙·앵커 예시)은
-# 모든 조항 호출에서 동일하므로 캐시 블록으로 분리한다.
+# 조항 호출 간 동일하므로 캐시 블록으로 분리한다. 도메인 컨텍스트는 프리픽스에
+# 주입되지만 문서당 상수라 캐시 효율을 해치지 않는다 (_build_prompt_parts 참조).
 _PROMPT_PREFIX, _PROMPT_SUFFIX = _PROMPT_TEMPLATE.split("{clause_text}")
 
 # 조항 분석은 서로 독립이라 병렬 호출한다. API rate limit을 고려한 보수적 동시성.
 _MAX_CONCURRENCY = 5
 
 
-def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
+def _analyze_clause(clause_id: str, text: str, domain: str = "",
+                    domain_evidence: str = "") -> AnalysisResult:
+    prefix, suffix = _build_prompt_parts(domain, domain_evidence)
     llm = get_worker_llm()
 
     for attempt in range(_PARSE_ATTEMPTS):
         try:
-            data = invoke_json(llm, text + _PROMPT_SUFFIX, cached_prefix=_PROMPT_PREFIX)
+            data = invoke_json(llm, text + suffix, cached_prefix=prefix)
             return AnalysisResult(
                 clause_id=clause_id,
                 explanation=data["explanation"],
@@ -100,11 +135,15 @@ def analysis_node(state: PipelineState) -> dict:
     """LangGraph 노드: clauses -> analysis_results.
 
     조항별 분석은 독립이므로 스레드 풀로 병렬 호출한다 (순서 보존).
+    도메인 컨텍스트(문서당 상수)를 모든 조항 호출에 전달한다.
     """
+    domain = state.get("domain", "")
+    evidence = state.get("domain_evidence", "")
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
         results: List[AnalysisResult] = list(
-            pool.map(lambda c: _analyze_clause(c["clause_id"], c["text"]), state["clauses"])
+            pool.map(lambda c: _analyze_clause(c["clause_id"], c["text"], domain, evidence),
+                     state["clauses"])
         )
-    if _ENABLE_STRUCTURAL_CHECKLIST:
+    if _ENABLE_STRUCTURAL_CHECKLIST and domain in _CHECKLIST_DOMAINS:
         results.append(_STRUCTURAL_RISK_CHECKLIST)
     return {"analysis_results": results}

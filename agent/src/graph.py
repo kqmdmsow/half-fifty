@@ -1,13 +1,18 @@
 """LangGraph 4단계 파이프라인 조립 (착수보고서 <그림 3>).
 
-Parser(Module) -> Analysis(Agent) -> Persona(Agent) -> Judge(Agent)
-                      ^                                    |
-                      +---- 점수 미달 시 최대 2회 재실행 ----+
+Parser(Module) -> Domain(Agent) -> Analysis(Agent) -> Persona(Agent) -> Judge(Agent)
+                                        ^                                    |
+                                        +------ 점수 미달 시 최대 2회 재실행 -----+
+
+Domain은 문서 유형(주택/상가 임대차, 보험, 대출 등)을 1회 판별해 Analysis의
+모든 조항 판정에 주입한다 — 같은 문언도 유형 따라 판정이 갈리기 때문
+(docs/risk_taxonomy_v2.md §C).
 """
 
 from langgraph.graph import END, StateGraph
 
 from src.nodes.analysis import analysis_node
+from src.nodes.domain import domain_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
 from src.nodes.persona import persona_node
@@ -49,6 +54,7 @@ def build_graph():
     graph = StateGraph(PipelineState)
 
     graph.add_node("parser", parser_node)
+    graph.add_node("domain", domain_node)
     graph.add_node("analysis", analysis_node)
     graph.add_node("persona", persona_node)
     graph.add_node("judge", judge_node)
@@ -56,7 +62,8 @@ def build_graph():
     graph.add_node("flag_review", _flag_needs_review)
 
     graph.set_entry_point("parser")
-    graph.add_edge("parser", "analysis")
+    graph.add_edge("parser", "domain")
+    graph.add_edge("domain", "analysis")
     graph.add_edge("analysis", "persona")
     graph.add_edge("persona", "judge")
 
@@ -84,6 +91,8 @@ def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
     initial_state: PipelineState = {
         "raw_text": raw_text,
         "persona": persona,  # type: ignore[typeddict-item]
+        "domain": "",
+        "domain_evidence": "",
         "clauses": [],
         "analysis_results": [],
         "adapted_results": [],

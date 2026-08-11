@@ -51,6 +51,8 @@ class PipelineState(TypedDict):
     persona: Literal["adult", "senior"]
 
     # 각 단계 출력
+    domain: str             # 문서 유형 (도메인 감지 실패 시 "알 수 없음")
+    domain_evidence: str    # 판별 근거 (원문 인용)
     clauses: List[Clause]
     analysis_results: List[AnalysisResult]
     adapted_results: List[AnalysisResult]  # 페르소나 적응 후

@@ -24,7 +24,7 @@ import os
 import time
 
 from src.llm import get_worker_llm, invoke_json
-from src.nodes.analysis import _PROMPT_TEMPLATE
+from src.nodes.analysis import build_prompt
 
 
 def get_llm(model_key: str):
@@ -105,7 +105,7 @@ def main() -> None:
         k, text = item
         if fatal["stop"]:
             return {"key": k, "risk_level": "SKIPPED", "risk_type": ""}
-        prompt = _PROMPT_TEMPLATE.replace("{clause_text}", text)
+        prompt = build_prompt(text)
         for attempt in range(4):
             try:
                 d = invoke_json(llm, prompt)
