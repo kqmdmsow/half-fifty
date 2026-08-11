@@ -9,6 +9,7 @@ explanation만 다시 쓴다. 나머지 필드(위험 여부/근거/질문)는 �
 """
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
 
@@ -16,6 +17,8 @@ from src.llm import get_worker_llm, invoke_json
 from src.state import AnalysisResult, PipelineState
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+_MAX_CONCURRENCY = 5  # analysis_node와 동일한 보수적 동시성
+
 _TEMPLATES = {
     "adult": (PROMPTS_DIR / "persona_adult.txt").read_text(encoding="utf-8"),
     "senior": (PROMPTS_DIR / "persona_senior.txt").read_text(encoding="utf-8"),
@@ -36,9 +39,14 @@ def _adapt(result: AnalysisResult, persona: str) -> AnalysisResult:
 
 
 def persona_node(state: PipelineState) -> dict:
-    """LangGraph 노드: analysis_results + persona -> adapted_results."""
+    """LangGraph 노드: analysis_results + persona -> adapted_results.
+
+    조항별 적응은 독립이므로 스레드 풀로 병렬 호출한다 (순서 보존).
+    템플릿이 캐시 최소 토큰에 못 미쳐 프롬프트 캐싱은 적용하지 않는다.
+    """
     persona = state["persona"]
-    adapted: List[AnalysisResult] = [
-        _adapt(r, persona) for r in state["analysis_results"]
-    ]
+    with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
+        adapted: List[AnalysisResult] = list(
+            pool.map(lambda r: _adapt(r, persona), state["analysis_results"])
+        )
     return {"adapted_results": adapted}

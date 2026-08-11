@@ -18,6 +18,7 @@ PR에서는 비활성화한다(_ENABLE_STRUCTURAL_CHECKLIST=False). 노출 위�
 남겨 다음 작업에서 이어갈 수 있게 한다.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
 
@@ -59,13 +60,20 @@ _STRUCTURAL_RISK_CHECKLIST = AnalysisResult(
 )
 
 
+# 프롬프트 캐싱: {clause_text} 앞의 정적 부분(위험 유형 정의·규칙·앵커 예시)은
+# 모든 조항 호출에서 동일하므로 캐시 블록으로 분리한다.
+_PROMPT_PREFIX, _PROMPT_SUFFIX = _PROMPT_TEMPLATE.split("{clause_text}")
+
+# 조항 분석은 서로 독립이라 병렬 호출한다. API rate limit을 고려한 보수적 동시성.
+_MAX_CONCURRENCY = 5
+
+
 def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
-    prompt = _PROMPT_TEMPLATE.replace("{clause_text}", text)
     llm = get_worker_llm()
 
     for attempt in range(_PARSE_ATTEMPTS):
         try:
-            data = invoke_json(llm, prompt)
+            data = invoke_json(llm, text + _PROMPT_SUFFIX, cached_prefix=_PROMPT_PREFIX)
             return AnalysisResult(
                 clause_id=clause_id,
                 explanation=data["explanation"],
@@ -89,10 +97,14 @@ def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
 
 
 def analysis_node(state: PipelineState) -> dict:
-    """LangGraph 노드: clauses -> analysis_results."""
-    results: List[AnalysisResult] = [
-        _analyze_clause(c["clause_id"], c["text"]) for c in state["clauses"]
-    ]
+    """LangGraph 노드: clauses -> analysis_results.
+
+    조항별 분석은 독립이므로 스레드 풀로 병렬 호출한다 (순서 보존).
+    """
+    with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
+        results: List[AnalysisResult] = list(
+            pool.map(lambda c: _analyze_clause(c["clause_id"], c["text"]), state["clauses"])
+        )
     if _ENABLE_STRUCTURAL_CHECKLIST:
         results.append(_STRUCTURAL_RISK_CHECKLIST)
     return {"analysis_results": results}

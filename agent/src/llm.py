@@ -5,10 +5,12 @@ Analysis/Persona/Judge 세 노드가 이 모듈을 통해서만 LLM을 호출한
 
 import json
 import os
+import threading
 from functools import lru_cache
 
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
+from langchain_core.messages import HumanMessage
 
 load_dotenv()
 
@@ -16,7 +18,9 @@ DEFAULT_MODEL_WORKER = "claude-haiku-4-5"
 DEFAULT_MODEL_JUDGE = "claude-sonnet-4-6"
 
 # 파이프라인 1회 실행 단위의 대략적 토큰 사용량 누적 (eval.py 등에서 사용).
+# 조항 병렬 분석 도입으로 여러 스레드가 동시에 갱신하므로 락으로 보호한다.
 _token_usage = {"input_tokens": 0, "output_tokens": 0}
+_token_lock = threading.Lock()
 
 
 def reset_token_usage() -> None:
@@ -52,13 +56,34 @@ def get_judge_llm() -> ChatAnthropic:
     return ChatAnthropic(model=model, temperature=0, timeout=REQUEST_TIMEOUT_SEC)
 
 
-def invoke_json(llm: ChatAnthropic, prompt: str) -> dict:
-    """LLM을 호출하고 응답 텍스트를 JSON 객체로 파싱해 반환한다."""
-    response = llm.invoke(prompt)
+def invoke_json(llm: ChatAnthropic, prompt: str, cached_prefix: str | None = None) -> dict:
+    """LLM을 호출하고 응답 텍스트를 JSON 객체로 파싱해 반환한다.
+
+    cached_prefix를 주면 그 부분을 Anthropic 프롬프트 캐시(ephemeral) 블록으로
+    보낸다 — 조항마다 반복되는 정적 프롬프트(위험 유형 정의·앵커 예시)를 캐시해
+    두 번째 호출부터 입력 토큰 비용을 크게 줄인다. 프리픽스가 모델별 캐시 최소
+    토큰(하이쿠 2048 등)에 못 미치면 API가 조용히 무시하므로 무해하다.
+    주의: cached_prefix는 호출 간 완전히 동일해야 캐시가 적중한다.
+    """
+    if cached_prefix is not None:
+        message = HumanMessage(
+            content=[
+                {
+                    "type": "text",
+                    "text": cached_prefix,
+                    "cache_control": {"type": "ephemeral"},
+                },
+                {"type": "text", "text": prompt},
+            ]
+        )
+        response = llm.invoke([message])
+    else:
+        response = llm.invoke(prompt)
 
     usage = getattr(response, "usage_metadata", None) or {}
-    _token_usage["input_tokens"] += usage.get("input_tokens", 0)
-    _token_usage["output_tokens"] += usage.get("output_tokens", 0)
+    with _token_lock:
+        _token_usage["input_tokens"] += usage.get("input_tokens", 0)
+        _token_usage["output_tokens"] += usage.get("output_tokens", 0)
 
     content = response.content
     if isinstance(content, list):
