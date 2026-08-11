@@ -25,7 +25,11 @@ from pathlib import Path
 from src.nodes.analysis import _analyze_clause
 
 LABELS_PATH = Path(__file__).parent.parent / "data" / "real_clause_labels.csv"
-OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_real_labels_claude.md"
+# 기본 출력은 베이스라인 문서 — 덮어쓰기 사고 방지를 위해 인자로 출력 파일명을 받는다.
+# 사용: python eval_real_labels.py [출력파일명.md]  (재실행 시 반드시 새 파일명 지정)
+import sys
+_out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_real_labels_claude.md"
+OUT_PATH = Path(__file__).parent.parent / "docs" / _out_name
 
 
 def _load_labels() -> list:

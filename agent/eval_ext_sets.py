@@ -20,7 +20,9 @@ from pathlib import Path
 from src.nodes.analysis import _analyze_clause
 
 DATA = Path(__file__).parent.parent / "data"
-OUT_PATH = Path(__file__).parent.parent / "docs" / "eval_ext_sets_transfer.md"
+import sys
+_out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_ext_sets_transfer.md"
+OUT_PATH = Path(__file__).parent.parent / "docs" / _out_name
 
 SETS = [
     ("임대차 확장 (ext, 14건)", DATA / "real_clause_labels_ext.csv"),
