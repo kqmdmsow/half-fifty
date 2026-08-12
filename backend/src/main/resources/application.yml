@@ -1,6 +1,12 @@
 server:
   port: ${PORT:8080}
 
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+
 # Python 에이전트 서비스 주소 (배포 시 AGENT_BASE_URL 환경변수로 주입)
 agent:
   base-url: ${AGENT_BASE_URL:http://localhost:8000}

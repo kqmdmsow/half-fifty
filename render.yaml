@@ -37,5 +37,4 @@ services:
     envVars:
       - key: VITE_BACKEND_URL
         value: https://halffifty-backend.onrender.com
-      - key: VITE_AGENT_URL
-        value: https://halffifty-agent.onrender.com
+      # PDF 포함 모든 요청이 백엔드 경유 (자문 §7) — 프론트는 에이전트 주소 불필요
