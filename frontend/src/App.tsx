@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { analyzeContract, analyzePdf, type AnalyzeResponse, type Persona } from './api'
+import { analyzeContract, analyzeImage, analyzePdf, type AnalyzeResponse, type Persona } from './api'
 import { Logo } from './components/ui'
 import { SAMPLE_RESULTS } from './data/sample'
 import { DetailScreen } from './screens/Detail'
@@ -64,7 +64,11 @@ export default function App() {
       if (mode === 'text' && text.trim()) {
         setData(await analyzeContract(text, persona))
       } else if (mode === 'pdf' && file) {
-        setData(await analyzePdf(file, persona))
+        setData(
+          file.type.startsWith('image/')
+            ? await analyzeImage(file, persona)
+            : await analyzePdf(file, persona),
+        )
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '분석 요청에 실패했어요.')
@@ -156,6 +160,7 @@ export default function App() {
             clauseCount={clauseCount}
             results={results}
             isSample={isSample}
+            warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
           />

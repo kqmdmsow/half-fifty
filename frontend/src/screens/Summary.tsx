@@ -9,12 +9,14 @@ export function SummaryScreen({
   clauseCount,
   results,
   isSample,
+  warnings = [],
   onSelectClause,
   onDone,
 }: {
   clauseCount: number
   results: ClauseResult[]
   isSample: boolean
+  warnings?: string[]
   onSelectClause: (clauseId: string) => void
   onDone: () => void
 }) {
@@ -48,6 +50,15 @@ export function SummaryScreen({
           분석 서버에 연결되지 않아 예시 결과를 보여드리고 있어요.
         </p>
       )}
+
+      {warnings.map((warning) => (
+        <p
+          key={warning}
+          className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700"
+        >
+          ⚠️ {warning}
+        </p>
+      ))}
 
       <p className="text-[14px] font-bold text-brand-600">분석 완료</p>
       <h1 className="mt-2 text-[26px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[32px]">

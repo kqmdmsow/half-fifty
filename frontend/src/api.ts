@@ -15,6 +15,7 @@ export interface ClauseResult {
 
 export interface AnalyzeResponse {
   clause_count: number
+  parse_warnings?: string[]
   retry_count: number
   needs_review: boolean
   judge_scores: Record<string, number>
