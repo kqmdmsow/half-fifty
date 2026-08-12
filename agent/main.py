@@ -26,6 +26,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from src.graph import run_pipeline
+from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
 
@@ -112,7 +113,35 @@ async def analyze_pdf(
     try:
         text = extract_text_from_pdf(pdf_bytes)
     except ValueError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+        # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
+        try:
+            text = document_parse_text(pdf_bytes, file.filename or "upload.pdf")
+        except OcrUnavailableError as ocr_exc:
+            raise HTTPException(
+                status_code=422, detail=f"{exc} / OCR 폴백 실패: {ocr_exc}") from ocr_exc
+
+    state = run_pipeline(text, persona=persona)
+    return _state_to_response(state)
+
+
+@app.post("/analyze-image", response_model=AnalyzeResponse)
+async def analyze_image(
+    file: UploadFile,
+    persona: Literal["adult", "senior"] = Form("adult"),
+) -> AnalyzeResponse:
+    """계약서 사진(jpg/png/webp) 분석 — Upstage Document Parse OCR 경유.
+
+    타깃 사용자(고령층)의 자연스러운 입력 수단. 표 구조를 인식하므로
+    별표·수수료율 표가 있는 계약서 사진에도 대응한다.
+    """
+    if file.content_type not in SUPPORTED_IMAGE_TYPES:
+        raise HTTPException(status_code=415, detail="jpg/png/webp 이미지만 지원합니다.")
+
+    image_bytes = await file.read()
+    try:
+        text = document_parse_text(image_bytes, file.filename or "upload.png")
+    except OcrUnavailableError as exc:
+        raise HTTPException(status_code=422, detail=f"사진에서 글자를 읽지 못했습니다: {exc}") from exc
 
     state = run_pipeline(text, persona=persona)
     return _state_to_response(state)

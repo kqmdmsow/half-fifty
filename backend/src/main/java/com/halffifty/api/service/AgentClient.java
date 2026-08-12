@@ -42,18 +42,29 @@ public class AgentClient {
      * 파일은 메모리에서만 전달하며 백엔드에 저장하지 않는다.
      */
     public AnalyzeResponse analyzePdf(byte[] pdfBytes, String filename, String persona) {
+        return forwardFile("/analyze-pdf", pdfBytes, filename, MediaType.APPLICATION_PDF, persona);
+    }
+
+    /** 계약서 사진(OCR) 프록시 — 에이전트 /analyze-image로 전달. */
+    public AnalyzeResponse analyzeImage(
+            byte[] imageBytes, String filename, MediaType contentType, String persona) {
+        return forwardFile("/analyze-image", imageBytes, filename, contentType, persona);
+    }
+
+    private AnalyzeResponse forwardFile(
+            String uri, byte[] bytes, String filename, MediaType contentType, String persona) {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("file", new ByteArrayResource(pdfBytes) {
+        builder.part("file", new ByteArrayResource(bytes) {
                     @Override
                     public String getFilename() {
                         return filename;
                     }
                 })
-                .contentType(MediaType.APPLICATION_PDF);
+                .contentType(contentType);
         builder.part("persona", persona);
 
         return restClient.post()
-                .uri("/analyze-pdf")
+                .uri(uri)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(builder.build())
                 .retrieve()
