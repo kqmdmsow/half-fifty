@@ -23,9 +23,7 @@ export interface AnalyzeResponse {
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:8080'
 
-// 에이전트(Python, 8000) 직접 호출용 — PDF 업로드는 백엔드를 거치지 않고
-// 에이전트에 바로 보낸다 (백엔드는 아직 이 경로를 프록시하지 않음).
-const AGENT_BASE_URL = import.meta.env.VITE_AGENT_URL ?? 'http://localhost:8000'
+
 
 export async function analyzeContract(
   text: string,
@@ -50,7 +48,7 @@ export async function analyzePdf(
   formData.append('file', file)
   formData.append('persona', persona)
 
-  const res = await fetch(`${AGENT_BASE_URL}/analyze-pdf`, {
+  const res = await fetch(`${BASE_URL}/api/contracts/analyze-pdf`, {
     method: 'POST',
     body: formData,
   })
