@@ -64,4 +64,7 @@ class PipelineState(TypedDict):
 
 # Judge 평균 점수가 이 값 미만이면 Analysis 재실행 (실험하며 조정)
 JUDGE_THRESHOLD = 3.5
+# faithfulness 필수 조건 (자문 §5): 평균이 높아도 원문 왜곡·창작 근거가 있으면
+# 통과 금지 — 평균이 치명 결함을 은폐하는 것을 막는 hard-fail 기준.
+FAITHFULNESS_MIN = 3.0
 MAX_RETRIES = 2
