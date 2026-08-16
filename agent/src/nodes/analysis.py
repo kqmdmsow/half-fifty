@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import List
 
 from src.llm import get_worker_llm, invoke_json
+from src.citation_check import find_fabricated_quotes
 from src.schemas import AnalysisOutput
 from src.state import AnalysisResult, PipelineState
 
@@ -78,6 +79,11 @@ def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:
             # risk_type, 번호 접두사)은 스키마 정규화가 흡수한다 (src/schemas.py).
             data = AnalysisOutput.model_validate(
                 invoke_json(llm, text + _PROMPT_SUFFIX, cached_prefix=_PROMPT_PREFIX))
+            # 인용 원문 존재 검사 (자문 §5, 규칙 기반): 창작 인용은 스키마
+            # 위반과 동급으로 취급 → 재시도, 소진 시 폴백.
+            fabricated = find_fabricated_quotes(data.risk_evidence, text)
+            if fabricated:
+                raise ValueError(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")
             return AnalysisResult(
                 clause_id=clause_id,
                 explanation=data.explanation,
