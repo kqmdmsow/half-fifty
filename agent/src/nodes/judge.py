@@ -22,6 +22,15 @@ _PROMPT_TEMPLATE = PROMPT_PATH.read_text(encoding="utf-8")
 
 _ASPECTS = ["clarity", "faithfulness", "risk_coverage", "actionability"]
 
+# analysis.py의 재시도+폴백 패턴을 그대로 이식 (PR#18 리뷰에서 지적된 사각지대):
+# invoke_json이 깨진 JSON을 반환하면 이전엔 예외가 파이프라인 전체를 타고
+# 올라가 죽었다. 1회 재시도 후에도 실패하면 명백히 낮은 점수로 폴백해
+# _route_after_judge가 재시도/주의필요 플래그로 정상 처리하게 한다
+# (침묵 통과가 아니라 사람 확인으로 넘기는 방향).
+_PARSE_ATTEMPTS = 2  # 최초 시도 + 재시도 1회
+_FALLBACK_SCORE = 1.0
+_FALLBACK_RATIONALE = "채점 실패 (LLM 응답 파싱 오류) — 수동 확인 필요"
+
 _ASPECT_RUBRIC = {
     "clarity": (
         "clarity (이해용이성): 설명이 지정된 페르소나({persona})의 난이도에 적합한가?\n"
@@ -100,15 +109,23 @@ def _judge(state: PipelineState) -> JudgeScores:
         .replace("{final_output}", final_output)
     )
 
-    data = invoke_json(get_judge_llm(), prompt)
-
-    scores = {}
-    rationale = {}
-    for aspect in _ASPECTS:
-        aspect_data = data[aspect]
-        scores[aspect] = float(aspect_data["score"])
-        rationale[aspect] = aspect_data["rationale"]
-        print(f"[Judge] {aspect}: {aspect_data['score']}점 — {aspect_data['rationale']}")
+    llm = get_judge_llm()
+    for attempt in range(_PARSE_ATTEMPTS):
+        try:
+            data = invoke_json(llm, prompt)
+            scores = {}
+            rationale = {}
+            for aspect in _ASPECTS:
+                aspect_data = data[aspect]
+                scores[aspect] = float(aspect_data["score"])
+                rationale[aspect] = aspect_data["rationale"]
+                print(f"[Judge] {aspect}: {aspect_data['score']}점 — {aspect_data['rationale']}")
+            break
+        except Exception as exc:  # JSON 파싱 실패, 키 누락 등
+            if attempt + 1 == _PARSE_ATTEMPTS:
+                print(f"[Judge] 채점 실패, 폴백 처리: {exc}")
+                scores = {aspect: _FALLBACK_SCORE for aspect in _ASPECTS}
+                rationale = {aspect: _FALLBACK_RATIONALE for aspect in _ASPECTS}
 
     return JudgeScores(
         clarity=scores["clarity"],
