@@ -56,12 +56,37 @@ export async function analyzePdf(
 
   if (!res.ok) {
     if (res.status === 422) {
-      throw new Error('텍스트 추출이 안 되는 PDF예요. 스캔본이면 지원 예정입니다.')
+      throw new Error('PDF에서 글자를 읽지 못했어요. 스캔본이면 사진이 선명한지 확인해주세요.')
     }
     if (res.status === 415) {
       throw new Error('PDF 파일만 업로드할 수 있어요.')
     }
     throw new Error(`PDF 분석 요청 실패 (${res.status})`)
+  }
+  return res.json()
+}
+
+export async function analyzeImage(
+  file: File,
+  persona: Persona,
+): Promise<AnalyzeResponse> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('persona', persona)
+
+  const res = await fetch(`${BASE_URL}/api/contracts/analyze-image`, {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!res.ok) {
+    if (res.status === 422) {
+      throw new Error('사진에서 글자를 읽지 못했어요. 계약서가 잘 보이게 다시 찍어주세요.')
+    }
+    if (res.status === 415) {
+      throw new Error('jpg/png/webp 사진만 올릴 수 있어요.')
+    }
+    throw new Error(`분석 요청 실패 (${res.status})`)
   }
   return res.json()
 }

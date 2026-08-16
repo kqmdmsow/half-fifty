@@ -75,4 +75,47 @@ public class ContractController {
         }
         return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona);
     }
+
+    /**
+     * 계약서 사진 업로드 분석 (OCR). 매직 바이트로 jpg/png/webp 판별 —
+     * Content-Type 헤더 위조 방어는 analyze-pdf와 동일 원칙.
+     */
+    @PostMapping(value = "/analyze-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AnalyzeResponse analyzeImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "persona", defaultValue = "adult") String persona)
+            throws IOException {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
+        }
+        if (file.getSize() > MAX_PDF_BYTES) {
+            throw new ResponseStatusException(
+                    HttpStatus.PAYLOAD_TOO_LARGE, "이미지는 10MB 이하만 지원합니다.");
+        }
+        byte[] bytes = file.getBytes();
+        MediaType type = sniffImageType(bytes);
+        if (type == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNSUPPORTED_MEDIA_TYPE, "jpg/png/webp 이미지만 지원합니다.");
+        }
+        if (!"adult".equals(persona) && !"senior".equals(persona)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
+        }
+        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona);
+    }
+
+    /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */
+    private static MediaType sniffImageType(byte[] b) {
+        if (b.length >= 3 && (b[0] & 0xFF) == 0xFF && (b[1] & 0xFF) == 0xD8 && (b[2] & 0xFF) == 0xFF) {
+            return MediaType.IMAGE_JPEG;
+        }
+        if (b.length >= 4 && (b[0] & 0xFF) == 0x89 && b[1] == 'P' && b[2] == 'N' && b[3] == 'G') {
+            return MediaType.IMAGE_PNG;
+        }
+        if (b.length >= 12 && b[0] == 'R' && b[1] == 'I' && b[2] == 'F' && b[3] == 'F'
+                && b[8] == 'W' && b[9] == 'E' && b[10] == 'B' && b[11] == 'P') {
+            return MediaType.parseMediaType("image/webp");
+        }
+        return null;
+    }
 }
