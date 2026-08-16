@@ -11,7 +11,7 @@ from src.nodes.analysis import analysis_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
 from src.nodes.persona import persona_node
-from src.state import JUDGE_THRESHOLD, MAX_RETRIES, PipelineState, judge_score_avg
+from src.state import FAITHFULNESS_MIN, JUDGE_THRESHOLD, MAX_RETRIES, PipelineState, judge_score_avg
 
 
 def _increment_retry(state: PipelineState) -> dict:
@@ -29,6 +29,16 @@ def _route_after_judge(state: PipelineState) -> str:
     - 미달 & 재시도 소진     -> needs_review 플래그 세우고 종료
     """
     avg = judge_score_avg(state["judge_scores"])
+    faith = state["judge_scores"]["faithfulness"]
+
+    # 필수 조건 (자문 §5): faithfulness 미달이면 평균과 무관하게 실패 처리 —
+    # 원문 왜곡·창작 근거는 다른 항목 점수로 상쇄될 수 없는 치명 결함.
+    if faith < FAITHFULNESS_MIN:
+        if state["retry_count"] < MAX_RETRIES:
+            print(f"[Judge] faithfulness {faith:.1f}점 < 필수 {FAITHFULNESS_MIN}점 -> 평균({avg:.2f}) 무관 재시도")
+            return "retry"
+        print(f"[Judge] faithfulness {faith:.1f}점 < 필수 {FAITHFULNESS_MIN}점, 재시도 소진 -> 주의 필요 플래그")
+        return "flag"
 
     if avg >= JUDGE_THRESHOLD:
         print(f"[Judge] 평균 {avg:.2f}점 >= {JUDGE_THRESHOLD}점 -> 통과")
