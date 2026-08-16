@@ -5,6 +5,12 @@ type InputMode = 'pdf' | 'text'
 
 const MAX_SIZE = 10 * 1024 * 1024
 
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const isImage = (f: File) =>
+  IMAGE_TYPES.includes(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name)
+const isPdf = (f: File) =>
+  f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+
 export function UploadScreen({
   mode,
   file,
@@ -30,8 +36,8 @@ export function UploadScreen({
   const acceptFile = (candidate: File | null) => {
     setFileError(null)
     if (!candidate) return
-    if (candidate.type !== 'application/pdf' && !candidate.name.toLowerCase().endsWith('.pdf')) {
-      setFileError('PDF 파일만 올릴 수 있어요.')
+    if (!isPdf(candidate) && !isImage(candidate)) {
+      setFileError('PDF 또는 사진(JPG·PNG·WEBP)만 올릴 수 있어요.')
       return
     }
     if (candidate.size > MAX_SIZE) {
@@ -53,7 +59,7 @@ export function UploadScreen({
     <div className="mx-auto max-w-xl animate-fade-up px-6 py-12 md:py-16">
       <PageTitle
         title="분석할 계약서를 올려주세요"
-        desc="텍스트를 읽을 수 있는 PDF를 지원해요. 분석이 끝나면 원본은 즉시 삭제돼요."
+        desc="PDF는 물론 휴대폰으로 찍은 계약서 사진(JPG·PNG)도 돼요. 분석이 끝나면 원본은 즉시 삭제돼요."
       />
 
       {/* 입력 방식 탭 */}
@@ -67,7 +73,7 @@ export function UploadScreen({
               mode === item ? 'bg-white text-ink-900 shadow-card' : 'text-ink-400 hover:text-ink-600'
             }`}
           >
-            {item === 'pdf' ? 'PDF 업로드' : '직접 붙여넣기'}
+            {item === 'pdf' ? '파일·사진 업로드' : '직접 붙여넣기'}
           </button>
         ))}
       </div>
@@ -96,14 +102,14 @@ export function UploadScreen({
             <input
               ref={inputRef}
               type="file"
-              accept="application/pdf"
+              accept="application/pdf,image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={(event) => acceptFile(event.target.files?.[0] ?? null)}
             />
             {file ? (
               <>
                 <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-safe-50 text-[26px]">
-                  📄
+                  {isImage(file) ? '📷' : '📄'}
                 </span>
                 <p className="mt-4 max-w-full truncate text-[16px] font-bold text-ink-900">
                   {file.name}
@@ -118,9 +124,11 @@ export function UploadScreen({
                   📎
                 </span>
                 <p className="mt-4 text-[16px] font-bold text-ink-900">
-                  PDF를 끌어다 놓거나 클릭하세요
+                  PDF나 계약서 사진을 끌어다 놓거나 클릭하세요
                 </p>
-                <p className="mt-1 text-[13px] text-ink-400">최대 10MB · 최대 20페이지</p>
+                <p className="mt-1 text-[13px] text-ink-400">
+                  PDF·JPG·PNG·WEBP · 최대 10MB · 스캔본도 읽을 수 있어요
+                </p>
               </>
             )}
           </div>
