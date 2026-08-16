@@ -1,7 +1,7 @@
 """Agent Service API (FastAPI).
 
 Spring Boot 백엔드(동훈)가 호출하는 진입점.
-PDF 업로드(/analyze-pdf)는 프론트에서 직접 호출한다 (CORS 허용).
+PDF 업로드(/analyze-pdf)도 백엔드 프록시를 거친다 (자문 §7 — 직통 제거).
 
 실행:
     cd agent
