@@ -156,6 +156,7 @@ export default function App() {
             clauseCount={clauseCount}
             results={results}
             isSample={isSample}
+            warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
           />
