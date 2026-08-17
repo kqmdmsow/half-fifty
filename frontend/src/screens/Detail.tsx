@@ -26,10 +26,14 @@ export function DetailScreen({
 
   // 음성 안내: 화면 진입 시 설명 읽기 (기기 최적 한국어 보이스 자동 선택 — src/tts.ts)
   useEffect(() => {
-    if (!voiceGuide) return
+    if (!voiceGuide || !clause) return
     speak(clause.explanation)
     return () => stopSpeaking()
   }, [voiceGuide, clause])
+
+  // 결과가 아직 없으면 렌더링하지 않는다 (가짜 예시 폴백 제거 후의 방어선).
+  // 훅 규칙 때문에 useEffect 뒤에 위치해야 한다.
+  if (!clause) return null
 
   const questions = clause.check_questions.length
     ? clause.check_questions

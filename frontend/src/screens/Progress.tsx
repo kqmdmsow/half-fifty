@@ -15,6 +15,7 @@ export function ProgressScreen({
   streamProgress,
   streamedClauses,
   onCancel,
+  onRetry,
   onShowResult,
 }: {
   loading: boolean
@@ -22,6 +23,7 @@ export function ProgressScreen({
   streamProgress?: { done: number; total: number } | null
   streamedClauses?: ClauseResult[]
   onCancel: () => void
+  onRetry?: () => void
   onShowResult: () => void
 }) {
   const [percent, setPercent] = useState(4)
@@ -93,7 +95,7 @@ export function ProgressScreen({
       </h1>
       <p className="mt-2.5 text-[15px] leading-relaxed text-ink-400">
         {error
-          ? '서버에 연결한 뒤 다시 시도해주세요.'
+          ? `${error} 잠시 후 다시 시도해주세요.`
           : loading
             ? streaming && streamProgress?.total
               ? `조항 ${streamProgress.done}/${streamProgress.total}개 분석 완료 — 끝난 조항부터 아래에 보여드려요.`
@@ -159,10 +161,10 @@ export function ProgressScreen({
         {error ? (
           <>
             <Button variant="secondary" size="lg" full onClick={onCancel}>
-              다시 시도
+              입력으로 돌아가기
             </Button>
-            <Button size="lg" full onClick={onShowResult}>
-              예시 결과 보기
+            <Button size="lg" full onClick={onRetry ?? onCancel}>
+              다시 시도
             </Button>
           </>
         ) : (

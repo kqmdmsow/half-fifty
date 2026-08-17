@@ -9,8 +9,8 @@ import {
   type Persona,
 } from './api'
 import { Logo } from './components/ui'
-import { SAMPLE_RESULTS } from './data/sample'
 import { LANGUAGES, t } from './i18n'
+import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
 import { ExtractScreen } from './screens/Extract'
@@ -55,18 +55,19 @@ export default function App() {
   const [streamProgress, setStreamProgress] = useState<{ done: number; total: number } | null>(null)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
-  // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다
+  // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
+  // 실패 시 가짜 예시(SAMPLE_RESULTS)를 보여주던 경로는 제거 — 오류는 오류로
+  // 안내하고 다시 시도하게 한다 (심사 중 가짜 결과 노출 방지).
   const sortedStreamed = [...streamedClauses].sort((a, b) =>
     a.clause_id.localeCompare(b.clause_id),
   )
   const streamingLive = loading && streamProgress !== null
-  const results = data?.results.length
+  const results: ClauseResultType[] = data?.results.length
     ? data.results
     : streamingLive
       ? sortedStreamed
-      : SAMPLE_RESULTS
-  const clauseCount = data?.clause_count ?? streamProgress?.total ?? 16
-  const isSample = !data && !streamingLive
+      : []
+  const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
@@ -215,6 +216,7 @@ export default function App() {
             streamProgress={streamProgress}
             streamedClauses={streamedClauses}
             onCancel={() => go('persona')}
+            onRetry={runAnalysis}
             onShowResult={() => go('summary')}
           />
         )}
@@ -222,7 +224,6 @@ export default function App() {
           <SummaryScreen
             clauseCount={clauseCount}
             results={results}
-            isSample={isSample}
             language={language}
             liveProgress={streamingLive ? streamProgress : null}
             warnings={data?.parse_warnings ?? []}

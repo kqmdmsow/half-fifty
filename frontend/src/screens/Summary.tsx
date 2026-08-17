@@ -9,7 +9,6 @@ type Filter = '전체' | RiskLevel
 export function SummaryScreen({
   clauseCount,
   results,
-  isSample,
   language = 'ko',
   liveProgress = null,
   warnings = [],
@@ -18,7 +17,6 @@ export function SummaryScreen({
 }: {
   clauseCount: number
   results: ClauseResult[]
-  isSample: boolean
   language?: LangCode
   /** 스트리밍 분석 중이면 {done,total} — 완료 조항부터 이 화면에 바로 쌓인다 */
   liveProgress?: { done: number; total: number } | null
@@ -52,12 +50,6 @@ export function SummaryScreen({
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
-      {isSample && (
-        <p className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700">
-          분석 서버에 연결되지 않아 예시 결과를 보여드리고 있어요.
-        </p>
-      )}
-
       {warnings.map((warning) => (
         <p
           key={warning}
