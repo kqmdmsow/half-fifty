@@ -7,6 +7,7 @@ Parser(Module) -> Analysis(Agent) -> Persona(Agent) -> Judge(Agent)
 
 from langgraph.graph import END, StateGraph
 
+from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import analysis_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
@@ -90,11 +91,18 @@ pipeline = build_graph()
 
 
 def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
-    """파이프라인 1회 실행 헬퍼."""
+    """파이프라인 1회 실행 헬퍼.
+
+    개인정보 마스킹은 Parser 이전에 1회 수행 — 이후 모든 단계(화면 표시 원문,
+    LLM 입력, 인용 검사)가 동일한 마스킹 텍스트를 보므로 정합성이 유지된다.
+    """
+    raw_text, pii_counts = mask_pii(raw_text)
+    initial_warnings = [masking_notice(pii_counts)] if pii_counts else []
+
     initial_state: PipelineState = {
         "raw_text": raw_text,
         "persona": persona,  # type: ignore[typeddict-item]
-        "parse_warnings": [],
+        "parse_warnings": initial_warnings,
         "clauses": [],
         "analysis_results": [],
         "adapted_results": [],

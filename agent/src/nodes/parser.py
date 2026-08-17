@@ -125,4 +125,6 @@ def parser_node(state: PipelineState) -> dict:
     clauses, warnings = split_clauses_with_warnings(state["raw_text"])
     if warnings:
         print(f"[Parser] 추출 경고 {len(warnings)}건: {warnings}")
-    return {"clauses": clauses, "parse_warnings": warnings}
+    # 파이프라인 진입 시 이미 쌓인 경고(개인정보 마스킹 고지 등)를 보존한다 —
+    # LangGraph는 반환 키를 병합이 아니라 교체하므로 여기서 이어 붙인다.
+    return {"clauses": clauses, "parse_warnings": state.get("parse_warnings", []) + warnings}
