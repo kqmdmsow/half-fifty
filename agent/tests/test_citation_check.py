@@ -32,3 +32,16 @@ def test_short_quotes_skipped():
 def test_ellipsis_split_segments_checked():
     ev = '"차임을 2기 이상 … 해지할 수 있다"는 조항.'
     assert find_fabricated_quotes(ev, CLAUSE) == []
+
+
+def test_가운뎃점_유니코드_변형은_오탐_아님():
+    """모델이 ·(U+00B7)를 ・(U+30FB)로 바꿔 써도 같은 인용으로 인정 — val clause_020 실측 사례."""
+    clause = "명의인·계좌번호·비밀번호가 맞으면 그 요청자를 본인으로 본다."
+    evidence = "「명의인・계좌번호・비밀번호가 맞으면 그 요청자를 본인으로」라고 명시되어 있다."
+    assert find_fabricated_quotes(evidence, clause) == []
+
+
+def test_대시_변형도_동일_인용_인정():
+    clause = "보증금 반환은 계약 종료 후-즉시-이행한다."
+    evidence = "원문은 「보증금 반환은 계약 종료 후—즉시—이행한다」고 정한다."
+    assert find_fabricated_quotes(evidence, clause) == []
