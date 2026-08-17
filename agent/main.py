@@ -79,12 +79,16 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
         for r in state["adapted_results"]
     ]
 
+    # judge_scores에는 점수(float) 외에 rationale(dict, 콘솔 로그 참고용)이 섞여
+    # 있다 — 백엔드 DTO는 Map<String, Double>이므로 숫자만 내보낸다.
+    judge_scores = {k: v for k, v in state["judge_scores"].items() if isinstance(v, (int, float))}
+
     return AnalyzeResponse(
         clause_count=len(state["clauses"]),
         parse_warnings=state.get("parse_warnings", []),
         retry_count=state["retry_count"],
         needs_review=state["needs_review"],
-        judge_scores=dict(state["judge_scores"]),
+        judge_scores=judge_scores,
         results=results,
     )
 
