@@ -199,9 +199,12 @@ function buildConsultServices(results: ClauseResult[]) {
     },
     {
       name: '나의 변호사 (대한변호사협회)',
-      desc: `이 계약과 맞는 '${keyword}' 분야 변호사를 바로 검색해 연결`,
+      // klaw는 검색 상태를 URL에 싣지 않는 SPA라 딥링크 필터가 불가능 —
+      // 검색어를 자동 복사해주고 붙여넣도록 안내한다 (협회 API 제휴 전 차선책).
+      desc: `버튼을 누르면 '${keyword}' 검색어가 복사돼요. 열린 검색창에 붙여넣기만 하세요.`,
       phone: null,
-      url: `https://www.klaw.or.kr/search?keyword=${encodeURIComponent(keyword)}`,
+      url: 'https://www.klaw.or.kr/search',
+      copyKeyword: keyword,
     },
     {
       name: '전세피해지원센터',
@@ -223,25 +226,32 @@ function ConsultCard({
   desc,
   phone,
   url,
+  copyKeyword,
 }: {
   name: string
   desc: string
   phone: string | null
   url: string
+  copyKeyword?: string
 }) {
+  const openWithKeyword = () => {
+    if (copyKeyword) {
+      navigator.clipboard?.writeText(copyKeyword).catch(() => {})
+    }
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
   return (
     <Card className="flex flex-col items-start p-5">
       <p className="text-[15px] font-bold text-ink-900">{name}</p>
       <p className="mb-3.5 mt-1 flex-1 text-[13px] leading-relaxed text-ink-400">{desc}</p>
       <div className="flex gap-2">
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={openWithKeyword}
           className="rounded-lg bg-brand-50 px-2.5 py-1.5 text-[13px] font-bold text-brand-600 hover:bg-brand-100"
         >
-          홈페이지 열기
-        </a>
+          {copyKeyword ? `'${copyKeyword}' 복사하고 열기` : '홈페이지 열기'}
+        </button>
         {phone && (
           <a
             href={`tel:${phone}`}

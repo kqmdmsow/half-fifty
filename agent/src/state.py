@@ -48,7 +48,8 @@ class PipelineState(TypedDict):
 
     # 입력
     raw_text: str
-    persona: Literal["adult", "senior"]
+    persona: Literal["adult", "senior", "foreigner"]
+    language: str  # 설명 출력 언어 (ko/en/zh/vi — persona 노드에서만 사용, 기본 "ko")
 
     # 각 단계 출력
     parse_warnings: List[str]  # Parser 추출 경고 (별지 제외, 커버리지 미달 등)

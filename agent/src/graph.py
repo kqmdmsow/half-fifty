@@ -90,7 +90,7 @@ def build_graph():
 pipeline = build_graph()
 
 
-def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
+def run_pipeline(raw_text: str, persona: str = "adult", language: str = "ko") -> PipelineState:
     """파이프라인 1회 실행 헬퍼.
 
     개인정보 마스킹은 Parser 이전에 1회 수행 — 이후 모든 단계(화면 표시 원문,
@@ -102,6 +102,7 @@ def run_pipeline(raw_text: str, persona: str = "adult") -> PipelineState:
     initial_state: PipelineState = {
         "raw_text": raw_text,
         "persona": persona,  # type: ignore[typeddict-item]
+        "language": language or "ko",
         "parse_warnings": initial_warnings,
         "clauses": [],
         "analysis_results": [],

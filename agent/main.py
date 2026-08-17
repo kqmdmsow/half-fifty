@@ -17,11 +17,13 @@ PDF 업로드(/analyze-pdf)도 백엔드 프록시를 거친다 (자문 §7 — 
       -F "file=@contract.pdf" -F "persona=adult"
 """
 
+import json
 import os
 
-from typing import List, Literal
+from typing import List, Literal, Optional
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -29,6 +31,9 @@ from src.graph import run_pipeline
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
+from src.stream import stream_analysis
+
+Language = Literal["ko", "en", "zh", "vi"]
 
 app = FastAPI(title="Half-Fifty Agent Service", version="0.1.0")
 
@@ -42,7 +47,9 @@ app.add_middleware(
 
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., description="계약서 원문 텍스트")
-    persona: Literal["adult", "senior"] = Field("adult", description="사용자 페르소나")
+    persona: Literal["adult", "senior", "foreigner"] = Field("adult", description="사용자 페르소나")
+    # Optional — 백엔드(Java record)가 필드를 안 보내거나 null을 보내도 허용
+    language: Optional[Language] = Field("ko", description="설명 출력 언어 (foreigner 페르소나용)")
 
 
 class ClauseResult(BaseModel):
@@ -100,14 +107,30 @@ def health() -> dict:
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
-    state = run_pipeline(req.text, persona=req.persona)
+    state = run_pipeline(req.text, persona=req.persona, language=req.language or "ko")
     return _state_to_response(state)
+
+
+@app.post("/analyze-stream")
+def analyze_stream(req: AnalyzeRequest) -> StreamingResponse:
+    """조항별 점진 스트리밍 (NDJSON). 이벤트 계약은 src/stream.py docstring 참조.
+
+    조항 이벤트는 Judge 검증 전 결과 — 클라이언트는 '검증 중'으로 표시하고
+    judge 이벤트로 확정해야 한다.
+    """
+
+    def gen():
+        for event in stream_analysis(req.text, req.persona, req.language or "ko"):
+            yield json.dumps(event, ensure_ascii=False) + "\n"
+
+    return StreamingResponse(gen(), media_type="application/x-ndjson")
 
 
 @app.post("/analyze-pdf", response_model=AnalyzeResponse)
 async def analyze_pdf(
     file: UploadFile,
-    persona: Literal["adult", "senior"] = Form("adult"),
+    persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
+    language: Language = Form("ko"),
 ) -> AnalyzeResponse:
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=415, detail="application/pdf 파일만 지원합니다.")
@@ -124,14 +147,15 @@ async def analyze_pdf(
             raise HTTPException(
                 status_code=422, detail=f"{exc} / OCR 폴백 실패: {ocr_exc}") from ocr_exc
 
-    state = run_pipeline(text, persona=persona)
+    state = run_pipeline(text, persona=persona, language=language or "ko")
     return _state_to_response(state)
 
 
 @app.post("/analyze-image", response_model=AnalyzeResponse)
 async def analyze_image(
     file: UploadFile,
-    persona: Literal["adult", "senior"] = Form("adult"),
+    persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
+    language: Language = Form("ko"),
 ) -> AnalyzeResponse:
     """계약서 사진(jpg/png/webp) 분석 — Upstage Document Parse OCR 경유.
 
@@ -147,5 +171,5 @@ async def analyze_image(
     except OcrUnavailableError as exc:
         raise HTTPException(status_code=422, detail=f"사진에서 글자를 읽지 못했습니다: {exc}") from exc
 
-    state = run_pipeline(text, persona=persona)
+    state = run_pipeline(text, persona=persona, language=language or "ko")
     return _state_to_response(state)

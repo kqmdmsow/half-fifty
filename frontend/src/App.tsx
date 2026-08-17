@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react'
-import { analyzeContract, analyzeImage, analyzePdf, type AnalyzeResponse, type Persona } from './api'
+import {
+  analyzeContractStream,
+  analyzeImage,
+  analyzePdf,
+  type AnalyzeResponse,
+  type ClauseResult,
+  type Language,
+  type Persona,
+} from './api'
 import { Logo } from './components/ui'
 import { SAMPLE_RESULTS } from './data/sample'
 import { DetailScreen } from './screens/Detail'
@@ -29,6 +37,7 @@ export default function App() {
   const [file, setFile] = useState<File | null>(null)
   const [text, setText] = useState('')
   const [persona, setPersona] = useState<Persona>('adult')
+  const [language, setLanguage] = useState<Language>('ko')
 
   // 접근성 설정
   const [largeText, setLargeText] = useState(false)
@@ -40,6 +49,10 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<AnalyzeResponse | null>(null)
   const [selectedClauseId, setSelectedClauseId] = useState<string | null>(null)
+
+  // 스트리밍 진행 상태 (텍스트 분석 경로에서만 채워짐)
+  const [streamProgress, setStreamProgress] = useState<{ done: number; total: number } | null>(null)
+  const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   const results = data?.results.length ? data.results : SAMPLE_RESULTS
   const clauseCount = data?.clause_count ?? 16
@@ -58,16 +71,30 @@ export default function App() {
   const runAnalysis = async () => {
     setError(null)
     setLoading(true)
+    setStreamProgress(null)
+    setStreamedClauses([])
     go('progress')
 
     try {
       if (mode === 'text' && text.trim()) {
-        setData(await analyzeContract(text, persona))
+        // 텍스트 경로는 조항별 스트리밍 — 끝난 조항부터 바로 보인다
+        setData(
+          await analyzeContractStream(text, persona, language, {
+            onMeta: (meta) => setStreamProgress({ done: 0, total: meta.clause_count }),
+            onClause: ({ done, total, result }) => {
+              setStreamProgress({ done, total })
+              setStreamedClauses((prev) => [
+                ...prev.filter((c) => c.clause_id !== result.clause_id),
+                result,
+              ])
+            },
+          }),
+        )
       } else if (mode === 'pdf' && file) {
         setData(
           file.type.startsWith('image/')
-            ? await analyzeImage(file, persona)
-            : await analyzePdf(file, persona),
+            ? await analyzeImage(file, persona, language)
+            : await analyzePdf(file, persona, language),
         )
       }
     } catch (err) {
@@ -136,10 +163,12 @@ export default function App() {
         {screen === 'persona' && (
           <PersonaScreen
             persona={persona}
+            language={language}
             largeText={largeText}
             highContrast={highContrast}
             voiceGuide={voiceGuide}
             onPersonaChange={setPersona}
+            onLanguageChange={setLanguage}
             onToggleLargeText={() => setLargeText((value) => !value)}
             onToggleHighContrast={() => setHighContrast((value) => !value)}
             onToggleVoiceGuide={() => setVoiceGuide((value) => !value)}
@@ -151,6 +180,8 @@ export default function App() {
           <ProgressScreen
             loading={loading}
             error={error}
+            streamProgress={streamProgress}
+            streamedClauses={streamedClauses}
             onCancel={() => go('persona')}
             onShowResult={() => go('summary')}
           />
