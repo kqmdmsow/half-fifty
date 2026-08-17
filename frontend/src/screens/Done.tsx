@@ -90,6 +90,21 @@ export function DoneScreen({
         </ActionCard>
       </div>
 
+      <div className="mt-10">
+        <h2 className="text-[18px] font-bold tracking-[-0.01em] text-ink-900">
+          바로 상담받을 수 있는 곳
+        </h2>
+        <p className="mt-1.5 text-[14px] text-ink-400">
+          위에서 복사한 상담 요약을 들고 연락하면 이야기가 훨씬 빨라져요. 모두 공공기관의
+          무료 상담이에요.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {CONSULT_SERVICES.map((service) => (
+            <ConsultCard key={service.name} {...service} />
+          ))}
+        </div>
+      </div>
+
       <Card className="mt-8 flex flex-col items-start justify-between gap-4 p-6 md:flex-row md:items-center">
         <div>
           <p className="text-[15px] font-bold text-ink-900">결과는 24시간 뒤 자동 삭제돼요</p>
@@ -119,6 +134,70 @@ export function DoneScreen({
         </Button>
       </div>
     </div>
+  )
+}
+
+const CONSULT_SERVICES = [
+  {
+    name: '대한법률구조공단',
+    desc: '계약서·임대차 등 모든 법률 문제 무료 상담',
+    phone: '132',
+    url: 'https://www.klac.or.kr',
+  },
+  {
+    name: '나의 변호사 (대한변호사협회)',
+    desc: '분야별 전문 변호사를 직접 찾아 연결',
+    phone: null,
+    url: 'https://www.klaw.or.kr',
+  },
+  {
+    name: '전세피해지원센터',
+    desc: '전세사기·보증금 피해 전문 상담 (국토교통부)',
+    phone: '1533-8119',
+    url: 'https://www.khug.or.kr/jeonse',
+  },
+  {
+    name: '금융감독원 금융민원센터',
+    desc: '대출·보험·금융상품 분쟁과 피해 상담',
+    phone: '1332',
+    url: 'https://www.fss.or.kr',
+  },
+]
+
+function ConsultCard({
+  name,
+  desc,
+  phone,
+  url,
+}: {
+  name: string
+  desc: string
+  phone: string | null
+  url: string
+}) {
+  return (
+    <Card className="flex flex-col items-start p-5">
+      <p className="text-[15px] font-bold text-ink-900">{name}</p>
+      <p className="mb-3.5 mt-1 flex-1 text-[13px] leading-relaxed text-ink-400">{desc}</p>
+      <div className="flex gap-2">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-lg bg-brand-50 px-2.5 py-1.5 text-[13px] font-bold text-brand-600 hover:bg-brand-100"
+        >
+          홈페이지 열기
+        </a>
+        {phone && (
+          <a
+            href={`tel:${phone}`}
+            className="rounded-lg bg-ink-50 px-2.5 py-1.5 text-[13px] font-bold text-ink-600 hover:bg-ink-100"
+          >
+            전화 {phone}
+          </a>
+        )}
+      </div>
+    </Card>
   )
 }
 
