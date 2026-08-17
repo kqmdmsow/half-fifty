@@ -1,8 +1,10 @@
 // 백엔드(Spring Boot, 8080) API 호출 모듈.
 // 백엔드 응답 스키마와 1:1 대응하는 타입 정의.
 
+import type { LangCode } from './i18n'
+
 export type Persona = 'adult' | 'senior' | 'foreigner'
-export type Language = 'ko' | 'en' | 'zh' | 'vi'
+export type Language = LangCode
 
 export interface ClauseResult {
   clause_id: string

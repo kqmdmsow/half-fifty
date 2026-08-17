@@ -27,11 +27,24 @@ _TEMPLATES = {
 }
 
 # 지원 출력 언어 — persona_foreigner 프롬프트의 {language}에 들어갈 자연어 이름.
+# 영문 병기는 모델이 언어를 확실히 인식하도록 하기 위함 (특히 저자원 언어).
 LANGUAGE_NAMES = {
     "ko": "한국어(쉬운 표현)",
     "en": "English",
-    "zh": "简体中文",
-    "vi": "Tiếng Việt",
+    "zh": "简体中文 (Simplified Chinese)",
+    "vi": "Tiếng Việt (Vietnamese)",
+    "th": "ภาษาไทย (Thai)",
+    "id": "Bahasa Indonesia (Indonesian)",
+    "tl": "Filipino/Tagalog",
+    "ne": "नेपाली (Nepali)",
+    "km": "ភាសាខ្មែរ (Khmer)",
+    "my": "မြန်မာဘာသာ (Burmese)",
+    "mn": "Монгол хэл (Mongolian)",
+    "uz": "Oʻzbek tili (Uzbek)",
+    "si": "සිංහල (Sinhala)",
+    "bn": "বাংলা (Bengali)",
+    "ru": "Русский (Russian)",
+    "ja": "日本語 (Japanese)",
 }
 
 

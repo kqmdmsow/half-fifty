@@ -1,5 +1,6 @@
 import type { Language, Persona } from '../api'
 import { Button, Card, PageTitle, Switch } from '../components/ui'
+import { LANGUAGES } from '../i18n'
 
 const PERSONAS: Array<{ id: Persona; emoji: string; title: string; desc: string }> = [
   {
@@ -22,12 +23,7 @@ const PERSONAS: Array<{ id: Persona; emoji: string; title: string; desc: string 
   },
 ]
 
-const LANGUAGES: Array<{ id: Language; label: string }> = [
-  { id: 'en', label: 'English' },
-  { id: 'zh', label: '中文' },
-  { id: 'vi', label: 'Tiếng Việt' },
-  { id: 'ko', label: '쉬운 한국어' },
-]
+// 언어 목록은 i18n.ts에서 관리 (2025 체류외국인·E-9·유학생 통계 기반 16종)
 
 export function PersonaScreen({
   persona,

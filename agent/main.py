@@ -33,7 +33,12 @@ from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
 from src.stream import stream_analysis
 
-Language = Literal["ko", "en", "zh", "vi"]
+# 2025 체류외국인(중국·베트남·네팔·우즈벡·캄보디아·태국 순)·E-9(캄보디아·네팔·
+# 베트남 상위)·유학생(우즈벡·몽골·네팔·미얀마) 통계 기반 16개 언어
+Language = Literal[
+    "ko", "en", "zh", "vi", "th", "id", "tl", "ne",
+    "km", "my", "mn", "uz", "si", "bn", "ru", "ja",
+]
 
 app = FastAPI(title="Half-Fifty Agent Service", version="0.1.0")
 

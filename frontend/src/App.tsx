@@ -54,9 +54,18 @@ export default function App() {
   const [streamProgress, setStreamProgress] = useState<{ done: number; total: number } | null>(null)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
-  const results = data?.results.length ? data.results : SAMPLE_RESULTS
-  const clauseCount = data?.clause_count ?? 16
-  const isSample = !data
+  // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다
+  const sortedStreamed = [...streamedClauses].sort((a, b) =>
+    a.clause_id.localeCompare(b.clause_id),
+  )
+  const streamingLive = loading && streamProgress !== null
+  const results = data?.results.length
+    ? data.results
+    : streamingLive
+      ? sortedStreamed
+      : SAMPLE_RESULTS
+  const clauseCount = data?.clause_count ?? streamProgress?.total ?? 16
+  const isSample = !data && !streamingLive
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
@@ -77,7 +86,10 @@ export default function App() {
 
     try {
       if (mode === 'text' && text.trim()) {
-        // 텍스트 경로는 조항별 스트리밍 — 끝난 조항부터 바로 보인다
+        // 텍스트 경로는 조항별 스트리밍 — 결과 화면으로 즉시 이동해
+        // 끝난 조항부터 카드로 쌓이고 '자세히 보기'도 바로 동작한다
+        setStreamProgress({ done: 0, total: 0 })
+        go('summary')
         setData(
           await analyzeContractStream(text, persona, language, {
             onMeta: (meta) => setStreamProgress({ done: 0, total: meta.clause_count }),
@@ -99,6 +111,8 @@ export default function App() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '분석 요청에 실패했어요.')
+      setStreamProgress(null)
+      go('progress') // 오류 안내와 재시도 버튼은 Progress 화면이 담당
     } finally {
       setLoading(false)
     }
@@ -191,6 +205,8 @@ export default function App() {
             clauseCount={clauseCount}
             results={results}
             isSample={isSample}
+            language={persona === 'foreigner' ? language : 'ko'}
+            liveProgress={streamingLive ? streamProgress : null}
             warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
@@ -201,6 +217,7 @@ export default function App() {
             clauseId={selectedClauseId ?? results[0].clause_id}
             results={results}
             voiceGuide={voiceGuide}
+            language={persona === 'foreigner' ? language : 'ko'}
             onSelectClause={setSelectedClauseId}
             onBack={() => go('summary')}
             onDone={() => go('done')}
