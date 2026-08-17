@@ -47,7 +47,9 @@ export function DoneScreen({
   }
 
   return (
-    <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
+    <>
+    <PrintReport results={results} />
+    <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16 print:hidden">
       <div className="text-center">
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-[28px]">
           🎉
@@ -99,7 +101,7 @@ export function DoneScreen({
           무료 상담이에요.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {CONSULT_SERVICES.map((service) => (
+          {buildConsultServices(results).map((service) => (
             <ConsultCard key={service.name} {...service} />
           ))}
         </div>
@@ -134,35 +136,87 @@ export function DoneScreen({
         </Button>
       </div>
     </div>
+    </>
   )
 }
 
-const CONSULT_SERVICES = [
-  {
-    name: '대한법률구조공단',
-    desc: '계약서·임대차 등 모든 법률 문제 무료 상담',
-    phone: '132',
-    url: 'https://www.klac.or.kr',
-  },
-  {
-    name: '나의 변호사 (대한변호사협회)',
-    desc: '분야별 전문 변호사를 직접 찾아 연결',
-    phone: null,
-    url: 'https://www.klaw.or.kr',
-  },
-  {
-    name: '전세피해지원센터',
-    desc: '전세사기·보증금 피해 전문 상담 (국토교통부)',
-    phone: '1533-8119',
-    url: 'https://www.khug.or.kr/jeonse',
-  },
-  {
-    name: '금융감독원 금융민원센터',
-    desc: '대출·보험·금융상품 분쟁과 피해 상담',
-    phone: '1332',
-    url: 'https://www.fss.or.kr',
-  },
-]
+/** 인쇄(PDF 저장) 전용 리포트 — 화면에는 숨겨지고 window.print() 시에만 렌더링.
+ *  Done 화면 자체를 인쇄하면 분석 결과가 하나도 안 담기던 문제의 해결책. */
+function PrintReport({ results }: { results: ClauseResult[] }) {
+  const risky = results.filter((r) => r.risk_level !== '안전')
+  return (
+    <div className="hidden px-8 py-6 print:block">
+      <h1 className="text-[20px] font-bold text-ink-900">하프피프티 계약서 분석 결과</h1>
+      <p className="mt-1 text-[11px] text-ink-400">
+        전체 {results.length}개 조항 중 확인이 필요한 조항 {risky.length}개 · 본 결과는 참고용
+        안내이며 법률 자문이 아닙니다. 중요한 결정은 반드시 전문가와 상담하세요.
+      </p>
+      {results.map((r) => (
+        <div
+          key={r.clause_id}
+          className="mt-4 border-t border-ink-100 pt-3"
+          style={{ breakInside: 'avoid' }}
+        >
+          <p className="text-[13px] font-bold text-ink-900">
+            [{r.risk_level}] {r.risk_type !== '해당 없음' ? r.risk_type : '표준 조항'}
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-ink-700">원문: {r.original_text}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-ink-900">설명: {r.explanation}</p>
+          {r.risk_level !== '안전' && r.risk_evidence && (
+            <p className="mt-1 text-[11px] leading-relaxed text-ink-700">근거: {r.risk_evidence}</p>
+          )}
+          {r.check_questions.length > 0 && (
+            <ul className="mt-1 list-disc pl-5 text-[11px] leading-relaxed text-ink-700">
+              {r.check_questions.map((q) => (
+                <li key={q}>확인할 것: {q}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** 분석 결과에서 계약 도메인을 추론해 변호사 검색 키워드로 쓴다.
+ *  (도메인 라우팅 PR#24 머지 전까지의 프론트 단독 휴리스틱 — 머지 후 서버
+ *  판정으로 대체 가능) */
+function consultKeyword(results: ClauseResult[]): string {
+  const text = results.map((r) => `${r.risk_type} ${r.original_text}`).join(' ')
+  if (/보증금|임대차|임차|전세|월세|임대인/.test(text)) return '임대차'
+  if (/대출|이자|금리|보험|카드|연금|투자|상환/.test(text)) return '금융'
+  return '계약'
+}
+
+function buildConsultServices(results: ClauseResult[]) {
+  const keyword = consultKeyword(results)
+  return [
+    {
+      name: '대한법률구조공단',
+      desc: '계약서·임대차 등 모든 법률 문제 무료 상담',
+      phone: '132',
+      url: 'https://www.klac.or.kr',
+    },
+    {
+      name: '나의 변호사 (대한변호사협회)',
+      desc: `이 계약과 맞는 '${keyword}' 분야 변호사를 바로 검색해 연결`,
+      phone: null,
+      url: `https://www.klaw.or.kr/search?keyword=${encodeURIComponent(keyword)}`,
+    },
+    {
+      name: '전세피해지원센터',
+      desc: '전세사기·보증금 피해 전문 상담 (국토교통부)',
+      phone: '1533-8119',
+      url: 'https://www.khug.or.kr/jeonse',
+    },
+    {
+      name: '금융감독원 금융민원센터',
+      desc: '대출·보험·금융상품 분쟁과 피해 상담',
+      phone: '1332',
+      url: 'https://www.fss.or.kr',
+    },
+  ]
+}
 
 function ConsultCard({
   name,

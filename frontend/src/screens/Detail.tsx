@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META } from '../data/sample'
+import { speak, stopSpeaking } from '../tts'
 
 export function DetailScreen({
   clauseId,
@@ -20,15 +21,11 @@ export function DetailScreen({
 }) {
   const clause = results.find((result) => result.clause_id === clauseId) ?? results[0]
 
-  // 음성 안내: 화면 진입 시 설명 읽기
+  // 음성 안내: 화면 진입 시 설명 읽기 (기기 최적 한국어 보이스 자동 선택 — src/tts.ts)
   useEffect(() => {
-    if (!voiceGuide || !('speechSynthesis' in window)) return
-    const utterance = new SpeechSynthesisUtterance(clause.explanation)
-    utterance.lang = 'ko-KR'
-    utterance.rate = 0.95
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(utterance)
-    return () => window.speechSynthesis.cancel()
+    if (!voiceGuide) return
+    speak(clause.explanation)
+    return () => stopSpeaking()
   }, [voiceGuide, clause])
 
   const questions = clause.check_questions.length

@@ -18,6 +18,7 @@ PR에서는 비활성화한다(_ENABLE_STRUCTURAL_CHECKLIST=False). 노출 위�
 남겨 다음 작업에서 이어갈 수 있게 한다.
 """
 
+import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
@@ -67,7 +68,9 @@ _STRUCTURAL_RISK_CHECKLIST = AnalysisResult(
 _PROMPT_PREFIX, _PROMPT_SUFFIX = _PROMPT_TEMPLATE.split("{clause_text}")
 
 # 조항 분석은 서로 독립이라 병렬 호출한다. API rate limit을 고려한 보수적 동시성.
-_MAX_CONCURRENCY = 5
+# 기본 5(보수적). API 티어가 허용하면 LLM_CONCURRENCY 환경변수로 상향 —
+# 조항 분석·페르소나가 병렬 폭만큼 빨라진다 (16조항 기준 5→10이면 약 절반).
+_MAX_CONCURRENCY = int(os.getenv("LLM_CONCURRENCY", "5"))
 
 
 def _analyze_clause(clause_id: str, text: str) -> AnalysisResult:

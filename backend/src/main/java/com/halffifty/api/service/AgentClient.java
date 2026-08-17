@@ -4,9 +4,12 @@ import com.halffifty.api.dto.AnalyzeRequest;
 import com.halffifty.api.dto.AnalyzeResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -53,20 +56,26 @@ public class AgentClient {
 
     private AnalyzeResponse forwardFile(
             String uri, byte[] bytes, String filename, MediaType contentType, String persona) {
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("file", new ByteArrayResource(bytes) {
-                    @Override
-                    public String getFilename() {
-                        return filename;
-                    }
-                })
-                .contentType(contentType);
-        builder.part("persona", persona);
+        // MultipartBodyBuilder는 내부에서 reactive-streams(Publisher)를 참조해
+        // WebFlux 없는 클래스패스에서는 NoClassDefFoundError로 죽는다 —
+        // 블로킹 스택 표준인 MultiValueMap + HttpEntity 방식으로 구성한다.
+        ByteArrayResource fileResource = new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        };
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentType(contentType);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new HttpEntity<>(fileResource, fileHeaders));
+        body.add("persona", persona);
 
         return restClient.post()
                 .uri(uri)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(builder.build())
+                .body(body)
                 .retrieve()
                 .body(AnalyzeResponse.class);
     }

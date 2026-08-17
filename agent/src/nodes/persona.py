@@ -9,6 +9,7 @@ explanation만 다시 쓴다. 나머지 필드(위험 여부/근거/질문)는 �
 """
 
 import json
+import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
@@ -17,7 +18,7 @@ from src.llm import get_worker_llm, invoke_json
 from src.state import AnalysisResult, PipelineState
 
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
-_MAX_CONCURRENCY = 5  # analysis_node와 동일한 보수적 동시성
+_MAX_CONCURRENCY = int(os.getenv("LLM_CONCURRENCY", "5"))  # analysis_node와 동일 (env로 상향 가능)
 
 _TEMPLATES = {
     "adult": (PROMPTS_DIR / "persona_adult.txt").read_text(encoding="utf-8"),

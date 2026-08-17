@@ -10,10 +10,14 @@ services:
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false        # 대시보드에서 직접 입력
+      - key: UPSTAGE_API_KEY
+        sync: false        # OCR(사진·스캔 PDF) 필수 — 누락 시 /analyze-image 전면 비작동
       - key: MODEL_WORKER
         value: claude-haiku-4-5
       - key: MODEL_JUDGE
         value: claude-sonnet-4-6
+      - key: LLM_CONCURRENCY
+        value: "10"        # 조항 분석·페르소나 병렬 폭 (기본 5, 실측 90s→70s)
       - key: CORS_ALLOWED_ORIGINS
         value: https://halffifty.onrender.com
 
