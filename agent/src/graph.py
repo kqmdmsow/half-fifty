@@ -107,6 +107,7 @@ def run_pipeline(raw_text: str, persona: str = "adult", language: str = "ko") ->
         "clauses": [],
         "analysis_results": [],
         "adapted_results": [],
+        "translations": {},
         "judge_scores": {  # type: ignore[typeddict-item]
             "clarity": 0.0,
             "faithfulness": 0.0,

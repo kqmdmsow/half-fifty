@@ -333,8 +333,122 @@ const RISK_TYPES: Record<LangCode, Record<string, string>> = {
   },
 }
 
-export function t(lang: LangCode, key: UIKey, vars?: Record<string, number | string>): string {
-  let text = UI[lang]?.[key] ?? UI.en[key] ?? UI.ko[key]
+type ExtraKey =
+  | 'translationLabel' | 'inKorean' | 'largeText'
+  | 'landingTitle1' | 'landingTitle2' | 'landingSubtitle' | 'landingCta'
+
+/** 뒤에 추가된 키 — UI 본 사전과 분리해 유지보수 (t()가 양쪽을 조회). */
+const UI_EXTRA: Record<LangCode, Record<ExtraKey, string>> = {
+  ko: {
+    translationLabel: '번역', inKorean: '한국어 원문', largeText: '가 글자 크게',
+    landingTitle1: '어려운 계약서,', landingTitle2: '쉬운 말로 확인하세요',
+    landingSubtitle: '불리할 수 있는 조항과 그 근거를 찾아, 계약 전에 꼭 물어볼 질문까지 알려드려요.',
+    landingCta: '계약서 분석 시작하기',
+  },
+  en: {
+    translationLabel: 'Translation', inKorean: 'In Korean', largeText: 'Aa Larger text',
+    landingTitle1: 'Difficult contracts,', landingTitle2: 'explained in plain words',
+    landingSubtitle: 'We find risky clauses with evidence, and give you the questions to ask before signing.',
+    landingCta: 'Analyze my contract',
+  },
+  zh: {
+    translationLabel: '翻译', inKorean: '韩语原文', largeText: 'Aa 放大字体',
+    landingTitle1: '难懂的合同，', landingTitle2: '用简单的话确认',
+    landingSubtitle: '找出可能不利的条款和依据，并告诉您签约前要问的问题。',
+    landingCta: '开始分析合同',
+  },
+  vi: {
+    translationLabel: 'Bản dịch', inKorean: 'Nguyên văn tiếng Hàn', largeText: 'Aa Chữ to hơn',
+    landingTitle1: 'Hợp đồng khó hiểu,', landingTitle2: 'hãy xem bằng lời dễ hiểu',
+    landingSubtitle: 'Tìm các điều khoản bất lợi kèm căn cứ, và cho bạn câu hỏi cần hỏi trước khi ký.',
+    landingCta: 'Bắt đầu phân tích hợp đồng',
+  },
+  th: {
+    translationLabel: 'คำแปล', inKorean: 'ต้นฉบับภาษาเกาหลี', largeText: 'Aa ตัวอักษรใหญ่ขึ้น',
+    landingTitle1: 'สัญญาที่เข้าใจยาก', landingTitle2: 'ตรวจสอบด้วยภาษาง่าย ๆ',
+    landingSubtitle: 'ค้นหาข้อสัญญาที่อาจเสียเปรียบพร้อมหลักฐาน และบอกคำถามที่ควรถามก่อนเซ็น',
+    landingCta: 'เริ่มวิเคราะห์สัญญา',
+  },
+  id: {
+    translationLabel: 'Terjemahan', inKorean: 'Teks asli Korea', largeText: 'Aa Perbesar teks',
+    landingTitle1: 'Kontrak yang sulit,', landingTitle2: 'dipahami dengan bahasa sederhana',
+    landingSubtitle: 'Kami menemukan pasal berisiko beserta dasarnya, dan memberi pertanyaan yang perlu diajukan sebelum tanda tangan.',
+    landingCta: 'Mulai analisis kontrak',
+  },
+  tl: {
+    translationLabel: 'Salin', inKorean: 'Orihinal sa Korean', largeText: 'Aa Palakihin ang teksto',
+    landingTitle1: 'Mahirap na kontrata,', landingTitle2: 'ipaliwanag sa simpleng salita',
+    landingSubtitle: 'Hinahanap namin ang mga mapanganib na sugnay na may batayan, at ibinibigay ang mga tanong bago pumirma.',
+    landingCta: 'Simulan ang pagsusuri',
+  },
+  ne: {
+    translationLabel: 'अनुवाद', inKorean: 'कोरियाली मूल', largeText: 'Aa ठूलो अक्षर',
+    landingTitle1: 'गाह्रो सम्झौता,', landingTitle2: 'सजिलो भाषामा जाँच्नुहोस्',
+    landingSubtitle: 'जोखिमपूर्ण धारा र आधार खोजेर, हस्ताक्षर अघि सोध्नुपर्ने प्रश्न पनि दिन्छौं।',
+    landingCta: 'सम्झौता विश्लेषण सुरु गर्नुहोस्',
+  },
+  km: {
+    translationLabel: 'ការបកប្រែ', inKorean: 'អត្ថបទដើមកូរ៉េ', largeText: 'Aa អក្សរធំជាង',
+    landingTitle1: 'កិច្ចសន្យាពិបាកយល់', landingTitle2: 'ពិនិត្យដោយពាក្យងាយៗ',
+    landingSubtitle: 'យើងរកប្រការដែលអាចខាតបង់ព្រមទាំងភស្តុតាង និងផ្តល់សំណួរដែលគួរសួរមុនចុះហត្ថលេខា។',
+    landingCta: 'ចាប់ផ្តើមវិភាគកិច្ចសន្យា',
+  },
+  my: {
+    translationLabel: 'ဘာသာပြန်', inKorean: 'ကိုရီးယား မူရင်း', largeText: 'Aa စာလုံးကြီး',
+    landingTitle1: 'နားလည်ရခက်သော စာချုပ်ကို', landingTitle2: 'ရိုးရှင်းသောစကားဖြင့် စစ်ဆေးပါ',
+    landingSubtitle: 'အန္တရာယ်ရှိနိုင်သောအပိုဒ်နှင့် အထောက်အထားကိုရှာပြီး လက်မှတ်မထိုးမီ မေးသင့်သောမေးခွန်းများကိုပေးသည်။',
+    landingCta: 'စာချုပ်စိစစ်မှု စတင်ရန်',
+  },
+  mn: {
+    translationLabel: 'Орчуулга', inKorean: 'Солонгос эх', largeText: 'Aa Томруулах',
+    landingTitle1: 'Ойлгоход хэцүү гэрээг', landingTitle2: 'энгийн үгээр шалгаарай',
+    landingSubtitle: 'Эрсдэлтэй заалт, үндэслэлийг олж, гарын үсэг зурахын өмнө асуух асуултыг өгнө.',
+    landingCta: 'Гэрээ шинжлэх',
+  },
+  uz: {
+    translationLabel: 'Tarjima', inKorean: 'Koreyscha asl matn', largeText: 'Aa Kattaroq matn',
+    landingTitle1: 'Murakkab shartnomani', landingTitle2: 'sodda tilda tekshiring',
+    landingSubtitle: 'Xavfli bandlarni asosi bilan topamiz va imzolashdan oldin so‘raladigan savollarni beramiz.',
+    landingCta: 'Shartnoma tahlilini boshlash',
+  },
+  si: {
+    translationLabel: 'පරිවර්තනය', inKorean: 'කොරියානු මුල් පිටපත', largeText: 'Aa විශාල අකුරු',
+    landingTitle1: 'තේරුම්ගත නොහැකි ගිවිසුම්,', landingTitle2: 'සරල වචනවලින් පරීක්ෂා කරන්න',
+    landingSubtitle: 'අවදානම් වගන්ති සහ පදනම සොයා, අත්සන් කිරීමට පෙර ඇසිය යුතු ප්‍රශ්නද ලබා දෙමු.',
+    landingCta: 'ගිවිසුම විශ්ලේෂණය අරඹන්න',
+  },
+  bn: {
+    translationLabel: 'অনুবাদ', inKorean: 'কোরীয় মূল', largeText: 'Aa বড় অক্ষর',
+    landingTitle1: 'কঠিন চুক্তি,', landingTitle2: 'সহজ ভাষায় যাচাই করুন',
+    landingSubtitle: 'ঝুঁকিপূর্ণ ধারা ও তার ভিত্তি খুঁজে বের করি, এবং সই করার আগে জিজ্ঞাসার প্রশ্নও দিই।',
+    landingCta: 'চুক্তি বিশ্লেষণ শুরু করুন',
+  },
+  ru: {
+    translationLabel: 'Перевод', inKorean: 'Корейский оригинал', largeText: 'Aa Крупнее шрифт',
+    landingTitle1: 'Сложный договор —', landingTitle2: 'проверьте простыми словами',
+    landingSubtitle: 'Находим рискованные пункты с обоснованием и даём вопросы, которые стоит задать до подписания.',
+    landingCta: 'Начать анализ договора',
+  },
+  ja: {
+    translationLabel: '翻訳', inKorean: '韓国語原文', largeText: 'Aa 文字を大きく',
+    landingTitle1: '難しい契約書を、', landingTitle2: 'やさしい言葉で確認',
+    landingSubtitle: '不利になり得る条項と根拠を見つけ、署名前に聞くべき質問までお伝えします。',
+    landingCta: '契約書の分析を始める',
+  },
+}
+
+export function t(
+  lang: LangCode,
+  key: UIKey | ExtraKey,
+  vars?: Record<string, number | string>,
+): string {
+  const base = (UI[lang] as Record<string, string>)?.[key] ?? (UI_EXTRA[lang] as Record<string, string>)?.[key]
+  let text =
+    base ??
+    (UI.en as Record<string, string>)[key] ??
+    (UI_EXTRA.en as Record<string, string>)[key] ??
+    (UI.ko as Record<string, string>)[key] ??
+    (UI_EXTRA.ko as Record<string, string>)[key]
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
       text = text.split(`{${name}}`).join(String(value))

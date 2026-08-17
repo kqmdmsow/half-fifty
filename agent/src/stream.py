@@ -37,28 +37,38 @@ from src.state import (
 )
 
 
-def _analyze_and_adapt(clause: Clause, persona: str, language: str) -> AnalysisResult:
+def _analyze_and_adapt(
+    clause: Clause, persona: str, language: str
+) -> tuple[AnalysisResult, dict | None]:
     result = _analyze_clause(clause["clause_id"], clause["text"])
-    return _adapt(result, persona, language)
+    return _adapt(result, persona, language, clause["text"])
 
 
 def _emit_clauses(
     clauses: List[Clause], persona: str, language: str, revision: int
 ) -> Iterator[dict]:
-    """전 조항을 병렬 분석+적응하고 완료 순서대로 clause 이벤트를 낸다."""
+    """전 조항을 병렬 분석+적응하고 완료 순서대로 clause 이벤트를 낸다.
+
+    번역(원문·질문)은 이벤트 payload에만 싣는다 — judge 입력(adapted 결과)에는
+    섞지 않는다 (persona._adapt docstring 참조).
+    """
     done = 0
     clause_text = {c["clause_id"]: c["text"] for c in clauses}
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
         futures = [pool.submit(_analyze_and_adapt, c, persona, language) for c in clauses]
         for future in as_completed(futures):
-            result = future.result()  # _analyze_clause/_adapt 모두 내부 폴백 보유
+            result, translation = future.result()  # 양쪽 모두 내부 폴백 보유
             done += 1
             yield {
                 "event": "clause",
                 "done": done,
                 "total": len(clauses),
                 "revision": revision,
-                "result": {**result, "original_text": clause_text[result["clause_id"]]},
+                "result": {
+                    **result,
+                    "original_text": clause_text[result["clause_id"]],
+                    **(translation or {}),
+                },
             }
 
 
@@ -81,9 +91,10 @@ def stream_analysis(raw_text: str, persona: str, language: str = "ko") -> Iterat
     numeric_scores: Dict[str, float] = {}
 
     while True:
+        _EVENT_ONLY_KEYS = {"original_text", "original_text_translated", "check_questions_translated"}
         for event in _emit_clauses(clauses, persona, language, revision=retry):
             results_by_id[event["result"]["clause_id"]] = {
-                k: v for k, v in event["result"].items() if k != "original_text"
+                k: v for k, v in event["result"].items() if k not in _EVENT_ONLY_KEYS
             }  # type: ignore[assignment]
             yield event
 

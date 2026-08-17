@@ -10,6 +10,7 @@ import {
 } from './api'
 import { Logo } from './components/ui'
 import { SAMPLE_RESULTS } from './data/sample'
+import { LANGUAGES, t } from './i18n'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
 import { ExtractScreen } from './screens/Extract'
@@ -137,23 +138,40 @@ export default function App() {
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo onClick={() => go('landing')} />
-          <button
-            type="button"
-            aria-pressed={largeText}
-            onClick={() => setLargeText((value) => !value)}
-            className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-              largeText
-                ? 'bg-ink-900 text-white'
-                : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-            }`}
-          >
-            가 글자 크게
-          </button>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
+              <span aria-hidden>🌐</span>
+              <select
+                aria-label="언어 선택 / Language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as Language)}
+                className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
+              >
+                {LANGUAGES.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              aria-pressed={largeText}
+              onClick={() => setLargeText((value) => !value)}
+              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+                largeText
+                  ? 'bg-ink-900 text-white'
+                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              {t(language, 'largeText')}
+            </button>
+          </div>
         </div>
       </header>
 
       <main>
-        {screen === 'landing' && <LandingScreen onStart={() => go('upload')} />}
+        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}
@@ -205,7 +223,7 @@ export default function App() {
             clauseCount={clauseCount}
             results={results}
             isSample={isSample}
-            language={persona === 'foreigner' ? language : 'ko'}
+            language={language}
             liveProgress={streamingLive ? streamProgress : null}
             warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
@@ -217,7 +235,7 @@ export default function App() {
             clauseId={selectedClauseId ?? results[0].clause_id}
             results={results}
             voiceGuide={voiceGuide}
-            language={persona === 'foreigner' ? language : 'ko'}
+            language={language}
             onSelectClause={setSelectedClauseId}
             onBack={() => go('summary')}
             onDone={() => go('done')}

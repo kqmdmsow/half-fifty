@@ -106,6 +106,14 @@ export function DetailScreen({
               <CopyButton text={clause.original_text} className="!bg-white" />
             </div>
             <p className="mt-2.5 text-[15px] leading-loose text-ink-700">{clause.original_text}</p>
+            {clause.original_text_translated && (
+              <div className="mt-3 border-t border-danger-500/10 pt-3">
+                <p className="text-[12px] font-bold text-ink-400">{t(language, 'translationLabel')}</p>
+                <p className="mt-1 text-[14px] leading-relaxed text-ink-600">
+                  {clause.original_text_translated}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="mt-7">
@@ -114,15 +122,39 @@ export function DetailScreen({
               <p className="mt-1 text-[13px] text-ink-400">{t(language, 'askKoreanHint')}</p>
             )}
             <div className="mt-3 space-y-2.5">
-              {questions.map((question) => (
-                <div
-                  key={question}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-ink-100 bg-white px-5 py-4"
-                >
-                  <span className="text-[14px] leading-relaxed text-ink-700">{question}</span>
-                  <CopyButton text={question} />
-                </div>
-              ))}
+              {questions.map((question, index) => {
+                const translated = clause.check_questions_translated?.[index]
+                return (
+                  <div
+                    key={question}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-ink-100 bg-white px-5 py-4"
+                  >
+                    <div className="min-w-0 flex-1">
+                      {/* 번역이 있으면 이해용 번역을 먼저, 상대방에게 보여줄 한국어를 아래에 */}
+                      {translated && (
+                        <p className="text-[14px] font-semibold leading-relaxed text-ink-900">
+                          {translated}
+                        </p>
+                      )}
+                      <p
+                        className={
+                          translated
+                            ? 'mt-1.5 rounded-lg bg-ink-25 px-2.5 py-1.5 text-[13px] leading-relaxed text-ink-600'
+                            : 'text-[14px] leading-relaxed text-ink-700'
+                        }
+                      >
+                        {translated && (
+                          <span className="mr-1.5 font-bold text-ink-400">
+                            {t(language, 'inKorean')}:
+                          </span>
+                        )}
+                        {question}
+                      </p>
+                    </div>
+                    <CopyButton text={question} />
+                  </div>
+                )
+              })}
             </div>
           </div>
 

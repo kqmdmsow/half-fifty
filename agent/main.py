@@ -65,6 +65,9 @@ class ClauseResult(BaseModel):
     risk_type: str
     risk_evidence: str
     check_questions: List[str]
+    # 비한국어 언어 선택 시에만 채워짐 (한국어 원문·질문은 그대로 유지 + 번역 병기)
+    original_text_translated: Optional[str] = None
+    check_questions_translated: Optional[List[str]] = None
 
 
 class AnalyzeResponse(BaseModel):
@@ -78,6 +81,7 @@ class AnalyzeResponse(BaseModel):
 
 def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     clause_text = {c["clause_id"]: c["text"] for c in state["clauses"]}
+    translations = state.get("translations", {})
     results = [
         ClauseResult(
             clause_id=r["clause_id"],
@@ -87,6 +91,8 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
             risk_type=r["risk_type"],
             risk_evidence=r["risk_evidence"],
             check_questions=r["check_questions"],
+            original_text_translated=translations.get(r["clause_id"], {}).get("original_text_translated"),
+            check_questions_translated=translations.get(r["clause_id"], {}).get("check_questions_translated"),
         )
         for r in state["adapted_results"]
     ]

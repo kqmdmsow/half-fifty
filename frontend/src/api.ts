@@ -14,6 +14,9 @@ export interface ClauseResult {
   risk_type: string
   risk_evidence: string
   check_questions: string[]
+  // 비한국어 언어 선택 시에만 채워짐 — 한국어 원문·질문에 번역 병기용
+  original_text_translated?: string | null
+  check_questions_translated?: string[] | null
 }
 
 export interface AnalyzeResponse {

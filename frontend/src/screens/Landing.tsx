@@ -1,6 +1,13 @@
 import { Button, RiskBadge } from '../components/ui'
+import { t, type LangCode } from '../i18n'
 
-export function LandingScreen({ onStart }: { onStart: () => void }) {
+export function LandingScreen({
+  onStart,
+  language = 'ko',
+}: {
+  onStart: () => void
+  language?: LangCode
+}) {
   return (
     <div className="animate-fade-up">
       {/* Hero */}
@@ -10,18 +17,16 @@ export function LandingScreen({ onStart }: { onStart: () => void }) {
             계약 전에, 한 번 더 안전하게
           </span>
           <h1 className="mt-6 text-[38px] font-bold leading-[1.25] tracking-[-0.02em] text-ink-900 md:text-[52px]">
-            어려운 계약서,
+            {t(language, 'landingTitle1')}
             <br />
-            쉬운 말로 확인하세요
+            {t(language, 'landingTitle2')}
           </h1>
           <p className="mt-5 max-w-md text-[17px] leading-relaxed text-ink-600">
-            불리할 수 있는 조항과 그 근거를 찾아,
-            <br className="hidden md:block" />
-            계약 전에 꼭 물어볼 질문까지 알려드려요.
+            {t(language, 'landingSubtitle')}
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Button size="lg" onClick={onStart}>
-              계약서 분석 시작하기
+              {t(language, 'landingCta')}
             </Button>
             <span className="text-[13px] font-medium text-ink-400">
               회원가입 없이 · 분석 후 원본 즉시 삭제

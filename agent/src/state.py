@@ -4,7 +4,7 @@
 LangGraph의 모든 노드는 이 PipelineState를 입력받고 일부 필드를 갱신해 반환한다.
 """
 
-from typing import List, Literal, TypedDict
+from typing import Dict, List, Literal, TypedDict
 
 
 class Clause(TypedDict):
@@ -57,6 +57,10 @@ class PipelineState(TypedDict):
     analysis_results: List[AnalysisResult]
     adapted_results: List[AnalysisResult]  # 페르소나 적응 후
     judge_scores: JudgeScores
+
+    # 비한국어 언어 선택 시 조항 원문·확인 질문 번역 (clause_id -> 번역 dict).
+    # adapted_results와 분리하는 이유: Judge 입력에 낯선 필드를 섞지 않기 위함.
+    translations: Dict[str, dict]
 
     # 재생성 루프 제어 (착수보고서: 최대 2회 재실행)
     retry_count: int
