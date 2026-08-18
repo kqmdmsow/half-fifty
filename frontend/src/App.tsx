@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   analyzeContractStream,
   analyzeImage,
@@ -52,6 +52,9 @@ export default function App() {
   const [data, setData] = useState<AnalyzeResponse | null>(null)
   const [selectedClauseId, setSelectedClauseId] = useState<string | null>(null)
 
+  // 새로고침/재방문 후 히스토리로 결과 화면에 진입하면 데이터가 없다 — 홈으로 폴백
+  const hasResultsRef = useRef(false)
+
   // 스트리밍 진행 상태 (텍스트 분석 경로에서만 채워짐)
   const [streamProgress, setStreamProgress] = useState<{ done: number; total: number } | null>(null)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
@@ -69,16 +72,32 @@ export default function App() {
       ? sortedStreamed
       : []
   const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
+  hasResultsRef.current = results.length > 0
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
     document.documentElement.style.fontSize = largeText ? '18px' : '16px'
   }, [largeText])
 
+  // 화면 전환을 브라우저 히스토리에 쌓는다 — 뒤로가기가 홈으로 튕기며 분석
+  // 결과까지 날리던 문제의 수정. popstate로 앱 내 화면 이동으로 처리한다.
   const go = (next: Screen) => {
+    window.history.pushState({ screen: next }, '')
     setScreen(next)
     window.scrollTo({ top: 0 })
   }
+
+  useEffect(() => {
+    window.history.replaceState({ screen: 'landing' }, '')
+    const onPop = (event: PopStateEvent) => {
+      const target = (event.state?.screen as Screen) ?? 'landing'
+      const needsData = target === 'summary' || target === 'detail' || target === 'done'
+      setScreen(needsData && !hasResultsRef.current ? 'landing' : target)
+      window.scrollTo({ top: 0 })
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   const runAnalysis = async () => {
     setError(null)
