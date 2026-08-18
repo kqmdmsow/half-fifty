@@ -4,7 +4,7 @@
 LangGraph의 모든 노드는 이 PipelineState를 입력받고 일부 필드를 갱신해 반환한다.
 """
 
-from typing import List, Literal, TypedDict
+from typing import Dict, List, Literal, TypedDict
 
 
 class Clause(TypedDict):
@@ -48,7 +48,8 @@ class PipelineState(TypedDict):
 
     # 입력
     raw_text: str
-    persona: Literal["adult", "senior"]
+    persona: Literal["adult", "senior", "foreigner"]
+    language: str  # 설명 출력 언어 (ko/en/zh/vi — persona 노드에서만 사용, 기본 "ko")
 
     # 각 단계 출력
     parse_warnings: List[str]  # Parser 추출 경고 (별지 제외, 커버리지 미달 등)
@@ -56,6 +57,10 @@ class PipelineState(TypedDict):
     analysis_results: List[AnalysisResult]
     adapted_results: List[AnalysisResult]  # 페르소나 적응 후
     judge_scores: JudgeScores
+
+    # 비한국어 언어 선택 시 조항 원문·확인 질문 번역 (clause_id -> 번역 dict).
+    # adapted_results와 분리하는 이유: Judge 입력에 낯선 필드를 섞지 않기 위함.
+    translations: Dict[str, dict]
 
     # 재생성 루프 제어 (착수보고서: 최대 2회 재실행)
     retry_count: int

@@ -11,6 +11,8 @@ public record ClauseResult(
         @JsonProperty("risk_level") String riskLevel,
         @JsonProperty("risk_type") String riskType,
         @JsonProperty("risk_evidence") String riskEvidence,
-        @JsonProperty("check_questions") List<String> checkQuestions
+        @JsonProperty("check_questions") List<String> checkQuestions,
+        @JsonProperty("original_text_translated") String originalTextTranslated,
+        @JsonProperty("check_questions_translated") List<String> checkQuestionsTranslated
 ) {
 }

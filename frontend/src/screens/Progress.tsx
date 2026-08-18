@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Button } from '../components/ui'
+import type { ClauseResult } from '../api'
+import { Button, RiskBadge } from '../components/ui'
 
 const PHASES = [
   '계약서 텍스트 읽기',
@@ -11,28 +12,40 @@ const PHASES = [
 export function ProgressScreen({
   loading,
   error,
+  streamProgress,
+  streamedClauses,
   onCancel,
+  onRetry,
   onShowResult,
 }: {
   loading: boolean
   error: string | null
+  streamProgress?: { done: number; total: number } | null
+  streamedClauses?: ClauseResult[]
   onCancel: () => void
+  onRetry?: () => void
   onShowResult: () => void
 }) {
   const [percent, setPercent] = useState(4)
   const doneRef = useRef(false)
+  const streaming = Boolean(streamProgress)
 
-  // 진행률: 로딩 중엔 92%까지 천천히, 완료되면 100%
+  // 진행률: 스트리밍이면 실제 완료 조항 수 기반, 아니면(파일 경로) 추정 애니메이션
   useEffect(() => {
     if (!loading) {
       setPercent(100)
+      return
+    }
+    if (streamProgress) {
+      // 조항 분석 90% + judge 검증 10%로 배분
+      setPercent(streamProgress.total ? (streamProgress.done / streamProgress.total) * 90 : 5)
       return
     }
     const timer = setInterval(() => {
       setPercent((value) => Math.min(value + Math.random() * 7, 92))
     }, 450)
     return () => clearInterval(timer)
-  }, [loading])
+  }, [loading, streamProgress])
 
   // 완료되면 잠시 뒤 자동으로 결과 화면으로
   useEffect(() => {
@@ -42,7 +55,15 @@ export function ProgressScreen({
     return () => clearTimeout(timer)
   }, [loading, error, onShowResult])
 
-  const phaseIndex = loading ? Math.min(Math.floor(percent / 25), 3) : 4
+  const phaseIndex = loading
+    ? streaming && streamProgress
+      ? streamProgress.done >= streamProgress.total && streamProgress.total > 0
+        ? 3 // 조항 분석 끝, judge 검증 중
+        : 2
+      : Math.min(Math.floor(percent / 25), 3)
+    : 4
+
+  const recentClauses = (streamedClauses ?? []).slice(-4).reverse()
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-6 py-16 text-center">
@@ -74,9 +95,11 @@ export function ProgressScreen({
       </h1>
       <p className="mt-2.5 text-[15px] leading-relaxed text-ink-400">
         {error
-          ? '예시 결과로 화면을 미리 확인할 수 있어요.'
+          ? `${error} 잠시 후 다시 시도해주세요.`
           : loading
-            ? '조항 단위로 나누고 위험 신호와 질문 목록을 정리해요.'
+            ? streaming && streamProgress?.total
+              ? `조항 ${streamProgress.done}/${streamProgress.total}개 분석 완료 — 끝난 조항부터 아래에 보여드려요.`
+              : '조항 단위로 나누고 위험 신호와 질문 목록을 정리해요.'
             : '잠시 후 결과 화면으로 이동해요.'}
       </p>
 
@@ -87,6 +110,23 @@ export function ProgressScreen({
           style={{ width: `${error ? 100 : percent}%` }}
         />
       </div>
+
+      {/* 스트리밍: 방금 끝난 조항 실시간 표시 (Judge 검증 전 — 확정은 결과 화면에서) */}
+      {streaming && recentClauses.length > 0 && (
+        <ul className="mt-6 w-full space-y-1.5 text-left" aria-live="polite">
+          {recentClauses.map((clause) => (
+            <li
+              key={clause.clause_id}
+              className="flex items-center justify-between gap-3 rounded-xl bg-ink-25 px-3.5 py-2.5"
+            >
+              <span className="min-w-0 flex-1 truncate text-[13px] text-ink-700">
+                {clause.original_text}
+              </span>
+              <RiskBadge level={clause.risk_level} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* 단계 목록 */}
       <ul className="mt-7 w-full space-y-1 text-left">
@@ -121,10 +161,10 @@ export function ProgressScreen({
         {error ? (
           <>
             <Button variant="secondary" size="lg" full onClick={onCancel}>
-              다시 시도
+              입력으로 돌아가기
             </Button>
-            <Button size="lg" full onClick={onShowResult}>
-              예시 결과 보기
+            <Button size="lg" full onClick={onRetry ?? onCancel}>
+              다시 시도
             </Button>
           </>
         ) : (

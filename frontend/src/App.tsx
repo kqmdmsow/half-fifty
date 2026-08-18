@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react'
-import { analyzeContract, analyzeImage, analyzePdf, type AnalyzeResponse, type Persona } from './api'
+import {
+  analyzeContractStream,
+  analyzeImage,
+  analyzePdf,
+  type AnalyzeResponse,
+  type ClauseResult,
+  type Language,
+  type Persona,
+} from './api'
 import { Logo } from './components/ui'
-import { SAMPLE_RESULTS } from './data/sample'
+import { LANGUAGES, t } from './i18n'
+import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
 import { ExtractScreen } from './screens/Extract'
@@ -29,6 +38,7 @@ export default function App() {
   const [file, setFile] = useState<File | null>(null)
   const [text, setText] = useState('')
   const [persona, setPersona] = useState<Persona>('adult')
+  const [language, setLanguage] = useState<Language>('ko')
 
   // 접근성 설정
   const [largeText, setLargeText] = useState(false)
@@ -41,9 +51,23 @@ export default function App() {
   const [data, setData] = useState<AnalyzeResponse | null>(null)
   const [selectedClauseId, setSelectedClauseId] = useState<string | null>(null)
 
-  const results = data?.results.length ? data.results : SAMPLE_RESULTS
-  const clauseCount = data?.clause_count ?? 16
-  const isSample = !data
+  // 스트리밍 진행 상태 (텍스트 분석 경로에서만 채워짐)
+  const [streamProgress, setStreamProgress] = useState<{ done: number; total: number } | null>(null)
+  const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
+
+  // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
+  // 실패 시 가짜 예시(SAMPLE_RESULTS)를 보여주던 경로는 제거 — 오류는 오류로
+  // 안내하고 다시 시도하게 한다 (심사 중 가짜 결과 노출 방지).
+  const sortedStreamed = [...streamedClauses].sort((a, b) =>
+    a.clause_id.localeCompare(b.clause_id),
+  )
+  const streamingLive = loading && streamProgress !== null
+  const results: ClauseResultType[] = data?.results.length
+    ? data.results
+    : streamingLive
+      ? sortedStreamed
+      : []
+  const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
@@ -58,20 +82,39 @@ export default function App() {
   const runAnalysis = async () => {
     setError(null)
     setLoading(true)
+    setStreamProgress(null)
+    setStreamedClauses([])
     go('progress')
 
     try {
       if (mode === 'text' && text.trim()) {
-        setData(await analyzeContract(text, persona))
+        // 텍스트 경로는 조항별 스트리밍 — 결과 화면으로 즉시 이동해
+        // 끝난 조항부터 카드로 쌓이고 '자세히 보기'도 바로 동작한다
+        setStreamProgress({ done: 0, total: 0 })
+        go('summary')
+        setData(
+          await analyzeContractStream(text, persona, language, {
+            onMeta: (meta) => setStreamProgress({ done: 0, total: meta.clause_count }),
+            onClause: ({ done, total, result }) => {
+              setStreamProgress({ done, total })
+              setStreamedClauses((prev) => [
+                ...prev.filter((c) => c.clause_id !== result.clause_id),
+                result,
+              ])
+            },
+          }),
+        )
       } else if (mode === 'pdf' && file) {
         setData(
           file.type.startsWith('image/')
-            ? await analyzeImage(file, persona)
-            : await analyzePdf(file, persona),
+            ? await analyzeImage(file, persona, language)
+            : await analyzePdf(file, persona, language),
         )
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '분석 요청에 실패했어요.')
+      setStreamProgress(null)
+      go('progress') // 오류 안내와 재시도 버튼은 Progress 화면이 담당
     } finally {
       setLoading(false)
     }
@@ -93,26 +136,43 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
-      <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo onClick={() => go('landing')} />
-          <button
-            type="button"
-            aria-pressed={largeText}
-            onClick={() => setLargeText((value) => !value)}
-            className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-              largeText
-                ? 'bg-ink-900 text-white'
-                : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-            }`}
-          >
-            가 글자 크게
-          </button>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
+              <span aria-hidden>🌐</span>
+              <select
+                aria-label="언어 선택 / Language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as Language)}
+                className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
+              >
+                {LANGUAGES.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              aria-pressed={largeText}
+              onClick={() => setLargeText((value) => !value)}
+              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+                largeText
+                  ? 'bg-ink-900 text-white'
+                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              {t(language, 'largeText')}
+            </button>
+          </div>
         </div>
       </header>
 
       <main>
-        {screen === 'landing' && <LandingScreen onStart={() => go('upload')} />}
+        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}
@@ -136,10 +196,12 @@ export default function App() {
         {screen === 'persona' && (
           <PersonaScreen
             persona={persona}
+            language={language}
             largeText={largeText}
             highContrast={highContrast}
             voiceGuide={voiceGuide}
             onPersonaChange={setPersona}
+            onLanguageChange={setLanguage}
             onToggleLargeText={() => setLargeText((value) => !value)}
             onToggleHighContrast={() => setHighContrast((value) => !value)}
             onToggleVoiceGuide={() => setVoiceGuide((value) => !value)}
@@ -151,7 +213,10 @@ export default function App() {
           <ProgressScreen
             loading={loading}
             error={error}
+            streamProgress={streamProgress}
+            streamedClauses={streamedClauses}
             onCancel={() => go('persona')}
+            onRetry={runAnalysis}
             onShowResult={() => go('summary')}
           />
         )}
@@ -159,7 +224,8 @@ export default function App() {
           <SummaryScreen
             clauseCount={clauseCount}
             results={results}
-            isSample={isSample}
+            language={language}
+            liveProgress={streamingLive ? streamProgress : null}
             warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
@@ -170,6 +236,7 @@ export default function App() {
             clauseId={selectedClauseId ?? results[0].clause_id}
             results={results}
             voiceGuide={voiceGuide}
+            language={language}
             onSelectClause={setSelectedClauseId}
             onBack={() => go('summary')}
             onDone={() => go('done')}
