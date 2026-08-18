@@ -71,11 +71,16 @@ export function LandingScreen({
             <br />
             중요한 것만 정확하게
           </h2>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            <Feature
+              emoji="📑"
+              title="13가지 계약 유형"
+              body="임대차·대출·보험·근로계약까지. 같은 조항도 주택이냐 상가냐에 따라 다른 법 기준으로 판단해요."
+            />
             <Feature
               emoji="💬"
               title="눈높이 맞춤 설명"
-              body="일반 성인과 고령층, 읽는 사람에게 맞는 말투와 표현으로 조항을 풀어드려요."
+              body="일반 성인·고령층·외국인(16개 언어), 읽는 사람에게 맞는 말과 언어로 풀어드려요."
             />
             <Feature
               emoji="🔍"

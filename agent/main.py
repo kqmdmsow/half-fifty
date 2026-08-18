@@ -143,6 +143,7 @@ async def analyze_pdf(
     file: UploadFile,
     persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
     language: Language = Form("ko"),
+    domain: str = Form(""),
 ) -> AnalyzeResponse:
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=415, detail="application/pdf 파일만 지원합니다.")
@@ -159,7 +160,7 @@ async def analyze_pdf(
             raise HTTPException(
                 status_code=422, detail=f"{exc} / OCR 폴백 실패: {ocr_exc}") from ocr_exc
 
-    state = run_pipeline(text, persona=persona, language=language or "ko")
+    state = run_pipeline(text, persona=persona, language=language or "ko", domain=domain)
     return _state_to_response(state)
 
 
@@ -168,6 +169,7 @@ async def analyze_image(
     file: UploadFile,
     persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
     language: Language = Form("ko"),
+    domain: str = Form(""),
 ) -> AnalyzeResponse:
     """계약서 사진(jpg/png/webp) 분석 — Upstage Document Parse OCR 경유.
 
@@ -183,5 +185,5 @@ async def analyze_image(
     except OcrUnavailableError as exc:
         raise HTTPException(status_code=422, detail=f"사진에서 글자를 읽지 못했습니다: {exc}") from exc
 
-    state = run_pipeline(text, persona=persona, language=language or "ko")
+    state = run_pipeline(text, persona=persona, language=language or "ko", domain=domain)
     return _state_to_response(state)
