@@ -17,7 +17,15 @@ from src.nodes.domain import domain_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
 from src.nodes.persona import persona_node
-from src.state import FAITHFULNESS_MIN, JUDGE_THRESHOLD, MAX_RETRIES, PipelineState, judge_score_avg
+from src.state import (
+    FAITHFULNESS_MIN,
+    JUDGE_THRESHOLD,
+    MAX_RETRIES,
+    PipelineState,
+    failing_aspects,
+    judge_score_avg,
+    shortcut_eligible,
+)
 
 
 def _increment_retry(state: PipelineState) -> dict:
@@ -25,6 +33,30 @@ def _increment_retry(state: PipelineState) -> dict:
     new_count = state["retry_count"] + 1
     print(f"[Retry] Judge 평균 점수 미달 ({JUDGE_THRESHOLD}점 기준) -> {new_count}차 재시도")
     return {"retry_count": new_count}
+
+
+def _route_retry_target(state: PipelineState) -> str:
+    """재생성 대상 분기 (자문 §3, #75): 미달 원인에 맞는 단계로만 돌아간다.
+
+    - clarity만 미달 & risk_coverage·faithfulness가 임계값보다 확실히 위
+      (shortcut_eligible) -> persona만 재실행 (판정 유효, 표현만 교정 —
+      비용 절감. temperature=0이라 피드백 없이는 동일 결과가 나올 수 있지만,
+      risk_coverage·faithfulness를 안전하게 재검증하지 않는 것 자체가
+      #35가 드러낸 위험이었으므로 이번 PR은 그 안전장치만 다룬다)
+    - 그 외(다른 aspect도 미달이거나, risk_coverage·faithfulness가 아슬아슬한
+      경우) -> analysis부터 재실행. #35가 실측으로 드러낸 구멍(아슬아슬한
+      통과를 재검증 없이 믿어 오분류가 새어나감)을 막기 위한 마진 조건.
+
+    Judge rationale을 재생성 프롬프트에 주입하는 부분은 이번 PR에서 제외했다
+    — 측정 결과 FP가 오히려 늘어(데모 contract_05 FP 1→5~6, 2회 일관) 별도
+    이슈에서 문구를 다시 설계하기로 했다.
+    """
+    scores = state["judge_scores"]
+    failing = set(failing_aspects(scores))
+    if failing == {"clarity"} and shortcut_eligible(scores):
+        print("[Retry] clarity만 미달 + risk_coverage/faithfulness 여유 확보 -> persona만 재실행")
+        return "persona"
+    return "analysis"
 
 
 def _route_after_judge(state: PipelineState) -> str:
@@ -87,7 +119,11 @@ def build_graph():
             "flag": "flag_review",
         },
     )
-    graph.add_edge("increment_retry", "analysis")  # 재생성 루프
+    graph.add_conditional_edges(  # 재생성 대상 분기 (#75) — 미달 원인별로 analysis/persona만
+        "increment_retry",
+        _route_retry_target,
+        {"analysis": "analysis", "persona": "persona"},
+    )
     graph.add_edge("flag_review", END)
 
     return graph.compile()

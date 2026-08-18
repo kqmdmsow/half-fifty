@@ -43,6 +43,28 @@ def judge_score_avg(scores: "JudgeScores") -> float:
     return sum(scores[k] for k in JUDGE_ASPECT_KEYS) / len(JUDGE_ASPECT_KEYS)
 
 
+def failing_aspects(scores: "JudgeScores") -> List[str]:
+    """임계 미달 aspect 목록 (JUDGE_ASPECT_KEYS 순서 유지)."""
+    return [k for k in JUDGE_ASPECT_KEYS if scores[k] < JUDGE_THRESHOLD]
+
+
+def shortcut_eligible(scores: "JudgeScores") -> bool:
+    """clarity-only 재생성 단축 허용 조건 (자문 §3 대응, #75/#35).
+
+    risk_coverage·faithfulness가 임계값을 근소하게만 넘긴 상태에서 clarity만
+    고쳐 persona만 재실행하고 재채점하면, Judge 채점 노이즈로 원래
+    재검증됐어야 할 위험 오분류가 "우연히 또 통과"하며 새어나간다(#35 실측:
+    데모 5건 FP 3→7, contract_05는 재시도 2→0 + needs_review True→False로
+    바뀌었는데 Judge 평균은 오히려 상승 — "품질 개선"이 아니라 눈속임).
+    risk_coverage·faithfulness가 임계값보다 확실히 위(+RETRY_SHORTCUT_MARGIN)
+    일 때만 단축을 허용한다 — 아슬아슬하면 analysis 전체 재실행으로 보낸다.
+    """
+    return (
+        scores["risk_coverage"] >= JUDGE_THRESHOLD + RETRY_SHORTCUT_MARGIN
+        and scores["faithfulness"] >= JUDGE_THRESHOLD + RETRY_SHORTCUT_MARGIN
+    )
+
+
 class PipelineState(TypedDict):
     """그래프 전체 상태."""
 
@@ -75,3 +97,5 @@ JUDGE_THRESHOLD = 3.5
 # 통과 금지 — 평균이 치명 결함을 은폐하는 것을 막는 hard-fail 기준.
 FAITHFULNESS_MIN = 3.0
 MAX_RETRIES = 2
+# clarity-only 재생성 단축(shortcut_eligible) 허용 마진 — #75/#35.
+RETRY_SHORTCUT_MARGIN = 1.0
