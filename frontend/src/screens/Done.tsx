@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton } from '../components/ui'
+import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 
 export function DoneScreen({
   results,
+  language = 'ko',
   onRestart,
 }: {
   results: ClauseResult[]
+  language?: LangCode
   onRestart: () => void
 }) {
   const [deleted, setDeleted] = useState(false)
@@ -32,15 +35,13 @@ export function DoneScreen({
           ✓
         </span>
         <h1 className="mt-6 text-[24px] font-bold tracking-[-0.02em] text-ink-900">
-          모든 데이터를 삭제했어요
+          {t(language, 'doDeletedTitle')}
         </h1>
         <p className="mt-2.5 text-[15px] leading-relaxed text-ink-400">
-          계약서 원본과 분석 결과가 모두 지워졌어요.
-          <br />
-          필요할 때 언제든 다시 이용하세요.
+          {t(language, 'doDeletedDesc')}
         </p>
         <Button size="lg" className="mt-8" onClick={onRestart}>
-          새 계약서 분석하기
+          {t(language, 'doNew')}
         </Button>
       </div>
     )
@@ -48,91 +49,90 @@ export function DoneScreen({
 
   return (
     <>
-    <PrintReport results={results} />
+    <PrintReport results={results} language={language} />
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16 print:hidden">
       <div className="text-center">
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-[28px]">
           🎉
         </span>
         <h1 className="mt-5 text-[26px] font-bold tracking-[-0.02em] text-ink-900 md:text-[30px]">
-          분석이 끝났어요. 이제 이렇게 해보세요
+          {t(language, 'doTitle')}
         </h1>
         <p className="mt-2.5 text-[15px] text-ink-400">
-          질문을 준비하고, 중요한 조항은 전문가와 상담하세요.
+          {t(language, 'doSubtitle')}
         </p>
       </div>
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         <ActionCard
           emoji="💬"
-          title="확인 질문 준비"
-          body="상대방에게 물어볼 질문을 한 번에 복사해요."
+          title={t(language, 'doCard1T')}
+          body={t(language, 'doCard1B')}
         >
-          <CopyButton text={allQuestions || '확인할 질문이 없어요.'} copiedText="복사 완료!">
-            질문 목록 복사
+          <CopyButton text={allQuestions || '-'} copiedText={t(language, 'doCopied')}>
+            {t(language, 'doCopyQ')}
           </CopyButton>
         </ActionCard>
-        <ActionCard emoji="🖨️" title="결과 저장" body="위험 조항과 근거를 문서로 남겨요.">
+        <ActionCard emoji="🖨️" title={t(language, 'doCard2T')} body={t(language, 'doCard2B')}>
           <button
             type="button"
             onClick={() => window.print()}
             className="rounded-lg bg-brand-50 px-2.5 py-1.5 text-[13px] font-bold text-brand-600 hover:bg-brand-100"
           >
-            인쇄 · PDF 저장
+            {t(language, 'doPrint')}
           </button>
         </ActionCard>
         <ActionCard
           emoji="👩‍⚖️"
-          title="전문가 상담 준비"
-          body="중요 조항을 원문과 함께 정리해요."
+          title={t(language, 'doCard3T')}
+          body={t(language, 'doCard3B')}
         >
-          <CopyButton text={consultSummary || '위험 조항이 없어요.'} copiedText="복사 완료!">
-            상담 요약 복사
+          <CopyButton text={consultSummary || '-'} copiedText={t(language, 'doCopied')}>
+            {t(language, 'doCopyC')}
           </CopyButton>
         </ActionCard>
       </div>
 
       <div className="mt-10">
         <h2 className="text-[18px] font-bold tracking-[-0.01em] text-ink-900">
-          바로 상담받을 수 있는 곳
+          {t(language, 'doConsultTitle')}
         </h2>
         <p className="mt-1.5 text-[14px] text-ink-400">
-          위에서 복사한 상담 요약을 들고 연락하면 이야기가 훨씬 빨라져요. 모두 공공기관의
-          무료 상담이에요.
+          {t(language, 'doConsultDesc')}
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {buildConsultServices(results).map((service) => (
-            <ConsultCard key={service.name} {...service} />
+          {buildConsultServices(results, language).map((service) => (
+            <ConsultCard key={service.name} {...service} language={language} />
           ))}
         </div>
       </div>
 
       <Card className="mt-8 flex flex-col items-start justify-between gap-4 p-6 md:flex-row md:items-center">
         <div>
-          <p className="text-[15px] font-bold text-ink-900">결과는 24시간 뒤 자동 삭제돼요</p>
+          <p className="text-[15px] font-bold text-ink-900">{t(language, 'doDeleteTitle')}</p>
           <p className="mt-1 text-[14px] leading-relaxed text-ink-400">
-            지금 바로 삭제할 수도 있어요. 삭제하면 결과를 다시 볼 수 없어요.
+            {t(language, 'doDeleteDesc')}
           </p>
         </div>
         {confirming ? (
           <div className="flex shrink-0 gap-2">
             <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>
-              취소
+              {t(language, 'doCancel')}
             </Button>
             <Button variant="danger" size="sm" onClick={() => setDeleted(true)}>
-              정말 삭제하기
+              {t(language, 'doConfirmDel')}
             </Button>
           </div>
         ) : (
           <Button variant="danger" size="sm" onClick={() => setConfirming(true)}>
-            지금 모두 삭제
+            {t(language, 'doDeleteBtn')}
           </Button>
         )}
       </Card>
 
       <div className="mt-9 text-center">
         <Button variant="secondary" onClick={onRestart}>
-          새 계약서 분석하기
+          {t(language, 'doNew')}
         </Button>
       </div>
     </div>
@@ -142,14 +142,13 @@ export function DoneScreen({
 
 /** 인쇄(PDF 저장) 전용 리포트 — 화면에는 숨겨지고 window.print() 시에만 렌더링.
  *  Done 화면 자체를 인쇄하면 분석 결과가 하나도 안 담기던 문제의 해결책. */
-function PrintReport({ results }: { results: ClauseResult[] }) {
+function PrintReport({ results, language = 'ko' }: { results: ClauseResult[]; language?: LangCode }) {
   const risky = results.filter((r) => r.risk_level !== '안전')
   return (
     <div className="hidden px-8 py-6 print:block">
-      <h1 className="text-[20px] font-bold text-ink-900">하프피프티 계약서 분석 결과</h1>
+      <h1 className="text-[20px] font-bold text-ink-900">{t(language, 'prTitle')}</h1>
       <p className="mt-1 text-[11px] text-ink-400">
-        전체 {results.length}개 조항 중 확인이 필요한 조항 {risky.length}개 · 본 결과는 참고용
-        안내이며 법률 자문이 아닙니다. 중요한 결정은 반드시 전문가와 상담하세요.
+        {t(language, 'prSummary', { total: results.length, need: risky.length })}
       </p>
       {results.map((r) => (
         <div
@@ -158,17 +157,18 @@ function PrintReport({ results }: { results: ClauseResult[] }) {
           style={{ breakInside: 'avoid' }}
         >
           <p className="text-[13px] font-bold text-ink-900">
-            [{r.risk_level}] {r.risk_type !== '해당 없음' ? r.risk_type : '표준 조항'}
+            [{riskLevelLabel(language, r.risk_level)}]{' '}
+            {r.risk_type !== '해당 없음' ? riskTypeLabel(language, r.risk_type) : t(language, 'standardClause')}
           </p>
-          <p className="mt-1 text-[11px] leading-relaxed text-ink-700">원문: {r.original_text}</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-ink-900">설명: {r.explanation}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-ink-700">{t(language, 'prOriginal')}: {r.original_text}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-ink-900">{t(language, 'prExplain')}: {r.explanation}</p>
           {r.risk_level !== '안전' && r.risk_evidence && (
-            <p className="mt-1 text-[11px] leading-relaxed text-ink-700">근거: {r.risk_evidence}</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-ink-700">{t(language, 'evidence')}: {r.risk_evidence}</p>
           )}
           {r.check_questions.length > 0 && (
             <ul className="mt-1 list-disc pl-5 text-[11px] leading-relaxed text-ink-700">
               {r.check_questions.map((q) => (
-                <li key={q}>확인할 것: {q}</li>
+                <li key={q}>{t(language, 'prCheck')}: {q}</li>
               ))}
             </ul>
           )}
@@ -188,12 +188,12 @@ function consultKeyword(results: ClauseResult[]): string {
   return '계약'
 }
 
-function buildConsultServices(results: ClauseResult[]) {
+function buildConsultServices(results: ClauseResult[], language: LangCode = 'ko') {
   const keyword = consultKeyword(results)
   return [
     {
       name: '대한법률구조공단',
-      desc: '계약서·임대차 등 모든 법률 문제 무료 상담',
+      desc: t(language, 'doSvcKlac'),
       phone: '132',
       url: 'https://www.klac.or.kr',
     },
@@ -201,20 +201,20 @@ function buildConsultServices(results: ClauseResult[]) {
       name: '나의 변호사 (대한변호사협회)',
       // klaw는 검색 상태를 URL에 싣지 않는 SPA라 딥링크 필터가 불가능 —
       // 검색어를 자동 복사해주고 붙여넣도록 안내한다 (협회 API 제휴 전 차선책).
-      desc: `버튼을 누르면 '${keyword}' 검색어가 복사돼요. 열린 검색창에 붙여넣기만 하세요.`,
+      desc: t(language, 'doSvcKlaw', { keyword }),
       phone: null,
       url: 'https://www.klaw.or.kr/search',
       copyKeyword: keyword,
     },
     {
       name: '전세피해지원센터',
-      desc: '전세사기·보증금 피해 전문 상담 (국토교통부)',
+      desc: t(language, 'doSvcJeonse'),
       phone: '1533-8119',
       url: 'https://www.khug.or.kr/jeonse',
     },
     {
       name: '금융감독원 금융민원센터',
-      desc: '대출·보험·금융상품 분쟁과 피해 상담',
+      desc: t(language, 'doSvcFss'),
       phone: '1332',
       url: 'https://www.fss.or.kr',
     },
@@ -227,12 +227,14 @@ function ConsultCard({
   phone,
   url,
   copyKeyword,
+  language = 'ko',
 }: {
   name: string
   desc: string
   phone: string | null
   url: string
   copyKeyword?: string
+  language?: LangCode
 }) {
   const openWithKeyword = () => {
     if (copyKeyword) {
@@ -250,14 +252,14 @@ function ConsultCard({
           onClick={openWithKeyword}
           className="rounded-lg bg-brand-50 px-2.5 py-1.5 text-[13px] font-bold text-brand-600 hover:bg-brand-100"
         >
-          {copyKeyword ? `'${copyKeyword}' 복사하고 열기` : '홈페이지 열기'}
+          {copyKeyword ? t(language, 'doCopyOpen', { keyword: copyKeyword }) : t(language, 'doOpen')}
         </button>
         {phone && (
           <a
             href={`tel:${phone}`}
             className="rounded-lg bg-ink-50 px-2.5 py-1.5 text-[13px] font-bold text-ink-600 hover:bg-ink-100"
           >
-            전화 {phone}
+            {t(language, 'doCall')} {phone}
           </a>
         )}
       </div>

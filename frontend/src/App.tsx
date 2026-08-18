@@ -181,6 +181,7 @@ export default function App() {
             file={file}
             text={text}
             domain={domain}
+            language={language}
             onModeChange={setMode}
             onFileChange={setFile}
             onTextChange={setText}
@@ -193,6 +194,7 @@ export default function App() {
             file={file}
             mode={mode}
             text={text}
+            language={language}
             onPrev={() => go('upload')}
             onNext={() => go('persona')}
           />
@@ -246,7 +248,7 @@ export default function App() {
             onDone={() => go('done')}
           />
         )}
-        {screen === 'done' && <DoneScreen results={results} onRestart={restart} />}
+        {screen === 'done' && <DoneScreen results={results} language={language} onRestart={restart} />}
       </main>
     </div>
   )
