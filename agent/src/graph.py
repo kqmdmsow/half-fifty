@@ -1,14 +1,19 @@
-"""LangGraph 4단계 파이프라인 조립 (착수보고서 <그림 3>).
+"""LangGraph 5단계 파이프라인 조립 (착수보고서 <그림 3> + Domain 확장).
 
-Parser(Module) -> Analysis(Agent) -> Persona(Agent) -> Judge(Agent)
-                      ^                                    |
-                      +---- 점수 미달 시 최대 2회 재실행 ----+
+Parser(Module) -> Domain(Agent) -> Analysis(Agent) -> Persona(Agent) -> Judge(Agent)
+                                        ^                                    |
+                                        +------ 점수 미달 시 최대 2회 재실행 -----+
+
+Domain은 문서 유형(주택/상가 임대차, 보험, 대출 등)을 1회 판별해 Analysis의
+모든 조항 판정에 주입한다 — 같은 문언도 유형 따라 판정이 갈리기 때문
+(docs/risk_taxonomy_v2.md §C).
 """
 
 from langgraph.graph import END, StateGraph
 
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import analysis_node
+from src.nodes.domain import domain_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
 from src.nodes.persona import persona_node
@@ -60,6 +65,7 @@ def build_graph():
     graph = StateGraph(PipelineState)
 
     graph.add_node("parser", parser_node)
+    graph.add_node("domain", domain_node)
     graph.add_node("analysis", analysis_node)
     graph.add_node("persona", persona_node)
     graph.add_node("judge", judge_node)
@@ -67,7 +73,8 @@ def build_graph():
     graph.add_node("flag_review", _flag_needs_review)
 
     graph.set_entry_point("parser")
-    graph.add_edge("parser", "analysis")
+    graph.add_edge("parser", "domain")
+    graph.add_edge("domain", "analysis")
     graph.add_edge("analysis", "persona")
     graph.add_edge("persona", "judge")
 
@@ -90,11 +97,15 @@ def build_graph():
 pipeline = build_graph()
 
 
-def run_pipeline(raw_text: str, persona: str = "adult", language: str = "ko") -> PipelineState:
+def run_pipeline(
+    raw_text: str, persona: str = "adult", language: str = "ko", domain: str = ""
+) -> PipelineState:
     """파이프라인 1회 실행 헬퍼.
 
     개인정보 마스킹은 Parser 이전에 1회 수행 — 이후 모든 단계(화면 표시 원문,
     LLM 입력, 인용 검사)가 동일한 마스킹 텍스트를 보므로 정합성이 유지된다.
+    domain은 사용자가 업로드 시 선택한 문서 유형(없으면 빈 값 — Domain 노드가
+    자동 판별을 시도하거나 "알 수 없음"으로 폴백).
     """
     raw_text, pii_counts = mask_pii(raw_text)
     initial_warnings = [masking_notice(pii_counts)] if pii_counts else []
@@ -103,6 +114,8 @@ def run_pipeline(raw_text: str, persona: str = "adult", language: str = "ko") ->
         "raw_text": raw_text,
         "persona": persona,  # type: ignore[typeddict-item]
         "language": language or "ko",
+        "domain": domain,
+        "domain_evidence": "",
         "parse_warnings": initial_warnings,
         "clauses": [],
         "analysis_results": [],
