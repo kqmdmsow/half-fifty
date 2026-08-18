@@ -27,6 +27,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
@@ -149,6 +150,12 @@ async def analyze_pdf(
         raise HTTPException(status_code=415, detail="application/pdf 파일만 지원합니다.")
 
     pdf_bytes = await file.read()
+    # 백엔드를 거치지 않고 agent를 직접 호출하는 우회 방어 (이슈 #77) —
+    # Content-Type 헤더는 위조 가능하므로 실제 바이트로 재검증한다.
+    if len(pdf_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="PDF는 10MB 이하만 지원합니다.")
+    if not is_pdf_magic(pdf_bytes):
+        raise HTTPException(status_code=415, detail="PDF 파일이 아닙니다.")
 
     try:
         text = extract_text_from_pdf(pdf_bytes)
@@ -180,6 +187,12 @@ async def analyze_image(
         raise HTTPException(status_code=415, detail="jpg/png/webp 이미지만 지원합니다.")
 
     image_bytes = await file.read()
+    # 백엔드를 거치지 않고 agent를 직접 호출하는 우회 방어 (이슈 #77) —
+    # Content-Type 헤더는 위조 가능하므로 실제 바이트로 재검증한다.
+    if len(image_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="이미지는 10MB 이하만 지원합니다.")
+    if sniff_image_type(image_bytes) is None:
+        raise HTTPException(status_code=415, detail="jpg/png/webp 이미지가 아닙니다.")
     try:
         text = document_parse_text(image_bytes, file.filename or "upload.png")
     except OcrUnavailableError as exc:
