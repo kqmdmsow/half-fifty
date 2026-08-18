@@ -57,19 +57,21 @@ public class AgentClient {
      * 프론트→에이전트 직통 경로를 제거하고 이 메서드로 일원화한다.
      * 파일은 메모리에서만 전달하며 백엔드에 저장하지 않는다.
      */
-    public AnalyzeResponse analyzePdf(byte[] pdfBytes, String filename, String persona, String language) {
-        return forwardFile("/analyze-pdf", pdfBytes, filename, MediaType.APPLICATION_PDF, persona, language);
+    public AnalyzeResponse analyzePdf(byte[] pdfBytes, String filename, String persona, String language,
+            String domain) {
+        return forwardFile("/analyze-pdf", pdfBytes, filename, MediaType.APPLICATION_PDF, persona, language, domain);
     }
 
     /** 계약서 사진(OCR) 프록시 — 에이전트 /analyze-image로 전달. */
     public AnalyzeResponse analyzeImage(
-            byte[] imageBytes, String filename, MediaType contentType, String persona, String language) {
-        return forwardFile("/analyze-image", imageBytes, filename, contentType, persona, language);
+            byte[] imageBytes, String filename, MediaType contentType, String persona, String language,
+            String domain) {
+        return forwardFile("/analyze-image", imageBytes, filename, contentType, persona, language, domain);
     }
 
     private AnalyzeResponse forwardFile(
             String uri, byte[] bytes, String filename, MediaType contentType, String persona,
-            String language) {
+            String language, String domain) {
         // MultipartBodyBuilder는 내부에서 reactive-streams(Publisher)를 참조해
         // WebFlux 없는 클래스패스에서는 NoClassDefFoundError로 죽는다 —
         // 블로킹 스택 표준인 MultiValueMap + HttpEntity 방식으로 구성한다.
@@ -86,6 +88,7 @@ public class AgentClient {
         body.add("file", new HttpEntity<>(fileResource, fileHeaders));
         body.add("persona", persona);
         body.add("language", language == null ? "ko" : language);
+        body.add("domain", domain == null ? "" : domain);
 
         return restClient.post()
                 .uri(uri)

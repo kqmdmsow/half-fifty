@@ -69,7 +69,8 @@ public class ContractController {
     public AnalyzeResponse analyzePdf(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "persona", defaultValue = "adult") String persona,
-            @RequestParam(value = "language", defaultValue = "ko") String language)
+            @RequestParam(value = "language", defaultValue = "ko") String language,
+            @RequestParam(value = "domain", defaultValue = "") String domain)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -88,7 +89,7 @@ public class ContractController {
         if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
         }
-        return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona, language);
+        return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona, language, domain);
     }
 
     /**
@@ -99,7 +100,8 @@ public class ContractController {
     public AnalyzeResponse analyzeImage(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "persona", defaultValue = "adult") String persona,
-            @RequestParam(value = "language", defaultValue = "ko") String language)
+            @RequestParam(value = "language", defaultValue = "ko") String language,
+            @RequestParam(value = "domain", defaultValue = "") String domain)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -117,7 +119,7 @@ public class ContractController {
         if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
         }
-        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona, language);
+        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona, language, domain);
     }
 
     /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */

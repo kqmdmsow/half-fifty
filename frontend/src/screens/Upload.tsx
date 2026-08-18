@@ -5,6 +5,14 @@ type InputMode = 'pdf' | 'text'
 
 const MAX_SIZE = 10 * 1024 * 1024
 
+// agent/src/nodes/domain.py의 ALLOWED_DOMAINS와 값이 정확히 일치해야 한다.
+// 회의 안건 D: 문서 유형은 업로드 시 사용자 선택이 기본 (LLM 자동판별은 opt-in).
+const DOMAINS = [
+  '주택임대차', '상가임대차', '임대차(구분불명)', '대출·여신', '보험',
+  '신용카드', '예금·수신', '투자·신탁', '가맹(프랜차이즈)', '상조·멤버십',
+  '매매·분양', '근로계약', '기타',
+]
+
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const isImage = (f: File) =>
   IMAGE_TYPES.includes(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name)
@@ -15,17 +23,21 @@ export function UploadScreen({
   mode,
   file,
   text,
+  domain,
   onModeChange,
   onFileChange,
   onTextChange,
+  onDomainChange,
   onNext,
 }: {
   mode: InputMode
   file: File | null
   text: string
+  domain: string
   onModeChange: (mode: InputMode) => void
   onFileChange: (file: File | null) => void
   onTextChange: (text: string) => void
+  onDomainChange: (domain: string) => void
   onNext: () => void
 }) {
   const [agreed, setAgreed] = useState(false)
@@ -146,6 +158,48 @@ export function UploadScreen({
           </p>
         )}
       </div>
+
+      {/* 문서 유형 선택 — 유형에 따라 판정이 갈리는 조항(예: 2기 연체 해지)이 있어
+          알려주면 더 정확해진다. 몰라도 분석은 가능 (조항 문언만으로 판단) */}
+      <Card className="mt-4 px-5 py-4">
+        <p className="text-[14px] font-bold text-ink-900">어떤 계약서인가요?</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-ink-400">
+          유형을 알려주시면 더 정확해져요. 예를 들어 같은 "2기 연체 시 해지" 조항도
+          주택이면 표준, 상가면 위험이에요. 몰라도 괜찮아요.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            aria-pressed={domain === ''}
+            onClick={() => onDomainChange('')}
+            className={`rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              domain === ''
+                ? 'bg-ink-900 text-white'
+                : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+            }`}
+          >
+            잘 모르겠어요
+          </button>
+          {DOMAINS.map((item) => {
+            const active = domain === item
+            return (
+              <button
+                key={item}
+                type="button"
+                aria-pressed={active}
+                onClick={() => onDomainChange(active ? '' : item)}
+                className={`rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                  active
+                    ? 'bg-brand-500 text-white'
+                    : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+                }`}
+              >
+                {item}
+              </button>
+            )
+          })}
+        </div>
+      </Card>
 
       {/* 동의 */}
       <Card className="mt-4 px-5 py-4">
