@@ -105,3 +105,22 @@ def test_프롬프트_예시_문구_재도용은_적발된다():
         # 재시도 소진 후 폴백(분석 실패)으로 떨어져야 한다.
         assert result["risk_evidence"] == analysis_module._FALLBACK_EVIDENCE, (
             f"'{phrase}' 재도용이 적발되지 않음 — 검사 범위가 다시 넓어졌을 가능성")
+
+
+# #70: 도메인 주입 시 모델이 문서 유형명·[표준 조항 예외] 판정 기준 문구를 출처
+# 표지 없이 따옴표로 인용하면(예: "주택임대차", "2기 이상 연체 시 해지") 창작
+# 인용으로 오판돼 올바른 위험 판정이 폴백됐다(주택임대차 경로 2/2 재현). #69의
+# 좁은 검사 범위는 유지하고, 대신 도메인 컨텍스트 프롬프트에 "이 문구들은
+# 따옴표 없이 서술하라"는 지시를 추가해 막는다 — 이 테스트는 그 지시문이
+# 실수로 빠지거나, 유형명이 다시 따옴표로 래핑되는 회귀를 API 없이 잡는다.
+def test_도메인_컨텍스트에_유형명_따옴표_래핑_없음():
+    from src.citation_check import _QUOTE_PATTERN
+    from src.nodes.analysis import _build_prompt_parts
+
+    prefix, _ = _build_prompt_parts("주택임대차", "사용자 선택")
+    start = prefix.find("[문서 유형]")
+    end = prefix.find("\n\n", start)
+    context_block = prefix[start:end]
+
+    assert not _QUOTE_PATTERN.search(context_block), "도메인 컨텍스트 문구 자체에 따옴표 래핑이 있음"
+    assert "따옴표" in context_block, "따옴표 금지 지시문이 빠짐"
