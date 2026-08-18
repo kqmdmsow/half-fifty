@@ -791,7 +791,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: '결과는 24시간 뒤 자동 삭제돼요', doDeleteDesc: '지금 바로 삭제할 수도 있어요. 삭제하면 결과를 다시 볼 수 없어요.',
     doDeleteBtn: '지금 모두 삭제', doCancel: '취소', doConfirmDel: '정말 삭제하기',
     doDeletedTitle: '모든 데이터를 삭제했어요', doDeletedDesc: '계약서 원본과 분석 결과가 모두 지워졌어요. 필요할 때 언제든 다시 이용하세요.', doNew: '새 계약서 분석하기',
-    prTitle: '하프피프티 계약서 분석 결과', prSummary: '전체 {total}개 조항 중 확인이 필요한 조항 {need}개 · 본 결과는 참고용 안내이며 법률 자문이 아닙니다. 중요한 결정은 반드시 전문가와 상담하세요.',
+    prTitle: '조목조목 계약서 분석 결과', prSummary: '전체 {total}개 조항 중 확인이 필요한 조항 {need}개 · 본 결과는 참고용 안내이며 법률 자문이 아닙니다. 중요한 결정은 반드시 전문가와 상담하세요.',
     prOriginal: '원문', prExplain: '설명', prCheck: '확인할 것',
   },
   en: {
@@ -824,7 +824,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Results auto-delete in 24 hours', doDeleteDesc: 'You can delete now. Deleted results cannot be viewed again.',
     doDeleteBtn: 'Delete all now', doCancel: 'Cancel', doConfirmDel: 'Yes, delete',
     doDeletedTitle: 'All data deleted', doDeletedDesc: 'The contract and results are gone. Come back anytime.', doNew: 'Analyze a new contract',
-    prTitle: 'HalfFifty Contract Analysis Report', prSummary: '{need} of {total} clauses need attention · For reference only, not legal advice. Consult a professional for important decisions.',
+    prTitle: 'Jomokjomok Contract Analysis Report', prSummary: '{need} of {total} clauses need attention · For reference only, not legal advice. Consult a professional for important decisions.',
     prOriginal: 'Original', prExplain: 'Explanation', prCheck: 'To check',
   },
   zh: {
@@ -857,7 +857,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: '结果24小时后自动删除', doDeleteDesc: '也可立即删除。删除后无法再次查看。',
     doDeleteBtn: '立即全部删除', doCancel: '取消', doConfirmDel: '确认删除',
     doDeletedTitle: '已删除全部数据', doDeletedDesc: '合同原件和分析结果均已清除。需要时随时再来。', doNew: '分析新合同',
-    prTitle: 'HalfFifty 合同分析结果', prSummary: '共{total}条中{need}条需注意 · 仅供参考，非法律意见。重要决定请咨询专业人士。',
+    prTitle: 'Jomokjomok 合同分析结果', prSummary: '共{total}条中{need}条需注意 · 仅供参考，非法律意见。重要决定请咨询专业人士。',
     prOriginal: '原文', prExplain: '说明', prCheck: '需确认',
   },
   vi: {
@@ -890,7 +890,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Kết quả tự xoá sau 24 giờ', doDeleteDesc: 'Bạn có thể xoá ngay bây giờ. Đã xoá thì không xem lại được.',
     doDeleteBtn: 'Xoá tất cả ngay', doCancel: 'Huỷ', doConfirmDel: 'Xoá thật',
     doDeletedTitle: 'Đã xoá toàn bộ dữ liệu', doDeletedDesc: 'Hợp đồng gốc và kết quả đã bị xoá. Hãy quay lại bất cứ lúc nào.', doNew: 'Phân tích hợp đồng mới',
-    prTitle: 'Báo cáo phân tích hợp đồng HalfFifty', prSummary: '{need}/{total} điều khoản cần chú ý · Chỉ để tham khảo, không phải tư vấn pháp lý. Quyết định quan trọng hãy hỏi chuyên gia.',
+    prTitle: 'Báo cáo phân tích hợp đồng Jomokjomok', prSummary: '{need}/{total} điều khoản cần chú ý · Chỉ để tham khảo, không phải tư vấn pháp lý. Quyết định quan trọng hãy hỏi chuyên gia.',
     prOriginal: 'Nguyên văn', prExplain: 'Giải thích', prCheck: 'Cần kiểm tra',
   },
   th: {
@@ -923,7 +923,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'ผลลัพธ์ลบอัตโนมัติใน 24 ชม.', doDeleteDesc: 'ลบตอนนี้ก็ได้ ลบแล้วดูอีกไม่ได้',
     doDeleteBtn: 'ลบทั้งหมดตอนนี้', doCancel: 'ยกเลิก', doConfirmDel: 'ยืนยันลบ',
     doDeletedTitle: 'ลบข้อมูลทั้งหมดแล้ว', doDeletedDesc: 'ต้นฉบับและผลวิเคราะห์ถูกลบหมดแล้ว กลับมาใช้ได้ทุกเมื่อ', doNew: 'วิเคราะห์สัญญาใหม่',
-    prTitle: 'รายงานวิเคราะห์สัญญา HalfFifty', prSummary: '{need} จาก {total} ข้อควรตรวจสอบ · เพื่ออ้างอิงเท่านั้น ไม่ใช่คำปรึกษากฎหมาย',
+    prTitle: 'รายงานวิเคราะห์สัญญา Jomokjomok', prSummary: '{need} จาก {total} ข้อควรตรวจสอบ · เพื่ออ้างอิงเท่านั้น ไม่ใช่คำปรึกษากฎหมาย',
     prOriginal: 'ต้นฉบับ', prExplain: 'คำอธิบาย', prCheck: 'สิ่งที่ต้องตรวจ',
   },
   id: {
@@ -956,7 +956,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Hasil terhapus otomatis dalam 24 jam', doDeleteDesc: 'Bisa dihapus sekarang. Yang terhapus tak bisa dilihat lagi.',
     doDeleteBtn: 'Hapus semua sekarang', doCancel: 'Batal', doConfirmDel: 'Ya, hapus',
     doDeletedTitle: 'Semua data terhapus', doDeletedDesc: 'Kontrak asli dan hasil sudah dihapus. Kembali kapan saja.', doNew: 'Analisis kontrak baru',
-    prTitle: 'Laporan Analisis Kontrak HalfFifty', prSummary: '{need} dari {total} pasal perlu perhatian · Hanya referensi, bukan nasihat hukum.',
+    prTitle: 'Laporan Analisis Kontrak Jomokjomok', prSummary: '{need} dari {total} pasal perlu perhatian · Hanya referensi, bukan nasihat hukum.',
     prOriginal: 'Teks asli', prExplain: 'Penjelasan', prCheck: 'Perlu dicek',
   },
   tl: {
@@ -989,7 +989,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Awtomatikong mabubura sa 24 oras', doDeleteDesc: 'Pwedeng burahin ngayon. Hindi na makikita kapag nabura.',
     doDeleteBtn: 'Burahin lahat ngayon', doCancel: 'Kanselahin', doConfirmDel: 'Oo, burahin',
     doDeletedTitle: 'Nabura na ang lahat ng data', doDeletedDesc: 'Nabura na ang kontrata at resulta. Bumalik anumang oras.', doNew: 'Suriin ang bagong kontrata',
-    prTitle: 'Ulat ng Pagsusuri ng Kontrata — HalfFifty', prSummary: '{need} sa {total} sugnay ang dapat pansinin · Sanggunian lamang, hindi legal na payo.',
+    prTitle: 'Ulat ng Pagsusuri ng Kontrata — Jomokjomok', prSummary: '{need} sa {total} sugnay ang dapat pansinin · Sanggunian lamang, hindi legal na payo.',
     prOriginal: 'Orihinal', prExplain: 'Paliwanag', prCheck: 'Susuriin',
   },
   ne: {
@@ -1022,7 +1022,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'नतिजा २४ घण्टामा स्वतः मेटिन्छ', doDeleteDesc: 'अहिले पनि मेट्न सकिन्छ। मेटेपछि फेरि हेर्न मिल्दैन।',
     doDeleteBtn: 'अहिले सबै मेट्नुहोस्', doCancel: 'रद्द', doConfirmDel: 'पक्कै मेट्ने',
     doDeletedTitle: 'सबै डेटा मेटियो', doDeletedDesc: 'मूल सम्झौता र नतिजा मेटिए। जहिले पनि फेरि आउनुहोस्।', doNew: 'नयाँ सम्झौता विश्लेषण',
-    prTitle: 'HalfFifty सम्झौता विश्लेषण प्रतिवेदन', prSummary: '{total} मध्ये {need} धारामा ध्यान चाहिन्छ · सन्दर्भका लागि मात्र, कानुनी सल्लाह होइन।',
+    prTitle: 'Jomokjomok सम्झौता विश्लेषण प्रतिवेदन', prSummary: '{total} मध्ये {need} धारामा ध्यान चाहिन्छ · सन्दर्भका लागि मात्र, कानुनी सल्लाह होइन।',
     prOriginal: 'मूल पाठ', prExplain: 'व्याख्या', prCheck: 'जाँच्नुपर्ने',
   },
   km: {
@@ -1055,7 +1055,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'លទ្ធផលលុបស្វ័យប្រវត្តិក្នុង ២៤ ម៉ោង', doDeleteDesc: 'អាចលុបឥឡូវក៏បាន។ លុបហើយមើលវិញមិនបានទេ។',
     doDeleteBtn: 'លុបទាំងអស់ឥឡូវ', doCancel: 'បោះបង់', doConfirmDel: 'ពិតជាលុប',
     doDeletedTitle: 'បានលុបទិន្នន័យទាំងអស់', doDeletedDesc: 'ច្បាប់ដើមនិងលទ្ធផលត្រូវបានលុប។ ត្រឡប់មកវិញបានគ្រប់ពេល។', doNew: 'វិភាគកិច្ចសន្យាថ្មី',
-    prTitle: 'របាយការណ៍វិភាគកិច្ចសន្យា HalfFifty', prSummary: '{need} ក្នុងចំណោម {total} ប្រការត្រូវប្រុងប្រយ័ត្ន · សម្រាប់យោងប៉ុណ្ណោះ មិនមែនដំបូន្មានច្បាប់ទេ។',
+    prTitle: 'របាយការណ៍វិភាគកិច្ចសន្យា Jomokjomok', prSummary: '{need} ក្នុងចំណោម {total} ប្រការត្រូវប្រុងប្រយ័ត្ន · សម្រាប់យោងប៉ុណ្ណោះ មិនមែនដំបូន្មានច្បាប់ទេ។',
     prOriginal: 'អត្ថបទដើម', prExplain: 'ការពន្យល់', prCheck: 'ត្រូវពិនិត្យ',
   },
   my: {
@@ -1088,7 +1088,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'ရလဒ်ကို ၂၄ နာရီအတွင်း အလိုအလျောက်ဖျက်သည်', doDeleteDesc: 'ယခုဖျက်လည်းရသည်။ ဖျက်ပြီးလျှင် ပြန်မကြည့်နိုင်ပါ။',
     doDeleteBtn: 'ယခုအားလုံးဖျက်ရန်', doCancel: 'ပယ်ဖျက်', doConfirmDel: 'သေချာဖျက်မည်',
     doDeletedTitle: 'ဒေတာအားလုံးဖျက်ပြီးပြီ', doDeletedDesc: 'မူရင်းနှင့်ရလဒ်များ ဖျက်ပြီးပြီ။ အချိန်မရွေး ပြန်လာနိုင်သည်။', doNew: 'စာချုပ်အသစ် စိစစ်ရန်',
-    prTitle: 'HalfFifty စာချုပ်စိစစ်ချက် အစီရင်ခံစာ', prSummary: 'အပိုဒ် {total} ခုအနက် {need} ခု သတိပြုရန် · ကိုးကားရန်သာ၊ ဥပဒေအကြံမဟုတ်ပါ။',
+    prTitle: 'Jomokjomok စာချုပ်စိစစ်ချက် အစီရင်ခံစာ', prSummary: 'အပိုဒ် {total} ခုအနက် {need} ခု သတိပြုရန် · ကိုးကားရန်သာ၊ ဥပဒေအကြံမဟုတ်ပါ။',
     prOriginal: 'မူရင်း', prExplain: 'ရှင်းလင်းချက်', prCheck: 'စစ်ရန်',
   },
   mn: {
@@ -1121,7 +1121,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Үр дүн 24 цагийн дараа автоматаар устана', doDeleteDesc: 'Одоо ч устгаж болно. Устгавал дахин харагдахгүй.',
     doDeleteBtn: 'Одоо бүгдийг устгах', doCancel: 'Болих', doConfirmDel: 'Тийм, устгах',
     doDeletedTitle: 'Бүх өгөгдөл устлаа', doDeletedDesc: 'Эх гэрээ, үр дүн бүгд устсан. Хэзээ ч дахин ирж болно.', doNew: 'Шинэ гэрээ шинжлэх',
-    prTitle: 'HalfFifty гэрээний шинжилгээний тайлан', prSummary: 'Нийт {total} заалтаас {need}-д анхаарал хэрэгтэй · Зөвхөн лавлагаа, хуулийн зөвлөгөө биш.',
+    prTitle: 'Jomokjomok гэрээний шинжилгээний тайлан', prSummary: 'Нийт {total} заалтаас {need}-д анхаарал хэрэгтэй · Зөвхөн лавлагаа, хуулийн зөвлөгөө биш.',
     prOriginal: 'Эх бичвэр', prExplain: 'Тайлбар', prCheck: 'Шалгах зүйл',
   },
   uz: {
@@ -1154,7 +1154,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Natijalar 24 soatdan soʻng avtomatik oʻchadi', doDeleteDesc: 'Hozir ham oʻchirsa boʻladi. Oʻchirilgach qayta koʻrib boʻlmaydi.',
     doDeleteBtn: 'Hozir hammasini oʻchirish', doCancel: 'Bekor', doConfirmDel: 'Ha, oʻchirish',
     doDeletedTitle: 'Barcha maʼlumot oʻchirildi', doDeletedDesc: 'Asl shartnoma va natijalar oʻchdi. Istalgan payt qayting.', doNew: 'Yangi shartnoma tahlili',
-    prTitle: 'HalfFifty shartnoma tahlili hisoboti', prSummary: '{total} banddan {need} tasiga eʼtibor kerak · Faqat maʼlumot uchun, yuridik maslahat emas.',
+    prTitle: 'Jomokjomok shartnoma tahlili hisoboti', prSummary: '{total} banddan {need} tasiga eʼtibor kerak · Faqat maʼlumot uchun, yuridik maslahat emas.',
     prOriginal: 'Asl matn', prExplain: 'Izoh', prCheck: 'Tekshirish kerak',
   },
   si: {
@@ -1187,7 +1187,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'ප්‍රතිඵල පැය 24කින් ස්වයංක්‍රීයව මකයි', doDeleteDesc: 'දැන්ම මැකීමටද හැක. මැකූ පසු නැවත බැලිය නොහැක.',
     doDeleteBtn: 'දැන් සියල්ල මකන්න', doCancel: 'අවලංගු', doConfirmDel: 'ඔව්, මකන්න',
     doDeletedTitle: 'සියලු දත්ත මකා දමන ලදි', doDeletedDesc: 'මුල් ගිවිසුම සහ ප්‍රතිඵල මැකිණි. ඕනෑම විටෙක නැවත එන්න.', doNew: 'නව ගිවිසුමක් විශ්ලේෂණය',
-    prTitle: 'HalfFifty ගිවිසුම් විශ්ලේෂණ වාර්තාව', prSummary: 'වගන්ති {total}න් {need}කට අවධානය අවශ්‍යයි · යොමුවට පමණි, නීති උපදෙසක් නොවේ.',
+    prTitle: 'Jomokjomok ගිවිසුම් විශ්ලේෂණ වාර්තාව', prSummary: 'වගන්ති {total}න් {need}කට අවධානය අවශ්‍යයි · යොමුවට පමණි, නීති උපදෙසක් නොවේ.',
     prOriginal: 'මුල් පිටපත', prExplain: 'පැහැදිලි කිරීම', prCheck: 'පරීක්ෂා කළ යුතු',
   },
   bn: {
@@ -1220,7 +1220,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'ফলাফল ২৪ ঘণ্টায় স্বয়ংক্রিয়ভাবে মুছে যায়', doDeleteDesc: 'এখনই মুছতেও পারেন। মুছলে আর দেখা যাবে না।',
     doDeleteBtn: 'এখনই সব মুছুন', doCancel: 'বাতিল', doConfirmDel: 'হ্যাঁ, মুছুন',
     doDeletedTitle: 'সব ডেটা মুছে ফেলা হয়েছে', doDeletedDesc: 'মূল চুক্তি ও ফলাফল মুছে গেছে। যেকোনো সময় আবার আসুন।', doNew: 'নতুন চুক্তি বিশ্লেষণ',
-    prTitle: 'HalfFifty চুক্তি বিশ্লেষণ প্রতিবেদন', prSummary: '{total}টির মধ্যে {need}টি ধারায় মনোযোগ দরকার · শুধুই সহায়ক তথ্য, আইনি পরামর্শ নয়।',
+    prTitle: 'Jomokjomok চুক্তি বিশ্লেষণ প্রতিবেদন', prSummary: '{total}টির মধ্যে {need}টি ধারায় মনোযোগ দরকার · শুধুই সহায়ক তথ্য, আইনি পরামর্শ নয়।',
     prOriginal: 'মূল পাঠ', prExplain: 'ব্যাখ্যা', prCheck: 'যা দেখতে হবে',
   },
   ru: {
@@ -1253,7 +1253,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: 'Результаты удалятся через 24 часа', doDeleteDesc: 'Можно удалить сейчас. После удаления просмотр невозможен.',
     doDeleteBtn: 'Удалить всё сейчас', doCancel: 'Отмена', doConfirmDel: 'Да, удалить',
     doDeletedTitle: 'Все данные удалены', doDeletedDesc: 'Договор и результаты стёрты. Возвращайтесь в любое время.', doNew: 'Анализировать новый договор',
-    prTitle: 'Отчёт анализа договора HalfFifty', prSummary: '{need} из {total} пунктов требуют внимания · Только для справки, не юридическая консультация.',
+    prTitle: 'Отчёт анализа договора Jomokjomok', prSummary: '{need} из {total} пунктов требуют внимания · Только для справки, не юридическая консультация.',
     prOriginal: 'Оригинал', prExplain: 'Пояснение', prCheck: 'Проверить',
   },
   ja: {
@@ -1286,7 +1286,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doDeleteTitle: '結果は24時間後に自動削除', doDeleteDesc: '今すぐ削除も可能。削除後は再表示できません。',
     doDeleteBtn: '今すべて削除', doCancel: 'キャンセル', doConfirmDel: '削除する',
     doDeletedTitle: 'すべてのデータを削除しました', doDeletedDesc: '契約書原本と結果は消去されました。いつでもまたどうぞ。', doNew: '新しい契約書を分析',
-    prTitle: 'HalfFifty 契約書分析レポート', prSummary: '全{total}条項中{need}件に注意 · 参考情報であり法律相談ではありません。',
+    prTitle: 'Jomokjomok 契約書分析レポート', prSummary: '全{total}条項中{need}件に注意 · 参考情報であり法律相談ではありません。',
     prOriginal: '原文', prExplain: '説明', prCheck: '確認事項',
   },
 }

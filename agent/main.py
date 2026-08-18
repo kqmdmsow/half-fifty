@@ -41,7 +41,7 @@ Language = Literal[
     "km", "my", "mn", "uz", "si", "bn", "ru", "ja",
 ]
 
-app = FastAPI(title="Half-Fifty Agent Service", version="0.1.0")
+app = FastAPI(title="Jomokjomok (조목조목) Agent Service", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
