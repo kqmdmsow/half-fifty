@@ -122,6 +122,13 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
                 invoke_json(llm, text + suffix, cached_prefix=prefix))
             # 인용 원문 존재 검사 (자문 §5, 규칙 기반): 창작 인용은 스키마
             # 위반과 동급으로 취급 → 재시도, 소진 시 폴백.
+            # 검사 대상은 조항 원문(text)만 유지한다 — 프롬프트 전체(prefix+suffix)로
+            # 넓히면 모델이 프롬프트 안의 예시 문구를 조항과 무관하게 그대로
+            # risk_evidence에 베껴도 "입력에 있으니 통과"로 새어나가는 구멍이
+            # 생긴다(2026-08 실측, test_citation_check.py의 회귀 테스트 참조).
+            # 도메인 주입 후 법령 인용 오탐은 citation_check.py의
+            # _LEGAL_SOURCE_MARKER(출처 표지 기반 면제)만으로 해결되므로 검사
+            # 범위 자체를 넓힐 필요가 없다.
             fabricated = find_fabricated_quotes(data.risk_evidence, text)
             if fabricated:
                 raise ValueError(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")

@@ -43,7 +43,30 @@ def extract_quotes(evidence: str) -> List[str]:
     return quotes
 
 
+# 법령·판례 출처 표지가 인용 직전(40자 이내)에 있으면 계약 원문 인용이 아니라
+# 외부 법지식 인용이다 — faithfulness 루브릭 명확화("외부 법지식 인용 ≠ 위반")와
+# 동일 원칙으로 하드페일 대상에서 제외한다 (그 인용의 정확성은 Judge 소관).
+# 실측 사례(#49 도메인 주입 후): "상가건물임대차보호법 제10조는 '3기의 차임액…'을
+# 규정" — 정확한 법령 인용이 원문 부재로 오판되어 올바른 위험 판정이 폴백됐다.
+_LEGAL_SOURCE_MARKER = re.compile(
+    r"(민법|보호법|약관규제법|임대차보호법|자본시장법|근로기준법|법률|판례|표준계약서"
+    r"|제\s?\d+\s?조(의\s?\d+)?).{0,40}$"
+)
+
+
 def find_fabricated_quotes(evidence: str, clause_text: str) -> List[str]:
-    """조항 원문에 존재하지 않는 인용 조각 목록을 반환한다 (빈 목록 = 통과)."""
+    """조항 원문에 존재하지 않는 '원문 주장' 인용 목록을 반환한다 (빈 목록 = 통과).
+
+    법령 출처가 명시된 인용은 검사 대상이 아니다 — 위 _LEGAL_SOURCE_MARKER 참조.
+    """
     norm_clause = _normalize(clause_text)
-    return [q for q in extract_quotes(evidence) if _normalize(q) not in norm_clause]
+    fabricated: List[str] = []
+    for m in _QUOTE_PATTERN.finditer(evidence):
+        preceding = evidence[max(0, m.start() - 60):m.start()]
+        if _LEGAL_SOURCE_MARKER.search(preceding):
+            continue
+        for part in _ELLIPSIS_SPLIT.split(m.group(1)):
+            part = part.strip()
+            if len(_normalize(part)) >= 5 and _normalize(part) not in norm_clause:
+                fabricated.append(part)
+    return fabricated
