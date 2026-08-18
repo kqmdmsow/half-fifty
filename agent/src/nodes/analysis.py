@@ -122,7 +122,12 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
                 invoke_json(llm, text + suffix, cached_prefix=prefix))
             # 인용 원문 존재 검사 (자문 §5, 규칙 기반): 창작 인용은 스키마
             # 위반과 동급으로 취급 → 재시도, 소진 시 폴백.
-            fabricated = find_fabricated_quotes(data.risk_evidence, text)
+            # 검사 대상 = 모델이 실제로 본 입력 전체(프롬프트 규칙 + 도메인
+            # 컨텍스트 + 조항 원문). 프롬프트가 제공한 표준 문구('2기(2개월)
+            # 이상 연체 시 해지')나 주입된 유형명('주택임대차')의 인용은 창작이
+            # 아니다 — #49 도메인 주입 후 조항 원문만 대조하면 올바른 판정이
+            # 오판 폴백되는 사례 실측. 입력 어디에도 없는 문구만 환각으로 잡는다.
+            fabricated = find_fabricated_quotes(data.risk_evidence, prefix + text + suffix)
             if fabricated:
                 raise ValueError(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")
             return AnalysisResult(

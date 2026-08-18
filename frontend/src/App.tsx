@@ -38,6 +38,7 @@ export default function App() {
   const [file, setFile] = useState<File | null>(null)
   const [text, setText] = useState('')
   const [persona, setPersona] = useState<Persona>('adult')
+  const [domain, setDomain] = useState('') // 사용자 선택 문서 유형 ('' = 모름)
   const [language, setLanguage] = useState<Language>('ko')
 
   // 접근성 설정
@@ -102,13 +103,13 @@ export default function App() {
                 result,
               ])
             },
-          }),
+          }, domain),
         )
       } else if (mode === 'pdf' && file) {
         setData(
           file.type.startsWith('image/')
-            ? await analyzeImage(file, persona, language)
-            : await analyzePdf(file, persona, language),
+            ? await analyzeImage(file, persona, language, domain)
+            : await analyzePdf(file, persona, language, domain),
         )
       }
     } catch (err) {
@@ -125,6 +126,7 @@ export default function App() {
     setError(null)
     setFile(null)
     setText('')
+    setDomain('')
     setSelectedClauseId(null)
     go('upload')
   }
@@ -178,9 +180,11 @@ export default function App() {
             mode={mode}
             file={file}
             text={text}
+            domain={domain}
             onModeChange={setMode}
             onFileChange={setFile}
             onTextChange={setText}
+            onDomainChange={setDomain}
             onNext={() => go('extract')}
           />
         )}

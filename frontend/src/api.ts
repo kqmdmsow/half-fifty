@@ -36,11 +36,12 @@ export async function analyzeContract(
   text: string,
   persona: Persona,
   language: Language = 'ko',
+  domain = '',
 ): Promise<AnalyzeResponse> {
   const res = await fetch(`${BASE_URL}/api/contracts/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, persona, language }),
+    body: JSON.stringify({ text, persona, language, domain }),
   })
   if (!res.ok) {
     throw new Error(`분석 요청 실패 (${res.status})`)
@@ -64,11 +65,12 @@ export async function analyzeContractStream(
   persona: Persona,
   language: Language,
   handlers: StreamHandlers,
+  domain = '',
 ): Promise<AnalyzeResponse> {
   const res = await fetch(`${BASE_URL}/api/contracts/analyze-stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, persona, language }),
+    body: JSON.stringify({ text, persona, language, domain }),
   })
   if (!res.ok || !res.body) {
     throw new Error(`분석 요청 실패 (${res.status})`)
@@ -136,11 +138,13 @@ export async function analyzePdf(
   file: File,
   persona: Persona,
   language: Language = 'ko',
+  domain = '',
 ): Promise<AnalyzeResponse> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('persona', persona)
   formData.append('language', language)
+  formData.append('domain', domain)
 
   const res = await fetch(`${BASE_URL}/api/contracts/analyze-pdf`, {
     method: 'POST',
@@ -163,11 +167,13 @@ export async function analyzeImage(
   file: File,
   persona: Persona,
   language: Language = 'ko',
+  domain = '',
 ): Promise<AnalyzeResponse> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('persona', persona)
   formData.append('language', language)
+  formData.append('domain', domain)
 
   const res = await fetch(`${BASE_URL}/api/contracts/analyze-image`, {
     method: 'POST',
