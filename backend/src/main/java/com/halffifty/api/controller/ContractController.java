@@ -6,6 +6,7 @@ import com.halffifty.api.service.AgentClient;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 /**
  * 계약서 분석 API.
@@ -42,6 +44,18 @@ public class ContractController {
         return agentClient.analyze(request);
     }
 
+    /**
+     * 조항별 점진 스트리밍 분석 (NDJSON 프록시). 에이전트 /analyze-stream을
+     * 그대로 중계한다 — 조항이 끝나는 대로 프론트에 결과가 도착한다.
+     */
+    @PostMapping(value = "/analyze-stream", produces = "application/x-ndjson")
+    public ResponseEntity<StreamingResponseBody> analyzeStream(@RequestBody AnalyzeRequest request) {
+        StreamingResponseBody body = out -> agentClient.streamAnalyze(request, out);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/x-ndjson"))
+                .body(body);
+    }
+
     /** 업로드 허용 최대 크기 (application.yml multipart 한도와 함께 이중 방어). */
     private static final long MAX_PDF_BYTES = 10 * 1024 * 1024;
 
@@ -54,7 +68,8 @@ public class ContractController {
     @PostMapping(value = "/analyze-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public AnalyzeResponse analyzePdf(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "persona", defaultValue = "adult") String persona)
+            @RequestParam(value = "persona", defaultValue = "adult") String persona,
+            @RequestParam(value = "language", defaultValue = "ko") String language)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -70,10 +85,10 @@ public class ContractController {
             throw new ResponseStatusException(
                     HttpStatus.UNSUPPORTED_MEDIA_TYPE, "PDF 파일이 아닙니다.");
         }
-        if (!"adult".equals(persona) && !"senior".equals(persona)) {
+        if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
         }
-        return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona);
+        return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona, language);
     }
 
     /**
@@ -83,7 +98,8 @@ public class ContractController {
     @PostMapping(value = "/analyze-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public AnalyzeResponse analyzeImage(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "persona", defaultValue = "adult") String persona)
+            @RequestParam(value = "persona", defaultValue = "adult") String persona,
+            @RequestParam(value = "language", defaultValue = "ko") String language)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -98,10 +114,10 @@ public class ContractController {
             throw new ResponseStatusException(
                     HttpStatus.UNSUPPORTED_MEDIA_TYPE, "jpg/png/webp 이미지만 지원합니다.");
         }
-        if (!"adult".equals(persona) && !"senior".equals(persona)) {
+        if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
         }
-        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona);
+        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona, language);
     }
 
     /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */

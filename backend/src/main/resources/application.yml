@@ -2,6 +2,11 @@ server:
   port: ${PORT:8080}
 
 spring:
+  mvc:
+    async:
+      # 스트리밍(analyze-stream)은 judge 재시도 포함 시 수 분까지 걸린다 —
+      # 기본 30초면 AsyncRequestTimeoutException으로 judge 이벤트 전에 끊긴다.
+      request-timeout: 600000
   servlet:
     multipart:
       max-file-size: 10MB

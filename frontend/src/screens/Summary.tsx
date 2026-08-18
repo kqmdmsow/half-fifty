@@ -2,25 +2,30 @@ import { useMemo, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
+import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 
 type Filter = '전체' | RiskLevel
 
 export function SummaryScreen({
   clauseCount,
   results,
-  isSample,
+  language = 'ko',
+  liveProgress = null,
   warnings = [],
   onSelectClause,
   onDone,
 }: {
   clauseCount: number
   results: ClauseResult[]
-  isSample: boolean
+  language?: LangCode
+  /** 스트리밍 분석 중이면 {done,total} — 완료 조항부터 이 화면에 바로 쌓인다 */
+  liveProgress?: { done: number; total: number } | null
   warnings?: string[]
   onSelectClause: (clauseId: string) => void
   onDone: () => void
 }) {
   const [filter, setFilter] = useState<Filter>('전체')
+  const live = Boolean(liveProgress)
 
   const counts = useMemo(
     () =>
@@ -45,12 +50,6 @@ export function SummaryScreen({
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
-      {isSample && (
-        <p className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700">
-          분석 서버에 연결되지 않아 예시 결과를 보여드리고 있어요.
-        </p>
-      )}
-
       {warnings.map((warning) => (
         <p
           key={warning}
@@ -60,21 +59,38 @@ export function SummaryScreen({
         </p>
       ))}
 
-      <p className="text-[14px] font-bold text-brand-600">분석 완료</p>
+      {live && liveProgress ? (
+        <div className="flex items-center gap-2.5">
+          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+          <p className="text-[14px] font-bold text-brand-600">
+            {t(language, 'analyzingLive', { done: liveProgress.done, total: liveProgress.total })}{' '}
+            <span className="font-semibold text-ink-400">— {t(language, 'liveHint')}</span>
+          </p>
+        </div>
+      ) : (
+        <p className="text-[14px] font-bold text-brand-600">{t(language, 'analysisDone')}</p>
+      )}
+
       <h1 className="mt-2 text-[26px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[32px]">
-        전체 {clauseCount}개 조항 중
+        {t(language, 'headlineTotal', { total: clauseCount })}
         <br />
         <span className={needCheck > 0 ? 'text-danger-500' : 'text-safe-700'}>
-          확인이 필요한 조항이 {needCheck}개
-        </span>{' '}
-        있어요
+          {t(language, 'headlineNeed', { need: needCheck })}
+        </span>
       </h1>
+
+      {/* 검증 대기 고지 — 조항은 다 나왔지만 judge 확정 전 */}
+      {live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 && (
+        <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
+          🛡️ {t(language, 'verifyingNote')}
+        </p>
+      )}
 
       {/* 요약 통계 */}
       <div className="mt-7 grid grid-cols-3 gap-2.5">
-        <StatCard label="위험" value={counts.위험} tone="danger" />
-        <StatCard label="주의" value={counts.주의} tone="caution" />
-        <StatCard label="안전" value={counts.안전} tone="safe" />
+        <StatCard label={riskLevelLabel(language, '위험')} value={counts.위험} tone="danger" />
+        <StatCard label={riskLevelLabel(language, '주의')} value={counts.주의} tone="caution" />
+        <StatCard label={riskLevelLabel(language, '안전')} value={counts.안전} tone="safe" />
       </div>
 
       {/* 최우선 확인 */}
@@ -85,8 +101,10 @@ export function SummaryScreen({
           className="mt-5 flex w-full items-center justify-between gap-4 rounded-3xl bg-danger-50 px-6 py-5 text-left transition-transform hover:-translate-y-0.5"
         >
           <div>
-            <p className="text-[13px] font-bold text-danger-600">가장 먼저 확인하세요</p>
-            <p className="mt-1 text-[16px] font-bold text-ink-900">{topRisk.risk_type}</p>
+            <p className="text-[13px] font-bold text-danger-600">{t(language, 'checkFirst')}</p>
+            <p className="mt-1 text-[16px] font-bold text-ink-900">
+              {riskTypeLabel(language, topRisk.risk_type)}
+            </p>
             <p className="mt-1 text-[14px] leading-relaxed text-ink-600">{topRisk.explanation}</p>
           </div>
           <span className="shrink-0 text-[18px] text-danger-500">→</span>
@@ -99,6 +117,7 @@ export function SummaryScreen({
           {(['전체', '위험', '주의', '안전'] as Filter[]).map((item) => {
             const count = item === '전체' ? results.length : counts[item]
             const active = filter === item
+            const label = item === '전체' ? t(language, 'all') : riskLevelLabel(language, item)
             return (
               <button
                 key={item}
@@ -108,56 +127,70 @@ export function SummaryScreen({
                   active ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
                 }`}
               >
-                {item} {count}
+                {label} {count}
               </button>
             )
           })}
         </div>
-        {allQuestions && <CopyButton text={allQuestions}>질문 전체 복사</CopyButton>}
+        {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
       </div>
 
-      {/* 조항 카드 */}
+      {/* 조항 카드 — 스트리밍 중엔 완료 순서대로 쌓인다 */}
       <div className="mt-4 space-y-3">
         {filtered.length === 0 ? (
-          <Card className="px-6 py-10 text-center text-[14px] text-ink-400">
-            해당하는 조항이 없어요.
-          </Card>
+          live ? (
+            <>
+              <div className="h-24 animate-pulse rounded-3xl bg-ink-25" />
+              <div className="h-24 animate-pulse rounded-3xl bg-ink-25" />
+            </>
+          ) : (
+            <Card className="px-6 py-10 text-center text-[14px] text-ink-400">
+              {t(language, 'noClauses')}
+            </Card>
+          )
         ) : (
           filtered.map((result) => (
             <Card
               key={result.clause_id}
               interactive
               onClick={() => onSelectClause(result.clause_id)}
-              className="p-6"
+              className="animate-fade-up p-6"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[15px] font-bold text-ink-900">
-                    {result.risk_type === '해당 없음' ? '표준 조항' : result.risk_type}
+                    {result.risk_type === '해당 없음'
+                      ? t(language, 'standardClause')
+                      : riskTypeLabel(language, result.risk_type)}
                   </p>
                   <p className="mt-1.5 line-clamp-2 text-[14px] leading-relaxed text-ink-400">
                     {result.explanation}
                   </p>
                 </div>
-                <RiskBadge level={result.risk_level} />
+                <RiskBadge
+                  level={result.risk_level}
+                  label={riskLevelLabel(language, result.risk_level)}
+                />
               </div>
               {result.risk_level !== '안전' && (
                 <p className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] leading-relaxed text-ink-600">
                   <span className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
-                    근거
+                    {t(language, 'evidence')}
                   </span>{' '}
                   {result.risk_evidence}
                 </p>
               )}
-              <p className="mt-3.5 text-[14px] font-bold text-brand-600">자세히 보기 →</p>
+              <p className="mt-3.5 text-[14px] font-bold text-brand-600">
+                {t(language, 'seeDetail')} →
+              </p>
             </Card>
           ))
         )}
       </div>
 
       <div className="mt-9 flex justify-center">
-        <Button variant="secondary" onClick={onDone}>
-          결과 활용하고 마치기
+        <Button variant="secondary" onClick={onDone} disabled={live}>
+          {t(language, 'finish')}
         </Button>
       </div>
     </div>

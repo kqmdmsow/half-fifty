@@ -44,14 +44,22 @@ export function Button({
 
 /* ---------- Risk badge ---------- */
 
-export function RiskBadge({ level, className = '' }: { level: RiskLevel; className?: string }) {
+export function RiskBadge({
+  level,
+  label,
+  className = '',
+}: {
+  level: RiskLevel
+  label?: string // 다국어 라벨 오버라이드 (i18n.riskLevelLabel)
+  className?: string
+}) {
   const meta = RISK_META[level]
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[13px] font-bold ${meta.badge} ${className}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-      {meta.label}
+      {label ?? meta.label}
     </span>
   )
 }
