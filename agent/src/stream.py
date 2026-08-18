@@ -16,7 +16,10 @@ MAX_RETRIES). 재시도가 발생하면 revision을 올려 clause 이벤트를 �
 결과이므로 프론트는 '검증 중' 상태를 표시하고, judge 이벤트로 확정해야 한다.**
 
 graph.py와 제어 흐름이 중복된다 — 임계값·단계를 바꿀 때 양쪽을 함께 수정할 것
-(상수는 state.py에서 공유하므로 임계값 자체는 한 곳이다).
+(상수는 state.py에서 공유하므로 임계값 자체는 한 곳이다). aspect별 재생성
+분기(#75)도 graph.py의 _route_retry_target과 동일 로직을 state.py의
+failing_aspects/shortcut_eligible로 공유해 드리프트를 막는다. Judge rationale을
+재생성 프롬프트에 주입하는 부분은 측정 결과(FP 증가) 제외했다 — 별도 이슈.
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -34,15 +37,23 @@ from src.state import (
     MAX_RETRIES,
     AnalysisResult,
     Clause,
+    failing_aspects,
     judge_score_avg,
+    shortcut_eligible,
 )
 
 
 def _analyze_and_adapt(
-    clause: Clause, persona: str, language: str, domain: str, domain_evidence: str
+    clause: Clause, persona: str, language: str, domain: str, domain_evidence: str,
 ) -> tuple[AnalysisResult, dict | None]:
     result = _analyze_clause(clause["clause_id"], clause["text"], domain, domain_evidence)
     return _adapt(result, persona, language, clause["text"])
+
+
+def _persona_only_adapt(
+    clause: Clause, prior_result: AnalysisResult, persona: str, language: str,
+) -> tuple[AnalysisResult, dict | None]:
+    return _adapt(prior_result, persona, language, clause["text"])
 
 
 def _emit_clauses(
@@ -63,6 +74,41 @@ def _emit_clauses(
         ]
         for future in as_completed(futures):
             result, translation = future.result()  # 양쪽 모두 내부 폴백 보유
+            done += 1
+            yield {
+                "event": "clause",
+                "done": done,
+                "total": len(clauses),
+                "revision": revision,
+                "result": {
+                    **result,
+                    "original_text": clause_text[result["clause_id"]],
+                    **(translation or {}),
+                },
+            }
+
+
+def _emit_persona_only(
+    clauses: List[Clause], persona: str, language: str, revision: int,
+    prior_results: Dict[str, AnalysisResult],
+) -> Iterator[dict]:
+    """clarity-only 단축(#75): analysis는 건너뛰고 직전 판정으로 persona만 재실행.
+
+    risk_level/risk_type/risk_evidence/check_questions은 prior_results 그대로
+    유지된다(persona._adapt는 explanation만 덮어씀). 피드백 미주입 상태라
+    temperature=0에서는 explanation이 그대로 나올 수 있으나, risk_coverage·
+    faithfulness를 재검증 없이 통과시키지 않는 안전장치(shortcut_eligible)
+    자체가 이 PR의 목적이다 — 개선 효과(피드백 주입)는 별도 이슈에서 다룬다.
+    """
+    done = 0
+    clause_text = {c["clause_id"]: c["text"] for c in clauses}
+    with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
+        futures = [
+            pool.submit(_persona_only_adapt, c, prior_results[c["clause_id"]], persona, language)
+            for c in clauses
+        ]
+        for future in as_completed(futures):
+            result, translation = future.result()
             done += 1
             yield {
                 "event": "clause",
@@ -103,11 +149,17 @@ def stream_analysis(
     retry = 0
     needs_review = False
     numeric_scores: Dict[str, float] = {}
+    persona_only = False  # clarity-only 단축 여부 (#75)
 
     while True:
         _EVENT_ONLY_KEYS = {"original_text", "original_text_translated", "check_questions_translated"}
-        for event in _emit_clauses(clauses, persona, language, revision=retry,
-                                   domain=resolved_domain, domain_evidence=domain_evidence):
+        if persona_only:
+            events = _emit_persona_only(clauses, persona, language, revision=retry,
+                                        prior_results=results_by_id)
+        else:
+            events = _emit_clauses(clauses, persona, language, revision=retry,
+                                   domain=resolved_domain, domain_evidence=domain_evidence)
+        for event in events:
             results_by_id[event["result"]["clause_id"]] = {
                 k: v for k, v in event["result"].items() if k not in _EVENT_ONLY_KEYS
             }  # type: ignore[assignment]
@@ -131,8 +183,15 @@ def stream_analysis(
         gate_failed = faith < FAITHFULNESS_MIN or avg < JUDGE_THRESHOLD
         if gate_failed and retry < MAX_RETRIES:
             retry += 1
+            # 재생성 대상 분기 (#75/#35): clarity만 미달 & risk_coverage·
+            # faithfulness가 임계값보다 확실히 위일 때만 persona 단축 허용.
+            # 아슬아슬하면 analysis 전체 재실행 (#35 실측: 마진 없이 단축을
+            # 허용했더니 FP 3→7로 증가).
+            failing = set(failing_aspects(scores))
+            persona_only = failing == {"clarity"} and shortcut_eligible(scores)
             yield {"event": "retry", "retry_count": retry,
-                   "reason": "faithfulness" if faith < FAITHFULNESS_MIN else "avg"}
+                   "reason": "faithfulness" if faith < FAITHFULNESS_MIN else "avg",
+                   "target": "persona" if persona_only else "analysis"}
             continue
         needs_review = gate_failed
         break
