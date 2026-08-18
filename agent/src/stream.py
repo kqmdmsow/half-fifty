@@ -24,6 +24,7 @@ from typing import Dict, Iterator, List
 
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import _MAX_CONCURRENCY, _analyze_clause
+from src.nodes.domain import domain_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import split_clauses_with_warnings
 from src.nodes.persona import _adapt
@@ -38,14 +39,15 @@ from src.state import (
 
 
 def _analyze_and_adapt(
-    clause: Clause, persona: str, language: str
+    clause: Clause, persona: str, language: str, domain: str, domain_evidence: str
 ) -> tuple[AnalysisResult, dict | None]:
-    result = _analyze_clause(clause["clause_id"], clause["text"])
+    result = _analyze_clause(clause["clause_id"], clause["text"], domain, domain_evidence)
     return _adapt(result, persona, language, clause["text"])
 
 
 def _emit_clauses(
-    clauses: List[Clause], persona: str, language: str, revision: int
+    clauses: List[Clause], persona: str, language: str, revision: int,
+    domain: str = "", domain_evidence: str = "",
 ) -> Iterator[dict]:
     """전 조항을 병렬 분석+적응하고 완료 순서대로 clause 이벤트를 낸다.
 
@@ -55,7 +57,10 @@ def _emit_clauses(
     done = 0
     clause_text = {c["clause_id"]: c["text"] for c in clauses}
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
-        futures = [pool.submit(_analyze_and_adapt, c, persona, language) for c in clauses]
+        futures = [
+            pool.submit(_analyze_and_adapt, c, persona, language, domain, domain_evidence)
+            for c in clauses
+        ]
         for future in as_completed(futures):
             result, translation = future.result()  # 양쪽 모두 내부 폴백 보유
             done += 1
@@ -72,16 +77,25 @@ def _emit_clauses(
             }
 
 
-def stream_analysis(raw_text: str, persona: str, language: str = "ko") -> Iterator[dict]:
+def stream_analysis(
+    raw_text: str, persona: str, language: str = "ko", domain: str = ""
+) -> Iterator[dict]:
     masked, pii_counts = mask_pii(raw_text)
     clauses, warnings = split_clauses_with_warnings(masked)
     if pii_counts:
         warnings = [masking_notice(pii_counts)] + warnings
 
+    # domain_node와 동일 로직(사용자 선택 우선, 자동판별은 opt-in) — graph.py와
+    # 제어 흐름이 중복된다는 모듈 docstring 경고대로 여기도 함께 갱신해야 한다.
+    domain_result = domain_node({"domain": domain, "raw_text": masked})  # type: ignore[arg-type]
+    resolved_domain = domain_result["domain"]
+    domain_evidence = domain_result["domain_evidence"]
+
     yield {
         "event": "meta",
         "clause_count": len(clauses),
         "parse_warnings": warnings,
+        "domain": resolved_domain,
         "clauses": [{"clause_id": c["clause_id"], "text": c["text"]} for c in clauses],
     }
 
@@ -92,7 +106,8 @@ def stream_analysis(raw_text: str, persona: str, language: str = "ko") -> Iterat
 
     while True:
         _EVENT_ONLY_KEYS = {"original_text", "original_text_translated", "check_questions_translated"}
-        for event in _emit_clauses(clauses, persona, language, revision=retry):
+        for event in _emit_clauses(clauses, persona, language, revision=retry,
+                                   domain=resolved_domain, domain_evidence=domain_evidence):
             results_by_id[event["result"]["clause_id"]] = {
                 k: v for k, v in event["result"].items() if k not in _EVENT_ONLY_KEYS
             }  # type: ignore[assignment]

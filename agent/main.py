@@ -55,6 +55,7 @@ class AnalyzeRequest(BaseModel):
     persona: Literal["adult", "senior", "foreigner"] = Field("adult", description="사용자 페르소나")
     # Optional — 백엔드(Java record)가 필드를 안 보내거나 null을 보내도 허용
     language: Optional[Language] = Field("ko", description="설명 출력 언어 (foreigner 페르소나용)")
+    domain: str = Field("", description="사용자가 선택한 문서 유형 (선택 입력, 예: 주택임대차)")
 
 
 class ClauseResult(BaseModel):
@@ -118,7 +119,7 @@ def health() -> dict:
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
-    state = run_pipeline(req.text, persona=req.persona, language=req.language or "ko")
+    state = run_pipeline(req.text, persona=req.persona, language=req.language or "ko", domain=req.domain)
     return _state_to_response(state)
 
 
@@ -131,7 +132,7 @@ def analyze_stream(req: AnalyzeRequest) -> StreamingResponse:
     """
 
     def gen():
-        for event in stream_analysis(req.text, req.persona, req.language or "ko"):
+        for event in stream_analysis(req.text, req.persona, req.language or "ko", req.domain):
             yield json.dumps(event, ensure_ascii=False) + "\n"
 
     return StreamingResponse(gen(), media_type="application/x-ndjson")

@@ -52,6 +52,8 @@ class PipelineState(TypedDict):
     language: str  # 설명 출력 언어 (ko/en/zh/vi — persona 노드에서만 사용, 기본 "ko")
 
     # 각 단계 출력
+    domain: str             # 문서 유형 (사용자 선택 또는 자동 판별, 실패 시 "알 수 없음")
+    domain_evidence: str    # 판별 근거 (사용자 선택이면 "사용자 선택")
     parse_warnings: List[str]  # Parser 추출 경고 (별지 제외, 커버리지 미달 등)
     clauses: List[Clause]
     analysis_results: List[AnalysisResult]
