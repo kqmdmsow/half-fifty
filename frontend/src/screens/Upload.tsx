@@ -1,5 +1,6 @@
 import { useRef, useState, type DragEvent } from 'react'
 import { Button, Card, PageTitle } from '../components/ui'
+import { domainLabel, t, type LangCode } from '../i18n'
 
 type InputMode = 'pdf' | 'text'
 
@@ -24,6 +25,7 @@ export function UploadScreen({
   file,
   text,
   domain,
+  language = 'ko',
   onModeChange,
   onFileChange,
   onTextChange,
@@ -34,6 +36,7 @@ export function UploadScreen({
   file: File | null
   text: string
   domain: string
+  language?: LangCode
   onModeChange: (mode: InputMode) => void
   onFileChange: (file: File | null) => void
   onTextChange: (text: string) => void
@@ -49,11 +52,11 @@ export function UploadScreen({
     setFileError(null)
     if (!candidate) return
     if (!isPdf(candidate) && !isImage(candidate)) {
-      setFileError('PDF 또는 사진(JPG·PNG·WEBP)만 올릴 수 있어요.')
+      setFileError(t(language, 'upErrType'))
       return
     }
     if (candidate.size > MAX_SIZE) {
-      setFileError('파일이 10MB를 넘어요. 더 작은 파일로 올려주세요.')
+      setFileError(t(language, 'upErrSize'))
       return
     }
     onFileChange(candidate)
@@ -70,8 +73,8 @@ export function UploadScreen({
   return (
     <div className="mx-auto max-w-xl animate-fade-up px-6 py-12 md:py-16">
       <PageTitle
-        title="분석할 계약서를 올려주세요"
-        desc="PDF는 물론 휴대폰으로 찍은 계약서 사진(JPG·PNG)도 돼요. 분석이 끝나면 원본은 즉시 삭제돼요."
+        title={t(language, 'upTitle')}
+        desc={t(language, 'upDesc')}
       />
 
       {/* 입력 방식 탭 */}
@@ -85,7 +88,7 @@ export function UploadScreen({
               mode === item ? 'bg-white text-ink-900 shadow-card' : 'text-ink-400 hover:text-ink-600'
             }`}
           >
-            {item === 'pdf' ? '파일·사진 업로드' : '직접 붙여넣기'}
+            {item === 'pdf' ? t(language, 'upTabFile') : t(language, 'upTabText')}
           </button>
         ))}
       </div>
@@ -127,7 +130,7 @@ export function UploadScreen({
                   {file.name}
                 </p>
                 <p className="mt-1 text-[13px] text-ink-400">
-                  {(file.size / 1024 / 1024).toFixed(1)}MB · 클릭해서 다른 파일로 바꾸기
+                  {(file.size / 1024 / 1024).toFixed(1)}MB · {t(language, 'upFileChange')}
                 </p>
               </>
             ) : (
@@ -136,10 +139,10 @@ export function UploadScreen({
                   📎
                 </span>
                 <p className="mt-4 text-[16px] font-bold text-ink-900">
-                  PDF나 계약서 사진을 끌어다 놓거나 클릭하세요
+                  {t(language, 'upDropTitle')}
                 </p>
                 <p className="mt-1 text-[13px] text-ink-400">
-                  PDF·JPG·PNG·WEBP · 최대 10MB · 스캔본도 읽을 수 있어요
+                  {t(language, 'upDropHint')}
                 </p>
               </>
             )}
@@ -147,7 +150,7 @@ export function UploadScreen({
         ) : (
           <textarea
             className="min-h-64 w-full resize-y rounded-3xl border border-ink-100 bg-white p-5 text-[15px] leading-relaxed text-ink-900 shadow-card outline-none placeholder:text-ink-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-50"
-            placeholder="계약서 내용을 붙여넣어 주세요. (30자 이상)"
+            placeholder={t(language, 'upPlaceholder')}
             value={text}
             onChange={(event) => onTextChange(event.target.value)}
           />
@@ -162,10 +165,9 @@ export function UploadScreen({
       {/* 문서 유형 선택 — 유형에 따라 판정이 갈리는 조항(예: 2기 연체 해지)이 있어
           알려주면 더 정확해진다. 몰라도 분석은 가능 (조항 문언만으로 판단) */}
       <Card className="mt-4 px-5 py-4">
-        <p className="text-[14px] font-bold text-ink-900">어떤 계약서인가요?</p>
+        <p className="text-[14px] font-bold text-ink-900">{t(language, 'upDomainTitle')}</p>
         <p className="mt-1 text-[13px] leading-relaxed text-ink-400">
-          유형을 알려주시면 더 정확해져요. 예를 들어 같은 "2기 연체 시 해지" 조항도
-          주택이면 표준, 상가면 위험이에요. 몰라도 괜찮아요.
+          {t(language, 'upDomainDesc')}
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           <button
@@ -178,7 +180,7 @@ export function UploadScreen({
                 : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
             }`}
           >
-            잘 모르겠어요
+            {t(language, 'upDomainUnknown')}
           </button>
           {DOMAINS.map((item) => {
             const active = domain === item
@@ -194,7 +196,7 @@ export function UploadScreen({
                     : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
                 }`}
               >
-                {item}
+                {domainLabel(language, item)}
               </button>
             )
           })}
@@ -211,16 +213,14 @@ export function UploadScreen({
             className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-md border-ink-200 accent-brand-500"
           />
           <span className="text-[14px] leading-relaxed text-ink-600">
-            분석을 위한 일시적 문서 처리에 동의합니다.{' '}
-            <span className="text-ink-400">
-              원문은 AI 학습에 사용하지 않으며 분석 완료 후 삭제돼요.
-            </span>
+            {t(language, 'upConsent')}{' '}
+            <span className="text-ink-400">{t(language, 'upConsentSub')}</span>
           </span>
         </label>
       </Card>
 
       <Button size="lg" full className="mt-6" disabled={!ready} onClick={onNext}>
-        {ready ? '다음' : mode === 'pdf' ? '계약서를 올려주세요' : '내용을 입력해 주세요'}
+        {ready ? t(language, 'upNext') : mode === 'pdf' ? t(language, 'upNeedFile') : t(language, 'upNeedText')}
       </Button>
     </div>
   )
