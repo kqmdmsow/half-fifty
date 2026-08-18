@@ -128,7 +128,7 @@ export function LandingScreen({
       {/* 푸터 */}
       <footer className="border-t border-ink-50 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-[13px] text-ink-400 md:flex-row">
-          <span className="font-semibold">© 하프피프티</span>
+          <span className="font-semibold">© 조목조목</span>
           <span className="max-w-md text-center leading-relaxed md:text-right">
             {t(language, 'footerDisclaimer')}
           </span>

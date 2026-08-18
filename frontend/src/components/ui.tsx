@@ -196,9 +196,9 @@ export function Logo({ onClick }: { onClick?: () => void }) {
   return (
     <button type="button" onClick={onClick} className="flex items-center gap-2.5">
       <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-brand-500 text-[15px] font-extrabold text-white">
-        하
+        조
       </span>
-      <span className="text-[17px] font-bold tracking-tight text-ink-900">하프피프티</span>
+      <span className="text-[17px] font-bold tracking-tight text-ink-900">조목조목</span>
     </button>
   )
 }
