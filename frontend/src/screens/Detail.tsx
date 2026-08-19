@@ -3,6 +3,7 @@ import type { ClauseResult } from '../api'
 import { Button, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { clauseHeading } from '../clauseTitle'
 import { speak, stopSpeaking } from '../tts'
 
 export function DetailScreen({
@@ -71,9 +72,10 @@ export function DetailScreen({
                     className={`h-2 w-2 shrink-0 rounded-full ${RISK_META[result.risk_level].dot}`}
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
-                    {result.risk_type === '해당 없음'
-                      ? t(language, 'standardClause')
-                      : riskTypeLabel(language, result.risk_type)}
+                    {clauseHeading(result.original_text) ??
+                      (result.risk_type === '해당 없음'
+                        ? t(language, 'standardClause')
+                        : riskTypeLabel(language, result.risk_type))}
                   </span>
                 </button>
               )
@@ -87,10 +89,18 @@ export function DetailScreen({
             <div>
               <RiskBadge level={clause.risk_level} label={riskLevelLabel(language, clause.risk_level)} />
               <h1 className="mt-3 text-[24px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[28px]">
-                {clause.risk_type === '해당 없음'
-                  ? t(language, 'standardClauseLong')
-                  : riskTypeLabel(language, clause.risk_type)}
+                {clauseHeading(clause.original_text) ??
+                  (clause.risk_type === '해당 없음'
+                    ? t(language, 'standardClauseLong')
+                    : riskTypeLabel(language, clause.risk_type))}
               </h1>
+              {clauseHeading(clause.original_text) && (
+                <p className="mt-1.5 text-[14px] font-bold text-ink-400">
+                  {clause.risk_type === '해당 없음'
+                    ? t(language, 'standardClauseLong')
+                    : riskTypeLabel(language, clause.risk_type)}
+                </p>
+              )}
             </div>
           </div>
 

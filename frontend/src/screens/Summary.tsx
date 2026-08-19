@@ -3,6 +3,7 @@ import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { clauseHeading } from '../clauseTitle'
 
 type Filter = '전체' | RiskLevel
 
@@ -103,7 +104,9 @@ export function SummaryScreen({
           <div>
             <p className="text-[13px] font-bold text-danger-600">{t(language, 'checkFirst')}</p>
             <p className="mt-1 text-[16px] font-bold text-ink-900">
-              {riskTypeLabel(language, topRisk.risk_type)}
+              {[clauseHeading(topRisk.original_text), riskTypeLabel(language, topRisk.risk_type)]
+                .filter(Boolean)
+                .join(' — ')}
             </p>
             <p className="mt-1 text-[14px] leading-relaxed text-ink-600">{topRisk.explanation}</p>
           </div>
@@ -149,7 +152,15 @@ export function SummaryScreen({
             </Card>
           )
         ) : (
-          filtered.map((result) => (
+          filtered.map((result) => {
+            // 카드 제목은 조항 표제(제N조…) — 유형은 괄호 보조 표기.
+            // 표제가 없으면 기존처럼 유형만 표시한다.
+            const heading = clauseHeading(result.original_text)
+            const typeLabel =
+              result.risk_type === '해당 없음'
+                ? t(language, 'standardClause')
+                : riskTypeLabel(language, result.risk_type)
+            return (
             <Card
               key={result.clause_id}
               interactive
@@ -159,9 +170,10 @@ export function SummaryScreen({
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[15px] font-bold text-ink-900">
-                    {result.risk_type === '해당 없음'
-                      ? t(language, 'standardClause')
-                      : riskTypeLabel(language, result.risk_type)}
+                    {heading ?? typeLabel}
+                    {heading && (
+                      <span className="ml-1.5 font-semibold text-ink-400">({typeLabel})</span>
+                    )}
                   </p>
                   <p className="mt-1.5 line-clamp-2 text-[14px] leading-relaxed text-ink-400">
                     {result.explanation}
@@ -184,7 +196,8 @@ export function SummaryScreen({
                 {t(language, 'seeDetail')} →
               </p>
             </Card>
-          ))
+            )
+          })
         )}
       </div>
 
