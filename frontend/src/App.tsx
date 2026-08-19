@@ -107,6 +107,9 @@ export default function App() {
     setLoading(true)
     setStreamProgress(null)
     setStreamedClauses([])
+    // 재분석(언어 변경 등) 시 이전 결과를 비운다 — 남겨두면 results가
+    // data?.results를 우선해 스트리밍 중에도 옛 결과가 계속 표시된다
+    setData(null)
     setAnalyzedLanguage(language)
     go('progress')
 
