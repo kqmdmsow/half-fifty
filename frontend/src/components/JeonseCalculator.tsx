@@ -9,15 +9,17 @@ import { t, type LangCode } from '../i18n'
  * 안선영·이상엽(2025) 수도권 전세보증 453,122건 이항로짓 + HUG 담보인정비율
  * 90% 인하(2023). 부채비율 = (선순위채권 + 전세보증금) / 주택가격.
  */
-// 원문 표10 대조 검증(2026-08-19): Exp(B) 29.923/5.489/2.590/1.508,
-// 준거변수는 부채비율 60% 미만 — <70%를 기준으로 뭉개면 60~70 구간의
-// 1.5배가 누락되므로 논문 그대로 5구간을 쓴다.
+// 원문 표10 대조 검증(2026-08-19): 승산비 Exp(B) 29.923/5.489/2.590/1.508,
+// 준거변수는 부채비율 60% 미만. rate는 표6 원자료(구간 내 사고건수/총건수)로
+// 직접 계산한 실측 사고율(%) — 표6의 '사고율' 컬럼은 전체 표본 대비 비율이라
+// 그대로 쓰면 오독이다(합계를 표3과 대조해 검증). UI에는 일반 사용자가
+// 직관적으로 이해하는 실측 사고율을 쓰고, 승산비(odds)는 근거 기록용으로 유지.
 const THRESHOLDS = [
-  { min: 0.9, odds: 29.9, labelKey: 'jcG1', adviceKey: 'jcG1Advice', tone: 'danger' },
-  { min: 0.8, odds: 5.5, labelKey: 'jcG2', adviceKey: 'jcG2Advice', tone: 'danger' },
-  { min: 0.7, odds: 2.6, labelKey: 'jcG3', adviceKey: 'jcG3Advice', tone: 'caution' },
-  { min: 0.6, odds: 1.5, labelKey: 'jcG5', adviceKey: 'jcG5Advice', tone: 'safe' },
-  { min: 0, odds: 1.0, labelKey: 'jcG4', adviceKey: 'jcG4Advice', tone: 'safe' },
+  { min: 0.9, odds: 29.9, rate: 17.6, labelKey: 'jcG1', adviceKey: 'jcG1Advice', tone: 'danger' },
+  { min: 0.8, odds: 5.5, rate: 2.0, labelKey: 'jcG2', adviceKey: 'jcG2Advice', tone: 'danger' },
+  { min: 0.7, odds: 2.6, rate: 0.8, labelKey: 'jcG3', adviceKey: 'jcG3Advice', tone: 'caution' },
+  { min: 0.6, odds: 1.5, rate: 0.4, labelKey: 'jcG5', adviceKey: 'jcG5Advice', tone: 'safe' },
+  { min: 0, odds: 1.0, rate: 0.2, labelKey: 'jcG4', adviceKey: 'jcG4Advice', tone: 'safe' },
 ] as const
 
 const TONE_STYLE = {
@@ -87,9 +89,9 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
             <span className="text-[22px] font-bold text-ink-900">{(ratio * 100).toFixed(1)}%</span>
             <span className="text-[12px] font-semibold text-ink-400">{t(language, 'jcRatio')}</span>
           </div>
-          {grade.odds > 1 && (
+          {grade.min > 0 && (
             <p className={`mt-2 text-[13px] font-bold ${TONE_STYLE[grade.tone].text}`}>
-              {t(language, 'jcOdds', { x: grade.odds })}
+              {t(language, 'jcRate', { rate: grade.rate })}
             </p>
           )}
           <p className="mt-2 text-[14px] leading-relaxed text-ink-700">
