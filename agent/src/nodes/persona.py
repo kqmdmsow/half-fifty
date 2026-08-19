@@ -83,6 +83,9 @@ def _adapt(
             translation = {
                 "original_text_translated": data.get("original_text_translated") or "",
                 "check_questions_translated": questions if isinstance(questions, list) else [],
+                # 근거도 번역 병기 (#99 후속) — 한국어 원본 risk_evidence는 judge
+                # 입력·citation_check용으로 그대로 유지되고, 번역은 표시 전용이다
+                "risk_evidence_translated": data.get("risk_evidence_translated") or "",
             }
     except Exception as exc:
         # 페르소나 적응 실패는 치명적이지 않다 — 원문 explanation을 그대로 쓰고

@@ -163,6 +163,7 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
         risk_type="해당 없음",
         risk_evidence=_FALLBACK_EVIDENCE,
         check_questions=[],
+        analysis_failed=True,  # 프론트 현지화용 기계 판독 마커 (#100)
     )
 
 
