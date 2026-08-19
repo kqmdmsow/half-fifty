@@ -4,6 +4,7 @@ import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
+import { FormattedText } from '../components/FormattedText'
 
 type Filter = '전체' | RiskLevel
 
@@ -108,7 +109,11 @@ export function SummaryScreen({
                 .filter(Boolean)
                 .join(' — ')}
             </p>
-            <p className="mt-1 text-[14px] leading-relaxed text-ink-600">{topRisk.explanation}</p>
+            <FormattedText
+              text={topRisk.explanation}
+              lead
+              className="mt-1.5 text-[14px] text-ink-600"
+            />
           </div>
           <span className="shrink-0 text-[18px] text-danger-500">→</span>
         </button>
@@ -185,12 +190,12 @@ export function SummaryScreen({
                 />
               </div>
               {result.risk_level !== '안전' && (
-                <p className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] leading-relaxed text-ink-600">
-                  <span className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
+                <div className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] text-ink-600">
+                  <p className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
                     {t(language, 'evidence')}
-                  </span>{' '}
-                  {result.risk_evidence}
-                </p>
+                  </p>
+                  <FormattedText text={result.risk_evidence} className="mt-1" />
+                </div>
               )}
               <p className="mt-3.5 text-[14px] font-bold text-brand-600">
                 {t(language, 'seeDetail')} →

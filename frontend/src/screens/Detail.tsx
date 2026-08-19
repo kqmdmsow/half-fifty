@@ -4,6 +4,7 @@ import { Button, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
+import { FormattedText } from '../components/FormattedText'
 import { speak, stopSpeaking } from '../tts'
 
 export function DetailScreen({
@@ -105,12 +106,12 @@ export function DetailScreen({
           </div>
 
           <Section title={t(language, 'explainSimply')}>
-            <p>{clause.explanation}</p>
+            <FormattedText text={clause.explanation} lead />
           </Section>
 
           {clause.risk_level !== '안전' && (
             <Section title={t(language, 'whyCheck')}>
-              <p>{clause.risk_evidence}</p>
+              <FormattedText text={clause.risk_evidence} />
             </Section>
           )}
 
