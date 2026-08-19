@@ -11,6 +11,10 @@ Domain은 문서 유형(주택/상가 임대차, 보험, 대출 등)을 1회 판
 
 from langgraph.graph import END, StateGraph
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import analysis_node
 from src.nodes.domain import domain_node
@@ -31,7 +35,7 @@ from src.state import (
 def _increment_retry(state: PipelineState) -> dict:
     """재실행 직전 retry_count 증가용 보조 노드."""
     new_count = state["retry_count"] + 1
-    print(f"[Retry] Judge 평균 점수 미달 ({JUDGE_THRESHOLD}점 기준) -> {new_count}차 재시도")
+    logger.info("Judge 평균 점수 미달 (%s점 기준) -> %d차 재시도", JUDGE_THRESHOLD, new_count)
     return {"retry_count": new_count}
 
 
@@ -54,7 +58,7 @@ def _route_retry_target(state: PipelineState) -> str:
     scores = state["judge_scores"]
     failing = set(failing_aspects(scores))
     if failing == {"clarity"} and shortcut_eligible(scores):
-        print("[Retry] clarity만 미달 + risk_coverage/faithfulness 여유 확보 -> persona만 재실행")
+        logger.info("clarity만 미달 + risk_coverage/faithfulness 여유 확보 -> persona만 재실행")
         return "persona"
     return "analysis"
 
@@ -73,18 +77,18 @@ def _route_after_judge(state: PipelineState) -> str:
     # 원문 왜곡·창작 근거는 다른 항목 점수로 상쇄될 수 없는 치명 결함.
     if faith < FAITHFULNESS_MIN:
         if state["retry_count"] < MAX_RETRIES:
-            print(f"[Judge] faithfulness {faith:.1f}점 < 필수 {FAITHFULNESS_MIN}점 -> 평균({avg:.2f}) 무관 재시도")
+            logger.info("faithfulness %.1f점 < 필수 %s점 -> 평균(%.2f) 무관 재시도", faith, FAITHFULNESS_MIN, avg)
             return "retry"
-        print(f"[Judge] faithfulness {faith:.1f}점 < 필수 {FAITHFULNESS_MIN}점, 재시도 소진 -> 주의 필요 플래그")
+        logger.warning("faithfulness %.1f점 < 필수 %s점, 재시도 소진 -> 주의 필요 플래그", faith, FAITHFULNESS_MIN)
         return "flag"
 
     if avg >= JUDGE_THRESHOLD:
-        print(f"[Judge] 평균 {avg:.2f}점 >= {JUDGE_THRESHOLD}점 -> 통과")
+        logger.info("평균 %.2f점 >= %s점 -> 통과", avg, JUDGE_THRESHOLD)
         return "pass"
     if state["retry_count"] < MAX_RETRIES:
-        print(f"[Judge] 평균 {avg:.2f}점 < {JUDGE_THRESHOLD}점 (재시도 {state['retry_count']}/{MAX_RETRIES})")
+        logger.info("평균 %.2f점 < %s점 (재시도 %d/%d)", avg, JUDGE_THRESHOLD, state["retry_count"], MAX_RETRIES)
         return "retry"
-    print(f"[Judge] 평균 {avg:.2f}점 < {JUDGE_THRESHOLD}점, 재시도 소진 ({MAX_RETRIES}/{MAX_RETRIES}) -> 주의 필요 플래그")
+    logger.warning("평균 %.2f점 < %s점, 재시도 소진 (%d/%d) -> 주의 필요 플래그", avg, JUDGE_THRESHOLD, MAX_RETRIES, MAX_RETRIES)
     return "flag"
 
 

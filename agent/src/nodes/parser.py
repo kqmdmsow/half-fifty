@@ -11,6 +11,10 @@
 import re
 from typing import List
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from src.state import Clause, PipelineState
 
 # "제1조", "제 1 조", "제1조(목적)", "제9조의2(계약갱신)" 등을 줄 시작에서만 잡는다.
@@ -124,7 +128,7 @@ def parser_node(state: PipelineState) -> dict:
     """LangGraph 노드: raw_text -> clauses, parse_warnings."""
     clauses, warnings = split_clauses_with_warnings(state["raw_text"])
     if warnings:
-        print(f"[Parser] 추출 경고 {len(warnings)}건: {warnings}")
+        logger.warning("추출 경고 %d건: %s", len(warnings), warnings)
     # 파이프라인 진입 시 이미 쌓인 경고(개인정보 마스킹 고지 등)를 보존한다 —
     # LangGraph는 반환 키를 병합이 아니라 교체하므로 여기서 이어 붙인다.
     return {"clauses": clauses, "parse_warnings": state.get("parse_warnings", []) + warnings}

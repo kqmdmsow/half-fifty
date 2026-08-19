@@ -14,6 +14,10 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from src.llm import get_worker_llm, invoke_json
 from src.state import AnalysisResult, PipelineState
 
@@ -83,7 +87,7 @@ def _adapt(
     except Exception as exc:
         # 페르소나 적응 실패는 치명적이지 않다 — 원문 explanation을 그대로 쓰고
         # 파이프라인은 계속 간다 (analysis/judge와 동일한 방어 원칙, PR#43 참조).
-        print(f"[Persona] {result['clause_id']} 적응 실패, 원본 설명 유지: {exc}")
+        logger.warning("%s 적응 실패, 원본 설명 유지: %s", result["clause_id"], exc)
         explanation = result["explanation"]
 
     adapted = dict(result)

@@ -14,6 +14,10 @@ import json
 import random
 from pathlib import Path
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from src.llm import get_judge_llm, invoke_json
 from src.state import JudgeScores, PipelineState
 
@@ -119,11 +123,11 @@ def _judge(state: PipelineState) -> JudgeScores:
                 aspect_data = data[aspect]
                 scores[aspect] = float(aspect_data["score"])
                 rationale[aspect] = aspect_data["rationale"]
-                print(f"[Judge] {aspect}: {aspect_data['score']}점 — {aspect_data['rationale']}")
+                logger.info("%s: %s점 — %s", aspect, aspect_data["score"], aspect_data["rationale"])
             break
         except Exception as exc:  # JSON 파싱 실패, 키 누락 등
             if attempt + 1 == _PARSE_ATTEMPTS:
-                print(f"[Judge] 채점 실패, 폴백 처리: {exc}")
+                logger.warning("채점 실패, 폴백 처리: %s", exc)
                 scores = {aspect: _FALLBACK_SCORE for aspect in _ASPECTS}
                 rationale = {aspect: _FALLBACK_RATIONALE for aspect in _ASPECTS}
 

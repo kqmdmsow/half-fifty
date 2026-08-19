@@ -18,7 +18,9 @@ PDF 업로드(/analyze-pdf)도 백엔드 프록시를 거친다 (자문 §7 — 
 """
 
 import json
+import logging
 import os
+import time
 
 from typing import List, Literal, Optional
 
@@ -41,7 +43,28 @@ Language = Literal[
     "km", "my", "mn", "uz", "si", "bn", "ru", "ja",
 ]
 
+# 운영 로그 표준화 (#80, 자문 §7 '오류 및 접근 기록 관리').
+# 원칙: 계약 내용·파일명 등 개인정보는 로그에 남기지 않는다 — 경로·상태·소요시간만.
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+_access_logger = logging.getLogger("access")
+
 app = FastAPI(title="Jomokjomok (조목조목) Agent Service", version="0.1.0")
+
+
+@app.middleware("http")
+async def access_log(request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    # 스트리밍 응답은 헤더 반환 시점까지의 시간이다 (본문 전송은 이후 계속됨)
+    _access_logger.info(
+        "%s %s -> %d (%.2fs)",
+        request.method, request.url.path, response.status_code,
+        time.perf_counter() - start,
+    )
+    return response
 
 app.add_middleware(
     CORSMiddleware,
