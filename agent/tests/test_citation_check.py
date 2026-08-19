@@ -124,3 +124,60 @@ def test_도메인_컨텍스트에_유형명_따옴표_래핑_없음():
 
     assert not _QUOTE_PATTERN.search(context_block), "도메인 컨텍스트 문구 자체에 따옴표 래핑이 있음"
     assert "따옴표" in context_block, "따옴표 금지 지시문이 빠짐"
+
+
+# #59: val 재측정에서 발견된 3가지 오탐 패턴 — 신유형(v2.1) 탓이 아니라
+# citation_check가 안전한 조항을 잘못 폴백시킨 것으로 확인됨 (contract_03/05,
+# normal_deposit_terms — 도메인 주입과 무관, 프롬프트 전반에서 발생).
+
+def test_조사_차이는_같은_인용으로_인정():
+    """val 실측(contract_03 clause_006): 모델이 '설비에 대한 노후'를 '설비의
+    노후'로 바꿔 인용해도 같은 내용 — 조사·연결어 차이는 창작 인용이 아니다."""
+    clause = "임대인은 주택의 주요 설비에 대한 노후·불량으로 인한 수선 의무를 부담한다."
+    evidence = "조항이 그 범위를 '주요 설비의 노후·불량'으로 한정하고 있습니다."
+    assert find_fabricated_quotes(evidence, clause) == []
+
+
+def test_유니코드_원점_U2024도_동일_인용_인정():
+    """val 실측(contract_05 clause_004): 원문 서식이 ·(U+00B7) 대신
+    ․(U+2024, ONE DOT LEADER)를 써도 같은 인용으로 인정해야 함."""
+    clause = "난방, 상․하수도, 전기시설 등 임차주택의 주요설비에 대한 노후·불량으로 인한 수선은 민법 제623조"
+    evidence = "조항은 '난방, 상·하수도, 전기시설 등 임차주택의 주요설비에 대한 노후·불량으로 인한 수선'을 규정합니다."
+    assert find_fabricated_quotes(evidence, clause) == []
+
+
+def test_risk_type_이름_자기인용은_면제():
+    """val 실측(contract_05 clause_012): 모델이 자기 risk_type 이름을 설명문에서
+    따옴표로 언급('~에 해당하지 않습니다')한 것을 창작 인용으로 오판하면 안 됨."""
+    clause = "중개보수는 거래 가액의 %인 원으로 임대인과 임차인이 각각 부담한다."
+    evidence = "수수료 산정 기준이 표준 서식에 따른 것이라 '불명확한 수수료·이자 조건'에 해당하지 않습니다."
+    assert find_fabricated_quotes(evidence, clause) == []
+
+
+def test_조사_관대화가_실제_창작_수치까지_봐주지_않음():
+    """조사·연결어 완화가 숫자·핵심 내용이 다른 진짜 창작 인용까지 통과시키면
+    안 된다 — #50 구멍 재발 방지 회귀."""
+    clause = "임대인은 계약금의 10%를 위약금으로 정한다."
+    evidence = "조항은 '위약금은 계약금의 50%로 정해진다'고 규정합니다."
+    assert find_fabricated_quotes(evidence, clause) == ["위약금은 계약금의 50%로 정해진다"]
+
+
+def test_필러토큰_제거가_무관한_내용까지_봐주지_않음():
+    """'~에 대한' 같은 연결어를 지워도, 애초에 조항에 없는 핵심 단어(예: 손해배상)가
+    포함된 창작 인용은 여전히 잡혀야 한다."""
+    clause = "임차인은 매월 정해진 날짜에 차임을 지급한다."
+    evidence = "조항은 '손해배상에 대한 별도 약정'을 두고 있다고 명시합니다."
+    assert find_fabricated_quotes(evidence, clause) == ["손해배상에 대한 별도 약정"]
+
+
+def test_의로_끝나는_단어는_손상되지_않음():
+    """'정의'처럼 실제로 의로 끝나는 단어가 조사 제거로 훼손돼 엉뚱하게
+    매칭되지 않는지 확인 (예: '정의'가 '정'으로 잘려 다른 단어와 우연히
+    일치하는 사고 방지)."""
+    clause = "본 계약에서 '임차인'의 정의는 별지에 따른다."
+    evidence = "조항은 '임차인의 정의는 별지에 따른다'고 명시합니다."
+    # 실제로 조항에 있는 내용이므로 통과해야 하며(오삭제로 인한 오탐 방지 확인),
+    assert find_fabricated_quotes(evidence, clause) == []
+    # 반대로 '정' 하나만으로 무관한 내용이 매칭되지는 않아야 한다.
+    fabricated_evidence = "조항은 '정만 받으면 계약이 성립한다'고 명시합니다."
+    assert find_fabricated_quotes(fabricated_evidence, clause) == ["정만 받으면 계약이 성립한다"]
