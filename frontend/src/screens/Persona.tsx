@@ -1,26 +1,12 @@
 import type { Language, Persona } from '../api'
 import { Button, Card, PageTitle, Switch } from '../components/ui'
-import { LANGUAGES } from '../i18n'
+import { LANGUAGES, t } from '../i18n'
 
-const PERSONAS: Array<{ id: Persona; emoji: string; title: string; desc: string }> = [
-  {
-    id: 'adult',
-    emoji: '🙂',
-    title: '일반 성인',
-    desc: '법률 용어를 짧게 풀이하고 핵심을 간결하게 설명해요.',
-  },
-  {
-    id: 'senior',
-    emoji: '👵',
-    title: '고령층',
-    desc: '짧은 문장과 일상적인 표현, 익숙한 예시로 설명해요.',
-  },
-  {
-    id: 'foreigner',
-    emoji: '🌏',
-    title: '외국인 거주자·근로자',
-    desc: '선택한 언어로 설명하고, 한국어 계약 용어를 함께 알려드려요.',
-  },
+// 라벨·설명은 i18n(UI_PERSONA)에서 — 이 화면만 하드코딩 한국어로 남아 있었다
+const PERSONAS: Array<{ id: Persona; emoji: string; titleKey: 'psAdult' | 'psSenior' | 'psForeigner'; descKey: 'psAdultDesc' | 'psSeniorDesc' | 'psForeignerDesc' }> = [
+  { id: 'adult', emoji: '🙂', titleKey: 'psAdult', descKey: 'psAdultDesc' },
+  { id: 'senior', emoji: '👵', titleKey: 'psSenior', descKey: 'psSeniorDesc' },
+  { id: 'foreigner', emoji: '🌏', titleKey: 'psForeigner', descKey: 'psForeignerDesc' },
 ]
 
 // 언어 목록은 i18n.ts에서 관리 (2025 체류외국인·E-9·유학생 통계 기반 16종)
@@ -54,10 +40,7 @@ export function PersonaScreen({
 }) {
   return (
     <div className="mx-auto max-w-xl animate-fade-up px-6 py-12 md:py-16">
-      <PageTitle
-        title="누구에게 맞춰 설명할까요?"
-        desc="위험 판단 기준은 동일해요. 설명의 말투와 쉬운 정도만 달라져요."
-      />
+      <PageTitle title={t(language, 'psTitle')} desc={t(language, 'psDesc')} />
 
       <div className="mt-8 grid gap-3 md:grid-cols-3">
         {PERSONAS.map((item) => {
@@ -84,8 +67,8 @@ export function PersonaScreen({
                   ✓
                 </span>
               </div>
-              <p className="mt-4 text-[17px] font-bold text-ink-900">{item.title}</p>
-              <p className="mt-1.5 text-[14px] leading-relaxed text-ink-400">{item.desc}</p>
+              <p className="mt-4 text-[17px] font-bold text-ink-900">{t(language, item.titleKey)}</p>
+              <p className="mt-1.5 text-[14px] leading-relaxed text-ink-400">{t(language, item.descKey)}</p>
             </button>
           )
         })}
@@ -93,7 +76,7 @@ export function PersonaScreen({
 
       {persona === 'foreigner' && (
         <Card className="mt-5 p-5">
-          <p className="text-[13px] font-bold text-ink-400">설명 언어 / Explanation language</p>
+          <p className="text-[13px] font-bold text-ink-400">{t(language, 'psLangLabel')}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {LANGUAGES.map((item) => {
               const active = language === item.id
@@ -115,40 +98,39 @@ export function PersonaScreen({
             })}
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-ink-400">
-            위험 판단은 한국 법 기준 그대로, 설명만 선택한 언어로 바꿔드려요. 한국어 계약
-            용어는 괄호로 함께 표기돼요.
+            {t(language, 'psLangHint')}
           </p>
         </Card>
       )}
 
       <Card className="mt-5 px-2 py-2">
-        <p className="px-4 pb-1 pt-3 text-[13px] font-bold text-ink-400">읽기 편한 화면 설정</p>
+        <p className="px-4 pb-1 pt-3 text-[13px] font-bold text-ink-400">{t(language, 'psA11y')}</p>
         <Switch
           checked={largeText}
-          label="글자 크게 보기"
-          description="전체 화면의 글자가 커져요"
+          label={t(language, 'psLarge')}
+          description={t(language, 'psLargeDesc')}
           onChange={onToggleLargeText}
         />
         <Switch
           checked={highContrast}
-          label="높은 명암 사용"
-          description="흐린 글자를 더 진하게 보여줘요"
+          label={t(language, 'psContrast')}
+          description={t(language, 'psContrastDesc')}
           onChange={onToggleHighContrast}
         />
         <Switch
           checked={voiceGuide}
-          label="설명 음성으로 듣기"
-          description="조항 설명을 소리로 들을 수 있어요"
+          label={t(language, 'psVoice')}
+          description={t(language, 'psVoiceDesc')}
           onChange={onToggleVoiceGuide}
         />
       </Card>
 
       <div className="mt-8 flex gap-2.5">
         <Button variant="secondary" size="lg" onClick={onPrev}>
-          이전
+          {t(language, 'psPrev')}
         </Button>
         <Button size="lg" full onClick={onStartAnalysis}>
-          계약서 분석 시작
+          {t(language, 'psStart')}
         </Button>
       </div>
     </div>

@@ -41,7 +41,8 @@ type UIKey =
   | 'copyAllQuestions' | 'evidence' | 'noClauses' | 'seeDetail' | 'finish'
   | 'backToSummary' | 'clauseList' | 'explainSimply' | 'whyCheck'
   | 'originalText' | 'askOther' | 'askKoreanHint' | 'otherClauses' | 'finishDetail'
-  | 'progressTitle' | 'cancel'
+  | 'progressTitle' | 'cancel' | 'langMismatch' | 'reanalyze'
+  | 'analysisFailedNote' | 'retryNote'
 
 const UI: Record<LangCode, Record<UIKey, string>> = {
   ko: {
@@ -55,6 +56,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: '계약서 원문', askOther: '계약 상대방에게 물어보세요', askKoreanHint: '질문은 한국어 그대로 화면을 보여주셔도 돼요',
     otherClauses: '다른 조항 보기', finishDetail: '확인 끝내고 결과 활용하기',
     progressTitle: '계약서를 꼼꼼히 살펴보고 있어요', cancel: '분석 취소',
+    langMismatch: '설명이 지금 선택한 언어와 달라요 — 다시 분석하면 이 언어로 받아볼 수 있어요', reanalyze: '이 언어로 다시 분석',
+    analysisFailedNote: '이 조항은 자동 분석에 실패했어요. 원문을 직접 확인해 주세요.', retryNote: 'AI 검증에서 보완할 점을 찾았어요 — 해당 조항을 다시 생성하고 있어요',
   },
   en: {
     analysisDone: 'Analysis complete', analyzingLive: 'Analyzing clause {done}/{total}', liveHint: 'Finished clauses appear first',
@@ -67,6 +70,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Original contract text (Korean)', askOther: 'Ask the other party', askKoreanHint: 'Questions are in Korean — you can show this screen directly',
     otherClauses: 'Other clauses', finishDetail: 'Done — use results',
     progressTitle: 'Reviewing your contract carefully', cancel: 'Cancel analysis',
+    langMismatch: 'These results were written in a different language — re-analyze to get them in this language', reanalyze: 'Re-analyze in this language',
+    analysisFailedNote: 'Automatic analysis failed for this clause. Please review the original text yourself.', retryNote: 'AI verification found issues — regenerating the affected clauses',
   },
   zh: {
     analysisDone: '分析完成', analyzingLive: '正在分析条款 {done}/{total}', liveHint: '已完成的条款会先显示',
@@ -79,6 +84,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: '合同原文（韩语）', askOther: '向对方询问', askKoreanHint: '问题为韩语 — 可以直接把屏幕出示给对方',
     otherClauses: '查看其他条款', finishDetail: '完成确认，使用结果',
     progressTitle: '正在仔细审查您的合同', cancel: '取消分析',
+    langMismatch: '当前结果的语言与所选语言不同 — 重新分析即可用该语言查看', reanalyze: '用此语言重新分析',
+    analysisFailedNote: '该条款自动分析失败，请直接核对原文。', retryNote: 'AI 验证发现待改进之处 — 正在重新生成相关条款',
   },
   vi: {
     analysisDone: 'Phân tích hoàn tất', analyzingLive: 'Đang phân tích điều khoản {done}/{total}', liveHint: 'Điều khoản xong sẽ hiển thị trước',
@@ -91,6 +98,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Nguyên văn hợp đồng (tiếng Hàn)', askOther: 'Hỏi bên kia hợp đồng', askKoreanHint: 'Câu hỏi bằng tiếng Hàn — bạn có thể đưa màn hình này cho họ xem',
     otherClauses: 'Điều khoản khác', finishDetail: 'Xong — dùng kết quả',
     progressTitle: 'Đang xem kỹ hợp đồng của bạn', cancel: 'Hủy phân tích',
+    langMismatch: 'Kết quả đang ở ngôn ngữ khác — phân tích lại để nhận kết quả bằng ngôn ngữ này', reanalyze: 'Phân tích lại bằng ngôn ngữ này',
+    analysisFailedNote: 'Phân tích tự động điều khoản này không thành công. Vui lòng tự kiểm tra nguyên văn.', retryNote: 'Kiểm chứng AI phát hiện điểm cần bổ sung — đang tạo lại các điều khoản liên quan',
   },
   th: {
     analysisDone: 'วิเคราะห์เสร็จสิ้น', analyzingLive: 'กำลังวิเคราะห์ข้อ {done}/{total}', liveHint: 'ข้อที่เสร็จแล้วจะแสดงก่อน',
@@ -103,6 +112,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'ข้อความสัญญาต้นฉบับ (ภาษาเกาหลี)', askOther: 'ถามอีกฝ่าย', askKoreanHint: 'คำถามเป็นภาษาเกาหลี — แสดงหน้าจอนี้ให้เขาดูได้เลย',
     otherClauses: 'ข้ออื่น ๆ', finishDetail: 'เสร็จแล้ว — ใช้ผลลัพธ์',
     progressTitle: 'กำลังตรวจสัญญาของคุณอย่างละเอียด', cancel: 'ยกเลิกการวิเคราะห์',
+    langMismatch: 'ผลลัพธ์เป็นภาษาอื่น — วิเคราะห์ใหม่เพื่อรับผลเป็นภาษานี้', reanalyze: 'วิเคราะห์ใหม่เป็นภาษานี้',
+    analysisFailedNote: 'วิเคราะห์ข้อนี้อัตโนมัติไม่สำเร็จ กรุณาตรวจสอบต้นฉบับด้วยตนเอง', retryNote: 'การตรวจสอบ AI พบจุดที่ต้องปรับ — กำลังสร้างข้อที่เกี่ยวข้องใหม่',
   },
   id: {
     analysisDone: 'Analisis selesai', analyzingLive: 'Menganalisis pasal {done}/{total}', liveHint: 'Pasal yang selesai tampil lebih dulu',
@@ -115,6 +126,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Teks asli kontrak (bahasa Korea)', askOther: 'Tanyakan ke pihak lain', askKoreanHint: 'Pertanyaan dalam bahasa Korea — tunjukkan layar ini langsung',
     otherClauses: 'Pasal lainnya', finishDetail: 'Selesai — gunakan hasil',
     progressTitle: 'Memeriksa kontrak Anda dengan teliti', cancel: 'Batalkan analisis',
+    langMismatch: 'Hasil ini dalam bahasa lain — analisis ulang untuk mendapatkannya dalam bahasa ini', reanalyze: 'Analisis ulang dalam bahasa ini',
+    analysisFailedNote: 'Analisis otomatis untuk pasal ini gagal. Silakan periksa teks aslinya langsung.', retryNote: 'Verifikasi AI menemukan kekurangan — membuat ulang pasal terkait',
   },
   tl: {
     analysisDone: 'Tapos na ang pagsusuri', analyzingLive: 'Sinusuri ang sugnay {done}/{total}', liveHint: 'Unang lalabas ang mga natapos na sugnay',
@@ -127,6 +140,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Orihinal na teksto ng kontrata (Korean)', askOther: 'Itanong sa kabilang partido', askKoreanHint: 'Nasa Korean ang mga tanong — maaaring ipakita ang screen na ito',
     otherClauses: 'Iba pang sugnay', finishDetail: 'Tapos na — gamitin ang resulta',
     progressTitle: 'Maingat na sinusuri ang iyong kontrata', cancel: 'Kanselahin',
+    langMismatch: 'Nasa ibang wika ang resulta — i-analyze muli para makuha ito sa wikang ito', reanalyze: 'I-analyze muli sa wikang ito',
+    analysisFailedNote: 'Nabigo ang awtomatikong pagsusuri sa probisyong ito. Pakisuri mismo ang orihinal na teksto.', retryNote: 'May nakitang dapat ayusin ang AI verification — muling binubuo ang mga probisyon',
   },
   ne: {
     analysisDone: 'विश्लेषण पूरा भयो', analyzingLive: 'धारा {done}/{total} विश्लेषण गर्दै', liveHint: 'सकिएका धाराहरू पहिले देखिन्छन्',
@@ -139,6 +154,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'सम्झौताको मूल पाठ (कोरियाली)', askOther: 'अर्को पक्षलाई सोध्नुहोस्', askKoreanHint: 'प्रश्नहरू कोरियालीमा छन् — यो स्क्रिन सिधै देखाउन सक्नुहुन्छ',
     otherClauses: 'अन्य धाराहरू', finishDetail: 'सकियो — नतिजा प्रयोग गर्नुहोस्',
     progressTitle: 'तपाईंको सम्झौता ध्यानपूर्वक जाँच्दै', cancel: 'रद्द गर्नुहोस्',
+    langMismatch: 'नतिजा अर्कै भाषामा छ — यो भाषामा हेर्न फेरि विश्लेषण गर्नुहोस्', reanalyze: 'यो भाषामा फेरि विश्लेषण',
+    analysisFailedNote: 'यो दफाको स्वचालित विश्लेषण असफल भयो। कृपया मूल पाठ आफैँ जाँच्नुहोस्।', retryNote: 'एआई प्रमाणीकरणले सुधार्नुपर्ने कुरा भेट्टायो — सम्बन्धित दफा पुनः बनाइँदै छ',
   },
   km: {
     analysisDone: 'ការវិភាគបានបញ្ចប់', analyzingLive: 'កំពុងវិភាគប្រការ {done}/{total}', liveHint: 'ប្រការដែលរួចរាល់នឹងបង្ហាញមុន',
@@ -151,6 +168,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'អត្ថបទកិច្ចសន្យាដើម (ភាសាកូរ៉េ)', askOther: 'សួរភាគីម្ខាងទៀត', askKoreanHint: 'សំណួរជាភាសាកូរ៉េ — អាចបង្ហាញអេក្រង់នេះដោយផ្ទាល់',
     otherClauses: 'ប្រការផ្សេងទៀត', finishDetail: 'រួចរាល់ — ប្រើលទ្ធផល',
     progressTitle: 'កំពុងពិនិត្យកិច្ចសន្យារបស់អ្នកយ៉ាងម៉ត់ចត់', cancel: 'បោះបង់',
+    langMismatch: 'លទ្ធផលជាភាសាផ្សេង — វិភាគម្ដងទៀតដើម្បីទទួលជាភាសានេះ', reanalyze: 'វិភាគម្ដងទៀតជាភាសានេះ',
+    analysisFailedNote: 'ការវិភាគស្វ័យប្រវត្តិសម្រាប់មាត្រានេះបរាជ័យ។ សូមពិនិត្យអត្ថបទដើមដោយផ្ទាល់។', retryNote: 'ការផ្ទៀងផ្ទាត់ AI រកឃើញចំណុចត្រូវកែ — កំពុងបង្កើតមាត្រាពាក់ព័ន្ធឡើងវិញ',
   },
   my: {
     analysisDone: 'စိစစ်မှု ပြီးပါပြီ', analyzingLive: 'အပိုဒ် {done}/{total} စိစစ်နေသည်', liveHint: 'ပြီးသောအပိုဒ်များ အရင်ပြသမည်',
@@ -163,6 +182,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'စာချုပ်မူရင်း (ကိုရီးယားဘာသာ)', askOther: 'တစ်ဖက်လူကို မေးပါ', askKoreanHint: 'မေးခွန်းများသည် ကိုရီးယားဘာသာဖြစ်သည် — ဤမျက်နှာပြင်ကို တိုက်ရိုက်ပြနိုင်သည်',
     otherClauses: 'အခြားအပိုဒ်များ', finishDetail: 'ပြီးပါပြီ — ရလဒ်ကိုသုံးပါ',
     progressTitle: 'သင့်စာချုပ်ကို သေချာစွာ စစ်ဆေးနေသည်', cancel: 'ပယ်ဖျက်ရန်',
+    langMismatch: 'ရလဒ်သည် အခြားဘာသာစကားဖြင့် ဖြစ်နေသည် — ဤဘာသာစကားဖြင့် ရရန် ပြန်လည်စိစစ်ပါ', reanalyze: 'ဤဘာသာစကားဖြင့် ပြန်စိစစ်မည်',
+    analysisFailedNote: 'ဤအပိုဒ်ကို အလိုအလျောက်စိစစ်မှု မအောင်မြင်ပါ။ မူရင်းစာသားကို ကိုယ်တိုင်စစ်ဆေးပါ။', retryNote: 'AI စိစစ်မှုတွင် ပြင်ဆင်ရန်တွေ့ရှိ — သက်ဆိုင်ရာအပိုဒ်များကို ပြန်လည်ဖန်တီးနေသည်',
   },
   mn: {
     analysisDone: 'Шинжилгээ дууслаа', analyzingLive: 'Заалт {done}/{total}-г шинжилж байна', liveHint: 'Дууссан заалтууд эхэлж харагдана',
@@ -175,6 +196,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Гэрээний эх бичвэр (солонгос хэл)', askOther: 'Нөгөө талаас асуугаарай', askKoreanHint: 'Асуултууд солонгосоор байгаа — энэ дэлгэцийг шууд үзүүлж болно',
     otherClauses: 'Бусад заалт', finishDetail: 'Дууслаа — үр дүнг ашиглах',
     progressTitle: 'Таны гэрээг нягт нямбай шалгаж байна', cancel: 'Цуцлах',
+    langMismatch: 'Үр дүн өөр хэл дээр байна — энэ хэлээр авахын тулд дахин шинжилнэ үү', reanalyze: 'Энэ хэлээр дахин шинжлэх',
+    analysisFailedNote: 'Энэ заалтын автомат шинжилгээ амжилтгүй боллоо. Эх бичвэрийг өөрөө шалгана уу.', retryNote: 'AI баталгаажуулалт сайжруулах зүйл илрүүллээ — холбогдох заалтуудыг дахин үүсгэж байна',
   },
   uz: {
     analysisDone: 'Tahlil yakunlandi', analyzingLive: '{done}/{total}-band tahlil qilinmoqda', liveHint: 'Tugagan bandlar birinchi ko‘rinadi',
@@ -187,6 +210,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Shartnoma asl matni (koreys tilida)', askOther: 'Ikkinchi tomondan so‘rang', askKoreanHint: 'Savollar koreys tilida — bu ekranni to‘g‘ridan-to‘g‘ri ko‘rsatishingiz mumkin',
     otherClauses: 'Boshqa bandlar', finishDetail: 'Tayyor — natijadan foydalaning',
     progressTitle: 'Shartnomangiz sinchiklab tekshirilmoqda', cancel: 'Bekor qilish',
+    langMismatch: 'Natijalar boshqa tilda — bu tilda olish uchun qayta tahlil qiling', reanalyze: 'Bu tilda qayta tahlil qilish',
+    analysisFailedNote: 'Ushbu band uchun avtomatik tahlil amalga oshmadi. Asl matnni o‘zingiz tekshiring.', retryNote: 'AI tekshiruvi kamchilik topdi — tegishli bandlar qayta yaratilmoqda',
   },
   si: {
     analysisDone: 'විශ්ලේෂණය අවසන්', analyzingLive: 'වගන්තිය {done}/{total} විශ්ලේෂණය වෙමින්', liveHint: 'අවසන් වූ වගන්ති මුලින් පෙන්වයි',
@@ -199,6 +224,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'ගිවිසුමේ මුල් පිටපත (කොරියානු)', askOther: 'අනෙක් පාර්ශ්වයෙන් අසන්න', askKoreanHint: 'ප්‍රශ්න කොරියානු භාෂාවෙන් — මෙම තිරය කෙලින්ම පෙන්විය හැක',
     otherClauses: 'වෙනත් වගන්ති', finishDetail: 'අවසන් — ප්‍රතිඵල භාවිතා කරන්න',
     progressTitle: 'ඔබේ ගිවිසුම හොඳින් පරීක්ෂා කරමින්', cancel: 'අවලංගු කරන්න',
+    langMismatch: 'ප්‍රතිඵල වෙනත් භාෂාවකින් ඇත — මෙම භාෂාවෙන් ලබා ගැනීමට නැවත විශ්ලේෂණය කරන්න', reanalyze: 'මෙම භාෂාවෙන් නැවත විශ්ලේෂණය',
+    analysisFailedNote: 'මෙම වගන්තියේ ස්වයංක්‍රීය විශ්ලේෂණය අසාර්ථක විය. කරුණාකර මුල් පිටපත ඔබම පරීක්ෂා කරන්න.', retryNote: 'AI සත්‍යාපනයේදී වැඩිදියුණු කළ යුතු දේ හමු විය — අදාළ වගන්ති නැවත සාදමින්',
   },
   bn: {
     analysisDone: 'বিশ্লেষণ সম্পন্ন', analyzingLive: 'ধারা {done}/{total} বিশ্লেষণ চলছে', liveHint: 'সম্পন্ন ধারাগুলো আগে দেখাবে',
@@ -211,6 +238,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'চুক্তির মূল পাঠ (কোরীয়)', askOther: 'অপর পক্ষকে জিজ্ঞাসা করুন', askKoreanHint: 'প্রশ্নগুলো কোরীয় ভাষায় — এই স্ক্রিন সরাসরি দেখাতে পারেন',
     otherClauses: 'অন্যান্য ধারা', finishDetail: 'শেষ — ফলাফল ব্যবহার করুন',
     progressTitle: 'আপনার চুক্তি মনোযোগ দিয়ে দেখা হচ্ছে', cancel: 'বাতিল করুন',
+    langMismatch: 'ফলাফল অন্য ভাষায় আছে — এই ভাষায় পেতে আবার বিশ্লেষণ করুন', reanalyze: 'এই ভাষায় আবার বিশ্লেষণ',
+    analysisFailedNote: 'এই ধারার স্বয়ংক্রিয় বিশ্লেষণ ব্যর্থ হয়েছে। অনুগ্রহ করে মূল লেখাটি নিজে যাচাই করুন।', retryNote: 'এআই যাচাইয়ে সংশোধনের বিষয় পাওয়া গেছে — সংশ্লিষ্ট ধারাগুলি আবার তৈরি হচ্ছে',
   },
   ru: {
     analysisDone: 'Анализ завершён', analyzingLive: 'Анализ пункта {done}/{total}', liveHint: 'Готовые пункты появляются первыми',
@@ -223,6 +252,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Оригинальный текст договора (корейский)', askOther: 'Спросите другую сторону', askKoreanHint: 'Вопросы на корейском — можно показать этот экран напрямую',
     otherClauses: 'Другие пункты', finishDetail: 'Готово — использовать результаты',
     progressTitle: 'Внимательно проверяем ваш договор', cancel: 'Отменить',
+    langMismatch: 'Результаты на другом языке — повторите анализ, чтобы получить их на этом языке', reanalyze: 'Проанализировать на этом языке',
+    analysisFailedNote: 'Автоматический анализ этого пункта не удался. Проверьте оригинальный текст самостоятельно.', retryNote: 'Проверка ИИ нашла недочёты — соответствующие пункты формируются заново',
   },
   ja: {
     analysisDone: '分析完了', analyzingLive: '条項 {done}/{total} を分析中', liveHint: '完了した条項から先に表示されます',
@@ -235,6 +266,8 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: '契約書原文（韓国語）', askOther: '相手方に質問しましょう', askKoreanHint: '質問は韓国語です — この画面をそのまま見せても構いません',
     otherClauses: '他の条項を見る', finishDetail: '確認を終えて結果を活用',
     progressTitle: '契約書を丁寧に確認しています', cancel: '分析をキャンセル',
+    langMismatch: '結果は別の言語で作成されています — この言語で見るには再分析してください', reanalyze: 'この言語で再分析',
+    analysisFailedNote: 'この条項の自動分析に失敗しました。原文を直接ご確認ください。', retryNote: 'AI検証で改善点が見つかりました — 該当条項を再生成しています',
   },
 }
 
@@ -1419,9 +1452,231 @@ export function domainLabel(lang: LangCode, koreanDomain: string): string {
   return DOMAIN_LABELS[lang]?.[koreanDomain] ?? DOMAIN_LABELS.en[koreanDomain] ?? koreanDomain
 }
 
+
+type PersonaKey =
+  | 'psTitle' | 'psDesc'
+  | 'psAdult' | 'psAdultDesc' | 'psSenior' | 'psSeniorDesc'
+  | 'psForeigner' | 'psForeignerDesc'
+  | 'psLangLabel' | 'psLangHint'
+  | 'psA11y' | 'psLarge' | 'psLargeDesc' | 'psContrast' | 'psContrastDesc'
+  | 'psVoice' | 'psVoiceDesc'
+  | 'psPrev' | 'psStart'
+
+// 페르소나 선택 화면 (기존에 하드코딩 한국어였던 마지막 미현지화 화면)
+const UI_PERSONA: Record<LangCode, Record<PersonaKey, string>> = {
+  ko: {
+    psTitle: '누구에게 맞춰 설명할까요?', psDesc: '위험 판단 기준은 동일해요. 설명의 말투와 쉬운 정도만 달라져요.',
+    psAdult: '일반 성인', psAdultDesc: '법률 용어를 짧게 풀이하고 핵심을 간결하게 설명해요.',
+    psSenior: '고령층', psSeniorDesc: '짧은 문장과 일상적인 표현, 익숙한 예시로 설명해요.',
+    psForeigner: '외국인 거주자·근로자', psForeignerDesc: '선택한 언어로 설명하고, 한국어 계약 용어를 함께 알려드려요.',
+    psLangLabel: '설명 언어 / Explanation language',
+    psLangHint: '위험 판단은 한국 법 기준 그대로, 설명만 선택한 언어로 바꿔드려요. 한국어 계약 용어는 괄호로 함께 표기돼요.',
+    psA11y: '읽기 편한 화면 설정',
+    psLarge: '글자 크게 보기', psLargeDesc: '전체 화면의 글자가 커져요',
+    psContrast: '높은 명암 사용', psContrastDesc: '흐린 글자를 더 진하게 보여줘요',
+    psVoice: '설명 음성으로 듣기', psVoiceDesc: '조항 설명을 소리로 들을 수 있어요',
+    psPrev: '이전', psStart: '계약서 분석 시작',
+  },
+  en: {
+    psTitle: 'Who should we explain for?', psDesc: 'Risk judgments stay the same — only the tone and simplicity of explanations change.',
+    psAdult: 'Adult', psAdultDesc: 'Concise explanations with legal terms briefly unpacked.',
+    psSenior: 'Senior', psSeniorDesc: 'Short sentences, everyday words, familiar examples.',
+    psForeigner: 'Foreign resident/worker', psForeignerDesc: 'Explains in your language, with Korean contract terms alongside.',
+    psLangLabel: 'Explanation language',
+    psLangHint: 'Risk is judged under Korean law as-is; only explanations switch to your language. Korean contract terms appear in parentheses.',
+    psA11y: 'Reading comfort settings',
+    psLarge: 'Larger text', psLargeDesc: 'Enlarges text across the screen',
+    psContrast: 'High contrast', psContrastDesc: 'Makes faint text darker',
+    psVoice: 'Read explanations aloud', psVoiceDesc: 'Listen to clause explanations',
+    psPrev: 'Back', psStart: 'Start analysis',
+  },
+  zh: {
+    psTitle: '为谁量身讲解？', psDesc: '风险判断标准相同，只是讲解的语气和难易度不同。',
+    psAdult: '普通成人', psAdultDesc: '简要解释法律用语，简明扼要地讲解要点。',
+    psSenior: '老年人', psSeniorDesc: '用短句、日常表达和熟悉的例子讲解。',
+    psForeigner: '外国居民·劳动者', psForeignerDesc: '用所选语言讲解，并同时标注韩语合同用语。',
+    psLangLabel: '讲解语言',
+    psLangHint: '风险判断仍以韩国法律为准，仅讲解换成所选语言。韩语合同用语会用括号并列标注。',
+    psA11y: '舒适阅读设置',
+    psLarge: '放大文字', psLargeDesc: '整个页面的文字变大',
+    psContrast: '高对比度', psContrastDesc: '让浅色文字更清晰',
+    psVoice: '语音朗读讲解', psVoiceDesc: '可以用声音收听条款讲解',
+    psPrev: '上一步', psStart: '开始分析合同',
+  },
+  vi: {
+    psTitle: 'Giải thích phù hợp cho ai?', psDesc: 'Tiêu chí đánh giá rủi ro giống nhau — chỉ khác giọng văn và mức độ dễ hiểu.',
+    psAdult: 'Người lớn', psAdultDesc: 'Giải thích ngắn gọn, làm rõ thuật ngữ pháp lý.',
+    psSenior: 'Người cao tuổi', psSeniorDesc: 'Câu ngắn, từ ngữ đời thường, ví dụ quen thuộc.',
+    psForeigner: 'Người nước ngoài cư trú/lao động', psForeignerDesc: 'Giải thích bằng ngôn ngữ bạn chọn, kèm thuật ngữ hợp đồng tiếng Hàn.',
+    psLangLabel: 'Ngôn ngữ giải thích',
+    psLangHint: 'Rủi ro vẫn được đánh giá theo luật Hàn Quốc; chỉ phần giải thích đổi sang ngôn ngữ bạn chọn. Thuật ngữ tiếng Hàn ghi kèm trong ngoặc.',
+    psA11y: 'Cài đặt dễ đọc',
+    psLarge: 'Chữ to hơn', psLargeDesc: 'Phóng to chữ trên toàn màn hình',
+    psContrast: 'Tương phản cao', psContrastDesc: 'Làm chữ mờ trở nên đậm hơn',
+    psVoice: 'Nghe giải thích', psVoiceDesc: 'Nghe giải thích điều khoản bằng giọng nói',
+    psPrev: 'Quay lại', psStart: 'Bắt đầu phân tích',
+  },
+  th: {
+    psTitle: 'อธิบายให้เหมาะกับใคร?', psDesc: 'เกณฑ์ตัดสินความเสี่ยงเหมือนกัน ต่างเพียงน้ำเสียงและความง่ายของคำอธิบาย',
+    psAdult: 'ผู้ใหญ่ทั่วไป', psAdultDesc: 'อธิบายศัพท์กฎหมายสั้น ๆ เน้นประเด็นสำคัญกระชับ',
+    psSenior: 'ผู้สูงอายุ', psSeniorDesc: 'ประโยคสั้น คำพูดในชีวิตประจำวัน ตัวอย่างที่คุ้นเคย',
+    psForeigner: 'ชาวต่างชาติ/แรงงานต่างชาติ', psForeignerDesc: 'อธิบายด้วยภาษาที่เลือก พร้อมศัพท์สัญญาภาษาเกาหลีกำกับ',
+    psLangLabel: 'ภาษาที่ใช้อธิบาย',
+    psLangHint: 'การตัดสินความเสี่ยงยึดกฎหมายเกาหลีเช่นเดิม เปลี่ยนเฉพาะคำอธิบายเป็นภาษาที่เลือก ศัพท์สัญญาเกาหลีจะกำกับในวงเล็บ',
+    psA11y: 'ตั้งค่าการอ่านที่สบายตา',
+    psLarge: 'ตัวอักษรใหญ่ขึ้น', psLargeDesc: 'ขยายตัวอักษรทั้งหน้าจอ',
+    psContrast: 'ความคมชัดสูง', psContrastDesc: 'ทำให้ตัวอักษรจางเข้มขึ้น',
+    psVoice: 'ฟังคำอธิบายด้วยเสียง', psVoiceDesc: 'ฟังคำอธิบายข้อสัญญาเป็นเสียงได้',
+    psPrev: 'ย้อนกลับ', psStart: 'เริ่มวิเคราะห์สัญญา',
+  },
+  id: {
+    psTitle: 'Dijelaskan untuk siapa?', psDesc: 'Standar penilaian risiko sama — hanya gaya bahasa dan tingkat kemudahannya yang berbeda.',
+    psAdult: 'Dewasa umum', psAdultDesc: 'Menjelaskan istilah hukum secara singkat dan padat.',
+    psSenior: 'Lansia', psSeniorDesc: 'Kalimat pendek, bahasa sehari-hari, contoh yang akrab.',
+    psForeigner: 'Warga/pekerja asing', psForeignerDesc: 'Dijelaskan dalam bahasa pilihan, disertai istilah kontrak bahasa Korea.',
+    psLangLabel: 'Bahasa penjelasan',
+    psLangHint: 'Risiko tetap dinilai menurut hukum Korea; hanya penjelasan yang beralih ke bahasa pilihan Anda. Istilah Korea ditulis dalam tanda kurung.',
+    psA11y: 'Pengaturan kenyamanan membaca',
+    psLarge: 'Perbesar teks', psLargeDesc: 'Memperbesar teks di seluruh layar',
+    psContrast: 'Kontras tinggi', psContrastDesc: 'Membuat teks samar lebih tegas',
+    psVoice: 'Dengarkan penjelasan', psVoiceDesc: 'Dengarkan penjelasan pasal dengan suara',
+    psPrev: 'Kembali', psStart: 'Mulai analisis',
+  },
+  tl: {
+    psTitle: 'Para kanino ang paliwanag?', psDesc: 'Pareho ang pamantayan sa panganib — tono at gaan ng paliwanag lang ang nagbabago.',
+    psAdult: 'Karaniwang adult', psAdultDesc: 'Maikling paliwanag ng legal terms, diretso sa punto.',
+    psSenior: 'Senior', psSeniorDesc: 'Maiikling pangungusap, pang-araw-araw na salita, pamilyar na halimbawa.',
+    psForeigner: 'Dayuhang residente/manggagawa', psForeignerDesc: 'Ipinapaliwanag sa napiling wika, may kasamang Korean contract terms.',
+    psLangLabel: 'Wika ng paliwanag',
+    psLangHint: 'Ang panganib ay hinuhusgahan pa rin ayon sa batas ng Korea; ang paliwanag lang ang nagiging napiling wika. Nakapaloob sa panaklong ang mga Korean term.',
+    psA11y: 'Mga setting sa maginhawang pagbasa',
+    psLarge: 'Palakihin ang teksto', psLargeDesc: 'Lumalaki ang teksto sa buong screen',
+    psContrast: 'Mataas na contrast', psContrastDesc: 'Pinapatingkad ang malabong teksto',
+    psVoice: 'Pakinggan ang paliwanag', psVoiceDesc: 'Maririnig ang paliwanag ng mga probisyon',
+    psPrev: 'Bumalik', psStart: 'Simulan ang pagsusuri',
+  },
+  ne: {
+    psTitle: 'कसका लागि मिलाएर बुझाउने?', psDesc: 'जोखिम मूल्याङ्कनको आधार उही हो — व्याख्याको शैली र सरलता मात्र फरक हुन्छ।',
+    psAdult: 'सामान्य वयस्क', psAdultDesc: 'कानुनी शब्दहरू छोटकरीमा खोलेर मुख्य कुरा संक्षेपमा बुझाइन्छ।',
+    psSenior: 'ज्येष्ठ नागरिक', psSeniorDesc: 'छोटा वाक्य, दैनिक अभिव्यक्ति र परिचित उदाहरणले बुझाइन्छ।',
+    psForeigner: 'विदेशी बासिन्दा/कामदार', psForeignerDesc: 'रोजेको भाषामा बुझाइन्छ, कोरियाली करार शब्दहरू सँगै देखाइन्छ।',
+    psLangLabel: 'व्याख्याको भाषा',
+    psLangHint: 'जोखिम कोरियाली कानुनकै आधारमा जाँचिन्छ; व्याख्या मात्र रोजेको भाषामा हुन्छ। कोरियाली शब्द कोष्ठकमा देखिन्छ।',
+    psA11y: 'सजिलो पढाइ सेटिङ',
+    psLarge: 'ठूलो अक्षर', psLargeDesc: 'पूरै स्क्रिनको अक्षर ठूलो हुन्छ',
+    psContrast: 'उच्च कन्ट्रास्ट', psContrastDesc: 'धमिलो अक्षर अझ गाढा देखिन्छ',
+    psVoice: 'व्याख्या सुन्ने', psVoiceDesc: 'दफाको व्याख्या आवाजमा सुन्न सकिन्छ',
+    psPrev: 'पछाडि', psStart: 'विश्लेषण सुरु गर्ने',
+  },
+  km: {
+    psTitle: 'ពន្យល់សម្រាប់អ្នកណា?', psDesc: 'លក្ខណៈវិនិច្ឆ័យហានិភ័យដូចគ្នា — ខុសគ្នាតែរបៀបនិយាយ និងកម្រិតងាយយល់ប៉ុណ្ណោះ។',
+    psAdult: 'មនុស្សពេញវ័យ', psAdultDesc: 'ពន្យល់ពាក្យច្បាប់ខ្លីៗ ចំណុចសំខាន់ៗយ៉ាងសង្ខេប។',
+    psSenior: 'មនុស្សវ័យចាស់', psSeniorDesc: 'ប្រយោគខ្លី ពាក្យប្រើប្រចាំថ្ងៃ និងឧទាហរណ៍ស្គាល់ច្បាស់។',
+    psForeigner: 'ជនបរទេសរស់នៅ/កម្មករ', psForeignerDesc: 'ពន្យល់ជាភាសាដែលបានជ្រើស ព្រមទាំងពាក្យកិច្ចសន្យាកូរ៉េ។',
+    psLangLabel: 'ភាសាពន្យល់',
+    psLangHint: 'ហានិភ័យវិនិច្ឆ័យតាមច្បាប់កូរ៉េដដែល; មានតែការពន្យល់ប៉ុណ្ណោះដែលប្ដូរទៅភាសាដែលបានជ្រើស។ ពាក្យកូរ៉េបង្ហាញក្នុងវង់ក្រចក។',
+    psA11y: 'ការកំណត់អានស្រួល',
+    psLarge: 'អក្សរធំ', psLargeDesc: 'អក្សរទាំងអេក្រង់ធំឡើង',
+    psContrast: 'កម្រិតផ្ទុយខ្ពស់', psContrastDesc: 'ធ្វើឱ្យអក្សរស្រអាប់ច្បាស់ជាង',
+    psVoice: 'ស្ដាប់ការពន្យល់', psVoiceDesc: 'អាចស្ដាប់ការពន្យល់មាត្រាជាសំឡេង',
+    psPrev: 'ថយក្រោយ', psStart: 'ចាប់ផ្ដើមវិភាគ',
+  },
+  my: {
+    psTitle: 'ဘယ်သူ့အတွက် ရှင်းပြပေးရမလဲ?', psDesc: 'အန္တရာယ်ဆုံးဖြတ်ချက်စံနှုန်း တူညီပြီး ရှင်းပြပုံလေသံနှင့် လွယ်ကူမှုသာ ကွာခြားသည်။',
+    psAdult: 'အရွယ်ရောက်သူ', psAdultDesc: 'ဥပဒေဝေါဟာရများကို တိုတိုရှင်းပြပြီး အဓိကအချက်ကို ကျစ်လစ်စွာ ဖော်ပြသည်။',
+    psSenior: 'သက်ကြီးရွယ်အို', psSeniorDesc: 'စာကြောင်းတို၊ နေ့စဉ်သုံးစကား၊ ရင်းနှီးသောဥပမာများဖြင့် ရှင်းပြသည်။',
+    psForeigner: 'နိုင်ငံခြားသားနေထိုင်သူ/လုပ်သား', psForeignerDesc: 'ရွေးထားသောဘာသာစကားဖြင့် ရှင်းပြပြီး ကိုရီးယားစာချုပ်ဝေါဟာရများကိုပါ ဖော်ပြသည်။',
+    psLangLabel: 'ရှင်းပြမည့်ဘာသာစကား',
+    psLangHint: 'အန္တရာယ်ကို ကိုရီးယားဥပဒေအတိုင်း ဆုံးဖြတ်ပြီး ရှင်းပြချက်သာ ရွေးထားသောဘာသာစကားသို့ ပြောင်းသည်။ ကိုရီးယားဝေါဟာရများကို ကွင်းစကွင်းပိတ်ဖြင့် ဖော်ပြသည်။',
+    psA11y: 'ဖတ်ရလွယ်ကူသော ဆက်တင်',
+    psLarge: 'စာလုံးကြီးကြီးကြည့်ရန်', psLargeDesc: 'မျက်နှာပြင်တစ်ခုလုံး၏ စာလုံးကြီးလာသည်',
+    psContrast: 'အရောင်ခြားနားမှုမြင့်', psContrastDesc: 'မှုန်သောစာလုံးကို ပိုထင်ရှားစေသည်',
+    psVoice: 'ရှင်းပြချက်ကို အသံဖြင့်နားထောင်ရန်', psVoiceDesc: 'အပိုဒ်ရှင်းပြချက်ကို အသံဖြင့် နားထောင်နိုင်သည်',
+    psPrev: 'နောက်သို့', psStart: 'စာချုပ်စိစစ်မှု စတင်မည်',
+  },
+  mn: {
+    psTitle: 'Хэнд зориулж тайлбарлах вэ?', psDesc: 'Эрсдэлийн үнэлгээний шалгуур адилхан — зөвхөн тайлбарын өнгө аяс, хялбар байдал л өөр.',
+    psAdult: 'Энгийн насанд хүрэгч', psAdultDesc: 'Хуулийн нэр томьёог товч тайлж, гол санааг ойлгомжтой хүргэнэ.',
+    psSenior: 'Ахмад настан', psSeniorDesc: 'Богино өгүүлбэр, өдөр тутмын үг хэллэг, танил жишээгээр тайлбарлана.',
+    psForeigner: 'Гадаад оршин суугч/ажилтан', psForeignerDesc: 'Сонгосон хэлээр тайлбарлаж, солонгос гэрээний нэр томьёог хамт харуулна.',
+    psLangLabel: 'Тайлбарын хэл',
+    psLangHint: 'Эрсдэлийг солонгос хуулиар хэвээр үнэлж, зөвхөн тайлбарыг сонгосон хэл рүү хөрвүүлнэ. Солонгос нэр томьёо хаалтад бичигдэнэ.',
+    psA11y: 'Уншихад тохиромжтой тохиргоо',
+    psLarge: 'Том үсэг', psLargeDesc: 'Дэлгэц даяарх үсэг томорно',
+    psContrast: 'Өндөр ялгарал', psContrastDesc: 'Бүдэг үсгийг илүү тод харуулна',
+    psVoice: 'Тайлбарыг сонсох', psVoiceDesc: 'Зүйл заалтын тайлбарыг дуугаар сонсож болно',
+    psPrev: 'Буцах', psStart: 'Шинжилгээ эхлүүлэх',
+  },
+  uz: {
+    psTitle: 'Kim uchun moslashtirib tushuntiramiz?', psDesc: 'Xavfni baholash mezoni bir xil — faqat tushuntirish ohangi va soddaligi farq qiladi.',
+    psAdult: 'Oddiy kattalar', psAdultDesc: 'Huquqiy atamalarni qisqa ochib, asosiy mazmunni lo\'nda tushuntiradi.',
+    psSenior: 'Keksalar', psSeniorDesc: 'Qisqa jumlalar, kundalik iboralar va tanish misollar bilan tushuntiradi.',
+    psForeigner: 'Chet ellik istiqomatchi/ishchi', psForeignerDesc: 'Tanlangan tilda tushuntiradi, koreyscha shartnoma atamalarini ham ko\'rsatadi.',
+    psLangLabel: 'Tushuntirish tili',
+    psLangHint: 'Xavf Koreya qonunlari bo\'yicha baholanadi; faqat tushuntirish tanlangan tilga o\'tadi. Koreyscha atamalar qavs ichida beriladi.',
+    psA11y: 'Qulay o\'qish sozlamalari',
+    psLarge: 'Kattaroq matn', psLargeDesc: 'Butun ekran matni kattalashadi',
+    psContrast: 'Yuqori kontrast', psContrastDesc: 'Xira matnni tiniqroq ko\'rsatadi',
+    psVoice: 'Tushuntirishni tinglash', psVoiceDesc: 'Band tushuntirishlarini ovozda eshitish mumkin',
+    psPrev: 'Orqaga', psStart: 'Tahlilni boshlash',
+  },
+  si: {
+    psTitle: 'කාට ගැළපෙන ලෙස පැහැදිලි කරමුද?', psDesc: 'අවදානම් විනිශ්චය එකමයි — පැහැදිලි කිරීමේ ස්වරය හා සරල බව පමණක් වෙනස් වේ.',
+    psAdult: 'සාමාන්‍ය වැඩිහිටියා', psAdultDesc: 'නීති වචන කෙටියෙන් විවෘත කර හරය සංක්ෂිප්තව පැහැදිලි කරයි.',
+    psSenior: 'වැඩිහිටි (ජ්‍යෙෂ්ඨ)', psSeniorDesc: 'කෙටි වාක්‍ය, එදිනෙදා වචන, හුරු උදාහරණවලින් පැහැදිලි කරයි.',
+    psForeigner: 'විදේශික පදිංචිකරු/සේවක', psForeignerDesc: 'තෝරාගත් භාෂාවෙන් පැහැදිලි කර, කොරියානු ගිවිසුම් වචන ද එක්ව පෙන්වයි.',
+    psLangLabel: 'පැහැදිලි කිරීමේ භාෂාව',
+    psLangHint: 'අවදානම කොරියානු නීතිය අනුවම විනිශ්චය වේ; පැහැදිලි කිරීම පමණක් තෝරාගත් භාෂාවට මාරු වේ. කොරියානු වචන වරහන් තුළ දැක්වේ.',
+    psA11y: 'පහසු කියවීමේ සැකසුම්',
+    psLarge: 'අකුරු විශාලව', psLargeDesc: 'මුළු තිරයේම අකුරු විශාල වේ',
+    psContrast: 'ඉහළ ප්‍රභේදනය', psContrastDesc: 'අඳුරු අකුරු වඩාත් තද කර පෙන්වයි',
+    psVoice: 'පැහැදිලි කිරීම හඬින් ඇසීම', psVoiceDesc: 'වගන්ති පැහැදිලි කිරීම් හඬින් ඇසිය හැක',
+    psPrev: 'ආපසු', psStart: 'විශ්ලේෂණය අරඹන්න',
+  },
+  bn: {
+    psTitle: 'কার জন্য মানিয়ে ব্যাখ্যা করব?', psDesc: 'ঝুঁকি বিচারের মানদণ্ড একই — শুধু ব্যাখ্যার ভঙ্গি ও সহজতা আলাদা।',
+    psAdult: 'সাধারণ প্রাপ্তবয়স্ক', psAdultDesc: 'আইনি শব্দ সংক্ষেপে খুলে মূল কথা গুছিয়ে ব্যাখ্যা করে।',
+    psSenior: 'প্রবীণ', psSeniorDesc: 'ছোট বাক্য, দৈনন্দিন ভাষা ও পরিচিত উদাহরণে ব্যাখ্যা করে।',
+    psForeigner: 'বিদেশি বাসিন্দা/শ্রমিক', psForeignerDesc: 'নির্বাচিত ভাষায় ব্যাখ্যা করে, সাথে কোরীয় চুক্তির শব্দও দেখায়।',
+    psLangLabel: 'ব্যাখ্যার ভাষা',
+    psLangHint: 'ঝুঁকি কোরীয় আইন অনুযায়ীই বিচার হয়; কেবল ব্যাখ্যা নির্বাচিত ভাষায় বদলায়। কোরীয় শব্দ বন্ধনীতে থাকে।',
+    psA11y: 'স্বাচ্ছন্দ্যে পড়ার সেটিংস',
+    psLarge: 'বড় অক্ষর', psLargeDesc: 'পুরো স্ক্রিনের অক্ষর বড় হয়',
+    psContrast: 'উচ্চ কনট্রাস্ট', psContrastDesc: 'অস্পষ্ট লেখা আরও গাঢ় দেখায়',
+    psVoice: 'ব্যাখ্যা শুনুন', psVoiceDesc: 'ধারার ব্যাখ্যা কণ্ঠে শোনা যায়',
+    psPrev: 'পেছনে', psStart: 'বিশ্লেষণ শুরু করুন',
+  },
+  ru: {
+    psTitle: 'Для кого адаптировать объяснения?', psDesc: 'Критерии оценки риска одинаковы — меняются только тон и простота объяснений.',
+    psAdult: 'Взрослый', psAdultDesc: 'Кратко раскрывает юридические термины и лаконично объясняет суть.',
+    psSenior: 'Пожилой человек', psSeniorDesc: 'Короткие фразы, повседневные слова, знакомые примеры.',
+    psForeigner: 'Иностранный житель/работник', psForeignerDesc: 'Объясняет на выбранном языке, приводя корейские термины договора рядом.',
+    psLangLabel: 'Язык объяснений',
+    psLangHint: 'Риск оценивается по корейскому праву; на выбранный язык переводятся только объяснения. Корейские термины даются в скобках.',
+    psA11y: 'Настройки комфортного чтения',
+    psLarge: 'Крупный текст', psLargeDesc: 'Увеличивает текст на всём экране',
+    psContrast: 'Высокий контраст', psContrastDesc: 'Делает бледный текст чётче',
+    psVoice: 'Озвучивание объяснений', psVoiceDesc: 'Объяснения пунктов можно прослушать',
+    psPrev: 'Назад', psStart: 'Начать анализ',
+  },
+  ja: {
+    psTitle: '誰に合わせて説明しますか？', psDesc: 'リスク判断の基準は同じです。説明の口調とやさしさだけが変わります。',
+    psAdult: '一般成人', psAdultDesc: '法律用語を短く噛み砕き、要点を簡潔に説明します。',
+    psSenior: '高齢者', psSeniorDesc: '短い文と日常的な表現、身近な例で説明します。',
+    psForeigner: '外国人居住者・労働者', psForeignerDesc: '選んだ言語で説明し、韓国語の契約用語も併記します。',
+    psLangLabel: '説明の言語',
+    psLangHint: 'リスク判断は韓国法基準のまま、説明だけを選んだ言語に切り替えます。韓国語の契約用語は括弧で併記されます。',
+    psA11y: '読みやすさの設定',
+    psLarge: '文字を大きく', psLargeDesc: '画面全体の文字が大きくなります',
+    psContrast: '高コントラスト', psContrastDesc: '薄い文字をより濃く表示します',
+    psVoice: '説明を音声で聞く', psVoiceDesc: '条項の説明を音声で聞けます',
+    psPrev: '戻る', psStart: '契約書の分析を開始',
+  },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -1431,7 +1686,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

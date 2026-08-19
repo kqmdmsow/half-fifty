@@ -3,6 +3,8 @@ import type { ClauseResult } from '../api'
 import { Button, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { clauseHeading } from '../clauseTitle'
+import { FormattedText } from '../components/FormattedText'
 import { speak, stopSpeaking } from '../tts'
 
 export function DetailScreen({
@@ -27,9 +29,9 @@ export function DetailScreen({
   // 음성 안내: 화면 진입 시 설명 읽기 (기기 최적 한국어 보이스 자동 선택 — src/tts.ts)
   useEffect(() => {
     if (!voiceGuide || !clause) return
-    speak(clause.explanation)
+    speak(clause.explanation, language)
     return () => stopSpeaking()
-  }, [voiceGuide, clause])
+  }, [voiceGuide, clause, language])
 
   // 결과가 아직 없으면 렌더링하지 않는다 (가짜 예시 폴백 제거 후의 방어선).
   // 훅 규칙 때문에 useEffect 뒤에 위치해야 한다.
@@ -71,9 +73,10 @@ export function DetailScreen({
                     className={`h-2 w-2 shrink-0 rounded-full ${RISK_META[result.risk_level].dot}`}
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
-                    {result.risk_type === '해당 없음'
-                      ? t(language, 'standardClause')
-                      : riskTypeLabel(language, result.risk_type)}
+                    {clauseHeading(result.original_text, language, result.original_text_translated) ??
+                      (result.risk_type === '해당 없음'
+                        ? t(language, 'standardClause')
+                        : riskTypeLabel(language, result.risk_type))}
                   </span>
                 </button>
               )
@@ -87,20 +90,32 @@ export function DetailScreen({
             <div>
               <RiskBadge level={clause.risk_level} label={riskLevelLabel(language, clause.risk_level)} />
               <h1 className="mt-3 text-[24px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[28px]">
-                {clause.risk_type === '해당 없음'
-                  ? t(language, 'standardClauseLong')
-                  : riskTypeLabel(language, clause.risk_type)}
+                {clauseHeading(clause.original_text, language, clause.original_text_translated) ??
+                  (clause.risk_type === '해당 없음'
+                    ? t(language, 'standardClauseLong')
+                    : riskTypeLabel(language, clause.risk_type))}
               </h1>
+              {clauseHeading(clause.original_text, language, clause.original_text_translated) && (
+                <p className="mt-1.5 text-[14px] font-bold text-ink-400">
+                  {clause.risk_type === '해당 없음'
+                    ? t(language, 'standardClauseLong')
+                    : riskTypeLabel(language, clause.risk_type)}
+                </p>
+              )}
             </div>
           </div>
 
           <Section title={t(language, 'explainSimply')}>
-            <p>{clause.explanation}</p>
+            <FormattedText text={clause.explanation} lead />
           </Section>
 
           {clause.risk_level !== '안전' && (
             <Section title={t(language, 'whyCheck')}>
-              <p>{clause.risk_evidence}</p>
+              {clause.analysis_failed ? (
+                <p>{t(language, 'analysisFailedNote')}</p>
+              ) : (
+                <FormattedText text={clause.risk_evidence_translated || clause.risk_evidence} />
+              )}
             </Section>
           )}
 
@@ -137,6 +152,9 @@ export function DetailScreen({
                       {/* 번역이 있으면 이해용 번역을 먼저, 상대방에게 보여줄 한국어를 아래에 */}
                       {translated && (
                         <p className="text-[14px] font-semibold leading-relaxed text-ink-900">
+                          <span className="mr-1.5 rounded bg-brand-50 px-1.5 py-0.5 text-[11px] font-bold text-brand-600">
+                            {t(language, 'translationLabel')}
+                          </span>
                           {translated}
                         </p>
                       )}

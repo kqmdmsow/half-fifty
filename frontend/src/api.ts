@@ -17,6 +17,11 @@ export interface ClauseResult {
   // 비한국어 언어 선택 시에만 채워짐 — 한국어 원문·질문에 번역 병기용
   original_text_translated?: string | null
   check_questions_translated?: string[] | null
+  risk_evidence_translated?: string | null
+  // 재시도 소진 폴백 마커 (#100) — true면 근거 문구를 i18n으로 치환해 표시
+  analysis_failed?: boolean
+  // 스트리밍 revision (judge 재시도 시 카드 교체 감지용, 프론트에서 주입)
+  revision?: number
 }
 
 export interface AnalyzeResponse {

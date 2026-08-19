@@ -3,6 +3,8 @@ import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { clauseHeading } from '../clauseTitle'
+import { FormattedText } from '../components/FormattedText'
 
 type Filter = '전체' | RiskLevel
 
@@ -11,6 +13,7 @@ export function SummaryScreen({
   results,
   language = 'ko',
   liveProgress = null,
+  retrying = false,
   warnings = [],
   onSelectClause,
   onDone,
@@ -20,6 +23,7 @@ export function SummaryScreen({
   language?: LangCode
   /** 스트리밍 분석 중이면 {done,total} — 완료 조항부터 이 화면에 바로 쌓인다 */
   liveProgress?: { done: number; total: number } | null
+  retrying?: boolean
   warnings?: string[]
   onSelectClause: (clauseId: string) => void
   onDone: () => void
@@ -79,12 +83,17 @@ export function SummaryScreen({
         </span>
       </h1>
 
-      {/* 검증 대기 고지 — 조항은 다 나왔지만 judge 확정 전 */}
-      {live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 && (
+      {/* 검증 대기 고지 — 조항은 다 나왔지만 judge 확정 전.
+          재시도 중에는 카드가 교체되는 이유를 명시한다 (#101) */}
+      {live && retrying ? (
+        <p className="mt-4 rounded-2xl bg-caution-50 px-4 py-3 text-[13px] font-semibold text-caution-700">
+          🔄 {t(language, 'retryNote')}
+        </p>
+      ) : live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 ? (
         <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
           🛡️ {t(language, 'verifyingNote')}
         </p>
-      )}
+      ) : null}
 
       {/* 요약 통계 */}
       <div className="mt-7 grid grid-cols-3 gap-2.5">
@@ -103,9 +112,15 @@ export function SummaryScreen({
           <div>
             <p className="text-[13px] font-bold text-danger-600">{t(language, 'checkFirst')}</p>
             <p className="mt-1 text-[16px] font-bold text-ink-900">
-              {riskTypeLabel(language, topRisk.risk_type)}
+              {[clauseHeading(topRisk.original_text, language, topRisk.original_text_translated), riskTypeLabel(language, topRisk.risk_type)]
+                .filter(Boolean)
+                .join(' — ')}
             </p>
-            <p className="mt-1 text-[14px] leading-relaxed text-ink-600">{topRisk.explanation}</p>
+            <FormattedText
+              text={topRisk.explanation}
+              lead
+              className="mt-1.5 text-[14px] text-ink-600"
+            />
           </div>
           <span className="shrink-0 text-[18px] text-danger-500">→</span>
         </button>
@@ -149,9 +164,17 @@ export function SummaryScreen({
             </Card>
           )
         ) : (
-          filtered.map((result) => (
+          filtered.map((result) => {
+            // 카드 제목은 조항 표제(제N조…) — 유형은 괄호 보조 표기.
+            // 표제가 없으면 기존처럼 유형만 표시한다.
+            const heading = clauseHeading(result.original_text, language, result.original_text_translated)
+            const typeLabel =
+              result.risk_type === '해당 없음'
+                ? t(language, 'standardClause')
+                : riskTypeLabel(language, result.risk_type)
+            return (
             <Card
-              key={result.clause_id}
+              key={`${result.clause_id}#r${result.revision ?? 0}`}
               interactive
               onClick={() => onSelectClause(result.clause_id)}
               className="animate-fade-up p-6"
@@ -159,9 +182,10 @@ export function SummaryScreen({
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[15px] font-bold text-ink-900">
-                    {result.risk_type === '해당 없음'
-                      ? t(language, 'standardClause')
-                      : riskTypeLabel(language, result.risk_type)}
+                    {heading ?? typeLabel}
+                    {heading && (
+                      <span className="ml-1.5 font-semibold text-ink-400">({typeLabel})</span>
+                    )}
                   </p>
                   <p className="mt-1.5 line-clamp-2 text-[14px] leading-relaxed text-ink-400">
                     {result.explanation}
@@ -173,18 +197,26 @@ export function SummaryScreen({
                 />
               </div>
               {result.risk_level !== '안전' && (
-                <p className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] leading-relaxed text-ink-600">
-                  <span className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
+                <div className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] text-ink-600">
+                  <p className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
                     {t(language, 'evidence')}
-                  </span>{' '}
-                  {result.risk_evidence}
-                </p>
+                  </p>
+                  {result.analysis_failed ? (
+                    <p className="mt-1 leading-relaxed">{t(language, 'analysisFailedNote')}</p>
+                  ) : (
+                    <FormattedText
+                      text={result.risk_evidence_translated || result.risk_evidence}
+                      className="mt-1"
+                    />
+                  )}
+                </div>
               )}
               <p className="mt-3.5 text-[14px] font-bold text-brand-600">
                 {t(language, 'seeDetail')} →
               </p>
             </Card>
-          ))
+            )
+          })
         )}
       </div>
 
