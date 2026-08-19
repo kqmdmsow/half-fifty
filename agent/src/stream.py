@@ -152,7 +152,7 @@ def stream_analysis(
     persona_only = False  # clarity-only 단축 여부 (#75)
 
     while True:
-        _EVENT_ONLY_KEYS = {"original_text", "original_text_translated", "check_questions_translated"}
+        _EVENT_ONLY_KEYS = {"original_text", "original_text_translated", "check_questions_translated", "risk_evidence_translated"}
         if persona_only:
             events = _emit_persona_only(clauses, persona, language, revision=retry,
                                         prior_results=results_by_id)

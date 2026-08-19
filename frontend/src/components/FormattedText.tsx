@@ -4,8 +4,8 @@
 
 const ENUM_MARKER = /\((\d{1,2})\)\s*/g
 // 한국어 종결(다./요.) 뒤 공백에서 문장을 나눈다 — "1.5%" 같은 숫자 소수점은
-// 뒤에 공백이 없어 분리되지 않는다.
-const SENTENCE_END = /(?<=[.!?…])\s+/
+// 뒤에 공백이 없어 분리되지 않는다. CJK 종결부호(。！？)는 공백 없이도 경계.
+const SENTENCE_END = /(?<=[.!?…])\s+|(?<=[。！？])\s*/
 
 function splitSentences(text: string): string[] {
   return text

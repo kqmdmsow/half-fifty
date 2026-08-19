@@ -114,7 +114,7 @@ export function DetailScreen({
               {clause.analysis_failed ? (
                 <p>{t(language, 'analysisFailedNote')}</p>
               ) : (
-                <FormattedText text={clause.risk_evidence} />
+                <FormattedText text={clause.risk_evidence_translated || clause.risk_evidence} />
               )}
             </Section>
           )}
@@ -152,6 +152,9 @@ export function DetailScreen({
                       {/* 번역이 있으면 이해용 번역을 먼저, 상대방에게 보여줄 한국어를 아래에 */}
                       {translated && (
                         <p className="text-[14px] font-semibold leading-relaxed text-ink-900">
+                          <span className="mr-1.5 rounded bg-brand-50 px-1.5 py-0.5 text-[11px] font-bold text-brand-600">
+                            {t(language, 'translationLabel')}
+                          </span>
                           {translated}
                         </p>
                       )}

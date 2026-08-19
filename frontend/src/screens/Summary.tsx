@@ -204,7 +204,10 @@ export function SummaryScreen({
                   {result.analysis_failed ? (
                     <p className="mt-1 leading-relaxed">{t(language, 'analysisFailedNote')}</p>
                   ) : (
-                    <FormattedText text={result.risk_evidence} className="mt-1" />
+                    <FormattedText
+                      text={result.risk_evidence_translated || result.risk_evidence}
+                      className="mt-1"
+                    />
                   )}
                 </div>
               )}
