@@ -170,6 +170,39 @@ def test_필러토큰_제거가_무관한_내용까지_봐주지_않음():
     assert find_fabricated_quotes(evidence, clause) == ["손해배상에 대한 별도 약정"]
 
 
+# #73: 도메인 미선택 경로에서도 analysis.txt [표준 조항 예외]가 항상 포함하는
+# 차임 연체 판정 기준 문구("2기(2개월) 이상 연체 시 해지" 등)를 모델이 그대로
+# 재인용하면, 법령 출처 표지를 60자 이내에 안 붙이는 경우 창작 인용으로
+# 오판돼 안전한 조항이 폴백됐다(재현: main e4ce028, 4회 중 1회). #70과 달리
+# 이 문구는 도메인 미주입 경로를 포함해 항상 존재해 프롬프트 쪽 "따옴표 없이
+# 서술" 지시로 못 막는다 — citation_check가 정확히 일치할 때만 면제한다.
+
+def test_표준조항_예외_문구_인용은_법령_표지_없이도_면제():
+    """val/main 실측(#73): 법령 근거를 문장 뒤로 떨어뜨려 60자 표지 조건을
+    못 만족해도, 표준 조항 예외 문구 자체의 인용은 창작 인용이 아니다."""
+    clause = "제5조(해지) 임차인이 2기의 차임액에 달하도록 차임을 연체한 때에는 임대인은 계약을 해지할 수 있다."
+    evidence = "이 조항은 \"2기(2개월) 이상 연체 시 해지\"에 해당하며 표준적인 내용입니다."
+    assert find_fabricated_quotes(evidence, clause) == []
+
+
+def test_표준조항_예외_문구가_analysis_txt에_실제로_존재함():
+    """citation_check.py의 면제 목록이 analysis.txt [표준 조항 예외]와
+    어긋나면(문구 수정 등) 이 테스트가 API 없이 드리프트를 잡는다."""
+    from src.citation_check import _STANDARD_CLAUSE_EXCEPTION_PHRASES
+    from src.nodes.analysis import _PROMPT_PREFIX
+
+    for phrase in _STANDARD_CLAUSE_EXCEPTION_PHRASES:
+        assert phrase in _PROMPT_PREFIX, f"'{phrase}'가 analysis.txt에서 사라짐 — 면제 목록 갱신 필요"
+
+
+def test_표준조항_예외_면제가_무관한_창작_인용까지_봐주지_않음():
+    """면제는 정확히 일치하는 문구에만 적용된다 — 비슷해 보여도 조항에 없는
+    다른 내용이 섞인 창작 인용은 여전히 잡혀야 한다."""
+    clause = "임대인은 계약금의 10%를 위약금으로 정한다."
+    evidence = "조항은 '3기 연체 해지 시 위약금 전액 몰수'라고 규정합니다."
+    assert find_fabricated_quotes(evidence, clause) == ["3기 연체 해지 시 위약금 전액 몰수"]
+
+
 def test_의로_끝나는_단어는_손상되지_않음():
     """'정의'처럼 실제로 의로 끝나는 단어가 조사 제거로 훼손돼 엉뚱하게
     매칭되지 않는지 확인 (예: '정의'가 '정'으로 잘려 다른 단어와 우연히
