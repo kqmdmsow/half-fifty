@@ -1,6 +1,7 @@
 import { useRef, useState, type DragEvent } from 'react'
 import { Button, Card, PageTitle } from '../components/ui'
-import { domainLabel, t, type LangCode } from '../i18n'
+import { domainLabel, riskLevelLabel, t, type LangCode } from '../i18n'
+import { DEMO_SAMPLES, type DemoSample } from '../data/samples'
 
 type InputMode = 'pdf' | 'text'
 
@@ -30,6 +31,7 @@ export function UploadScreen({
   onFileChange,
   onTextChange,
   onDomainChange,
+  onSampleSelect,
   onNext,
 }: {
   mode: InputMode
@@ -41,6 +43,7 @@ export function UploadScreen({
   onFileChange: (file: File | null) => void
   onTextChange: (text: string) => void
   onDomainChange: (domain: string) => void
+  onSampleSelect: (sample: DemoSample) => void
   onNext: () => void
 }) {
   const [agreed, setAgreed] = useState(false)
@@ -76,6 +79,33 @@ export function UploadScreen({
         title={t(language, 'upTitle')}
         desc={t(language, 'upDesc')}
       />
+
+      {/* 원클릭 데모 샘플 (#81) — 계약서가 없어도 버튼 하나로 체험 */}
+      <Card className="mt-6 px-5 py-4">
+        <p className="text-[14px] font-bold text-ink-900">{t(language, 'spTitle')}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-ink-400">{t(language, 'spDesc')}</p>
+        <div className="mt-3 grid gap-2 md:grid-cols-2">
+          {DEMO_SAMPLES.map((sample) => (
+            <button
+              key={sample.id}
+              type="button"
+              onClick={() => onSampleSelect(sample)}
+              className="flex items-center justify-between gap-2 rounded-xl bg-ink-25 px-3.5 py-2.5 text-left text-[13px] font-semibold text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
+            >
+              <span className="min-w-0 flex-1">{t(language, sample.labelKey)}</span>
+              <span
+                className={`shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-bold ${
+                  sample.expected === '위험'
+                    ? 'bg-danger-50 text-danger-600'
+                    : 'bg-safe-50 text-safe-700'
+                }`}
+              >
+                {riskLevelLabel(language ?? 'ko', sample.expected)}
+              </span>
+            </button>
+          ))}
+        </div>
+      </Card>
 
       {/* 입력 방식 탭 */}
       <div className="mt-8 grid grid-cols-2 rounded-2xl bg-ink-50 p-1">

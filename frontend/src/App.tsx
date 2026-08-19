@@ -10,6 +10,7 @@ import {
 } from './api'
 import { Logo } from './components/ui'
 import { LANGUAGES, t } from './i18n'
+import type { DemoSample } from './data/samples'
 import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
@@ -150,6 +151,15 @@ export default function App() {
     go('upload')
   }
 
+  // 원클릭 데모 샘플 (#81): 조항·유형·(시나리오6) 페르소나까지 한 번에 세팅
+  const applySample = (sample: DemoSample) => {
+    setMode('text')
+    setText(sample.text)
+    setDomain(sample.domain)
+    if (sample.persona) setPersona(sample.persona)
+    setFile(null)
+  }
+
   const openDetail = (clauseId: string) => {
     setSelectedClauseId(clauseId)
     go('detail')
@@ -205,6 +215,7 @@ export default function App() {
             onFileChange={setFile}
             onTextChange={setText}
             onDomainChange={setDomain}
+            onSampleSelect={applySample}
             onNext={() => go('extract')}
           />
         )}
