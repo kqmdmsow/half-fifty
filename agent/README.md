@@ -1,9 +1,9 @@
-# agent — LangGraph 4단계 파이프라인
+# agent — LangGraph 5단계 파이프라인
 
 담당: 최민제
 
-LLM 연동 완료 상태. Parser는 규칙 기반, Analysis/Persona/Judge는 실제
-Claude API를 호출한다. 모델은 이원화되어 있다: Analysis/Persona는
+LLM 연동 완료 상태. Parser는 규칙 기반, Domain/Analysis/Persona/Judge는
+실제 Claude API를 호출한다. 모델은 이원화되어 있다: Domain/Analysis/Persona는
 `MODEL_WORKER`(기본 Haiku, 저렴한 생성용), Judge는 `MODEL_JUDGE`(기본
 Sonnet, 채점 정확도용)를 사용한다.
 
@@ -20,6 +20,7 @@ agent/
 │   ├── llm.py            # LLM 클라이언트 생성 + JSON 파싱 + 토큰 사용량 추적 공통 유틸
 │   ├── nodes/
 │   │   ├── parser.py    # 규칙 기반 조항 분리 (LLM 아님, 줄 시작 앤커링 + 별지/서명란 컷오프)
+│   │   ├── domain.py    # 문서 유형 판별 (사용자 선택 우선, 자동판별은 opt-in, MODEL_WORKER)
 │   │   ├── analysis.py  # 4종 출력 생성 (analysis.txt 프롬프트, MODEL_WORKER)
 │   │   ├── persona.py   # 페르소나 적응 (persona_*.txt 프롬프트, MODEL_WORKER)
 │   │   └── judge.py     # 4 Aspect 채점 (judge_rubric.txt 프롬프트, MODEL_JUDGE)
