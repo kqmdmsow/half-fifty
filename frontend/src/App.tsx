@@ -10,6 +10,7 @@ import {
 } from './api'
 import { Logo } from './components/ui'
 import { LANGUAGES, t } from './i18n'
+import type { DemoSample } from './data/samples'
 import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
@@ -150,6 +151,27 @@ export default function App() {
     go('upload')
   }
 
+  // 원클릭 데모 샘플 (#81): 조항·유형·(시나리오6) 페르소나까지 한 번에 세팅.
+  // 파일 샘플(PDF·사진)은 번들된 정적 자산을 File로 만들어 실제 업로드 경로 그대로 태운다.
+  const applySample = async (sample: DemoSample) => {
+    setDomain(sample.domain)
+    if (sample.persona) setPersona(sample.persona)
+    if (sample.kind === 'file' && sample.fileUrl) {
+      setMode('pdf')
+      setText('')
+      try {
+        const blob = await fetch(sample.fileUrl).then((r) => r.blob())
+        setFile(new File([blob], sample.fileName ?? 'sample', { type: sample.fileType }))
+      } catch {
+        setFile(null)
+      }
+    } else {
+      setMode('text')
+      setFile(null)
+      setText(sample.text ?? '')
+    }
+  }
+
   const openDetail = (clauseId: string) => {
     setSelectedClauseId(clauseId)
     go('detail')
@@ -205,6 +227,7 @@ export default function App() {
             onFileChange={setFile}
             onTextChange={setText}
             onDomainChange={setDomain}
+            onSampleSelect={applySample}
             onNext={() => go('extract')}
           />
         )}
