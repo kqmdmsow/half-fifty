@@ -20,6 +20,10 @@
 
 import os
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from pathlib import Path
 
 from src.llm import get_worker_llm, invoke_json
@@ -58,7 +62,7 @@ def _detect_domain(raw_text: str) -> tuple[str, str]:
             return DOMAIN_UNKNOWN, f"허용 외 응답: {domain[:40]}"
         return domain, str(data.get("evidence", ""))[:200]
     except Exception as exc:
-        print(f"[Domain] 판별 실패, '{DOMAIN_UNKNOWN}' 폴백: {exc}")
+        logger.warning("판별 실패, %r 폴백: %s", DOMAIN_UNKNOWN, exc)
         return DOMAIN_UNKNOWN, str(exc)[:80]
 
 
@@ -66,12 +70,12 @@ def domain_node(state: PipelineState) -> dict:
     """LangGraph 노드: (사용자 선택 도메인 | 자동 판별 | 알 수 없음) -> domain."""
     user_domain = state.get("domain", "")
     if user_domain and user_domain in ALLOWED_DOMAINS:
-        print(f"[Domain] 사용자 선택 유형 사용: {user_domain}")
+        logger.info("사용자 선택 유형 사용: %s", user_domain)
         return {"domain": user_domain, "domain_evidence": "사용자 선택"}
 
     if os.getenv("DOMAIN_DETECTION", "").lower() != "llm":
         return {"domain": DOMAIN_UNKNOWN, "domain_evidence": "사용자 선택 없음 (자동 판별 비활성)"}
 
     domain, evidence = _detect_domain(state["raw_text"])
-    print(f"[Domain] 자동 판별 유형: {domain}" + (f" (근거: {evidence[:60]})" if domain != DOMAIN_UNKNOWN else ""))
+    logger.info("자동 판별 유형: %s%s", domain, f" (근거: {evidence[:60]})" if domain != DOMAIN_UNKNOWN else "")
     return {"domain": domain, "domain_evidence": evidence}

@@ -23,6 +23,10 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from src.llm import get_worker_llm, invoke_json
 from src.citation_check import find_fabricated_quotes
 from src.schemas import AnalysisOutput
@@ -150,7 +154,7 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             )
         except Exception as exc:  # JSON 파싱 실패, 키 누락, 스키마 검증 실패 등
             if attempt + 1 == _PARSE_ATTEMPTS:
-                print(f"[Analysis] {clause_id} 분석 실패, 폴백 처리: {exc}")
+                logger.warning("%s 분석 실패, 폴백 처리: %s", clause_id, exc)
 
     return AnalysisResult(
         clause_id=clause_id,

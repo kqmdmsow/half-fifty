@@ -15,6 +15,10 @@
 from pathlib import Path
 from typing import List
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from src.llm import get_worker_llm, invoke_json
 from src.nodes.judge import judge_node
 from src.nodes.parser import parser_node
@@ -66,7 +70,7 @@ def _call_baseline_llm(clauses: List[Clause]) -> List[AnalysisResult]:
             return results
         except Exception as exc:  # JSON 파싱 실패, 키 누락 등
             if attempt + 1 == _PARSE_ATTEMPTS:
-                print(f"[Baseline] 분석 실패, 전체 폴백 처리: {exc}")
+                logger.warning("분석 실패, 전체 폴백 처리: %s", exc)
 
     return [_fallback_result(c["clause_id"]) for c in clauses]
 
