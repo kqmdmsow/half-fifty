@@ -162,6 +162,57 @@ def analyze_stream(req: AnalyzeRequest) -> StreamingResponse:
     return StreamingResponse(gen(), media_type="application/x-ndjson")
 
 
+def _ndjson(event: dict) -> str:
+    return json.dumps(event, ensure_ascii=False) + "\n"
+
+
+@app.post("/analyze-file-stream")
+async def analyze_file_stream(
+    file: UploadFile,
+    persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
+    language: Language = Form("ko"),
+    domain: str = Form(""),
+) -> StreamingResponse:
+    """파일(PDF·사진) 업로드의 조항별 점진 스트리밍 (NDJSON).
+
+    이벤트 계약은 /analyze-stream과 동일하고, 맨 앞에 추출 단계 이벤트가 붙는다:
+      {"event":"extract"}                              # 텍스트 추출(OCR 포함) 시작
+      {"event":"error","status":422,"message":...}     # 추출 실패 시 — 스트림이
+                                                       # 이미 열린 뒤라 HTTP 상태
+                                                       # 대신 이벤트로 알린다
+    형식·용량 검증은 스트림을 열기 전이므로 기존 파일 엔드포인트와 동일하게
+    HTTPException으로 응답한다. Judge 게이트(재시도·needs_review)는 텍스트
+    스트리밍과 완전히 같은 stream_analysis를 재사용한다.
+    """
+    raw = await file.read()
+    if len(raw) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="파일은 10MB 이하만 지원합니다.")
+    pdf = is_pdf_magic(raw)
+    if not pdf and sniff_image_type(raw) is None:
+        raise HTTPException(status_code=415, detail="PDF 또는 jpg/png/webp 파일만 지원합니다.")
+    filename = file.filename or ("upload.pdf" if pdf else "upload.png")
+
+    def gen():
+        yield _ndjson({"event": "extract"})
+        try:
+            if pdf:
+                try:
+                    text = extract_text_from_pdf(raw)
+                except ValueError:
+                    # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
+                    text = document_parse_text(raw, filename)
+            else:
+                text = document_parse_text(raw, filename)
+        except (OcrUnavailableError, ValueError) as exc:
+            yield _ndjson({"event": "error", "status": 422,
+                           "message": f"파일에서 글자를 읽지 못했습니다: {exc}"})
+            return
+        for event in stream_analysis(text, persona, language or "ko", domain):
+            yield _ndjson(event)
+
+    return StreamingResponse(gen(), media_type="application/x-ndjson")
+
+
 @app.post("/analyze-pdf", response_model=AnalyzeResponse)
 async def analyze_pdf(
     file: UploadFile,

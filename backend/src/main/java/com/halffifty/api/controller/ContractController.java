@@ -122,6 +122,46 @@ public class ContractController {
         return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona, language, domain);
     }
 
+    /**
+     * 파일(PDF·사진) 업로드의 조항별 점진 스트리밍 (NDJSON 프록시).
+     * 검증(용량·매직 바이트·페르소나)은 기존 파일 엔드포인트와 동일하게 스트림을
+     * 열기 전에 수행하고, 통과하면 에이전트 /analyze-file-stream을 그대로 중계한다.
+     */
+    @PostMapping(value = "/analyze-file-stream", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = "application/x-ndjson")
+    public ResponseEntity<StreamingResponseBody> analyzeFileStream(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "persona", defaultValue = "adult") String persona,
+            @RequestParam(value = "language", defaultValue = "ko") String language,
+            @RequestParam(value = "domain", defaultValue = "") String domain)
+            throws IOException {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
+        }
+        if (file.getSize() > MAX_PDF_BYTES) {
+            throw new ResponseStatusException(
+                    HttpStatus.PAYLOAD_TOO_LARGE, "파일은 10MB 이하만 지원합니다.");
+        }
+        byte[] bytes = file.getBytes();
+        boolean isPdf = bytes.length >= 5
+                && new String(bytes, 0, 5, StandardCharsets.US_ASCII).startsWith("%PDF-");
+        MediaType imageType = isPdf ? null : sniffImageType(bytes);
+        if (!isPdf && imageType == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNSUPPORTED_MEDIA_TYPE, "PDF 또는 jpg/png/webp 파일만 지원합니다.");
+        }
+        if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
+        }
+        MediaType contentType = isPdf ? MediaType.APPLICATION_PDF : imageType;
+        String filename = file.getOriginalFilename();
+        StreamingResponseBody body = out -> agentClient.streamAnalyzeFile(
+                bytes, filename, contentType, persona, language, domain, out);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/x-ndjson"))
+                .body(body);
+    }
+
     /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */
     private static MediaType sniffImageType(byte[] b) {
         if (b.length >= 3 && (b[0] & 0xFF) == 0xFF && (b[1] & 0xFF) == 0xD8 && (b[2] & 0xFF) == 0xFF) {
