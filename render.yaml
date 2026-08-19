@@ -26,6 +26,7 @@ services:
     runtime: docker
     rootDir: backend
     plan: starter
+    healthCheckPath: /health
     envVars:
       - key: AGENT_BASE_URL
         value: https://halffifty-agent.onrender.com
