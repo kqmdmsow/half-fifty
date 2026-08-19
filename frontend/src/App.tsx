@@ -85,6 +85,18 @@ export default function App() {
     document.documentElement.style.fontSize = largeText ? '18px' : '16px'
   }, [largeText])
 
+  // 접근성(#82): 화면 전환 시 스크린리더 포커스를 새 화면 제목으로 이동 —
+  // SPA는 페이지 로드가 없어 전환을 알리지 않으면 리더가 침묵한다
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const heading = document.querySelector<HTMLElement>('main h1')
+      if (heading) {
+        heading.setAttribute('tabindex', '-1')
+        heading.focus({ preventScroll: true })
+      }
+    })
+  }, [screen])
+
   // 화면 전환을 브라우저 히스토리에 쌓는다 — 뒤로가기가 홈으로 튕기며 분석
   // 결과까지 날리던 문제의 수정. popstate로 앱 내 화면 이동으로 처리한다.
   const go = (next: Screen) => {
@@ -233,6 +245,18 @@ export default function App() {
               }`}
             >
               {t(language, 'largeText')}
+            </button>
+            <button
+              type="button"
+              aria-pressed={highContrast}
+              onClick={() => setHighContrast((value) => !value)}
+              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+                highContrast
+                  ? 'bg-ink-900 text-white'
+                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              {t(language, 'hcToggle')}
             </button>
           </div>
         </div>

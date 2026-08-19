@@ -63,6 +63,7 @@ export function DetailScreen({
                   key={result.clause_id}
                   type="button"
                   onClick={() => onSelectClause(result.clause_id)}
+                  aria-label={`${clauseHeading(result.original_text, language, result.original_text_translated) ?? result.clause_id}, ${riskLevelLabel(language, result.risk_level)}`}
                   className={`flex shrink-0 items-center gap-2.5 rounded-2xl px-4 py-3 text-left text-[14px] font-semibold transition-colors ${
                     active
                       ? 'bg-ink-900 text-white'
