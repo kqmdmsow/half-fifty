@@ -1,6 +1,6 @@
 """위험 유형별 실제 분쟁 사례 각주 조회 (#91 시그니처 기능 ① 실제 사건 각주).
 
-data/case_footnotes.json은 골든셋(data/real_clause_labels*.csv)의 A등급
+case_footnotes.json(이 모듈 옆)은 골든셋(data/real_clause_labels*.csv)의 A등급
 (정부·법원 판정) 행 중 사건번호가 검증 가능한 출처만 사람이 직접 검수해
 risk_type별로 큐레이션한 정적 테이블이다. LLM 호출도 임베딩 검색도 없는
 순수 dict 조회라 신규 환각·오인용 경로가 없다 — 자문의견서가 권고한
@@ -18,7 +18,11 @@ import json
 from pathlib import Path
 from typing import List, TypedDict
 
-_PATH = Path(__file__).parent.parent.parent / "data" / "case_footnotes.json"
+# 주의: 레포 루트 data/가 아니라 agent/src/ 안에 둔다 — 에이전트 컨테이너는
+# rootDir=agent(COPY . .)라 루트 data/가 존재하지 않아, 루트 참조 시 import
+# 단계에서 FileNotFoundError로 부팅이 죽는다 (PR #125 리뷰 재현). 골든셋
+# 원천(real_clause_labels*.csv)은 data/에 그대로 두고 큐레이션 산출물만 여기.
+_PATH = Path(__file__).parent / "case_footnotes.json"
 _TABLE: dict = json.loads(_PATH.read_text(encoding="utf-8"))
 _TABLE.pop("_readme", None)
 

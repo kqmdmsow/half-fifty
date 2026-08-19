@@ -31,7 +31,7 @@ def test_모든_risk_type이_스키마와_어긋나지_않음():
     from pathlib import Path
 
     table = json.loads(
-        (Path(__file__).parent.parent.parent / "data" / "case_footnotes.json")
+        (Path(__file__).parent.parent / "src" / "case_footnotes.json")
         .read_text(encoding="utf-8")
     )
     for key in table:
