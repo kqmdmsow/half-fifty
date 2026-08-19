@@ -60,6 +60,9 @@ export default function App() {
   // 결과가 생성된 언어 — 결과를 보다가 언어를 바꾸면 UI 라벨만 바뀌고 설명은
   // 분석 시점 언어로 남는다. 불일치를 감지해 재분석 안내 배너를 띄운다.
   const [analyzedLanguage, setAnalyzedLanguage] = useState<Language>('ko')
+  // judge 재시도로 조항이 다시 생성되는 중 — 카드가 소리 없이 교체되는 대신
+  // 배너로 알린다 (#101 '새로고침 느낌' 피드백)
+  const [retrying, setRetrying] = useState(false)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
@@ -111,6 +114,7 @@ export default function App() {
     // data?.results를 우선해 스트리밍 중에도 옛 결과가 계속 표시된다
     setData(null)
     setAnalyzedLanguage(language)
+    setRetrying(false)
     go('progress')
 
     try {
@@ -122,13 +126,14 @@ export default function App() {
         setData(
           await analyzeContractStream(text, persona, language, {
             onMeta: (meta) => setStreamProgress({ done: 0, total: meta.clause_count }),
-            onClause: ({ done, total, result }) => {
+            onClause: ({ done, total, revision, result }) => {
               setStreamProgress({ done, total })
               setStreamedClauses((prev) => [
                 ...prev.filter((c) => c.clause_id !== result.clause_id),
-                result,
+                { ...result, revision },
               ])
             },
+            onRetry: () => setRetrying(true),
           }, domain),
         )
       } else if (mode === 'pdf' && file) {
@@ -144,6 +149,7 @@ export default function App() {
       go('progress') // 오류 안내와 재시도 버튼은 Progress 화면이 담당
     } finally {
       setLoading(false)
+      setRetrying(false)
     }
   }
 
@@ -278,6 +284,7 @@ export default function App() {
             results={results}
             language={language}
             liveProgress={streamingLive ? streamProgress : null}
+            retrying={retrying}
             warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}

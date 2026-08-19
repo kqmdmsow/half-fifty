@@ -111,7 +111,11 @@ export function DetailScreen({
 
           {clause.risk_level !== '안전' && (
             <Section title={t(language, 'whyCheck')}>
-              <FormattedText text={clause.risk_evidence} />
+              {clause.analysis_failed ? (
+                <p>{t(language, 'analysisFailedNote')}</p>
+              ) : (
+                <FormattedText text={clause.risk_evidence} />
+              )}
             </Section>
           )}
 

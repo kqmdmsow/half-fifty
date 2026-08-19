@@ -4,7 +4,7 @@
 LangGraph의 모든 노드는 이 PipelineState를 입력받고 일부 필드를 갱신해 반환한다.
 """
 
-from typing import Dict, List, Literal, TypedDict
+from typing import NotRequired, Dict, List, Literal, TypedDict
 
 
 class Clause(TypedDict):
@@ -23,6 +23,9 @@ class AnalysisResult(TypedDict):
     risk_type: str          # ② 위험 유형 (없으면 "해당 없음")
     risk_evidence: str      # ③ 위험 근거
     check_questions: List[str]  # ④ 사용자가 확인해야 할 질문
+    # 재시도 소진 폴백 여부 — 프론트가 이 코드로 안내 문구를 현지화한다 (#100).
+    # persona._adapt의 dict(result) 복사로 이벤트 payload까지 살아서 전달된다.
+    analysis_failed: NotRequired[bool]
 
 
 class JudgeScores(TypedDict):
