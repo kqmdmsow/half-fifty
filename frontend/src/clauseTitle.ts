@@ -54,7 +54,9 @@ export function clauseHeading(
     let title = (m[2] ?? m[3] ?? m[4])?.trim()
     if (language !== 'ko' && translatedText) {
       const tm = TRANS_TITLE.exec(translatedText)
-      if (tm) title = tm[1].trim()
+      // 번역 제목 안의 중첩 괄호(한국어 병기·후리가나 등)는 첫 여는 괄호에서 자른다
+      // — "期限の利益喪失（기한의 이익 상실…" → "期限の利益喪失"
+      if (tm) title = tm[1].split(/[（(【\[]/)[0].trim() || title
     }
     // CJK는 붙여 쓰고(제4조(특약)), 그 외 문자권은 괄호 앞을 띄운다 (Article 4 (…))
     const sep = language === 'ko' || language === 'ja' || language === 'zh' ? '' : ' '
