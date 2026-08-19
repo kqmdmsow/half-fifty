@@ -10,7 +10,7 @@
 | §1 이질 문서(광고·가맹)를 하나의 평균으로 비교 | 골든셋을 조항 단위로 통일, finance(금융 핵심)/ext(임대차 일반화)/AI Hub(커버리지)로 **분리 집계** — 광고·가맹은 확장 실험으로 격리 | docs/eval_ext_sets_transfer.md, eval_real_labels의 A등급 분리 |
 | §1 위험=단일 조항 vs 정상=완전 문서(길이 교란) | 조항 단위 골든셋 107행으로 양쪽 형식 통일 | data/real_clause_labels*.csv |
 | §4 프롬프트 비공개·재현 불가 | 프롬프트 전문 저장소 버전 관리, 변경 전후 성능·사유 기록(v1→v2→v2.1), 개발/평가 데이터 분리(train/val/test 1회 원칙) | agent/src/prompts/, docs/risk_taxonomy_v2.md, docs/eval_fp_tuning_round1.md |
-| §5 위험 탐지를 LLM 점수가 아닌 골드 라벨 P/R/F1로 | 이미 그렇게 측정(Test 40 P/R/F1, A등급 별도) — LLM judge는 정성 항목(설명 품질) 전용 | docs/eval_real_labels_claude_pr18.md |
+| §5 위험 탐지를 LLM 점수가 아닌 골드 라벨 P/R/F1로 | 이미 그렇게 측정 — 단, F1은 별도 계산하지 않고 Precision/Recall/Accuracy 3종으로 집계(Test 40, A등급 별도) — LLM judge는 정성 항목(설명 품질) 전용 | docs/eval_real_labels_claude_final.md |
 | §1 유형별 판단 근거 상이 | 문서 유형 감지 라우팅 도입(주택/상가 등 13종 판별 후 주입) | PR #24, docs/design_rationale.md §2 |
 
 ## B. 신규 작업 (우선순위순)
