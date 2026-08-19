@@ -2,10 +2,13 @@ package com.halffifty.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.halffifty.api.dto.AnalyzeRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -104,11 +107,52 @@ public class AgentClient {
      * 지원하지 않아 JDK HttpClient를 사용한다.
      */
     public void streamAnalyze(AnalyzeRequest request, OutputStream out) throws IOException {
+        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(request)))
+                .build();
+        pipeStream(httpRequest, out);
+    }
+
+    /**
+     * 파일(PDF·사진) 스트리밍 프록시 — 에이전트 /analyze-file-stream으로 multipart
+     * 전송 후 NDJSON을 그대로 중계한다. JDK HttpClient는 multipart를 지원하지
+     * 않으므로 바디를 직접 조립한다 (파일은 메모리에서만 전달, 저장하지 않음).
+     */
+    public void streamAnalyzeFile(byte[] bytes, String filename, MediaType contentType,
+            String persona, String language, String domain, OutputStream out) throws IOException {
+        String boundary = "----jomokjomok" + UUID.randomUUID();
+        // 파일명은 multipart 헤더 문법을 깨는 문자(따옴표·개행)만 치환해 전달
+        String safeName = (filename == null || filename.isBlank() ? "upload" : filename)
+                .replaceAll("[\"\\r\\n]", "_");
+
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        writeFormField(body, boundary, "persona", persona);
+        writeFormField(body, boundary, "language", language == null ? "ko" : language);
+        writeFormField(body, boundary, "domain", domain == null ? "" : domain);
+        body.write(("--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"file\"; filename=\"" + safeName + "\"\r\n"
+                + "Content-Type: " + contentType + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+        body.write(bytes);
+        body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+
+        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-file-stream"))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+                .build();
+        pipeStream(httpRequest, out);
+    }
+
+    private static void writeFormField(ByteArrayOutputStream body, String boundary,
+            String name, String value) throws IOException {
+        body.write(("--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n"
+                + value + "\r\n").getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다. */
+    private void pipeStream(HttpRequest httpRequest, OutputStream out) throws IOException {
         try {
-            HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(request)))
-                    .build();
             HttpResponse<InputStream> response =
                     httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
             try (InputStream in = response.body()) {

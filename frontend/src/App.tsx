@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   analyzeContractStream,
-  analyzeImage,
-  analyzePdf,
+  analyzeFileStream,
   type AnalyzeResponse,
   type ClauseResult,
   type Language,
@@ -125,10 +124,22 @@ export default function App() {
           }, domain),
         )
       } else if (mode === 'pdf' && file) {
+        // 파일 경로도 동일한 스트리밍 UX — 텍스트 추출(OCR)까지는 진행 화면을
+        // 유지하고, 조항 목록이 확정되는 meta부터 결과 화면에서 카드가 쌓인다
         setData(
-          file.type.startsWith('image/')
-            ? await analyzeImage(file, persona, language, domain)
-            : await analyzePdf(file, persona, language, domain),
+          await analyzeFileStream(file, persona, language, {
+            onMeta: (meta) => {
+              setStreamProgress({ done: 0, total: meta.clause_count })
+              go('summary')
+            },
+            onClause: ({ done, total, result }) => {
+              setStreamProgress({ done, total })
+              setStreamedClauses((prev) => [
+                ...prev.filter((c) => c.clause_id !== result.clause_id),
+                result,
+              ])
+            },
+          }, domain),
         )
       }
     } catch (err) {
