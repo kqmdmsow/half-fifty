@@ -13,22 +13,65 @@ risk_evidence가 따옴표로 원문을 인용할 때, 그 인용이 조항 원�
 import re
 from typing import List
 
+from src.schemas import RISK_TYPES
+
 # 여닫는 따옴표 쌍: 「」 『』 “” ‘’ "" ''
 _QUOTE_PATTERN = re.compile(r"[「『“‘\"']([^「『“‘\"'」』”’]{5,}?)[」』”’\"']")
 
 # 인용 내부의 중략 표기 — 분할해서 각 조각을 따로 검사한다
 _ELLIPSIS_SPLIT = re.compile(r"(?:…|⋯|\.{3}|중략)")
 
+# 조사(단어 끝에 붙는 것만 제거 — 단어 중간·시작의 동일 글자는 안 건드림).
+# 긴 조사부터 매칭해야 짧은 조사가 먼저 걸려 앞부분이 남는 사고를 막는다
+# (예: "으로서"를 "로"보다 먼저 검사).
+_JOSA_SUFFIXES = (
+    "으로서", "으로써", "이라는", "라는", "에서는", "에게는",
+    "으로는", "로는", "에는", "에서", "에게", "께서", "이나", "부터", "까지",
+    "보다", "처럼", "같이", "만큼", "마저", "조차",
+    "으로", "로", "은", "는", "이", "가", "을", "를", "의", "에", "도", "만", "나",
+)
+# 독립 토큰으로만 등장할 때 통째로 제거하는 연결어(의존명사+조사 결합형).
+# "~에 대한/관한/의한/따른" 류 — 조사 대체 표현으로 흔히 쓰이지만 접미사가
+# 아니라 별도 토큰이라 위 리스트로는 못 잡는다.
+_FILLER_TOKENS = frozenset({
+    "대한", "대하여", "관한", "관하여", "의한", "의하여", "따른", "따라",
+    "위한", "위하여", "인한", "인하여",
+})
+
+
+def _strip_josa(token: str) -> str:
+    for suf in _JOSA_SUFFIXES:
+        if token.endswith(suf) and len(token) > len(suf):
+            return token[: -len(suf)]
+    return token
+
 
 def _normalize(s: str) -> str:
-    """공백 제거 + 따옴표·괄호류 통일 — 표기 차이로 인한 오탐 방지.
+    """공백 제거 + 조사·연결어·따옴표류 통일 — 표기·사소한 어미 차이로 인한 오탐 방지.
 
-    가운뎃점은 모델이 ·(U+00B7) 대신 ・(U+30FB)·․(U+FF65)로 바꿔 쓰는 사례가
-    실측됨(val clause_020 폴백 원인) — 유니코드 변형까지 제거한다. 같은 이유로
-    CJK 구두점(、。)과 대시류(‐–—)도 비교에서 무시한다.
+    가운뎃점은 모델이 ·(U+00B7) 대신 ・(U+30FB)·･(U+FF65)·․(U+2024)로 바꿔
+    쓰거나 원문 자체가 그렇게 조판된 사례가 실측됨(val clause_020, contract_05
+    clause_004) — 유니코드 변형까지 제거한다. 같은 이유로 CJK 구두점(、。)과
+    대시류(‐–—)도 비교에서 무시한다.
+
+    조사(은/는/이/가/을/를/의/에/으로 등)와 "~에 대한/관한/따른" 류 연결어는
+    공백 기준 토큰 단위로만 제거한다(단어 중간 글자는 안 건드려 "정의"→"정"
+    같은 오삭제를 피한다) — val 실측(contract_03 clause_006: "설비에 대한
+    노후"를 모델이 "설비의 노후"로 바꿔 쓴 사례)이 근거.
     """
-    s = re.sub(r"\s+", "", s)
-    s = re.sub(r"[「」『』“”‘’\"'()\[\]·・･•,\.、。‐–—-]", "", s)
+    tokens = s.split()
+    kept = []
+    for tok in tokens:
+        trailing = ""
+        core = tok
+        while core and not core[-1].isalnum():  # Hangul 음절도 isalnum()=True
+            trailing = core[-1] + trailing
+            core = core[:-1]
+        if core in _FILLER_TOKENS:
+            continue
+        kept.append(_strip_josa(core) + trailing)
+    s = "".join(kept)
+    s = re.sub(r"[「」『』“”‘’\"'()\[\]·・･•․,\.、。‐–—-]", "", s)
     return s
 
 
@@ -53,11 +96,18 @@ _LEGAL_SOURCE_MARKER = re.compile(
     r"|제\s?\d+\s?조(의\s?\d+)?).{0,40}$"
 )
 
+# risk_type 카테고리 이름 자체를 설명문에서 따옴표로 인용하는 경우(예: "이 조항은
+# '불명확한 수수료·이자 조건'에 해당하지 않습니다") — 조항 원문 주장이 아니라
+# 분류 체계 용어 언급이라 창작 인용이 아니다. val 실측(contract_05 clause_012)에서
+# 이걸 못 걸러 안전한 조항이 폴백된 사례 확인. 정확히 일치할 때만 면제한다(#59).
+_RISK_TYPE_NAMES_NORMALIZED = frozenset(_normalize(name) for name in RISK_TYPES)
+
 
 def find_fabricated_quotes(evidence: str, clause_text: str) -> List[str]:
     """조항 원문에 존재하지 않는 '원문 주장' 인용 목록을 반환한다 (빈 목록 = 통과).
 
-    법령 출처가 명시된 인용은 검사 대상이 아니다 — 위 _LEGAL_SOURCE_MARKER 참조.
+    법령 출처가 명시된 인용, risk_type 카테고리 이름 자체의 인용은 검사 대상이
+    아니다 — 위 _LEGAL_SOURCE_MARKER·_RISK_TYPE_NAMES_NORMALIZED 참조.
     """
     norm_clause = _normalize(clause_text)
     fabricated: List[str] = []
@@ -67,6 +117,11 @@ def find_fabricated_quotes(evidence: str, clause_text: str) -> List[str]:
             continue
         for part in _ELLIPSIS_SPLIT.split(m.group(1)):
             part = part.strip()
-            if len(_normalize(part)) >= 5 and _normalize(part) not in norm_clause:
+            norm_part = _normalize(part)
+            if len(norm_part) < 5:
+                continue
+            if norm_part in _RISK_TYPE_NAMES_NORMALIZED:
+                continue
+            if norm_part not in norm_clause:
                 fabricated.append(part)
     return fabricated
