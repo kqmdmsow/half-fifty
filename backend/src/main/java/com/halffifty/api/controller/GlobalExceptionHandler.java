@@ -1,5 +1,7 @@
 package com.halffifty.api.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,6 +19,8 @@ import org.springframework.web.client.RestClientResponseException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     public record ErrorResponse(String message) {
     }
 
@@ -24,6 +28,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceAccessException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ErrorResponse agentUnreachable(ResourceAccessException e) {
+        // 사용자 응답은 일반 문구, 원인은 서버 로그로 — 심사 기간 장애 추적용 (#80)
+        log.error("에이전트 연결 실패", e);
         return new ErrorResponse("분석 서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요.");
     }
 
@@ -31,6 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RestClientResponseException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ErrorResponse agentError(RestClientResponseException e) {
+        log.error("에이전트 오류 응답: HTTP {}", e.getStatusCode().value(), e);
         return new ErrorResponse("분석 처리 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.");
     }
 }
