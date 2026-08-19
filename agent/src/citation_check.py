@@ -102,12 +102,33 @@ _LEGAL_SOURCE_MARKER = re.compile(
 # 이걸 못 걸러 안전한 조항이 폴백된 사례 확인. 정확히 일치할 때만 면제한다(#59).
 _RISK_TYPE_NAMES_NORMALIZED = frozenset(_normalize(name) for name in RISK_TYPES)
 
+# analysis.txt [표준 조항 예외](62~68행)가 따옴표로 감싸 제시하는 차임 연체
+# 판정 기준 문구 자체 — risk_type 이름과 동일한 성격(조항 원문 주장이 아니라
+# 프롬프트가 정의한 분류 기준 용어 인용)이라 같은 방식으로 면제한다(#73).
+# #70(도메인 컨텍스트, _DOMAIN_CONTEXT_KNOWN)과 달리 이 문구는 도메인 미주입
+# 경로를 포함한 analysis.txt 본문에 항상 존재해, 프롬프트 쪽 "따옴표 없이
+# 서술" 지시로는 무도메인 프롬프트 바이트 단위 보존 원칙(#69)을 지킬 수
+# 없다 — citation_check 쪽에서 정확히 일치할 때만 면제하는 쪽이 프롬프트를
+# 건드리지 않고 문제를 근본적으로 막는다. 문구가 바뀌면 이 목록도 같이
+# 갱신해야 하며, test_citation_check.py가 analysis.txt 본문에 이 문구들이
+# 실제로 존재하는지 확인해 드리프트를 잡는다.
+_STANDARD_CLAUSE_EXCEPTION_PHRASES = (
+    "2기(2개월) 이상 연체 시 해지",
+    "3기 연체",
+    "2기 연체 해지",
+    "3기 연체 해지",
+)
+_STANDARD_CLAUSE_EXCEPTION_NORMALIZED = frozenset(
+    _normalize(p) for p in _STANDARD_CLAUSE_EXCEPTION_PHRASES
+)
+
 
 def find_fabricated_quotes(evidence: str, clause_text: str) -> List[str]:
     """조항 원문에 존재하지 않는 '원문 주장' 인용 목록을 반환한다 (빈 목록 = 통과).
 
-    법령 출처가 명시된 인용, risk_type 카테고리 이름 자체의 인용은 검사 대상이
-    아니다 — 위 _LEGAL_SOURCE_MARKER·_RISK_TYPE_NAMES_NORMALIZED 참조.
+    법령 출처가 명시된 인용, risk_type 카테고리 이름·[표준 조항 예외] 판정
+    기준 문구 자체의 인용은 검사 대상이 아니다 — 위 _LEGAL_SOURCE_MARKER·
+    _RISK_TYPE_NAMES_NORMALIZED·_STANDARD_CLAUSE_EXCEPTION_NORMALIZED 참조.
     """
     norm_clause = _normalize(clause_text)
     fabricated: List[str] = []
@@ -121,6 +142,8 @@ def find_fabricated_quotes(evidence: str, clause_text: str) -> List[str]:
             if len(norm_part) < 5:
                 continue
             if norm_part in _RISK_TYPE_NAMES_NORMALIZED:
+                continue
+            if norm_part in _STANDARD_CLAUSE_EXCEPTION_NORMALIZED:
                 continue
             if norm_part not in norm_clause:
                 fabricated.append(part)
