@@ -43,6 +43,7 @@ type UIKey =
   | 'originalText' | 'askOther' | 'askKoreanHint' | 'otherClauses' | 'finishDetail'
   | 'progressTitle' | 'cancel' | 'langMismatch' | 'reanalyze'
   | 'analysisFailedNote' | 'retryNote'
+  | 'relatedCases' | 'relatedCasesDisclaimer'
 
 const UI: Record<LangCode, Record<UIKey, string>> = {
   ko: {
@@ -58,6 +59,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: '계약서를 꼼꼼히 살펴보고 있어요', cancel: '분석 취소',
     langMismatch: '설명이 지금 선택한 언어와 달라요 — 다시 분석하면 이 언어로 받아볼 수 있어요', reanalyze: '이 언어로 다시 분석',
     analysisFailedNote: '이 조항은 자동 분석에 실패했어요. 원문을 직접 확인해 주세요.', retryNote: 'AI 검증에서 보완할 점을 찾았어요 — 해당 조항을 다시 생성하고 있어요',
+    relatedCases: '비슷한 조항으로 실제 분쟁이 있었어요', relatedCasesDisclaimer: '동일한 사건은 아니며, 개별 사안에 따라 판단이 다를 수 있어요',
   },
   en: {
     analysisDone: 'Analysis complete', analyzingLive: 'Analyzing clause {done}/{total}', liveHint: 'Finished clauses appear first',
@@ -72,6 +74,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Reviewing your contract carefully', cancel: 'Cancel analysis',
     langMismatch: 'These results were written in a different language — re-analyze to get them in this language', reanalyze: 'Re-analyze in this language',
     analysisFailedNote: 'Automatic analysis failed for this clause. Please review the original text yourself.', retryNote: 'AI verification found issues — regenerating the affected clauses',
+    relatedCases: 'Similar clauses led to real disputes', relatedCasesDisclaimer: 'Not the same case — outcomes can differ case by case',
   },
   zh: {
     analysisDone: '分析完成', analyzingLive: '正在分析条款 {done}/{total}', liveHint: '已完成的条款会先显示',
@@ -86,6 +89,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: '正在仔细审查您的合同', cancel: '取消分析',
     langMismatch: '当前结果的语言与所选语言不同 — 重新分析即可用该语言查看', reanalyze: '用此语言重新分析',
     analysisFailedNote: '该条款自动分析失败，请直接核对原文。', retryNote: 'AI 验证发现待改进之处 — 正在重新生成相关条款',
+    relatedCases: '类似条款曾引发实际纠纷', relatedCasesDisclaimer: '并非同一案件，具体判断可能因个案而异',
   },
   vi: {
     analysisDone: 'Phân tích hoàn tất', analyzingLive: 'Đang phân tích điều khoản {done}/{total}', liveHint: 'Điều khoản xong sẽ hiển thị trước',
@@ -100,6 +104,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Đang xem kỹ hợp đồng của bạn', cancel: 'Hủy phân tích',
     langMismatch: 'Kết quả đang ở ngôn ngữ khác — phân tích lại để nhận kết quả bằng ngôn ngữ này', reanalyze: 'Phân tích lại bằng ngôn ngữ này',
     analysisFailedNote: 'Phân tích tự động điều khoản này không thành công. Vui lòng tự kiểm tra nguyên văn.', retryNote: 'Kiểm chứng AI phát hiện điểm cần bổ sung — đang tạo lại các điều khoản liên quan',
+    relatedCases: 'Điều khoản tương tự từng gây tranh chấp thực tế', relatedCasesDisclaimer: 'Không phải cùng vụ việc — kết quả có thể khác nhau tùy trường hợp',
   },
   th: {
     analysisDone: 'วิเคราะห์เสร็จสิ้น', analyzingLive: 'กำลังวิเคราะห์ข้อ {done}/{total}', liveHint: 'ข้อที่เสร็จแล้วจะแสดงก่อน',
@@ -114,6 +119,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'กำลังตรวจสัญญาของคุณอย่างละเอียด', cancel: 'ยกเลิกการวิเคราะห์',
     langMismatch: 'ผลลัพธ์เป็นภาษาอื่น — วิเคราะห์ใหม่เพื่อรับผลเป็นภาษานี้', reanalyze: 'วิเคราะห์ใหม่เป็นภาษานี้',
     analysisFailedNote: 'วิเคราะห์ข้อนี้อัตโนมัติไม่สำเร็จ กรุณาตรวจสอบต้นฉบับด้วยตนเอง', retryNote: 'การตรวจสอบ AI พบจุดที่ต้องปรับ — กำลังสร้างข้อที่เกี่ยวข้องใหม่',
+    relatedCases: 'ข้อสัญญาคล้ายกันเคยเกิดข้อพิพาทจริง', relatedCasesDisclaimer: 'ไม่ใช่กรณีเดียวกัน ผลอาจต่างกันไปในแต่ละกรณี',
   },
   id: {
     analysisDone: 'Analisis selesai', analyzingLive: 'Menganalisis pasal {done}/{total}', liveHint: 'Pasal yang selesai tampil lebih dulu',
@@ -128,6 +134,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Memeriksa kontrak Anda dengan teliti', cancel: 'Batalkan analisis',
     langMismatch: 'Hasil ini dalam bahasa lain — analisis ulang untuk mendapatkannya dalam bahasa ini', reanalyze: 'Analisis ulang dalam bahasa ini',
     analysisFailedNote: 'Analisis otomatis untuk pasal ini gagal. Silakan periksa teks aslinya langsung.', retryNote: 'Verifikasi AI menemukan kekurangan — membuat ulang pasal terkait',
+    relatedCases: 'Pasal serupa pernah memicu sengketa nyata', relatedCasesDisclaimer: 'Bukan kasus yang sama — hasil bisa berbeda tiap kasus',
   },
   tl: {
     analysisDone: 'Tapos na ang pagsusuri', analyzingLive: 'Sinusuri ang sugnay {done}/{total}', liveHint: 'Unang lalabas ang mga natapos na sugnay',
@@ -142,6 +149,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Maingat na sinusuri ang iyong kontrata', cancel: 'Kanselahin',
     langMismatch: 'Nasa ibang wika ang resulta — i-analyze muli para makuha ito sa wikang ito', reanalyze: 'I-analyze muli sa wikang ito',
     analysisFailedNote: 'Nabigo ang awtomatikong pagsusuri sa probisyong ito. Pakisuri mismo ang orihinal na teksto.', retryNote: 'May nakitang dapat ayusin ang AI verification — muling binubuo ang mga probisyon',
+    relatedCases: 'May aktwal na hidwaan sa katulad na sugnay', relatedCasesDisclaimer: 'Hindi parehong kaso — maaaring magkaiba ang resulta sa bawat kaso',
   },
   ne: {
     analysisDone: 'विश्लेषण पूरा भयो', analyzingLive: 'धारा {done}/{total} विश्लेषण गर्दै', liveHint: 'सकिएका धाराहरू पहिले देखिन्छन्',
@@ -156,6 +164,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'तपाईंको सम्झौता ध्यानपूर्वक जाँच्दै', cancel: 'रद्द गर्नुहोस्',
     langMismatch: 'नतिजा अर्कै भाषामा छ — यो भाषामा हेर्न फेरि विश्लेषण गर्नुहोस्', reanalyze: 'यो भाषामा फेरि विश्लेषण',
     analysisFailedNote: 'यो दफाको स्वचालित विश्लेषण असफल भयो। कृपया मूल पाठ आफैँ जाँच्नुहोस्।', retryNote: 'एआई प्रमाणीकरणले सुधार्नुपर्ने कुरा भेट्टायो — सम्बन्धित दफा पुनः बनाइँदै छ',
+    relatedCases: 'यस्तै धाराका कारण वास्तविक विवाद भएको थियो', relatedCasesDisclaimer: 'उस्तै घटना होइन — फैसला केसअनुसार फरक हुन सक्छ',
   },
   km: {
     analysisDone: 'ការវិភាគបានបញ្ចប់', analyzingLive: 'កំពុងវិភាគប្រការ {done}/{total}', liveHint: 'ប្រការដែលរួចរាល់នឹងបង្ហាញមុន',
@@ -170,6 +179,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'កំពុងពិនិត្យកិច្ចសន្យារបស់អ្នកយ៉ាងម៉ត់ចត់', cancel: 'បោះបង់',
     langMismatch: 'លទ្ធផលជាភាសាផ្សេង — វិភាគម្ដងទៀតដើម្បីទទួលជាភាសានេះ', reanalyze: 'វិភាគម្ដងទៀតជាភាសានេះ',
     analysisFailedNote: 'ការវិភាគស្វ័យប្រវត្តិសម្រាប់មាត្រានេះបរាជ័យ។ សូមពិនិត្យអត្ថបទដើមដោយផ្ទាល់។', retryNote: 'ការផ្ទៀងផ្ទាត់ AI រកឃើញចំណុចត្រូវកែ — កំពុងបង្កើតមាត្រាពាក់ព័ន្ធឡើងវិញ',
+    relatedCases: 'ប្រការស្រដៀងគ្នាធ្លាប់មានវិវាទជាក់ស្តែង', relatedCasesDisclaimer: 'មិនមែនករណីដូចគ្នាទេ — លទ្ធផលអាចខុសគ្នាតាមករណីនីមួយៗ',
   },
   my: {
     analysisDone: 'စိစစ်မှု ပြီးပါပြီ', analyzingLive: 'အပိုဒ် {done}/{total} စိစစ်နေသည်', liveHint: 'ပြီးသောအပိုဒ်များ အရင်ပြသမည်',
@@ -184,6 +194,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'သင့်စာချုပ်ကို သေချာစွာ စစ်ဆေးနေသည်', cancel: 'ပယ်ဖျက်ရန်',
     langMismatch: 'ရလဒ်သည် အခြားဘာသာစကားဖြင့် ဖြစ်နေသည် — ဤဘာသာစကားဖြင့် ရရန် ပြန်လည်စိစစ်ပါ', reanalyze: 'ဤဘာသာစကားဖြင့် ပြန်စိစစ်မည်',
     analysisFailedNote: 'ဤအပိုဒ်ကို အလိုအလျောက်စိစစ်မှု မအောင်မြင်ပါ။ မူရင်းစာသားကို ကိုယ်တိုင်စစ်ဆေးပါ။', retryNote: 'AI စိစစ်မှုတွင် ပြင်ဆင်ရန်တွေ့ရှိ — သက်ဆိုင်ရာအပိုဒ်များကို ပြန်လည်ဖန်တီးနေသည်',
+    relatedCases: 'ဆင်တူအပိုဒ်များကြောင့် အမှန်တကယ် အငြင်းပွားမှုများရှိခဲ့', relatedCasesDisclaimer: 'တူညီသောအမှုမဟုတ်ပါ — ရလဒ်သည် အမှုအလိုက် ကွာခြားနိုင်သည်',
   },
   mn: {
     analysisDone: 'Шинжилгээ дууслаа', analyzingLive: 'Заалт {done}/{total}-г шинжилж байна', liveHint: 'Дууссан заалтууд эхэлж харагдана',
@@ -198,6 +209,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Таны гэрээг нягт нямбай шалгаж байна', cancel: 'Цуцлах',
     langMismatch: 'Үр дүн өөр хэл дээр байна — энэ хэлээр авахын тулд дахин шинжилнэ үү', reanalyze: 'Энэ хэлээр дахин шинжлэх',
     analysisFailedNote: 'Энэ заалтын автомат шинжилгээ амжилтгүй боллоо. Эх бичвэрийг өөрөө шалгана уу.', retryNote: 'AI баталгаажуулалт сайжруулах зүйл илрүүллээ — холбогдох заалтуудыг дахин үүсгэж байна',
+    relatedCases: 'Төстэй заалтаас болж бодит маргаан гарч байсан', relatedCasesDisclaimer: 'Яг ижил хэрэг биш — үр дүн хэрэг тус бүрээр ялгаатай байж болно',
   },
   uz: {
     analysisDone: 'Tahlil yakunlandi', analyzingLive: '{done}/{total}-band tahlil qilinmoqda', liveHint: 'Tugagan bandlar birinchi ko‘rinadi',
@@ -212,6 +224,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Shartnomangiz sinchiklab tekshirilmoqda', cancel: 'Bekor qilish',
     langMismatch: 'Natijalar boshqa tilda — bu tilda olish uchun qayta tahlil qiling', reanalyze: 'Bu tilda qayta tahlil qilish',
     analysisFailedNote: 'Ushbu band uchun avtomatik tahlil amalga oshmadi. Asl matnni o‘zingiz tekshiring.', retryNote: 'AI tekshiruvi kamchilik topdi — tegishli bandlar qayta yaratilmoqda',
+    relatedCases: 'Shunga oʻxshash bandlar haqiqiy nizolarga sabab boʻlgan', relatedCasesDisclaimer: 'Xuddi shu ish emas — natija har bir holatda farq qilishi mumkin',
   },
   si: {
     analysisDone: 'විශ්ලේෂණය අවසන්', analyzingLive: 'වගන්තිය {done}/{total} විශ්ලේෂණය වෙමින්', liveHint: 'අවසන් වූ වගන්ති මුලින් පෙන්වයි',
@@ -226,6 +239,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'ඔබේ ගිවිසුම හොඳින් පරීක්ෂා කරමින්', cancel: 'අවලංගු කරන්න',
     langMismatch: 'ප්‍රතිඵල වෙනත් භාෂාවකින් ඇත — මෙම භාෂාවෙන් ලබා ගැනීමට නැවත විශ්ලේෂණය කරන්න', reanalyze: 'මෙම භාෂාවෙන් නැවත විශ්ලේෂණය',
     analysisFailedNote: 'මෙම වගන්තියේ ස්වයංක්‍රීය විශ්ලේෂණය අසාර්ථක විය. කරුණාකර මුල් පිටපත ඔබම පරීක්ෂා කරන්න.', retryNote: 'AI සත්‍යාපනයේදී වැඩිදියුණු කළ යුතු දේ හමු විය — අදාළ වගන්ති නැවත සාදමින්',
+    relatedCases: 'සමාන වගන්ති නිසා සැබෑ ආරවුල් ඇති වී ඇත', relatedCasesDisclaimer: 'එකම නඩුව නොවේ — තීන්දුව අවස්ථාවෙන් අවස්ථාවට වෙනස් විය හැක',
   },
   bn: {
     analysisDone: 'বিশ্লেষণ সম্পন্ন', analyzingLive: 'ধারা {done}/{total} বিশ্লেষণ চলছে', liveHint: 'সম্পন্ন ধারাগুলো আগে দেখাবে',
@@ -240,6 +254,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'আপনার চুক্তি মনোযোগ দিয়ে দেখা হচ্ছে', cancel: 'বাতিল করুন',
     langMismatch: 'ফলাফল অন্য ভাষায় আছে — এই ভাষায় পেতে আবার বিশ্লেষণ করুন', reanalyze: 'এই ভাষায় আবার বিশ্লেষণ',
     analysisFailedNote: 'এই ধারার স্বয়ংক্রিয় বিশ্লেষণ ব্যর্থ হয়েছে। অনুগ্রহ করে মূল লেখাটি নিজে যাচাই করুন।', retryNote: 'এআই যাচাইয়ে সংশোধনের বিষয় পাওয়া গেছে — সংশ্লিষ্ট ধারাগুলি আবার তৈরি হচ্ছে',
+    relatedCases: 'অনুরূপ ধারার কারণে প্রকৃত বিরোধ হয়েছিল', relatedCasesDisclaimer: 'একই ঘটনা নয় — সিদ্ধান্ত ক্ষেত্রবিশেষে ভিন্ন হতে পারে',
   },
   ru: {
     analysisDone: 'Анализ завершён', analyzingLive: 'Анализ пункта {done}/{total}', liveHint: 'Готовые пункты появляются первыми',
@@ -254,6 +269,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: 'Внимательно проверяем ваш договор', cancel: 'Отменить',
     langMismatch: 'Результаты на другом языке — повторите анализ, чтобы получить их на этом языке', reanalyze: 'Проанализировать на этом языке',
     analysisFailedNote: 'Автоматический анализ этого пункта не удался. Проверьте оригинальный текст самостоятельно.', retryNote: 'Проверка ИИ нашла недочёты — соответствующие пункты формируются заново',
+    relatedCases: 'Похожие пункты уже приводили к реальным спорам', relatedCasesDisclaimer: 'Это не тот же случай — решение может отличаться в зависимости от дела',
   },
   ja: {
     analysisDone: '分析完了', analyzingLive: '条項 {done}/{total} を分析中', liveHint: '完了した条項から先に表示されます',
@@ -268,6 +284,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     progressTitle: '契約書を丁寧に確認しています', cancel: '分析をキャンセル',
     langMismatch: '結果は別の言語で作成されています — この言語で見るには再分析してください', reanalyze: 'この言語で再分析',
     analysisFailedNote: 'この条項の自動分析に失敗しました。原文を直接ご確認ください。', retryNote: 'AI検証で改善点が見つかりました — 該当条項を再生成しています',
+    relatedCases: '似た条項で実際に紛争がありました', relatedCasesDisclaimer: '同一の事件ではなく、個別事案により判断が異なる場合があります',
   },
 }
 

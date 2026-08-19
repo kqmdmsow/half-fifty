@@ -6,6 +6,18 @@ import type { LangCode } from './i18n'
 export type Persona = 'adult' | 'senior' | 'foreigner'
 export type Language = LangCode
 
+// 실제 사건 각주 (#91 시그니처 기능 ①) — agent src/case_footnotes.py와 1:1 대응.
+// 골든셋 A등급(정부·법원 판정) 사례만 사람이 검수해 risk_type별로 큐레이션한
+// 정적 목록이라 값 자체가 오분류될 일은 없다(판정 로직과 무관, 표시 전용).
+export interface RelatedCase {
+  case_id: string
+  agency: string
+  citation: string
+  result: string
+  source: string
+  grade: string
+}
+
 export interface ClauseResult {
   clause_id: string
   original_text: string
@@ -22,6 +34,8 @@ export interface ClauseResult {
   analysis_failed?: boolean
   // 스트리밍 revision (judge 재시도 시 카드 교체 감지용, 프론트에서 주입)
   revision?: number
+  // 실제 사건 각주 (#91) — 매핑이 없는 risk_type이면 빈 배열 또는 undefined
+  related_cases?: RelatedCase[]
 }
 
 export interface AnalyzeResponse {

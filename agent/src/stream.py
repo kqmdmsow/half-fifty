@@ -25,6 +25,7 @@ failing_aspects/shortcut_eligible로 공유해 드리프트를 막는다. Judge 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Iterator, List
 
+from src.case_footnotes import get_related_cases
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import _MAX_CONCURRENCY, _analyze_clause
 from src.nodes.domain import domain_node
@@ -62,8 +63,9 @@ def _emit_clauses(
 ) -> Iterator[dict]:
     """전 조항을 병렬 분석+적응하고 완료 순서대로 clause 이벤트를 낸다.
 
-    번역(원문·질문)은 이벤트 payload에만 싣는다 — judge 입력(adapted 결과)에는
-    섞지 않는다 (persona._adapt docstring 참조).
+    번역(원문·질문)·related_cases(실제 사건 각주, #91)는 이벤트 payload에만
+    싣는다 — judge 입력(adapted 결과)에는 섞지 않는다 (persona._adapt
+    docstring, src/case_footnotes.py 격리 원칙 참조).
     """
     done = 0
     clause_text = {c["clause_id"]: c["text"] for c in clauses}
@@ -84,6 +86,7 @@ def _emit_clauses(
                     **result,
                     "original_text": clause_text[result["clause_id"]],
                     **(translation or {}),
+                    "related_cases": get_related_cases(result["risk_type"]),
                 },
             }
 
@@ -119,6 +122,7 @@ def _emit_persona_only(
                     **result,
                     "original_text": clause_text[result["clause_id"]],
                     **(translation or {}),
+                    "related_cases": get_related_cases(result["risk_type"]),
                 },
             }
 
@@ -152,7 +156,13 @@ def stream_analysis(
     persona_only = False  # clarity-only 단축 여부 (#75)
 
     while True:
-        _EVENT_ONLY_KEYS = {"original_text", "original_text_translated", "check_questions_translated", "risk_evidence_translated"}
+        # related_cases(#91)는 표시 전용 — 빠지면 judge_state["adapted_results"]로
+        # 새어 들어가 Judge가 채점 근거로 잘못 읽을 위험이 있다(격리 원칙).
+        _EVENT_ONLY_KEYS = {
+            "original_text", "original_text_translated",
+            "check_questions_translated", "risk_evidence_translated",
+            "related_cases",
+        }
         if persona_only:
             events = _emit_persona_only(clauses, persona, language, revision=retry,
                                         prior_results=results_by_id)
