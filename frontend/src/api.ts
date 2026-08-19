@@ -44,7 +44,9 @@ export async function analyzeContract(
     body: JSON.stringify({ text, persona, language, domain }),
   })
   if (!res.ok) {
-    throw new Error(`분석 요청 실패 (${res.status})`)
+    // 백엔드 표준 에러(JSON {message})가 있으면 그대로 사용자에게 (#52)
+    const message = await res.json().then((d) => d?.message).catch(() => null)
+    throw new Error(message ?? `분석 요청 실패 (${res.status})`)
   }
   return res.json()
 }
@@ -73,7 +75,8 @@ export async function analyzeContractStream(
     body: JSON.stringify({ text, persona, language, domain }),
   })
   if (!res.ok || !res.body) {
-    throw new Error(`분석 요청 실패 (${res.status})`)
+    const message = res.ok ? null : await res.json().then((d) => d?.message).catch(() => null)
+    throw new Error(message ?? `분석 요청 실패 (${res.status})`)
   }
 
   const reader = res.body.getReader()

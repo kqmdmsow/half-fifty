@@ -10,7 +10,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import com.halffifty.api.dto.AnalyzeResponse;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,13 +37,21 @@ public class AgentClient {
     private final RestClient restClient;
     private final String agentBaseUrl;
     private final ObjectMapper objectMapper;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build(); // 스트리밍은 읽기 타임아웃 없음 — async 600s(application.yml)가 상한
 
     public AgentClient(@Value("${agent.base-url}") String agentBaseUrl, ObjectMapper objectMapper) {
         this.agentBaseUrl = agentBaseUrl;
         this.objectMapper = objectMapper;
+        // 타임아웃 (#52): 미설정 시 에이전트가 죽으면 요청이 무한 대기했다.
+        // read 7분 = 최악 케이스(21조항 + judge 재시도 2회 ≈ 5분) + 여유.
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(10))
+                .withReadTimeout(Duration.ofMinutes(7));
         this.restClient = RestClient.builder()
                 .baseUrl(agentBaseUrl)
+                .requestFactory(ClientHttpRequestFactories.get(settings))
                 .build();
     }
 
