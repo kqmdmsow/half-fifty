@@ -73,7 +73,7 @@ export function DetailScreen({
                     className={`h-2 w-2 shrink-0 rounded-full ${RISK_META[result.risk_level].dot}`}
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
-                    {clauseHeading(result.original_text) ??
+                    {clauseHeading(result.original_text, language, result.original_text_translated) ??
                       (result.risk_type === '해당 없음'
                         ? t(language, 'standardClause')
                         : riskTypeLabel(language, result.risk_type))}
@@ -90,12 +90,12 @@ export function DetailScreen({
             <div>
               <RiskBadge level={clause.risk_level} label={riskLevelLabel(language, clause.risk_level)} />
               <h1 className="mt-3 text-[24px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[28px]">
-                {clauseHeading(clause.original_text) ??
+                {clauseHeading(clause.original_text, language, clause.original_text_translated) ??
                   (clause.risk_type === '해당 없음'
                     ? t(language, 'standardClauseLong')
                     : riskTypeLabel(language, clause.risk_type))}
               </h1>
-              {clauseHeading(clause.original_text) && (
+              {clauseHeading(clause.original_text, language, clause.original_text_translated) && (
                 <p className="mt-1.5 text-[14px] font-bold text-ink-400">
                   {clause.risk_type === '해당 없음'
                     ? t(language, 'standardClauseLong')

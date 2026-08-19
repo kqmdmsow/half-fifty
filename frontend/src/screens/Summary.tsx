@@ -105,7 +105,7 @@ export function SummaryScreen({
           <div>
             <p className="text-[13px] font-bold text-danger-600">{t(language, 'checkFirst')}</p>
             <p className="mt-1 text-[16px] font-bold text-ink-900">
-              {[clauseHeading(topRisk.original_text), riskTypeLabel(language, topRisk.risk_type)]
+              {[clauseHeading(topRisk.original_text, language, topRisk.original_text_translated), riskTypeLabel(language, topRisk.risk_type)]
                 .filter(Boolean)
                 .join(' — ')}
             </p>
@@ -160,7 +160,7 @@ export function SummaryScreen({
           filtered.map((result) => {
             // 카드 제목은 조항 표제(제N조…) — 유형은 괄호 보조 표기.
             // 표제가 없으면 기존처럼 유형만 표시한다.
-            const heading = clauseHeading(result.original_text)
+            const heading = clauseHeading(result.original_text, language, result.original_text_translated)
             const typeLabel =
               result.risk_type === '해당 없음'
                 ? t(language, 'standardClause')
