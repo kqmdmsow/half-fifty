@@ -285,6 +285,7 @@ export default function App() {
             language={language}
             liveProgress={streamingLive ? streamProgress : null}
             retrying={retrying}
+            domain={domain}
             warnings={data?.parse_warnings ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
