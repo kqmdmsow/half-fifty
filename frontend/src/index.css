@@ -22,10 +22,28 @@
   }
 }
 
-/* 접근성: 높은 명암 모드 */
+/* 접근성: 높은 명암 모드 (#82 — 저시력 대응)
+   흐린 회색 텍스트·연한 테두리·연한 배지를 진하게 끌어올린다.
+   색상 시스템 전면 재설계는 스코프 밖 — 대비 부족 지점만 조준 사격 */
+.hc .text-ink-300,
 .hc .text-ink-400 {
-  color: #4e5968;
+  color: #26303b;
 }
 .hc .text-ink-600 {
   color: #191f28;
 }
+.hc .placeholder\:text-ink-300::placeholder,
+.hc .placeholder\:text-ink-200::placeholder {
+  color: #4e5968;
+}
+.hc .border-ink-100,
+.hc .border-ink-200 {
+  border-color: #6b7684;
+}
+.hc .bg-ink-25 {
+  background-color: #eef1f4;
+}
+.hc .text-danger-600 { color: #b3261e; }
+.hc .text-safe-700 { color: #14532d; }
+.hc .text-caution-700 { color: #7c3d00; }
+.hc .text-brand-600 { color: #1246a3; }

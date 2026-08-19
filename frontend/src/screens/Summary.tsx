@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
@@ -6,6 +6,7 @@ import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
+import { speak, stopSpeaking } from '../tts'
 import { FormattedText } from '../components/FormattedText'
 
 type Filter = '전체' | RiskLevel
@@ -33,6 +34,10 @@ export function SummaryScreen({
   onDone: () => void
 }) {
   const [filter, setFilter] = useState<Filter>('전체')
+  const [reading, setReading] = useState(false)
+
+  // 화면을 떠나면 낭독도 멈춘다
+  useEffect(() => () => stopSpeaking(), [])
   const live = Boolean(liveProgress)
 
   const counts = useMemo(
@@ -151,7 +156,36 @@ export function SummaryScreen({
             )
           })}
         </div>
-        {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
+        <div className="flex items-center gap-2">
+          {/* 전체 낭독 (#82) — 조항별: 표제 → 판정 → 쉬운 설명 → 확인 질문 순 */}
+          <button
+            type="button"
+            aria-pressed={reading}
+            onClick={() => {
+              if (reading) {
+                stopSpeaking()
+                setReading(false)
+                return
+              }
+              const script = filtered
+                .map((r) => {
+                  const head = clauseHeading(r.original_text, language, r.original_text_translated)
+                  const parts = [head, riskLevelLabel(language, r.risk_level), r.explanation,
+                    ...r.check_questions]
+                  return parts.filter(Boolean).join('. ')
+                })
+                .join('.\n')
+              setReading(true)
+              speak(script, language, () => setReading(false))
+            }}
+            className={`rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+              reading ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
+            }`}
+          >
+            🔊 {t(language, reading ? 'readAllStop' : 'readAll')}
+          </button>
+          {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
+        </div>
       </div>
 
       {/* 조항 카드 — 스트리밍 중엔 완료 순서대로 쌓인다 */}
