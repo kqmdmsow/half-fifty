@@ -7,7 +7,9 @@
 - Actionability  : 실행 가능한 행동(질문)을 제시하는가
 
 src/prompts/judge_rubric.txt로 MODEL_JUDGE를 호출해 채점한다.
-점수 근거(rationale)는 사람-LLM 상관도 분석 참고용으로 콘솔에 로그로 남긴다.
+점수 근거(rationale)는 원문 조항을 인용/요약할 수 있어 기본 로그 레벨(INFO)에는
+남기지 않는다 — LOG_LEVEL=DEBUG로 켰을 때만 콘솔에 노출한다 (#58,
+privacy_data_handling.md "조항 원문을 서버 로그에 남기지 않음"과 정합).
 """
 
 import json
@@ -123,11 +125,15 @@ def _judge(state: PipelineState) -> JudgeScores:
                 aspect_data = data[aspect]
                 scores[aspect] = float(aspect_data["score"])
                 rationale[aspect] = aspect_data["rationale"]
-                logger.info("%s: %s점 — %s", aspect, aspect_data["score"], aspect_data["rationale"])
+                # rationale은 원문 조항을 인용/요약할 수 있어 DEBUG에서만 남긴다.
+                logger.debug("%s: %s점 — %s", aspect, aspect_data["score"], aspect_data["rationale"])
             break
         except Exception as exc:  # JSON 파싱 실패, 키 누락 등
             if attempt + 1 == _PARSE_ATTEMPTS:
-                logger.warning("채점 실패, 폴백 처리: %s", exc)
+                # exc는 LLM 원응답 일부(최대 200자, src/llm.py invoke_json)를 담을 수
+                # 있어 종류만 WARNING, 전체 내용은 DEBUG로만 남긴다.
+                logger.warning("채점 실패, 폴백 처리: %s", type(exc).__name__)
+                logger.debug("채점 실패 상세", exc_info=exc)
                 scores = {aspect: _FALLBACK_SCORE for aspect in _ASPECTS}
                 rationale = {aspect: _FALLBACK_RATIONALE for aspect in _ASPECTS}
 
