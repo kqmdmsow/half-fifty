@@ -151,13 +151,25 @@ export default function App() {
     go('upload')
   }
 
-  // 원클릭 데모 샘플 (#81): 조항·유형·(시나리오6) 페르소나까지 한 번에 세팅
-  const applySample = (sample: DemoSample) => {
-    setMode('text')
-    setText(sample.text)
+  // 원클릭 데모 샘플 (#81): 조항·유형·(시나리오6) 페르소나까지 한 번에 세팅.
+  // 파일 샘플(PDF·사진)은 번들된 정적 자산을 File로 만들어 실제 업로드 경로 그대로 태운다.
+  const applySample = async (sample: DemoSample) => {
     setDomain(sample.domain)
     if (sample.persona) setPersona(sample.persona)
-    setFile(null)
+    if (sample.kind === 'file' && sample.fileUrl) {
+      setMode('pdf')
+      setText('')
+      try {
+        const blob = await fetch(sample.fileUrl).then((r) => r.blob())
+        setFile(new File([blob], sample.fileName ?? 'sample', { type: sample.fileType }))
+      } catch {
+        setFile(null)
+      }
+    } else {
+      setMode('text')
+      setFile(null)
+      setText(sample.text ?? '')
+    }
   }
 
   const openDetail = (clauseId: string) => {
