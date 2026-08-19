@@ -9,10 +9,14 @@ import { t, type LangCode } from '../i18n'
  * 안선영·이상엽(2025) 수도권 전세보증 453,122건 이항로짓 + HUG 담보인정비율
  * 90% 인하(2023). 부채비율 = (선순위채권 + 전세보증금) / 주택가격.
  */
+// 원문 표10 대조 검증(2026-08-19): Exp(B) 29.923/5.489/2.590/1.508,
+// 준거변수는 부채비율 60% 미만 — <70%를 기준으로 뭉개면 60~70 구간의
+// 1.5배가 누락되므로 논문 그대로 5구간을 쓴다.
 const THRESHOLDS = [
   { min: 0.9, odds: 29.9, labelKey: 'jcG1', adviceKey: 'jcG1Advice', tone: 'danger' },
   { min: 0.8, odds: 5.5, labelKey: 'jcG2', adviceKey: 'jcG2Advice', tone: 'danger' },
   { min: 0.7, odds: 2.6, labelKey: 'jcG3', adviceKey: 'jcG3Advice', tone: 'caution' },
+  { min: 0.6, odds: 1.5, labelKey: 'jcG5', adviceKey: 'jcG5Advice', tone: 'safe' },
   { min: 0, odds: 1.0, labelKey: 'jcG4', adviceKey: 'jcG4Advice', tone: 'safe' },
 ] as const
 
@@ -38,7 +42,7 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
 
   const ready = depositN > 0 && priceN > 0
   const ratio = ready ? (seniorN + depositN) / priceN : null
-  const grade = ratio === null ? null : THRESHOLDS.find((g) => ratio >= g.min) ?? THRESHOLDS[3]
+  const grade = ratio === null ? null : THRESHOLDS.find((g) => ratio >= g.min) ?? THRESHOLDS[THRESHOLDS.length - 1]
 
   const field = (
     labelKey: 'jcDeposit' | 'jcPrice' | 'jcSenior',
