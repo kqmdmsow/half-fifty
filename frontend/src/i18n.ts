@@ -41,7 +41,7 @@ type UIKey =
   | 'copyAllQuestions' | 'evidence' | 'noClauses' | 'seeDetail' | 'finish'
   | 'backToSummary' | 'clauseList' | 'explainSimply' | 'whyCheck'
   | 'originalText' | 'askOther' | 'askKoreanHint' | 'otherClauses' | 'finishDetail'
-  | 'progressTitle' | 'cancel'
+  | 'progressTitle' | 'cancel' | 'langMismatch' | 'reanalyze'
 
 const UI: Record<LangCode, Record<UIKey, string>> = {
   ko: {
@@ -55,6 +55,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: '계약서 원문', askOther: '계약 상대방에게 물어보세요', askKoreanHint: '질문은 한국어 그대로 화면을 보여주셔도 돼요',
     otherClauses: '다른 조항 보기', finishDetail: '확인 끝내고 결과 활용하기',
     progressTitle: '계약서를 꼼꼼히 살펴보고 있어요', cancel: '분석 취소',
+    langMismatch: '설명이 지금 선택한 언어와 달라요 — 다시 분석하면 이 언어로 받아볼 수 있어요', reanalyze: '이 언어로 다시 분석',
   },
   en: {
     analysisDone: 'Analysis complete', analyzingLive: 'Analyzing clause {done}/{total}', liveHint: 'Finished clauses appear first',
@@ -67,6 +68,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Original contract text (Korean)', askOther: 'Ask the other party', askKoreanHint: 'Questions are in Korean — you can show this screen directly',
     otherClauses: 'Other clauses', finishDetail: 'Done — use results',
     progressTitle: 'Reviewing your contract carefully', cancel: 'Cancel analysis',
+    langMismatch: 'These results were written in a different language — re-analyze to get them in this language', reanalyze: 'Re-analyze in this language',
   },
   zh: {
     analysisDone: '分析完成', analyzingLive: '正在分析条款 {done}/{total}', liveHint: '已完成的条款会先显示',
@@ -79,6 +81,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: '合同原文（韩语）', askOther: '向对方询问', askKoreanHint: '问题为韩语 — 可以直接把屏幕出示给对方',
     otherClauses: '查看其他条款', finishDetail: '完成确认，使用结果',
     progressTitle: '正在仔细审查您的合同', cancel: '取消分析',
+    langMismatch: '当前结果的语言与所选语言不同 — 重新分析即可用该语言查看', reanalyze: '用此语言重新分析',
   },
   vi: {
     analysisDone: 'Phân tích hoàn tất', analyzingLive: 'Đang phân tích điều khoản {done}/{total}', liveHint: 'Điều khoản xong sẽ hiển thị trước',
@@ -91,6 +94,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Nguyên văn hợp đồng (tiếng Hàn)', askOther: 'Hỏi bên kia hợp đồng', askKoreanHint: 'Câu hỏi bằng tiếng Hàn — bạn có thể đưa màn hình này cho họ xem',
     otherClauses: 'Điều khoản khác', finishDetail: 'Xong — dùng kết quả',
     progressTitle: 'Đang xem kỹ hợp đồng của bạn', cancel: 'Hủy phân tích',
+    langMismatch: 'Kết quả đang ở ngôn ngữ khác — phân tích lại để nhận kết quả bằng ngôn ngữ này', reanalyze: 'Phân tích lại bằng ngôn ngữ này',
   },
   th: {
     analysisDone: 'วิเคราะห์เสร็จสิ้น', analyzingLive: 'กำลังวิเคราะห์ข้อ {done}/{total}', liveHint: 'ข้อที่เสร็จแล้วจะแสดงก่อน',
@@ -103,6 +107,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'ข้อความสัญญาต้นฉบับ (ภาษาเกาหลี)', askOther: 'ถามอีกฝ่าย', askKoreanHint: 'คำถามเป็นภาษาเกาหลี — แสดงหน้าจอนี้ให้เขาดูได้เลย',
     otherClauses: 'ข้ออื่น ๆ', finishDetail: 'เสร็จแล้ว — ใช้ผลลัพธ์',
     progressTitle: 'กำลังตรวจสัญญาของคุณอย่างละเอียด', cancel: 'ยกเลิกการวิเคราะห์',
+    langMismatch: 'ผลลัพธ์เป็นภาษาอื่น — วิเคราะห์ใหม่เพื่อรับผลเป็นภาษานี้', reanalyze: 'วิเคราะห์ใหม่เป็นภาษานี้',
   },
   id: {
     analysisDone: 'Analisis selesai', analyzingLive: 'Menganalisis pasal {done}/{total}', liveHint: 'Pasal yang selesai tampil lebih dulu',
@@ -115,6 +120,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Teks asli kontrak (bahasa Korea)', askOther: 'Tanyakan ke pihak lain', askKoreanHint: 'Pertanyaan dalam bahasa Korea — tunjukkan layar ini langsung',
     otherClauses: 'Pasal lainnya', finishDetail: 'Selesai — gunakan hasil',
     progressTitle: 'Memeriksa kontrak Anda dengan teliti', cancel: 'Batalkan analisis',
+    langMismatch: 'Hasil ini dalam bahasa lain — analisis ulang untuk mendapatkannya dalam bahasa ini', reanalyze: 'Analisis ulang dalam bahasa ini',
   },
   tl: {
     analysisDone: 'Tapos na ang pagsusuri', analyzingLive: 'Sinusuri ang sugnay {done}/{total}', liveHint: 'Unang lalabas ang mga natapos na sugnay',
@@ -127,6 +133,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Orihinal na teksto ng kontrata (Korean)', askOther: 'Itanong sa kabilang partido', askKoreanHint: 'Nasa Korean ang mga tanong — maaaring ipakita ang screen na ito',
     otherClauses: 'Iba pang sugnay', finishDetail: 'Tapos na — gamitin ang resulta',
     progressTitle: 'Maingat na sinusuri ang iyong kontrata', cancel: 'Kanselahin',
+    langMismatch: 'Nasa ibang wika ang resulta — i-analyze muli para makuha ito sa wikang ito', reanalyze: 'I-analyze muli sa wikang ito',
   },
   ne: {
     analysisDone: 'विश्लेषण पूरा भयो', analyzingLive: 'धारा {done}/{total} विश्लेषण गर्दै', liveHint: 'सकिएका धाराहरू पहिले देखिन्छन्',
@@ -139,6 +146,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'सम्झौताको मूल पाठ (कोरियाली)', askOther: 'अर्को पक्षलाई सोध्नुहोस्', askKoreanHint: 'प्रश्नहरू कोरियालीमा छन् — यो स्क्रिन सिधै देखाउन सक्नुहुन्छ',
     otherClauses: 'अन्य धाराहरू', finishDetail: 'सकियो — नतिजा प्रयोग गर्नुहोस्',
     progressTitle: 'तपाईंको सम्झौता ध्यानपूर्वक जाँच्दै', cancel: 'रद्द गर्नुहोस्',
+    langMismatch: 'नतिजा अर्कै भाषामा छ — यो भाषामा हेर्न फेरि विश्लेषण गर्नुहोस्', reanalyze: 'यो भाषामा फेरि विश्लेषण',
   },
   km: {
     analysisDone: 'ការវិភាគបានបញ្ចប់', analyzingLive: 'កំពុងវិភាគប្រការ {done}/{total}', liveHint: 'ប្រការដែលរួចរាល់នឹងបង្ហាញមុន',
@@ -151,6 +159,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'អត្ថបទកិច្ចសន្យាដើម (ភាសាកូរ៉េ)', askOther: 'សួរភាគីម្ខាងទៀត', askKoreanHint: 'សំណួរជាភាសាកូរ៉េ — អាចបង្ហាញអេក្រង់នេះដោយផ្ទាល់',
     otherClauses: 'ប្រការផ្សេងទៀត', finishDetail: 'រួចរាល់ — ប្រើលទ្ធផល',
     progressTitle: 'កំពុងពិនិត្យកិច្ចសន្យារបស់អ្នកយ៉ាងម៉ត់ចត់', cancel: 'បោះបង់',
+    langMismatch: 'លទ្ធផលជាភាសាផ្សេង — វិភាគម្ដងទៀតដើម្បីទទួលជាភាសានេះ', reanalyze: 'វិភាគម្ដងទៀតជាភាសានេះ',
   },
   my: {
     analysisDone: 'စိစစ်မှု ပြီးပါပြီ', analyzingLive: 'အပိုဒ် {done}/{total} စိစစ်နေသည်', liveHint: 'ပြီးသောအပိုဒ်များ အရင်ပြသမည်',
@@ -163,6 +172,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'စာချုပ်မူရင်း (ကိုရီးယားဘာသာ)', askOther: 'တစ်ဖက်လူကို မေးပါ', askKoreanHint: 'မေးခွန်းများသည် ကိုရီးယားဘာသာဖြစ်သည် — ဤမျက်နှာပြင်ကို တိုက်ရိုက်ပြနိုင်သည်',
     otherClauses: 'အခြားအပိုဒ်များ', finishDetail: 'ပြီးပါပြီ — ရလဒ်ကိုသုံးပါ',
     progressTitle: 'သင့်စာချုပ်ကို သေချာစွာ စစ်ဆေးနေသည်', cancel: 'ပယ်ဖျက်ရန်',
+    langMismatch: 'ရလဒ်သည် အခြားဘာသာစကားဖြင့် ဖြစ်နေသည် — ဤဘာသာစကားဖြင့် ရရန် ပြန်လည်စိစစ်ပါ', reanalyze: 'ဤဘာသာစကားဖြင့် ပြန်စိစစ်မည်',
   },
   mn: {
     analysisDone: 'Шинжилгээ дууслаа', analyzingLive: 'Заалт {done}/{total}-г шинжилж байна', liveHint: 'Дууссан заалтууд эхэлж харагдана',
@@ -175,6 +185,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Гэрээний эх бичвэр (солонгос хэл)', askOther: 'Нөгөө талаас асуугаарай', askKoreanHint: 'Асуултууд солонгосоор байгаа — энэ дэлгэцийг шууд үзүүлж болно',
     otherClauses: 'Бусад заалт', finishDetail: 'Дууслаа — үр дүнг ашиглах',
     progressTitle: 'Таны гэрээг нягт нямбай шалгаж байна', cancel: 'Цуцлах',
+    langMismatch: 'Үр дүн өөр хэл дээр байна — энэ хэлээр авахын тулд дахин шинжилнэ үү', reanalyze: 'Энэ хэлээр дахин шинжлэх',
   },
   uz: {
     analysisDone: 'Tahlil yakunlandi', analyzingLive: '{done}/{total}-band tahlil qilinmoqda', liveHint: 'Tugagan bandlar birinchi ko‘rinadi',
@@ -187,6 +198,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Shartnoma asl matni (koreys tilida)', askOther: 'Ikkinchi tomondan so‘rang', askKoreanHint: 'Savollar koreys tilida — bu ekranni to‘g‘ridan-to‘g‘ri ko‘rsatishingiz mumkin',
     otherClauses: 'Boshqa bandlar', finishDetail: 'Tayyor — natijadan foydalaning',
     progressTitle: 'Shartnomangiz sinchiklab tekshirilmoqda', cancel: 'Bekor qilish',
+    langMismatch: 'Natijalar boshqa tilda — bu tilda olish uchun qayta tahlil qiling', reanalyze: 'Bu tilda qayta tahlil qilish',
   },
   si: {
     analysisDone: 'විශ්ලේෂණය අවසන්', analyzingLive: 'වගන්තිය {done}/{total} විශ්ලේෂණය වෙමින්', liveHint: 'අවසන් වූ වගන්ති මුලින් පෙන්වයි',
@@ -199,6 +211,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'ගිවිසුමේ මුල් පිටපත (කොරියානු)', askOther: 'අනෙක් පාර්ශ්වයෙන් අසන්න', askKoreanHint: 'ප්‍රශ්න කොරියානු භාෂාවෙන් — මෙම තිරය කෙලින්ම පෙන්විය හැක',
     otherClauses: 'වෙනත් වගන්ති', finishDetail: 'අවසන් — ප්‍රතිඵල භාවිතා කරන්න',
     progressTitle: 'ඔබේ ගිවිසුම හොඳින් පරීක්ෂා කරමින්', cancel: 'අවලංගු කරන්න',
+    langMismatch: 'ප්‍රතිඵල වෙනත් භාෂාවකින් ඇත — මෙම භාෂාවෙන් ලබා ගැනීමට නැවත විශ්ලේෂණය කරන්න', reanalyze: 'මෙම භාෂාවෙන් නැවත විශ්ලේෂණය',
   },
   bn: {
     analysisDone: 'বিশ্লেষণ সম্পন্ন', analyzingLive: 'ধারা {done}/{total} বিশ্লেষণ চলছে', liveHint: 'সম্পন্ন ধারাগুলো আগে দেখাবে',
@@ -211,6 +224,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'চুক্তির মূল পাঠ (কোরীয়)', askOther: 'অপর পক্ষকে জিজ্ঞাসা করুন', askKoreanHint: 'প্রশ্নগুলো কোরীয় ভাষায় — এই স্ক্রিন সরাসরি দেখাতে পারেন',
     otherClauses: 'অন্যান্য ধারা', finishDetail: 'শেষ — ফলাফল ব্যবহার করুন',
     progressTitle: 'আপনার চুক্তি মনোযোগ দিয়ে দেখা হচ্ছে', cancel: 'বাতিল করুন',
+    langMismatch: 'ফলাফল অন্য ভাষায় আছে — এই ভাষায় পেতে আবার বিশ্লেষণ করুন', reanalyze: 'এই ভাষায় আবার বিশ্লেষণ',
   },
   ru: {
     analysisDone: 'Анализ завершён', analyzingLive: 'Анализ пункта {done}/{total}', liveHint: 'Готовые пункты появляются первыми',
@@ -223,6 +237,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: 'Оригинальный текст договора (корейский)', askOther: 'Спросите другую сторону', askKoreanHint: 'Вопросы на корейском — можно показать этот экран напрямую',
     otherClauses: 'Другие пункты', finishDetail: 'Готово — использовать результаты',
     progressTitle: 'Внимательно проверяем ваш договор', cancel: 'Отменить',
+    langMismatch: 'Результаты на другом языке — повторите анализ, чтобы получить их на этом языке', reanalyze: 'Проанализировать на этом языке',
   },
   ja: {
     analysisDone: '分析完了', analyzingLive: '条項 {done}/{total} を分析中', liveHint: '完了した条項から先に表示されます',
@@ -235,6 +250,7 @@ const UI: Record<LangCode, Record<UIKey, string>> = {
     originalText: '契約書原文（韓国語）', askOther: '相手方に質問しましょう', askKoreanHint: '質問は韓国語です — この画面をそのまま見せても構いません',
     otherClauses: '他の条項を見る', finishDetail: '確認を終えて結果を活用',
     progressTitle: '契約書を丁寧に確認しています', cancel: '分析をキャンセル',
+    langMismatch: '結果は別の言語で作成されています — この言語で見るには再分析してください', reanalyze: 'この言語で再分析',
   },
 }
 
