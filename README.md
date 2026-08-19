@@ -11,20 +11,23 @@
 
 ```
 프론트(5173) → 백엔드(8080) → 에이전트(8000)
-                                └─ Parser → Analysis → Persona → Judge
-                                              ↑ 점수 미달 시 최대 2회 재실행 ┘
+                                └─ Parser → Domain → Analysis → Persona → Judge
+                                                        ↑ 점수 미달 시 최대 2회 재실행 ┘
 ```
+
+Domain은 문서 유형(주택/상가 임대차, 보험, 대출 등)을 1회 판별해 Analysis의
+모든 조항 판정에 주입한다 — 같은 문언도 유형에 따라 판정이 갈리기 때문.
 
 ```
 half-fifty/
-├── agent/      # Python + LangGraph 4단계 파이프라인 (담당: 최민제)
+├── agent/      # Python + LangGraph 5단계 파이프라인 (담당: 최민제)
 ├── backend/    # Java Spring Boot API 서버 (담당: 전동훈)
 ├── frontend/   # React + TypeScript + TailwindCSS (담당: 김민찬)
 ├── data/       # 골든데이터셋·앵커쌍 (hldcc·LBox·AI Hub·금감원 실측 라벨)
 └── docs/       # 실험 리포트, 검증 설계, 회의록
 ```
 
-- 4단계 파이프라인은 단일 LLM 호출(Baseline) 대비 우위를 실측으로 비교·검증합니다
+- 5단계 파이프라인은 단일 LLM 호출(Baseline) 대비 우위를 실측으로 비교·검증합니다
   (`docs/eval_baseline_vs_ours.md` 계열).
 - Judge는 운영 중 품질 게이팅(임계값 미달 시 재시도)과 평가 채점을 담당합니다 —
   아래 "저울 교정" 참조.
