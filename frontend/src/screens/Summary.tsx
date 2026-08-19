@@ -4,6 +4,7 @@ import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
+import { JeonseCalculator } from '../components/JeonseCalculator'
 import { FormattedText } from '../components/FormattedText'
 
 type Filter = '전체' | RiskLevel
@@ -14,6 +15,7 @@ export function SummaryScreen({
   language = 'ko',
   liveProgress = null,
   retrying = false,
+  domain = '',
   warnings = [],
   onSelectClause,
   onDone,
@@ -24,6 +26,7 @@ export function SummaryScreen({
   /** 스트리밍 분석 중이면 {done,total} — 완료 조항부터 이 화면에 바로 쌓인다 */
   liveProgress?: { done: number; total: number } | null
   retrying?: boolean
+  domain?: string
   warnings?: string[]
   onSelectClause: (clauseId: string) => void
   onDone: () => void
@@ -219,6 +222,14 @@ export function SummaryScreen({
           })
         )}
       </div>
+
+      {/* 깡통전세 위험 계산기 (#63) — 임대차 도메인일 때만. 조항 분석과 별개로
+          계약서 밖 구조적 위험(전세가율)을 사용자 입력만으로 확인한다 */}
+      {['주택임대차', '상가임대차', '임대차(구분불명)'].includes(domain) && (
+        <div className="mt-6">
+          <JeonseCalculator language={language} />
+        </div>
+      )}
 
       <div className="mt-9 flex justify-center">
         <Button variant="secondary" onClick={onDone} disabled={live}>
