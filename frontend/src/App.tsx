@@ -88,13 +88,16 @@ export default function App() {
   // 접근성(#82): 화면 전환 시 스크린리더 포커스를 새 화면 제목으로 이동 —
   // SPA는 페이지 로드가 없어 전환을 알리지 않으면 리더가 침묵한다
   useEffect(() => {
-    requestAnimationFrame(() => {
+    // rAF는 백그라운드 탭에서 정지되므로 setTimeout 사용 — effect 시점에
+    // 이미 커밋이 끝나 있어 지연 0으로 충분하다
+    const timer = setTimeout(() => {
       const heading = document.querySelector<HTMLElement>('main h1')
       if (heading) {
         heading.setAttribute('tabindex', '-1')
         heading.focus({ preventScroll: true })
       }
-    })
+    }, 0)
+    return () => clearTimeout(timer)
   }, [screen])
 
   // 화면 전환을 브라우저 히스토리에 쌓는다 — 뒤로가기가 홈으로 튕기며 분석
