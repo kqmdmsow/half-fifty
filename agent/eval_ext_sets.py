@@ -5,9 +5,10 @@
 1회 측정한다. 집계 규칙은 eval_real_labels.py와 동일:
 양성 = 예측 risk_level ∈ {주의, 위험}, 정답 양성 = gold_risk_level == 위험.
 
-- data/real_clause_labels_ext.csv     : 임대차 확장 14건 (동일 도메인 일반화)
-- data/real_clause_labels_finance.csv : 금융 8행 (도메인 전이 — 임대차로 튜닝된
-  프롬프트를 수정 없이 적용, risk_type 불일치는 관찰 항목)
+- data/real_clause_labels_ext.csv     : 임대차 확장 34건 (동일 도메인 일반화)
+- data/real_clause_labels_finance.csv : 금융 33행 (도메인 전이 — 임대차로 튜닝된
+  프롬프트를 수정 없이 적용, risk_type 불일치는 관찰 항목. #89에서 유형 편중
+  해소 위해 확충 중)
 
 결과는 docs/eval_ext_sets_transfer.md에 저장 (기존 문서 덮어쓰지 않음).
 
@@ -40,8 +41,8 @@ _out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_ext_sets_transfer.md"
 OUT_PATH = Path(__file__).parent.parent / "docs" / _out_name
 
 SETS = [
-    ("임대차 확장 (ext, 14건)", DATA / "real_clause_labels_ext.csv"),
-    ("금융 전이 (finance, 8행)", DATA / "real_clause_labels_finance.csv"),
+    ("임대차 확장 (ext, 34건)", DATA / "real_clause_labels_ext.csv"),
+    ("금융 전이 (finance, 33행)", DATA / "real_clause_labels_finance.csv"),
 ]
 
 
