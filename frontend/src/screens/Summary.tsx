@@ -5,6 +5,7 @@ import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { JeonseCalculator } from '../components/JeonseCalculator'
+import { JeonseTimeline } from '../components/JeonseTimeline'
 import { FormattedText } from '../components/FormattedText'
 
 type Filter = '전체' | RiskLevel
@@ -226,8 +227,9 @@ export function SummaryScreen({
       {/* 깡통전세 위험 계산기 (#63) — 임대차 도메인일 때만. 조항 분석과 별개로
           계약서 밖 구조적 위험(전세가율)을 사용자 입력만으로 확인한다 */}
       {['주택임대차', '상가임대차', '임대차(구분불명)'].includes(domain) && (
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
           <JeonseCalculator language={language} />
+          <JeonseTimeline language={language} />
         </div>
       )}
 

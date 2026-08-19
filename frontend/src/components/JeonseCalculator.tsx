@@ -33,10 +33,28 @@ function parseAmount(value: string): number {
   return Number.isFinite(n) && n >= 0 ? n : 0
 }
 
+// 위험 가중 요인 (표10 Exp(B), 부채비율과 같은 단일 모형의 조정 승산비)
+const RISK_FACTORS = [
+  { key: 'corp', labelKey: 'jcFCorp', odds: 3.6 },
+  { key: 'multi', labelKey: 'jcFMulti', odds: 5.8 },
+  { key: 'offi', labelKey: 'jcFOffi', odds: 2.3 },
+  { key: 'appraisal', labelKey: 'jcFAppraisal', odds: 4.8 },
+  { key: 'region', labelKey: 'jcFRegion', odds: 7.0 },
+] as const
+
 export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
   const [deposit, setDeposit] = useState('')
   const [price, setPrice] = useState('')
   const [senior, setSenior] = useState('')
+  const [factors, setFactors] = useState<Set<string>>(new Set())
+
+  const toggleFactor = (key: string) =>
+    setFactors((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
 
   const depositN = parseAmount(deposit)
   const priceN = parseAmount(price)
@@ -102,6 +120,47 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
         <p className="mt-4 rounded-2xl bg-ink-25 px-4 py-3 text-[13px] font-semibold text-ink-400">
           {t(language, 'jcHint')}
         </p>
+      )}
+
+      {/* 위험 가중 요인 체크 (①) — 부채비율과 별개로 사기 다발 조건을 표시 */}
+      <div className="mt-4 rounded-2xl bg-ink-25 px-4 py-3.5">
+        <p className="text-[13px] font-bold text-ink-700">{t(language, 'jcFactorTitle')}</p>
+        <div className="mt-2.5 grid gap-1.5 md:grid-cols-2">
+          {RISK_FACTORS.map((f) => (
+            <label key={f.key} className="flex cursor-pointer items-center gap-2 text-[13px] text-ink-600">
+              <input
+                type="checkbox"
+                checked={factors.has(f.key)}
+                onChange={() => toggleFactor(f.key)}
+                className="h-4 w-4 shrink-0 cursor-pointer rounded border-ink-200 accent-brand-500"
+              />
+              <span className="min-w-0 flex-1">{t(language, f.labelKey)}</span>
+              <span className="shrink-0 rounded bg-danger-50 px-1.5 py-0.5 text-[11px] font-bold text-danger-600">
+                ×{f.odds}
+              </span>
+            </label>
+          ))}
+        </div>
+        {factors.size > 0 && (
+          <p className="mt-2.5 rounded-xl bg-danger-50 px-3 py-2 text-[13px] font-bold text-danger-600">
+            ⚠️ {t(language, 'jcFactorWarn', { n: factors.size })}
+          </p>
+        )}
+      </div>
+
+      {/* HUG 보증 가입 유도 (④) — 부채비율 90% 이하일 때만 (초과 구간은 가입 불가) */}
+      {ratio !== null && ratio <= 0.9 && (
+        <div className="mt-3 flex flex-col gap-2.5 rounded-2xl bg-safe-50 px-4 py-3.5 md:flex-row md:items-center md:justify-between">
+          <p className="text-[13px] leading-relaxed text-safe-700">🛡️ {t(language, 'jcHugOk')}</p>
+          <a
+            href="https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp"
+            target="_blank"
+            rel="noreferrer"
+            className="shrink-0 rounded-xl bg-safe-500 px-3.5 py-2 text-center text-[13px] font-bold text-white"
+          >
+            {t(language, 'jcHugBtn')} →
+          </a>
+        </div>
       )}
 
       <p className="mt-3 text-[11px] leading-relaxed text-ink-300">
