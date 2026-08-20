@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton } from '../components/ui'
-import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { riskLevelLabel, riskLevelLabel as rl, riskTypeLabel, t, type LangCode } from '../i18n'
+import { clauseHeading } from '../clauseTitle'
 
 export function DoneScreen({
   results,
@@ -61,6 +62,40 @@ export function DoneScreen({
         <p className="mt-2.5 text-[15px] text-ink-400">
           {t(language, 'doSubtitle')}
         </p>
+      </div>
+
+      {/* 결과 텍스트 다운로드 (#126 v1) — 점자정보단말기·문서 앱은 txt를
+          그대로 읽는다(단말기 자체 점역이 표준 사용). 자체 BRF 점역은
+          한국 점자 규정 오변환 위험이 있어 후속(liblouis 검증 후). */}
+      <div className="mx-auto mt-4 max-w-md text-center">
+        <button
+          type="button"
+          onClick={() => {
+            const lines: string[] = []
+            results.forEach((r) => {
+              const head = clauseHeading(r.original_text, language, r.original_text_translated) ?? r.clause_id
+              lines.push(`■ ${head} — ${rl(language, r.risk_level)}`)
+              lines.push(r.explanation)
+              if (r.risk_level !== '안전' && !r.analysis_failed) {
+                lines.push(`[근거] ${r.risk_evidence_translated || r.risk_evidence}`)
+              }
+              r.check_questions.forEach((q, i) => lines.push(`[질문${i + 1}] ${q}`))
+              lines.push(`[원문] ${r.original_text}`)
+              lines.push('')
+            })
+            const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `${t(language, 'dlFilename')}.txt`
+            a.click()
+            URL.revokeObjectURL(url)
+          }}
+          className="rounded-xl bg-ink-50 px-4 py-2.5 text-[14px] font-bold text-ink-700 transition-colors hover:bg-ink-100"
+        >
+          <span aria-hidden>💾</span> {t(language, 'dlBtn')}
+        </button>
+        <p className="mt-1.5 text-[12px] text-ink-400">{t(language, 'dlNote')}</p>
       </div>
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
