@@ -154,7 +154,11 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             )
         except Exception as exc:  # JSON 파싱 실패, 키 누락, 스키마 검증 실패 등
             if attempt + 1 == _PARSE_ATTEMPTS:
-                logger.warning("%s 분석 실패, 폴백 처리: %s", clause_id, exc)
+                # exc는 창작 인용 30자(위 ValueError)나 LLM 원응답 일부(최대 200자,
+                # src/llm.py invoke_json)를 담을 수 있어 종류만 WARNING, 전체
+                # 내용은 DEBUG로만 남긴다 (#58, privacy_data_handling.md 정합).
+                logger.warning("%s 분석 실패, 폴백 처리: %s", clause_id, type(exc).__name__)
+                logger.debug("%s 분석 실패 상세", clause_id, exc_info=exc)
 
     return AnalysisResult(
         clause_id=clause_id,
