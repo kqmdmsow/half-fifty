@@ -3,9 +3,11 @@ import { riskLevelLabel, t, type LangCode } from '../i18n'
 
 export function LandingScreen({
   onStart,
+  onApiInfo,
   language = 'ko',
 }: {
   onStart: () => void
+  onApiInfo?: () => void // 제휴·API 안내 (#85) — 미전달 시 링크 숨김
   language?: LangCode
 }) {
   return (
@@ -128,7 +130,18 @@ export function LandingScreen({
       {/* 푸터 */}
       <footer className="border-t border-ink-50 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-[13px] text-ink-400 md:flex-row">
-          <span className="font-semibold">© 조목조목</span>
+          <span className="flex items-center gap-4">
+            <span className="font-semibold">© 조목조목</span>
+            {onApiInfo && (
+              <button
+                type="button"
+                onClick={onApiInfo}
+                className="font-semibold text-ink-600 underline underline-offset-2 hover:text-ink-900"
+              >
+                {t(language, 'apiFooterLink')}
+              </button>
+            )}
+          </span>
           <span className="max-w-md text-center leading-relaxed md:text-right">
             {t(language, 'footerDisclaimer')}
           </span>
