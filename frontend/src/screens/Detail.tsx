@@ -146,6 +146,29 @@ export function DetailScreen({
             </Section>
           )}
 
+          {/* 실제 사건 각주 (#91 시그니처 기능 ①) — 큐레이션된 A등급 사례가
+              있는 risk_type일 때만 노출. "동일 사건"이 아니라 "유사 사례"임을
+              문구로 못 박아 단정을 피한다(자문 §7). */}
+          {!!clause.related_cases?.length && (
+            <section className="mt-6">
+              <h2 className="text-[14px] font-bold text-ink-400">📎 {t(language, 'relatedCases')}</h2>
+              <div className="mt-2 space-y-2.5">
+                {clause.related_cases.map((c) => (
+                  <div
+                    key={c.case_id}
+                    className="rounded-2xl border border-ink-100 bg-white p-4"
+                  >
+                    <p className="text-[13px] font-bold text-brand-600">
+                      {c.agency} {c.citation}
+                    </p>
+                    <p className="mt-1 text-[14px] leading-relaxed text-ink-700">{c.result}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-[12px] text-ink-400">{t(language, 'relatedCasesDisclaimer')}</p>
+            </section>
+          )}
+
           <div className="mt-6 rounded-2xl border border-danger-500/20 bg-danger-50 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>

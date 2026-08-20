@@ -29,6 +29,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
@@ -94,6 +95,9 @@ class ClauseResult(BaseModel):
     original_text_translated: Optional[str] = None
     check_questions_translated: Optional[List[str]] = None
     risk_evidence_translated: Optional[str] = None
+    # 시그니처 기능 ① 실제 사건 각주 (#91) — 표시 전용, Judge 채점에는
+    # 안 쓰인다 (state에 안 실리고 여기서 응답 조립 시점에만 조회).
+    related_cases: List[CaseFootnote] = []
 
 
 class AnalyzeResponse(BaseModel):
@@ -120,6 +124,7 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
             original_text_translated=translations.get(r["clause_id"], {}).get("original_text_translated"),
             check_questions_translated=translations.get(r["clause_id"], {}).get("check_questions_translated"),
             risk_evidence_translated=translations.get(r["clause_id"], {}).get("risk_evidence_translated"),
+            related_cases=get_related_cases(r["risk_type"]),
         )
         for r in state["adapted_results"]
     ]
