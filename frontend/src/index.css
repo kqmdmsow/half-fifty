@@ -88,6 +88,14 @@
     box-shadow: var(--krds-box-shadow-outline);
   }
 
+  /* 화면 전환 시 스크린리더용 프로그램 포커스(h1 tabindex=-1)는 시각적
+     링을 그리지 않는다 — 키보드 조작이 아닌 내비게이션 알림용 포커스 */
+  [tabindex='-1']:focus,
+  [tabindex='-1']:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
   /* KRDS 터치 타깃 최소 48px (--krds-size-height-7).
      인라인 텍스트 링크는 min-height가 무효(인라인 박스)라 영향 없고,
      버튼·셀렉트·입력 필드가 대상이다. */
