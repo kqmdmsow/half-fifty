@@ -2235,9 +2235,114 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+
+type QuizKey =
+  | 'qzTitle' | 'qzDesc' | 'qzStart' | 'qzLoading' | 'qzUnavailable'
+  | 'qzCorrect' | 'qzWrong' | 'qzGoClause' | 'qzScore' | 'qzRetry'
+
+// 3문답 이해 확인 (#92)
+const UI_QUIZ: Record<LangCode, Record<QuizKey, string>> = {
+  ko: {
+    qzTitle: '제대로 이해했는지 확인해볼까요?', qzDesc: '방금 본 설명에서 3문항을 만들어 드려요. 틀려도 괜찮아요 — 해당 조항을 다시 보여드려요.',
+    qzStart: '3문답 시작', qzLoading: '문항을 만들고 있어요…', qzUnavailable: '이 결과로는 문항을 만들 수 없었어요. 조항 설명을 직접 확인해 주세요.',
+    qzCorrect: '정답이에요!', qzWrong: '아쉬워요 — 아래 조항을 다시 확인해 보세요', qzGoClause: '해당 조항 다시 보기',
+    qzScore: '{total}문항 중 {n}개 정답', qzRetry: '다시 풀기',
+  },
+  en: {
+    qzTitle: 'Shall we check your understanding?', qzDesc: 'Three questions from what you just read. Wrong answers are fine — we point you back to the clause.',
+    qzStart: 'Start 3 questions', qzLoading: 'Preparing questions…', qzUnavailable: 'Could not build questions from this result. Please review the clause explanations directly.',
+    qzCorrect: 'Correct!', qzWrong: 'Not quite — review the clause below', qzGoClause: 'Review this clause',
+    qzScore: '{n} of {total} correct', qzRetry: 'Try again',
+  },
+  zh: {
+    qzTitle: '来确认一下是否真的理解了？', qzDesc: '根据刚才的说明出3道题。答错也没关系 — 会带你回到相应条款。',
+    qzStart: '开始3道题', qzLoading: '正在出题…', qzUnavailable: '无法根据此结果出题，请直接查看条款说明。',
+    qzCorrect: '答对了！', qzWrong: '差一点 — 请再看看下面的条款', qzGoClause: '重看该条款',
+    qzScore: '共{total}题答对{n}题', qzRetry: '再做一次',
+  },
+  vi: {
+    qzTitle: 'Kiểm tra xem bạn đã hiểu đúng chưa?', qzDesc: 'Ba câu hỏi từ phần giải thích vừa xem. Sai cũng không sao — sẽ đưa bạn về điều khoản tương ứng.',
+    qzStart: 'Bắt đầu 3 câu hỏi', qzLoading: 'Đang tạo câu hỏi…', qzUnavailable: 'Không tạo được câu hỏi từ kết quả này. Vui lòng xem trực tiếp phần giải thích.',
+    qzCorrect: 'Chính xác!', qzWrong: 'Chưa đúng — xem lại điều khoản bên dưới', qzGoClause: 'Xem lại điều khoản',
+    qzScore: 'Đúng {n}/{total} câu', qzRetry: 'Làm lại',
+  },
+  th: {
+    qzTitle: 'ลองเช็กว่าเข้าใจถูกไหม?', qzDesc: 'มี 3 ข้อจากคำอธิบายที่เพิ่งอ่าน ตอบผิดไม่เป็นไร — จะพากลับไปดูข้อสัญญานั้น',
+    qzStart: 'เริ่ม 3 ข้อ', qzLoading: 'กำลังสร้างคำถาม…', qzUnavailable: 'สร้างคำถามจากผลนี้ไม่ได้ กรุณาดูคำอธิบายข้อสัญญาโดยตรง',
+    qzCorrect: 'ถูกต้อง!', qzWrong: 'ยังไม่ใช่ — ดูข้อสัญญาด้านล่างอีกครั้ง', qzGoClause: 'ดูข้อนี้อีกครั้ง',
+    qzScore: 'ถูก {n} จาก {total} ข้อ', qzRetry: 'ทำใหม่',
+  },
+  id: {
+    qzTitle: 'Cek apakah Anda sudah paham?', qzDesc: 'Tiga soal dari penjelasan barusan. Salah tidak apa-apa — kami arahkan kembali ke pasalnya.',
+    qzStart: 'Mulai 3 soal', qzLoading: 'Menyiapkan soal…', qzUnavailable: 'Tidak bisa membuat soal dari hasil ini. Silakan tinjau penjelasan pasal langsung.',
+    qzCorrect: 'Benar!', qzWrong: 'Belum tepat — tinjau pasal di bawah', qzGoClause: 'Tinjau pasal ini',
+    qzScore: '{n} dari {total} benar', qzRetry: 'Coba lagi',
+  },
+  tl: {
+    qzTitle: 'I-check natin kung naintindihan mo?', qzDesc: 'Tatlong tanong mula sa paliwanag. Ayos lang magkamali — ibabalik ka namin sa probisyon.',
+    qzStart: 'Simulan ang 3 tanong', qzLoading: 'Ginagawa ang mga tanong…', qzUnavailable: 'Hindi makabuo ng tanong mula sa resulta. Suriin ang paliwanag ng probisyon.',
+    qzCorrect: 'Tama!', qzWrong: 'Hindi pa — balikan ang probisyon sa ibaba', qzGoClause: 'Balikan ang probisyong ito',
+    qzScore: '{n} sa {total} ang tama', qzRetry: 'Ulitin',
+  },
+  ne: {
+    qzTitle: 'राम्ररी बुझ्नुभयो कि जाँचौं?', qzDesc: 'भर्खरको व्याख्याबाट ३ प्रश्न। गल्ती भए पनि ठीक छ — सम्बन्धित दफामा फर्काउँछौं।',
+    qzStart: '३ प्रश्न सुरु', qzLoading: 'प्रश्न बनाउँदै…', qzUnavailable: 'यो नतिजाबाट प्रश्न बनाउन सकिएन। दफाको व्याख्या सिधै हेर्नुहोस्।',
+    qzCorrect: 'सही!', qzWrong: 'मिलेन — तलको दफा फेरि हेर्नुहोस्', qzGoClause: 'यो दफा फेरि हेर्ने',
+    qzScore: '{total} मध्ये {n} सही', qzRetry: 'फेरि खेल्ने',
+  },
+  km: {
+    qzTitle: 'ពិនិត្យមើលថាយល់ត្រូវឬអត់?', qzDesc: 'សំណួរ ៣ ពីការពន្យល់ដែលទើបអាន។ ខុសក៏មិនអីដែរ — យើងនាំអ្នកទៅមាត្រានោះវិញ។',
+    qzStart: 'ចាប់ផ្ដើម ៣ សំណួរ', qzLoading: 'កំពុងបង្កើតសំណួរ…', qzUnavailable: 'មិនអាចបង្កើតសំណួរពីលទ្ធផលនេះទេ។ សូមមើលការពន្យល់មាត្រាដោយផ្ទាល់។',
+    qzCorrect: 'ត្រូវហើយ!', qzWrong: 'មិនទាន់ត្រូវ — មើលមាត្រាខាងក្រោមម្ដងទៀត', qzGoClause: 'មើលមាត្រានេះម្ដងទៀត',
+    qzScore: 'ត្រូវ {n} ក្នុងចំណោម {total}', qzRetry: 'ធ្វើម្ដងទៀត',
+  },
+  my: {
+    qzTitle: 'သေချာနားလည်လား စစ်ကြည့်မလား?', qzDesc: 'အခုဖတ်ခဲ့တဲ့ရှင်းလင်းချက်မှ မေးခွန်း ၃ ခု။ မှားလည်းရပါတယ် — သက်ဆိုင်ရာအပိုဒ်ကို ပြန်ပြပေးပါမယ်။',
+    qzStart: 'မေးခွန်း ၃ ခု စတင်', qzLoading: 'မေးခွန်းပြင်ဆင်နေသည်…', qzUnavailable: 'ဤရလဒ်မှ မေးခွန်းမဖန်တီးနိုင်ပါ။ အပိုဒ်ရှင်းလင်းချက်ကို တိုက်ရိုက်ကြည့်ပါ။',
+    qzCorrect: 'မှန်ပါသည်!', qzWrong: 'မမှန်သေး — အောက်ကအပိုဒ်ကို ပြန်ကြည့်ပါ', qzGoClause: 'ဤအပိုဒ်ကို ပြန်ကြည့်ရန်',
+    qzScore: '{total} ခုမှ {n} ခုမှန်', qzRetry: 'ပြန်ဖြေမည်',
+  },
+  mn: {
+    qzTitle: 'Зөв ойлгосон эсэхээ шалгах уу?', qzDesc: 'Дөнгөж уншсан тайлбараас 3 асуулт. Буруу байсан ч зүгээр — тухайн заалт руу буцаана.',
+    qzStart: '3 асуулт эхлэх', qzLoading: 'Асуулт бэлдэж байна…', qzUnavailable: 'Энэ үр дүнгээс асуулт үүсгэж чадсангүй. Заалтын тайлбарыг шууд үзнэ үү.',
+    qzCorrect: 'Зөв!', qzWrong: 'Болоогүй — доорх заалтыг дахин үзнэ үү', qzGoClause: 'Энэ заалтыг дахин үзэх',
+    qzScore: '{total}-аас {n} зөв', qzRetry: 'Дахин бөглөх',
+  },
+  uz: {
+    qzTitle: 'Toʻgʻri tushunganingizni tekshiramizmi?', qzDesc: 'Hozirgi tushuntirishdan 3 ta savol. Xato ham mayli — tegishli bandga qaytaramiz.',
+    qzStart: '3 savolni boshlash', qzLoading: 'Savollar tayyorlanmoqda…', qzUnavailable: 'Bu natijadan savol tuzib boʻlmadi. Band tushuntirishini bevosita koʻring.',
+    qzCorrect: 'Toʻgʻri!', qzWrong: 'Hali emas — quyidagi bandni qayta koʻring', qzGoClause: 'Bu bandni qayta koʻrish',
+    qzScore: '{total} tadan {n} tasi toʻgʻri', qzRetry: 'Qayta yechish',
+  },
+  si: {
+    qzTitle: 'නිවැරදිව තේරුම් ගත්තාදැයි බලමුද?', qzDesc: 'දැන් කියවූ පැහැදිලි කිරීමෙන් ප්‍රශ්න 3ක්. වැරදුණත් කමක් නැහැ — අදාළ වගන්තියට ආපසු ගෙන යනවා.',
+    qzStart: 'ප්‍රශ්න 3 අරඹන්න', qzLoading: 'ප්‍රශ්න සාදමින්…', qzUnavailable: 'මෙම ප්‍රතිඵලයෙන් ප්‍රශ්න සෑදිය නොහැක. වගන්ති පැහැදිලි කිරීම කෙලින්ම බලන්න.',
+    qzCorrect: 'නිවැරදියි!', qzWrong: 'තවම නැහැ — පහත වගන්තිය නැවත බලන්න', qzGoClause: 'මෙම වගන්තිය නැවත බලන්න',
+    qzScore: '{total}න් {n}ක් නිවැරදියි', qzRetry: 'නැවත උත්සාහ',
+  },
+  bn: {
+    qzTitle: 'ঠিকমতো বুঝেছেন কিনা দেখবেন?', qzDesc: 'এইমাত্র পড়া ব্যাখ্যা থেকে ৩টি প্রশ্ন। ভুল হলেও সমস্যা নেই — সংশ্লিষ্ট ধারায় ফিরিয়ে নেব।',
+    qzStart: '৩ প্রশ্ন শুরু', qzLoading: 'প্রশ্ন তৈরি হচ্ছে…', qzUnavailable: 'এই ফলাফল থেকে প্রশ্ন তৈরি করা যায়নি। ধারার ব্যাখ্যা সরাসরি দেখুন।',
+    qzCorrect: 'সঠিক!', qzWrong: 'হয়নি — নিচের ধারাটি আবার দেখুন', qzGoClause: 'এই ধারা আবার দেখুন',
+    qzScore: '{total}টির মধ্যে {n}টি সঠিক', qzRetry: 'আবার চেষ্টা',
+  },
+  ru: {
+    qzTitle: 'Проверим, правильно ли вы поняли?', qzDesc: 'Три вопроса по только что прочитанному. Ошибаться можно — мы вернём вас к нужному пункту.',
+    qzStart: 'Начать 3 вопроса', qzLoading: 'Готовим вопросы…', qzUnavailable: 'Не удалось составить вопросы по этому результату. Просмотрите пояснения к пунктам напрямую.',
+    qzCorrect: 'Верно!', qzWrong: 'Не совсем — просмотрите пункт ниже', qzGoClause: 'Просмотреть пункт',
+    qzScore: 'Верно {n} из {total}', qzRetry: 'Пройти снова',
+  },
+  ja: {
+    qzTitle: 'きちんと理解できたか確認しませんか？', qzDesc: 'いま読んだ説明から3問出題します。間違えても大丈夫 — 該当条項に戻ってご案内します。',
+    qzStart: '3問クイズを開始', qzLoading: '問題を作成中…', qzUnavailable: 'この結果からは問題を作成できませんでした。条項の説明を直接ご確認ください。',
+    qzCorrect: '正解です！', qzWrong: 'おしい — 下の条項をもう一度確認しましょう', qzGoClause: 'この条項を見直す',
+    qzScore: '{total}問中{n}問正解', qzRetry: 'もう一度',
+  },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | QuizKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2247,7 +2352,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_QUIZ] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

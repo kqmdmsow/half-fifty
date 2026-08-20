@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { ClauseResult } from '../api'
+import type { ClauseResult, Persona } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
@@ -8,6 +8,7 @@ import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
 import { speak, stopSpeaking } from '../tts'
 import { FormattedText } from '../components/FormattedText'
+import { QuizCard } from '../components/QuizCard'
 
 type Filter = '전체' | RiskLevel
 
@@ -18,6 +19,7 @@ export function SummaryScreen({
   liveProgress = null,
   retrying = false,
   domain = '',
+  persona = 'adult',
   warnings = [],
   onSelectClause,
   onDone,
@@ -29,6 +31,7 @@ export function SummaryScreen({
   liveProgress?: { done: number; total: number } | null
   retrying?: boolean
   domain?: string
+  persona?: Persona
   warnings?: string[]
   onSelectClause: (clauseId: string) => void
   onDone: () => void
@@ -257,6 +260,18 @@ export function SummaryScreen({
           })
         )}
       </div>
+
+      {/* 3문답 이해 확인 (#92) — 분석 확정 후에만 (스트리밍 중 출제는 재료가 미완) */}
+      {!live && results.length > 0 && (
+        <div className="mt-6">
+          <QuizCard
+            results={results}
+            persona={persona}
+            language={language}
+            onSelectClause={onSelectClause}
+          />
+        </div>
+      )}
 
       {/* 깡통전세 위험 계산기 (#63) — 임대차 도메인일 때만. 조항 분석과 별개로
           계약서 밖 구조적 위험(전세가율)을 사용자 입력만으로 확인한다 */}

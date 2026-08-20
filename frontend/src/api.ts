@@ -258,3 +258,28 @@ export async function analyzeImage(
   }
   return res.json()
 }
+
+// ---- 이해 확인 퀴즈 (#92, 시그니처 ②) ----------------------------------
+
+export interface QuizQuestion {
+  clause_id: string
+  question: string
+  choices: string[]
+  answer_index: number
+  answer_quote: string
+}
+
+export async function fetchQuiz(
+  items: Array<Pick<ClauseResult, 'clause_id' | 'explanation' | 'risk_level' | 'risk_type' | 'risk_evidence'>>,
+  persona: Persona,
+  language: Language,
+): Promise<QuizQuestion[]> {
+  const res = await fetch(`${BASE_URL}/api/contracts/quiz`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items, persona, language }),
+  })
+  if (!res.ok) throw new Error(`퀴즈 생성 실패 (${res.status})`)
+  const data = await res.json()
+  return data.questions ?? []
+}
