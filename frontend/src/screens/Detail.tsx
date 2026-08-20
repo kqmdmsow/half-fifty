@@ -43,7 +43,7 @@ export function DetailScreen({
 
   // 음성 명령 (#127) — Detail 문맥에서 6종: 다음/이전/읽어줘/멈춰/요약/더 쉽게.
   // 인식 결과는 명령 해석 후 즉시 폐기 (전송·저장 없음).
-  const [listening, setListening] = useState(false)
+  const [micOn, setMicOn] = useState(false)
   const voiceRef = useRef<VoiceSession | null>(null)
   const stateRef = useRef({ clauseId: '', results: [] as ClauseResult[] })
   stateRef.current = { clauseId: clause?.clause_id ?? '', results }
@@ -64,7 +64,7 @@ export function DetailScreen({
       else if (cmd === 'stop') stopSpeaking()
       else if (cmd === 'summary') onBack()
       // 'easier' 명령은 #133(다시 설명) 머지 후 requestReexplain('easier')로 연결
-    }, setListening)
+    }, setMicOn)
   }
 
   useEffect(() => () => voiceRef.current?.stop(), [])
@@ -91,16 +91,16 @@ export function DetailScreen({
         <span className="mb-6 ml-3 inline-flex items-center gap-2">
           <button
             type="button"
-            aria-pressed={listening}
+            aria-pressed={micOn}
             onClick={toggleVoice}
             className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
-              listening ? 'bg-danger-500 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              micOn ? 'bg-danger-500 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
             }`}
           >
             <span aria-hidden>🎤</span>
-            {listening ? t(language, 'vcOff') : t(language, 'vcToggle')}
+            {micOn ? t(language, 'vcOff') : t(language, 'vcToggle')}
           </button>
-          {listening && (
+          {micOn && (
             <span className="text-[12px] font-semibold text-ink-400" role="status">
               {t(language, 'vcListening')}
             </span>
