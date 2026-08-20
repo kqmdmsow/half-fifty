@@ -15,6 +15,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from src.injection_check import detect_injection, injection_warning
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import analysis_node
 from src.nodes.domain import domain_node
@@ -149,6 +150,10 @@ def run_pipeline(
     """
     raw_text, pii_counts = mask_pii(raw_text)
     initial_warnings = [masking_notice(pii_counts)] if pii_counts else []
+    # 인젝션 1층 방어 (#67) — stream.py와 동일 배선 (모듈 docstring 참조)
+    injections = detect_injection(raw_text)
+    if injections:
+        initial_warnings = [injection_warning(injections)] + initial_warnings
 
     initial_state: PipelineState = {
         "raw_text": raw_text,
