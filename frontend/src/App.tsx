@@ -229,9 +229,11 @@ export default function App() {
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* 좁은 폭(375px)에서는 컨트롤이 둘째 줄로 내려간다 — 고정 h-16이면
+            zoom 스테퍼가 추가된 뒤 오버플로로 '또렷하게'가 잘림 (실측) */}
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-y-1 px-4 py-1.5 md:px-6">
           <Logo onClick={() => go('landing')} />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
             <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
               <span aria-hidden>🌐</span>
               <select
