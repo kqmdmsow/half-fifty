@@ -31,6 +31,7 @@ from src.nodes.analysis import _MAX_CONCURRENCY, _analyze_clause
 from src.nodes.domain import domain_node
 from src.nodes.judge import judge_node
 from src.nodes.parser import split_clauses_with_warnings
+from src.warning_codes import classify_all
 from src.nodes.persona import _adapt
 from src.state import (
     FAITHFULNESS_MIN,
@@ -145,6 +146,7 @@ def stream_analysis(
         "event": "meta",
         "clause_count": len(clauses),
         "parse_warnings": warnings,
+        "parse_warning_codes": classify_all(warnings),
         "domain": resolved_domain,
         "clauses": [{"clause_id": c["clause_id"], "text": c["text"]} for c in clauses],
     }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
-import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { riskLevelLabel, riskTypeLabel, t, WARNING_CODE_KEYS, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
@@ -19,6 +19,7 @@ export function SummaryScreen({
   retrying = false,
   domain = '',
   warnings = [],
+  warningCodes = [],
   onSelectClause,
   onDone,
 }: {
@@ -30,6 +31,7 @@ export function SummaryScreen({
   retrying?: boolean
   domain?: string
   warnings?: string[]
+  warningCodes?: Array<string | null>
   onSelectClause: (clauseId: string) => void
   onDone: () => void
 }) {
@@ -63,14 +65,19 @@ export function SummaryScreen({
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
-      {warnings.map((warning) => (
+      {warnings.map((warning, wi) => {
+        const code = warningCodes[wi]
+        const key = code ? WARNING_CODE_KEYS[code] : undefined
+        const text = key ? t(language, key) : warning
+        return (
         <p
           key={warning}
           className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700"
         >
-          ⚠️ {warning}
+          <span aria-hidden>⚠️</span> {text}
         </p>
-      ))}
+        )
+      })}
 
       {live && liveProgress ? (
         <div className="flex items-center gap-2.5">
