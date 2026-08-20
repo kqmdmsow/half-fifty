@@ -2235,9 +2235,65 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+
+type FeedbackKey =
+  | 'fbTitle' | 'fbNote' | 'fbBad' | 'fbOkay' | 'fbGood' | 'fbThanks'
+
+// 사람 평가 수집 카드 (자문 §6 — 만족도·소요시간)
+const UI_FEEDBACK: Record<LangCode, Record<FeedbackKey, string>> = {
+  ko: {
+    fbTitle: '이 분석이 도움이 됐나요?', fbNote: '의견은 이 기기에만 익명으로 저장돼요 — 서비스 개선에 사용됩니다.', fbBad: '아쉬워요', fbOkay: '보통이에요', fbGood: '도움됐어요', fbThanks: '의견 감사해요!',
+  },
+  en: {
+    fbTitle: 'Was this analysis helpful?', fbNote: 'Feedback is stored anonymously on this device only — used to improve the service.', fbBad: 'Not really', fbOkay: 'It was okay', fbGood: 'Helpful', fbThanks: 'Thanks for your feedback!',
+  },
+  zh: {
+    fbTitle: '这次分析有帮助吗？', fbNote: '反馈仅匿名保存在本设备上，用于改进服务。', fbBad: '不太行', fbOkay: '一般', fbGood: '有帮助', fbThanks: '感谢您的反馈！',
+  },
+  vi: {
+    fbTitle: 'Phân tích này có hữu ích không?', fbNote: 'Phản hồi chỉ được lưu ẩn danh trên thiết bị này — dùng để cải thiện dịch vụ.', fbBad: 'Chưa tốt', fbOkay: 'Bình thường', fbGood: 'Hữu ích', fbThanks: 'Cảm ơn phản hồi của bạn!',
+  },
+  th: {
+    fbTitle: 'การวิเคราะห์นี้มีประโยชน์ไหม?', fbNote: 'ความเห็นถูกเก็บแบบไม่ระบุตัวตนบนอุปกรณ์นี้เท่านั้น เพื่อปรับปรุงบริการ', fbBad: 'ยังไม่ดี', fbOkay: 'พอใช้', fbGood: 'มีประโยชน์', fbThanks: 'ขอบคุณสำหรับความเห็น!',
+  },
+  id: {
+    fbTitle: 'Apakah analisis ini membantu?', fbNote: 'Masukan disimpan anonim hanya di perangkat ini — untuk perbaikan layanan.', fbBad: 'Kurang', fbOkay: 'Biasa saja', fbGood: 'Membantu', fbThanks: 'Terima kasih atas masukannya!',
+  },
+  tl: {
+    fbTitle: 'Nakatulong ba ang pagsusuring ito?', fbNote: 'Ang feedback ay naka-save nang anonymous sa device na ito lamang — gagamitin sa pagpapabuti.', fbBad: 'Hindi gaano', fbOkay: 'Okay lang', fbGood: 'Nakatulong', fbThanks: 'Salamat sa feedback!',
+  },
+  ne: {
+    fbTitle: 'यो विश्लेषण उपयोगी थियो?', fbNote: 'प्रतिक्रिया यही यन्त्रमा मात्र गुमनाम रूपमा सुरक्षित हुन्छ — सेवा सुधारमा प्रयोग हुन्छ।', fbBad: 'राम्रो भएन', fbOkay: 'ठिकै', fbGood: 'उपयोगी', fbThanks: 'प्रतिक्रियाका लागि धन्यवाद!',
+  },
+  km: {
+    fbTitle: 'ការវិភាគនេះមានប្រយោជន៍ទេ?', fbNote: 'មតិរក្សាទុកអនាមិកតែក្នុងឧបករណ៍នេះ — ប្រើសម្រាប់កែលម្អសេវា។', fbBad: 'មិនសូវល្អ', fbOkay: 'ធម្មតា', fbGood: 'មានប្រយោជន៍', fbThanks: 'អរគុណចំពោះមតិ!',
+  },
+  my: {
+    fbTitle: 'ဤစိစစ်မှုက အထောက်အကူဖြစ်ခဲ့လား?', fbNote: 'အကြံပြုချက်ကို ဤစက်တွင်သာ အမည်မသိသိမ်းပြီး ဝန်ဆောင်မှုတိုးတက်ရေးအတွက် သုံးသည်။', fbBad: 'သိပ်မကောင်း', fbOkay: 'အသင့်အတင့်', fbGood: 'အထောက်အကူဖြစ်', fbThanks: 'အကြံပြုချက်အတွက် ကျေးဇူးတင်ပါသည်!',
+  },
+  mn: {
+    fbTitle: 'Энэ шинжилгээ тус болсон уу?', fbNote: 'Санал зөвхөн энэ төхөөрөмжид нэргүйгээр хадгалагдана — үйлчилгээг сайжруулахад ашиглана.', fbBad: 'Тааруухан', fbOkay: 'Дунд зэрэг', fbGood: 'Тус болсон', fbThanks: 'Санал өгсөнд баярлалаа!',
+  },
+  uz: {
+    fbTitle: 'Bu tahlil foydali boʻldimi?', fbNote: 'Fikr faqat shu qurilmada anonim saqlanadi — xizmatni yaxshilashga ishlatiladi.', fbBad: 'Unchalik emas', fbOkay: 'Oʻrtacha', fbGood: 'Foydali', fbThanks: 'Fikringiz uchun rahmat!',
+  },
+  si: {
+    fbTitle: 'මෙම විශ්ලේෂණය ප්‍රයෝජනවත් වුණාද?', fbNote: 'අදහස මෙම උපකරණයේ පමණක් නිර්නාමිකව සුරැකේ — සේවා වැඩිදියුණුවට යොදාගැනේ.', fbBad: 'එතරම් නැහැ', fbOkay: 'සාමාන්‍යයි', fbGood: 'ප්‍රයෝජනවත්', fbThanks: 'අදහසට ස්තුතියි!',
+  },
+  bn: {
+    fbTitle: 'এই বিশ্লেষণ কি সহায়ক ছিল?', fbNote: 'মতামত শুধু এই ডিভাইসে বেনামে সংরক্ষিত হয় — সেবা উন্নতিতে ব্যবহৃত হয়।', fbBad: 'তেমন না', fbOkay: 'মোটামুটি', fbGood: 'সহায়ক', fbThanks: 'মতামতের জন্য ধন্যবাদ!',
+  },
+  ru: {
+    fbTitle: 'Был ли этот анализ полезен?', fbNote: 'Отзыв хранится анонимно только на этом устройстве — для улучшения сервиса.', fbBad: 'Не очень', fbOkay: 'Нормально', fbGood: 'Полезно', fbThanks: 'Спасибо за отзыв!',
+  },
+  ja: {
+    fbTitle: 'この分析は役に立ちましたか？', fbNote: 'フィードバックはこの端末にのみ匿名で保存され、サービス改善に使われます。', fbBad: 'いまいち', fbOkay: 'ふつう', fbGood: '役に立った', fbThanks: 'フィードバックありがとうございます！',
+  },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | FeedbackKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2247,7 +2303,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_FEEDBACK] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
