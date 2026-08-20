@@ -20,6 +20,7 @@ PDF 업로드(/analyze-pdf)도 백엔드 프록시를 거친다 (자문 §7 — 
 import json
 import logging
 import os
+from pathlib import Path
 import time
 
 from typing import List, Literal, Optional
@@ -32,6 +33,7 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
+from src.learn_content import SCAMS, content_as_context
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
@@ -141,6 +143,39 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
         judge_scores=judge_scores,
         results=results,
     )
+
+
+_LEARN_CHAT_PROMPT = (
+    Path(__file__).parent / "src" / "prompts" / "learn_chat.txt"
+).read_text(encoding="utf-8")
+
+
+class LearnChatRequest(BaseModel):
+    """교육 페이지 챗봇 (#103) — 컨텍스트는 서버 사본만 사용 (클라이언트 미신뢰)."""
+
+    question: str = Field(..., min_length=2, max_length=500)
+    language: Optional[Language] = "ko"
+
+
+@app.get("/learn")
+def learn() -> dict:
+    """교육 콘텐츠 단일 원천 — 프론트가 표시용으로 가져간다."""
+    return {"scams": SCAMS}
+
+
+@app.post("/learn-chat")
+def learn_chat(req: LearnChatRequest) -> dict:
+    from src.llm import get_worker_llm, invoke_json
+
+    prompt = (_LEARN_CHAT_PROMPT
+              .replace("{language}", req.language or "ko")
+              .replace("{content}", content_as_context())
+              .replace("{question}", req.question))
+    try:
+        data = invoke_json(get_worker_llm(), prompt)
+        return {"ok": True, "answer": str(data["answer"])[:1000]}
+    except Exception:
+        return {"ok": False}
 
 
 @app.get("/health")

@@ -56,6 +56,18 @@ public class ContractController {
                 .body(body);
     }
 
+    /** 교육 콘텐츠 프록시 (#104). */
+    @org.springframework.web.bind.annotation.GetMapping("/learn")
+    public String learn() {
+        return agentClient.learn();
+    }
+
+    /** 교육 챗봇 프록시 (#103). */
+    @PostMapping("/learn-chat")
+    public String learnChat(@RequestBody String request) {
+        return agentClient.learnChat(request);
+    }
+
     /** 업로드 허용 최대 크기 (application.yml multipart 한도와 함께 이중 방어). */
     private static final long MAX_PDF_BYTES = 10 * 1024 * 1024;
 

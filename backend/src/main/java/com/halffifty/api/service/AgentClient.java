@@ -66,6 +66,21 @@ public class AgentClient {
                 .body(AnalyzeResponse.class);
     }
 
+    /** 교육 콘텐츠 프록시 (#104). */
+    public String learn() {
+        return restClient.get().uri("/learn").retrieve().body(String.class);
+    }
+
+    /** 교육 챗봇 프록시 (#103). */
+    public String learnChat(String requestJson) {
+        return restClient.post()
+                .uri("/learn-chat")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
     /**
      * PDF 업로드 프록시. 전문가 자문 §7 반영 — 모든 요청이 백엔드를 거치도록
      * 프론트→에이전트 직통 경로를 제거하고 이 메서드로 일원화한다.
