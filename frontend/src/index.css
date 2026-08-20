@@ -80,6 +80,42 @@
   button {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* KRDS 포커스 링 — 얇은 outline 대신 4px box-shadow(--krds-box-shadow-outline).
+     키보드 사용자(:focus-visible)에게만 표시, 모든 인터랙티브 요소 공통. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--krds-box-shadow-outline);
+  }
+
+  /* KRDS 터치 타깃 최소 48px (--krds-size-height-7).
+     인라인 텍스트 링크는 min-height가 무효(인라인 박스)라 영향 없고,
+     버튼·셀렉트·입력 필드가 대상이다. */
+  button,
+  select,
+  input[type='text'],
+  input[type='number'],
+  input[type='date'] {
+    min-height: var(--krds-size-height-7);
+  }
+  /* 체크박스·라디오는 높이 대신 크기 자체를 KRDS 아이콘 크기로 */
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* 움직임 최소화 선호 대응 — 애니메이션·전환을 사실상 정지 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ============================================================

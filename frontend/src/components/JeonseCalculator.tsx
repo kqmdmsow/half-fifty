@@ -1,5 +1,8 @@
 import { useState } from 'react'
-import { Card } from './ui'
+import { Card, RiskIcon } from './ui'
+
+// 계산기 등급 톤 → 위험도 아이콘 매핑 (3중 인코딩: 색+아이콘+텍스트)
+const TONE_LEVEL = { danger: '위험', caution: '주의', safe: '안전' } as const
 import { t, type LangCode } from '../i18n'
 
 /** 깡통전세 위험 계산기 (#63) — LLM 무관, 순수 프론트 계산.
@@ -101,7 +104,8 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
       {grade && ratio !== null ? (
         <div className={`mt-4 rounded-2xl border p-4 ${TONE_STYLE[grade.tone].box}`}>
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className={`rounded-lg px-2.5 py-1 text-[13px] font-bold ${TONE_STYLE[grade.tone].badge}`}>
+            <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[13px] font-bold ${TONE_STYLE[grade.tone].badge}`}>
+              <RiskIcon level={TONE_LEVEL[grade.tone]} />
               {t(language, grade.labelKey)}
             </span>
             <span className="text-[22px] font-bold text-ink-900">{(ratio * 100).toFixed(1)}%</span>
