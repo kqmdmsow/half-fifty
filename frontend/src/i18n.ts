@@ -2235,9 +2235,33 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+
+type VoiceKey =
+  | 'vcToggle' | 'vcListening' | 'vcOff'
+
+// 앱 내 음성 명령 (#127)
+const UI_VOICE: Record<LangCode, Record<VoiceKey, string>> = {
+  ko: { vcToggle: '음성 명령', vcListening: '듣고 있어요 — "다음", "이전", "읽어줘", "멈춰", "더 쉽게"', vcOff: '음성 명령 끄기' },
+  en: { vcToggle: 'Voice commands', vcListening: 'Listening — "next", "previous", "read", "stop", "simpler"', vcOff: 'Turn off voice commands' },
+  zh: { vcToggle: '语音命令', vcListening: '正在听 — “下一个”“上一个”“读一下”“停止”“更简单”', vcOff: '关闭语音命令' },
+  vi: { vcToggle: 'Lệnh giọng nói', vcListening: 'Đang nghe — "tiếp", "trước", "đọc", "dừng", "dễ hơn"', vcOff: 'Tắt lệnh giọng nói' },
+  th: { vcToggle: 'คำสั่งเสียง', vcListening: 'กำลังฟัง — "ถัดไป" "ก่อนหน้า" "อ่าน" "หยุด" "ง่ายขึ้น"', vcOff: 'ปิดคำสั่งเสียง' },
+  id: { vcToggle: 'Perintah suara', vcListening: 'Mendengarkan — "berikutnya", "sebelumnya", "baca", "berhenti", "lebih mudah"', vcOff: 'Matikan perintah suara' },
+  tl: { vcToggle: 'Voice commands', vcListening: 'Nakikinig — "next", "previous", "basahin", "tigil", "mas simple"', vcOff: 'I-off ang voice commands' },
+  ne: { vcToggle: 'आवाज आदेश', vcListening: 'सुन्दै — "अर्को", "अघिल्लो", "पढ", "रोक", "सजिलो"', vcOff: 'आवाज आदेश बन्द' },
+  km: { vcToggle: 'ពាក្យបញ្ជាសំឡេង', vcListening: 'កំពុងស្ដាប់ — "បន្ទាប់" "មុន" "អាន" "ឈប់" "ងាយជាង"', vcOff: 'បិទពាក្យបញ្ជាសំឡេង' },
+  my: { vcToggle: 'အသံအမိန့်', vcListening: 'နားထောင်နေသည် — "နောက်တစ်ခု" "အရင်" "ဖတ်ပြ" "ရပ်" "ပိုလွယ်"', vcOff: 'အသံအမိန့်ပိတ်ရန်' },
+  mn: { vcToggle: 'Дуут тушаал', vcListening: 'Сонсож байна — "дараах", "өмнөх", "унш", "зогс", "хялбар"', vcOff: 'Дуут тушаал унтраах' },
+  uz: { vcToggle: 'Ovozli buyruq', vcListening: 'Tinglamoqda — "keyingi", "oldingi", "oʻqi", "toʻxta", "osonroq"', vcOff: 'Ovozli buyruqni oʻchirish' },
+  si: { vcToggle: 'හඬ විධාන', vcListening: 'අසමින් — "ඊළඟ", "පෙර", "කියවන්න", "නවත්වන්න", "සරලව"', vcOff: 'හඬ විධාන වසන්න' },
+  bn: { vcToggle: 'ভয়েস কমান্ড', vcListening: 'শুনছে — "পরের", "আগের", "পড়ো", "থামো", "সহজে"', vcOff: 'ভয়েস কমান্ড বন্ধ' },
+  ru: { vcToggle: 'Голосовые команды', vcListening: 'Слушаю — «дальше», «назад», «прочитай», «стоп», «проще»', vcOff: 'Выключить голосовые команды' },
+  ja: { vcToggle: '音声コマンド', vcListening: '聞いています — 「次」「前」「読んで」「止めて」「もっと簡単に」', vcOff: '音声コマンドをオフ' },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | VoiceKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2247,7 +2271,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_VOICE] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
