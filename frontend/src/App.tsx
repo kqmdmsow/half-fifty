@@ -218,6 +218,13 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
+      {/* 스크린리더·키보드 사용자용 스킵 링크 (#82 2차) — 포커스될 때만 보임 */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-brand-500 focus:px-4 focus:py-2 focus:text-white"
+      >
+        {t(language, 'skipToMain')}
+      </a>
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo onClick={() => go('landing')} />
@@ -265,7 +272,7 @@ export default function App() {
         </div>
       </header>
 
-      <main>
+      <main id="main">
         {/* 결과 열람 중 언어 변경 감지 — 설명은 분석 시점 언어로 생성되므로
             바꾼 언어로 받으려면 재분석이 필요하다. 입력(텍스트·파일)은 상태에
             남아 있어 버튼 한 번으로 같은 계약서를 다시 분석한다. */}
