@@ -106,6 +106,30 @@
   }
 }
 
+/* 스크롤 리빌·히어로 스태거 (#134 모션) — 움직임을 선호하는 사용자에게만.
+   reduced-motion이거나 IO 미지원이면 숨김 상태 자체가 적용되지 않아
+   콘텐츠는 항상 보인다 (Reveal.tsx 참조). */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  /* 히어로 로드 스태거 — 배지→제목→부제→CTA 순서로 떠오른다 */
+  .hero-stagger > * {
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+  .hero-stagger > *:nth-child(3) { animation-delay: 0.2s; }
+  .hero-stagger > *:nth-child(4) { animation-delay: 0.3s; }
+}
+
 /* 움직임 최소화 선호 대응 — 애니메이션·전환을 사실상 정지 */
 @media (prefers-reduced-motion: reduce) {
   *,
