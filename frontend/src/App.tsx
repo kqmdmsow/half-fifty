@@ -358,6 +358,7 @@ export default function App() {
             results={results}
             voiceGuide={voiceGuide}
             language={language}
+            persona={persona}
             onSelectClause={setSelectedClauseId}
             onBack={() => go('summary')}
             onDone={() => go('done')}

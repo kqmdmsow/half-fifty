@@ -143,6 +143,24 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     )
 
 
+class ReexplainRequest(BaseModel):
+    """사용자 트리거 재설명 (#76) — explanation만 재생성, 판정 불변."""
+
+    clause_id: str
+    clause_text: str = Field(..., description="조항 원문 (judge faithfulness 채점 기준)")
+    analysis: dict = Field(..., description="기존 분석 결과 (risk_level 등 판정 필드 포함)")
+    mode: Literal["easier", "detailed"]
+    persona: Literal["adult", "senior", "foreigner"] = "adult"
+    language: Optional[Language] = "ko"
+
+
+@app.post("/reexplain")
+def reexplain_endpoint(req: ReexplainRequest) -> dict:
+    """judge 게이트 통과분만 반환 — 실패 시 ok=False (프론트는 기존 설명 유지)."""
+    return reexplain(req.clause_id, req.clause_text, req.analysis,
+                     req.mode, req.persona, req.language or "ko")
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
