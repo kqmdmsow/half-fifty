@@ -121,6 +121,12 @@
     opacity: 1;
     transform: none;
   }
+  /* 회전 헤드라인 단어 교체 (#134) — 아래에서 살짝 떠오르며 교체 */
+  .word-swap {
+    display: inline-block;
+    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
   /* 히어로 로드 스태거 — 배지→제목→부제→CTA 순서로 떠오른다 */
   .hero-stagger > * {
     animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
