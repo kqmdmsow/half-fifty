@@ -11,6 +11,8 @@
  * 클라우드 TTS(Clova·ElevenLabs 등)는 비용·백엔드 프록시가 필요해 로드맵으로 남긴다.
  */
 
+import { useEffect, useState } from 'react'
+
 import type { LangCode } from './i18n'
 
 // 앱 언어 코드 → BCP-47 (SpeechSynthesis lang)
@@ -68,6 +70,35 @@ export function speak(text: string, language: LangCode = 'ko', onEnd?: () => voi
     return
   }
   utter()
+}
+
+/** 선택 언어의 보이스가 이 기기에 있는지 (#86-①).
+ *
+ * Web Speech 보이스는 OS/브라우저 의존이라 저자원 언어(km/my/mn/uz/si 등)는
+ * 없을 수 있다. 없으면 한국어 기본 보이스가 외국어 텍스트를 엉뚱하게 읽는
+ * 것보다 버튼을 안 보여주는 게 낫다 — 이 한계는 기능명세서에 명시.
+ * 보이스 목록이 아직 비어 있으면(비동기 로드 전) 낙관적으로 true를 반환하고,
+ * useVoiceAvailable이 voiceschanged에서 재평가한다.
+ */
+export function voiceAvailable(language: LangCode): boolean {
+  if (!('speechSynthesis' in window)) return false
+  const voices = window.speechSynthesis.getVoices()
+  if (voices.length === 0) return true
+  const prefix = (TTS_LANG[language] ?? 'ko-KR').split('-')[0].toLowerCase()
+  return voices.some((v) => v.lang.replace('_', '-').toLowerCase().startsWith(prefix))
+}
+
+/** voiceAvailable의 리액티브 버전 — 보이스 목록 로드 완료 시 재평가. */
+export function useVoiceAvailable(language: LangCode): boolean {
+  const [available, setAvailable] = useState(() => voiceAvailable(language))
+  useEffect(() => {
+    const update = () => setAvailable(voiceAvailable(language))
+    update()
+    if (!('speechSynthesis' in window)) return
+    window.speechSynthesis.addEventListener('voiceschanged', update)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', update)
+  }, [language])
+  return available
 }
 
 export function stopSpeaking() {
