@@ -90,7 +90,10 @@ def _adapt(
     except Exception as exc:
         # 페르소나 적응 실패는 치명적이지 않다 — 원문 explanation을 그대로 쓰고
         # 파이프라인은 계속 간다 (analysis/judge와 동일한 방어 원칙, PR#43 참조).
-        logger.warning("%s 적응 실패, 원본 설명 유지: %s", result["clause_id"], exc)
+        # exc는 LLM 원응답 일부(최대 200자, src/llm.py invoke_json)를 담을 수
+        # 있어 종류만 WARNING, 전체 내용은 DEBUG로만 남긴다 (#58).
+        logger.warning("%s 적응 실패, 원본 설명 유지: %s", result["clause_id"], type(exc).__name__)
+        logger.debug("%s 적응 실패 상세", result["clause_id"], exc_info=exc)
         explanation = result["explanation"]
 
     adapted = dict(result)

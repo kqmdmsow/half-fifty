@@ -38,6 +38,14 @@ _FILLER_TOKENS = frozenset({
     "위한", "위하여", "인한", "인하여",
 })
 
+# 목적어로 쓰인 지시대명사 — 완전한 조사 결합형(이+를, 그것+을)으로만
+# 매칭한다. 대명사 어근("이", "그")은 넣지 않는다: "이 조항"처럼 뒤 명사를
+# 꾸미는 관형사로도 흔히 쓰여서, 어근만 지우면 무관한 단어까지 훼손될
+# 위험이 크다(#78 데모 리허설 실측: normal_deposit_terms clause_014
+# "은행이 이를 접수한 뒤"를 모델이 "은행이 접수한 뒤"로 인용해 폴백됨).
+# 그 외 변형(새 단어 추가·순서 변경·다른 문구)은 여전히 엄격하게 검사한다.
+_PRONOUN_FILLER_TOKENS = frozenset({"이를", "그를", "이것을", "그것을"})
+
 
 def _strip_josa(token: str) -> str:
     for suf in _JOSA_SUFFIXES:
@@ -67,7 +75,7 @@ def _normalize(s: str) -> str:
         while core and not core[-1].isalnum():  # Hangul 음절도 isalnum()=True
             trailing = core[-1] + trailing
             core = core[:-1]
-        if core in _FILLER_TOKENS:
+        if core in _FILLER_TOKENS or core in _PRONOUN_FILLER_TOKENS:
             continue
         kept.append(_strip_josa(core) + trailing)
     s = "".join(kept)

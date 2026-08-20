@@ -46,13 +46,17 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
   return picked
 }
 
-export function speak(text: string, language: LangCode = 'ko') {
+export function speak(text: string, language: LangCode = 'ko', onEnd?: () => void) {
   if (!('speechSynthesis' in window)) return
   const lang = TTS_LANG[language] ?? 'ko-KR'
   const utter = () => {
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = lang
     utterance.rate = 0.95
+    if (onEnd) {
+      utterance.onend = onEnd
+      utterance.onerror = onEnd // cancel() 포함 — 버튼 상태 복원 보장
+    }
     const voice = pickVoice(lang)
     if (voice) utterance.voice = voice
     window.speechSynthesis.cancel()

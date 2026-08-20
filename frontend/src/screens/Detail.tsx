@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META } from '../data/sample'
@@ -25,6 +25,7 @@ export function DetailScreen({
   onDone: () => void
 }) {
   const clause = results.find((result) => result.clause_id === clauseId) ?? results[0]
+  const [listening, setListening] = useState(false)
 
   // 음성 안내: 화면 진입 시 설명 읽기 (기기 최적 한국어 보이스 자동 선택 — src/tts.ts)
   useEffect(() => {
@@ -32,6 +33,12 @@ export function DetailScreen({
     speak(clause.explanation, language)
     return () => stopSpeaking()
   }, [voiceGuide, clause, language])
+
+  // 수동 "들어보기" 버튼 상태(#118) — 조항을 바꾸면 이전 조항 재생 상태를 들고
+  // 있지 않도록 초기화. 실제 정지는 위 effect의 cleanup(stopSpeaking)이 처리.
+  useEffect(() => {
+    setListening(false)
+  }, [clause?.clause_id])
 
   // 결과가 아직 없으면 렌더링하지 않는다 (가짜 예시 폴백 제거 후의 방어선).
   // 훅 규칙 때문에 useEffect 뒤에 위치해야 한다.
@@ -63,6 +70,7 @@ export function DetailScreen({
                   key={result.clause_id}
                   type="button"
                   onClick={() => onSelectClause(result.clause_id)}
+                  aria-label={`${clauseHeading(result.original_text, language, result.original_text_translated) ?? result.clause_id}, ${riskLevelLabel(language, result.risk_level)}`}
                   className={`flex shrink-0 items-center gap-2.5 rounded-2xl px-4 py-3 text-left text-[14px] font-semibold transition-colors ${
                     active
                       ? 'bg-ink-900 text-white'
@@ -103,6 +111,25 @@ export function DetailScreen({
                 </p>
               )}
             </div>
+            {/* 수동 낭독 버튼 (#118) — 자동 재생 토글과 별개로 누구나 즉시 재생 가능 */}
+            <button
+              type="button"
+              aria-pressed={listening}
+              onClick={() => {
+                if (listening) {
+                  stopSpeaking()
+                  setListening(false)
+                  return
+                }
+                setListening(true)
+                speak(clause.explanation, language, () => setListening(false))
+              }}
+              className={`shrink-0 rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+                listening ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
+              }`}
+            >
+              🔊 {t(language, listening ? 'readAllStop' : 'listenClause')}
+            </button>
           </div>
 
           <Section title={t(language, 'explainSimply')}>

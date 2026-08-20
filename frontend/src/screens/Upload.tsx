@@ -107,6 +107,10 @@ export function UploadScreen({
         </div>
       </Card>
 
+      {/* 스크린리더 전용 경로 안내 (#82) — 2025 금융위 정책으로 은행 계약서류가
+          텍스트 파일로 제공되기 시작해, 붙여넣기가 시각장애인 주 경로다 */}
+      <p className="sr-only">{t(language, 'upSrHint')}</p>
+
       {/* 입력 방식 탭 */}
       <div className="mt-8 grid grid-cols-2 rounded-2xl bg-ink-50 p-1">
         {(['pdf', 'text'] as InputMode[]).map((item) => (
