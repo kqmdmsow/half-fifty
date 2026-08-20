@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   KRDS (대한민국 정부 디지털 서비스 디자인시스템) 토큰 이식
+   원본: KRDS-uiux/krds-uiux resources/css/token/krds_tokens.css
+         + resources/css/common/common.css (2024-12-09 생성본, 2026-08-20 수집)
+
+   ◦ 색은 RGB 트리플릿(예: 11 80 208)으로 둔다 — tailwind.config.js가
+     rgb(var(--c-*) / <alpha-value>)로 참조해 bg-white/90 같은
+     알파 수식이 그대로 동작하고, 모드 전환은 이 변수 스왑만으로 끝난다.
+   ◦ 치수 토큰은 rem→px 환산(×10). KRDS는 html {font-size: 62.5%}
+     (1rem=10px) 전제인데 이 앱은 Tailwind 기본(1rem=16px)이라
+     rem을 그대로 옮기면 전부 62.5% 크기로 깨진다. 루트 62.5% 전환은
+     기존 px 유틸리티 전면 재검토가 필요해 px 환산을 택했다.
+   ◦ 각 값의 KRDS 출처 토큰명을 주석으로 병기 — 심사 대응 근거.
+   ============================================================ */
+:root {
+  /* --- 색 (light 세트) --- */
+  --c-white: 255 255 255; /* #ffffff — --krds-color-light-gray-0 */
+  --c-ink-900: 19 20 22; /* #131416 — --krds-light-color-text-bolder (gray-95) */
+  --c-ink-700: 30 33 36; /* #1e2124 — --krds-light-color-text-basic (gray-90) */
+  --c-ink-600: 70 76 83; /* #464c53 — --krds-light-color-text-subtle (gray-70) */
+  --c-ink-400: 88 97 106; /* #58616a — --krds-color-light-gray-60 */
+  --c-ink-300: 109 120 130; /* #6d7882 — --krds-color-light-gray-50 (4.68:1 — gray-40은 3.1:1이라 미채택) */
+  --c-ink-200: 205 209 213; /* #cdd1d5 — --krds-light-color-border-gray-light (gray-20) */
+  --c-ink-100: 230 232 234; /* #e6e8ea — --krds-color-light-gray-10 */
+  --c-ink-50: 244 245 246; /* #f4f5f6 — --krds-light-color-surface-gray-subtler (gray-5) */
+  --c-ink-25: 244 245 246; /* #f4f5f6 — --krds-color-light-gray-5 */
+  --c-brand-50: 236 242 254; /* #ecf2fe — --krds-light-color-surface-primary-subtler (primary-5) */
+  --c-brand-100: 216 229 253; /* #d8e5fd — --krds-light-color-element-primary-light (primary-10) */
+  --c-brand-500: 11 80 208; /* #0b50d0 — --krds-light-color-text-primary (primary-60; primary-50은 흰글자 4.2:1이라 미채택) */
+  --c-brand-600: 8 56 145; /* #083891 — --krds-color-light-primary-70 (hover) */
+  --c-brand-700: 5 37 97; /* #052561 — --krds-color-light-primary-80 (active) */
+  --c-danger-50: 253 239 236; /* #fdefec — --krds-light-color-surface-danger-subtler (danger-5) */
+  --c-danger-500: 222 52 18; /* #de3412 — --krds-color-light-danger-50 (흰글자 4.56:1) */
+  --c-danger-600: 189 44 15; /* #bd2c0f — --krds-light-color-text-danger (danger-60) */
+  --c-caution-50: 255 243 219; /* #fff3db — --krds-light-color-surface-warning-subtler (warning-5) */
+  --c-caution-500: 158 106 0; /* #9e6a00 — --krds-color-light-warning-50 (흰글자 4.65:1) */
+  --c-caution-700: 138 92 0; /* #8a5c00 — --krds-light-color-text-warning (warning-60) */
+  --c-safe-50: 234 246 236; /* #eaf6ec — --krds-light-color-surface-success-subtler (success-5) */
+  --c-safe-500: 34 135 56; /* #228738 — --krds-color-light-success-50 (흰글자 4.57:1) */
+  --c-safe-700: 38 115 55; /* #267337 — --krds-light-color-text-success (success-60) */
+  --c-focus-ring: 11 80 208; /* #0b50d0 — --krds-light-color-border-primary 계열 (primary-60) */
+
+  /* --- 치수·효과 (KRDS common.css, rem→px 환산) --- */
+  --krds-size-height-7: 48px; /* --krds-size-height-7 = number-16 = 4.8rem — 터치 타깃 최소 */
+  --krds-size-height-5: 32px; /* number-12 = 3.2rem */
+  --krds-box-shadow-outline: 0 0 0 4px rgb(var(--c-focus-ring)); /* 0.4rem */
+  --krds-box-shadow-outline-inset: inset 0 0 0 2px rgb(var(--c-focus-ring)); /* 0.2rem */
+  --krds-font-underline-offset: 3px; /* 0.3rem */
+  /* 글자·화면 크기 5단계 (--krds-zoom-*) — App.tsx가 JS로 적용 */
+  --krds-zoom-small: 0.9;
+  --krds-zoom-medium: 1;
+  --krds-zoom-large: 1.1;
+  --krds-zoom-xlarge: 1.3;
+  --krds-zoom-xxlarge: 1.5;
+  /* 그림자 색 (--krds-light-color-alpha-shadow1/2/3) */
+  --c-shadow-1: rgba(0, 0, 0, 0.05);
+  --c-shadow-2: rgba(0, 0, 0, 0.08);
+  --c-shadow-3: rgba(0, 0, 0, 0.12);
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;

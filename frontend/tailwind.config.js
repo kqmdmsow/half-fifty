@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         sans: [
+          'Pretendard GOV',
           'Pretendard Variable',
           'Pretendard',
           '-apple-system',
