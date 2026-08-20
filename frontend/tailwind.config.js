@@ -19,32 +19,50 @@ export default {
           'sans-serif',
         ],
       },
+      // KRDS 토큰 매핑 — 클래스명은 유지, 값은 src/index.css의 CSS 변수
+      // (RGB 트리플릿)를 참조한다. 실값·KRDS 출처 토큰명은 index.css 주석 참조.
+      // white까지 변수인 이유: KRDS 고대비 모드는 배경 반전(흰→검)이라
+      // 변수 스왑만으로 모드가 전환되려면 white도 슬롯이어야 한다.
       colors: {
+        white: 'rgb(var(--c-white) / <alpha-value>)',
         brand: {
-          50: '#EBF3FE',
-          100: '#D6E7FD',
-          500: '#3182F6',
-          600: '#1B64DA',
-          700: '#1957C2',
+          50: 'rgb(var(--c-brand-50) / <alpha-value>)',
+          100: 'rgb(var(--c-brand-100) / <alpha-value>)',
+          500: 'rgb(var(--c-brand-500) / <alpha-value>)',
+          600: 'rgb(var(--c-brand-600) / <alpha-value>)',
+          700: 'rgb(var(--c-brand-700) / <alpha-value>)',
         },
         ink: {
-          900: '#191F28',
-          700: '#333D4B',
-          600: '#4E5968',
-          400: '#8B95A1',
-          300: '#B0B8C1',
-          200: '#D1D6DB',
-          100: '#E5E8EB',
-          50: '#F2F4F6',
-          25: '#F9FAFB',
+          900: 'rgb(var(--c-ink-900) / <alpha-value>)',
+          700: 'rgb(var(--c-ink-700) / <alpha-value>)',
+          600: 'rgb(var(--c-ink-600) / <alpha-value>)',
+          400: 'rgb(var(--c-ink-400) / <alpha-value>)',
+          300: 'rgb(var(--c-ink-300) / <alpha-value>)',
+          200: 'rgb(var(--c-ink-200) / <alpha-value>)',
+          100: 'rgb(var(--c-ink-100) / <alpha-value>)',
+          50: 'rgb(var(--c-ink-50) / <alpha-value>)',
+          25: 'rgb(var(--c-ink-25) / <alpha-value>)',
         },
-        danger: { 50: '#FEECEE', 500: '#F04452', 600: '#D22030' },
-        caution: { 50: '#FFF3E0', 500: '#FE9800', 700: '#B65C00' },
-        safe: { 50: '#E5F9F1', 500: '#00C471', 700: '#00794D' },
+        danger: {
+          50: 'rgb(var(--c-danger-50) / <alpha-value>)',
+          500: 'rgb(var(--c-danger-500) / <alpha-value>)',
+          600: 'rgb(var(--c-danger-600) / <alpha-value>)',
+        },
+        caution: {
+          50: 'rgb(var(--c-caution-50) / <alpha-value>)',
+          500: 'rgb(var(--c-caution-500) / <alpha-value>)',
+          700: 'rgb(var(--c-caution-700) / <alpha-value>)',
+        },
+        safe: {
+          50: 'rgb(var(--c-safe-50) / <alpha-value>)',
+          500: 'rgb(var(--c-safe-500) / <alpha-value>)',
+          700: 'rgb(var(--c-safe-700) / <alpha-value>)',
+        },
       },
       boxShadow: {
-        card: '0 1px 3px rgba(25, 31, 40, 0.06), 0 6px 20px rgba(25, 31, 40, 0.05)',
-        float: '0 8px 30px rgba(25, 31, 40, 0.12)',
+        // 기하는 기존 유지, 색만 KRDS alpha-shadow1/2/3 토큰
+        card: '0 1px 3px var(--c-shadow-1), 0 6px 20px var(--c-shadow-2)',
+        float: '0 8px 30px var(--c-shadow-3)',
       },
       keyframes: {
         'fade-up': {
