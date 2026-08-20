@@ -17,6 +17,9 @@ _PASS = {"clarity": 5.0, "faithfulness": 5.0, "risk_coverage": 4.5,
          "actionability": 4.5, "rationale": {}}
 _FAIL_FAITH = {"clarity": 5.0, "faithfulness": 2.0, "risk_coverage": 5.0,
                "actionability": 5.0, "rationale": {}}
+# 재설명이 안 바꾸는 축(coverage·actionability)이 낮아도 faith+clarity면 통과
+_LOW_UNCHANGED = {"clarity": 4.5, "faithfulness": 4.0, "risk_coverage": 2.0,
+                  "actionability": 2.0, "rationale": {}}
 
 
 def _run(gen_returns, judge_returns):
@@ -66,3 +69,12 @@ def test_짧은_설명은_생성실패로_처리():
     out = _run([{"explanation": "짧다"}, {"explanation": "이건 충분히 긴 두 번째 설명이에요. 원문에 충실합니다."}],
                [_PASS])
     assert out["ok"] is True and out["retry_count"] == 1
+
+
+def test_안바꾸는_축이_낮아도_faith_clarity면_통과():
+    """실측 근거: 'easier' 재작성은 근거·질문(불변 필드)을 채점하는
+    risk_coverage·actionability를 구조적으로 낮게 받는다 — 게이트는
+    재설명이 실제로 바꾸는 축만 본다 (#75 aspect 라우팅 철학)."""
+    out = _run([{"explanation": "쉽게 말하면, 보증금을 돌려줄 회사가 책임을 안 진다는 뜻이에요."}],
+               [_LOW_UNCHANGED])
+    assert out["ok"] is True

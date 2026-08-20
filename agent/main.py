@@ -34,6 +34,7 @@ from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
+from src.reexplain import reexplain
 from src.state import PipelineState
 from src.stream import stream_analysis
 

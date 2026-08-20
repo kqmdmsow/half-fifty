@@ -21,7 +21,7 @@ from typing import Optional
 
 from src.llm import get_worker_llm, invoke_json
 from src.nodes.judge import judge_node
-from src.state import FAITHFULNESS_MIN, JUDGE_THRESHOLD, judge_score_avg
+from src.state import FAITHFULNESS_MIN, JUDGE_THRESHOLD
 
 logger = logging.getLogger(__name__)
 
@@ -97,14 +97,19 @@ def reexplain(
         numeric = {k: v for k, v in scores.items() if isinstance(v, (int, float))}
         last_scores = numeric
         faith = scores["faithfulness"]
-        avg = judge_score_avg(scores)
-        if faith >= FAITHFULNESS_MIN and avg >= JUDGE_THRESHOLD:
-            logger.info("%s 재설명 게이트 통과 (faith %.1f, avg %.2f, %d차)",
-                        clause_id, faith, avg, attempt + 1)
+        clarity = scores["clarity"]
+        # 게이트는 재설명이 실제로 바꾸는 축만 본다 (#75 aspect 라우팅과 동일
+        # 철학): faithfulness(원문 왜곡 — 필수) + clarity(이해용이성 — 재설명의
+        # 존재 이유). risk_coverage·actionability는 건드리지 않은 필드(근거·
+        # 질문)의 속성이라 전체 평균에 넣으면 '더 쉽게'(=짧게) 재작성이
+        # 구조적으로 미달함 — 실측: 통과 불가 (faith 4.0인데 coverage 2.0).
+        if faith >= FAITHFULNESS_MIN and clarity >= JUDGE_THRESHOLD:
+            logger.info("%s 재설명 게이트 통과 (faith %.1f, clarity %.1f, %d차)",
+                        clause_id, faith, clarity, attempt + 1)
             return {"ok": True, "explanation": explanation,
                     "judge_scores": numeric, "retry_count": attempt}
-        logger.info("%s 재설명 게이트 미달 (faith %.1f, avg %.2f, %d차)",
-                    clause_id, faith, avg, attempt + 1)
+        logger.info("%s 재설명 게이트 미달 (faith %.1f, clarity %.1f, %d차)",
+                    clause_id, faith, clarity, attempt + 1)
 
     return {"ok": False, "reason": "gate_failed",
             "judge_scores": last_scores, "retry_count": _MAX_ATTEMPTS - 1}
