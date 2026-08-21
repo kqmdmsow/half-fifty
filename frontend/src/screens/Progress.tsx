@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, RiskBadge } from '../components/ui'
+import { LensMark } from '../components/Brand'
 
 const PHASES = [
   '계약서 텍스트 읽기',
@@ -83,7 +84,19 @@ export function ProgressScreen({
             className="transition-all duration-500"
           />
         </svg>
-        <span className="absolute text-[22px]">{error ? '⚠️' : loading ? '📄' : '✅'}</span>
+        {/* 분석 중에는 돋보기 마크가 조항을 들여다본다 (#134 브랜드 마크) */}
+        <span className="absolute flex items-center justify-center">
+          {loading && !error ? (
+            <LensMark size={30} className="animate-lens-scan" />
+          ) : (
+            <span
+              aria-hidden
+              className={`text-[24px] font-extrabold ${error ? 'text-caution-500' : 'text-safe-500'}`}
+            >
+              {error ? '!' : '✓'}
+            </span>
+          )}
+        </span>
       </div>
 
       <h1 className="mt-8 text-[24px] font-bold tracking-[-0.02em] text-ink-900 md:text-[28px]">

@@ -7,7 +7,6 @@ import {
   type Language,
   type Persona,
 } from './api'
-import { Logo } from './components/ui'
 import { LANGUAGES, t } from './i18n'
 import { saveRecord, type SavedRecord } from './records'
 import { currentSession, pushServerRecord, signOut, type Session } from './auth'
@@ -21,6 +20,7 @@ import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
+import { DocMark, Wordmark } from './components/Brand'
 import { LoginScreen } from './screens/Login'
 import { RecordsScreen } from './screens/Records'
 
@@ -74,6 +74,7 @@ export default function App() {
   // 로그인 세션 (#102) — 로그인이 여는 기능은 '결과를 계정에 보관' 하나뿐이다.
   const [session, setSession] = useState<Session | null>(() => currentSession())
   const [savedToAccount, setSavedToAccount] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   // 로그인 후 자동으로 이어서 보관할지 (끝내기 화면에서 로그인으로 보낸 경우)
   const pendingKeepRef = useRef(false)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
@@ -116,6 +117,7 @@ export default function App() {
   // 화면 전환을 브라우저 히스토리에 쌓는다 — 뒤로가기가 홈으로 튕기며 분석
   // 결과까지 날리던 문제의 수정. popstate로 앱 내 화면 이동으로 처리한다.
   const go = (next: Screen) => {
+    setMenuOpen(false)
     window.history.pushState({ screen: next }, '')
     setScreen(next)
     window.scrollTo({ top: 0 })
@@ -260,72 +262,106 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
+      {/* 헤더 (#134) — 왼쪽 메뉴 버튼 + 가운데 로고. 언어·글자크기·또렷하게·
+          기록·로그인은 메뉴 안으로 모아 첫 화면을 비운다. */}
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Logo onClick={() => go('landing')} />
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
-              <span aria-hidden>🌐</span>
-              <select
-                aria-label="언어 선택 / Language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as Language)}
-                className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
-              >
-                {LANGUAGES.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              aria-pressed={largeText}
-              onClick={() => setLargeText((value) => !value)}
-              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                largeText
-                  ? 'bg-ink-900 text-white'
-                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-              }`}
-            >
-              {t(language, 'largeText')}
-            </button>
-            <button
-              type="button"
-              onClick={() => go('records')}
-              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
-            >
-              {t(language, 'rcNav')}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (session) {
-                  signOut()
-                  setSession(null)
-                } else {
-                  go('login')
-                }
-              }}
-              className="rounded-full bg-ink-50 px-4 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
-            >
-              {t(language, session ? 'lgOut' : 'lgNav')}
-            </button>
-            <button
-              type="button"
-              aria-pressed={highContrast}
-              onClick={() => setHighContrast((value) => !value)}
-              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                highContrast
-                  ? 'bg-ink-900 text-white'
-                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-              }`}
-            >
-              {t(language, 'hcToggle')}
-            </button>
-          </div>
+        <div className="relative mx-auto flex h-16 max-w-6xl items-center px-4 md:px-6">
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            aria-label={t(language, 'navMenu')}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="flex h-12 w-12 shrink-0 flex-col items-center justify-center gap-[5px] rounded-xl hover:bg-ink-50"
+          >
+            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-transform ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`} />
+            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-opacity ${menuOpen ? 'opacity-0' : ''}`} />
+            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-transform ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false)
+              go('landing')
+            }}
+            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2"
+          >
+            <DocMark size={26} />
+            <Wordmark className="text-[19px]" />
+          </button>
         </div>
+
+        {menuOpen && (
+          <div id="site-menu" className="border-t border-ink-50 bg-white">
+            <div className="mx-auto max-w-6xl px-4 py-4 md:px-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600">
+                  <select
+                    aria-label="언어 선택 / Language"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as Language)}
+                    className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
+                  >
+                    {LANGUAGES.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  aria-pressed={largeText}
+                  onClick={() => setLargeText((value) => !value)}
+                  className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+                    largeText ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+                  }`}
+                >
+                  {t(language, 'largeText')}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={highContrast}
+                  onClick={() => setHighContrast((value) => !value)}
+                  className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+                    highContrast ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+                  }`}
+                >
+                  {t(language, 'hcToggle')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    go('records')
+                  }}
+                  className="rounded-full bg-ink-50 px-4 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+                >
+                  {t(language, 'rcNav')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    if (session) {
+                      signOut()
+                      setSession(null)
+                    } else {
+                      go('login')
+                    }
+                  }}
+                  className="rounded-full bg-ink-50 px-4 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+                >
+                  {t(language, session ? 'lgOut' : 'lgNav')}
+                </button>
+              </div>
+              {session && (
+                <p className="mt-3 text-[12px] font-semibold text-ink-400">{session.email}</p>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       <main>
