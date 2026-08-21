@@ -361,6 +361,7 @@ export default function App() {
             retrying={retrying}
             domain={domain}
             warnings={data?.parse_warnings ?? []}
+            warningCodes={data?.parse_warning_codes ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
           />

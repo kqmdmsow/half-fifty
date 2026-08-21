@@ -2235,6 +2235,113 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+type WarnKey =
+  | 'wnPii' | 'wnByulji' | 'wnLowCoverage' | 'wnInjection'
+
+// parse_warnings 현지화 (#86-② — agent warning_codes.py와 코드 정렬)
+const UI_WARNINGS: Record<LangCode, Record<WarnKey, string>> = {
+  ko: {
+    wnPii: '개인정보(전화번호·주민등록번호 등)를 자동으로 가렸어요. 분석에는 영향이 없어요.',
+    wnByulji: '별지(첨부 문서) 이후 내용은 분석에서 제외했어요. 중요한 내용이 있다면 그 부분만 따로 붙여넣어 다시 분석해 보세요.',
+    wnLowCoverage: '문서 일부가 조항으로 분리되지 않았어요. 빠진 조항이 없는지 원문과 대조해 확인하세요.',
+    wnInjection: '이 문서에서 AI 분석을 조작하려는 문구가 감지됐어요. 판정을 그대로 믿지 말고 원문을 직접 확인하세요.',
+  },
+  en: {
+    wnPii: 'Personal data (phone, ID numbers, etc.) was masked automatically. Analysis is unaffected.',
+    wnByulji: 'Content after attachments was excluded. If it matters, paste that part separately and re-analyze.',
+    wnLowCoverage: 'Part of the document couldn\'t be split into clauses. Cross-check the original for missing clauses.',
+    wnInjection: 'Text attempting to manipulate the AI analysis was detected. Don\'t take verdicts at face value — check the original.',
+  },
+  zh: {
+    wnPii: '已自动遮盖个人信息（电话、身份证号等），不影响分析。',
+    wnByulji: '附件之后的内容未纳入分析。如有重要内容，请单独粘贴后重新分析。',
+    wnLowCoverage: '文档部分内容未能拆分为条款。请对照原文确认有无遗漏。',
+    wnInjection: '检测到试图操纵AI分析的文字。请勿直接采信判定，务必核对原文。',
+  },
+  vi: {
+    wnPii: 'Thông tin cá nhân (điện thoại, số định danh...) đã được che tự động. Không ảnh hưởng phân tích.',
+    wnByulji: 'Nội dung sau phụ lục đã bị loại khỏi phân tích. Nếu quan trọng, dán riêng phần đó và phân tích lại.',
+    wnLowCoverage: 'Một phần tài liệu không tách được thành điều khoản. Đối chiếu nguyên văn xem có thiếu không.',
+    wnInjection: 'Phát hiện văn bản cố thao túng phân tích AI. Đừng tin ngay phán định — kiểm tra nguyên văn.',
+  },
+  th: {
+    wnPii: 'ปิดบังข้อมูลส่วนตัว (เบอร์โทร เลขประจำตัว ฯลฯ) โดยอัตโนมัติ ไม่กระทบการวิเคราะห์',
+    wnByulji: 'เนื้อหาหลังเอกสารแนบไม่ถูกวิเคราะห์ หากสำคัญ ให้วางส่วนนั้นแยกแล้ววิเคราะห์ใหม่',
+    wnLowCoverage: 'เอกสารบางส่วนแยกเป็นข้อไม่ได้ โปรดเทียบต้นฉบับว่าไม่มีข้อตกหล่น',
+    wnInjection: 'พบข้อความพยายามบิดเบือนการวิเคราะห์ AI อย่าเชื่อคำตัดสินทันที โปรดตรวจต้นฉบับ',
+  },
+  id: {
+    wnPii: 'Data pribadi (telepon, nomor identitas, dll.) ditutup otomatis. Analisis tidak terpengaruh.',
+    wnByulji: 'Konten setelah lampiran dikecualikan. Jika penting, tempel bagian itu terpisah dan analisis ulang.',
+    wnLowCoverage: 'Sebagian dokumen tidak bisa dipecah jadi pasal. Periksa naskah asli untuk pasal yang hilang.',
+    wnInjection: 'Terdeteksi teks yang mencoba memanipulasi analisis AI. Jangan langsung percaya — periksa naskah asli.',
+  },
+  tl: {
+    wnPii: 'Awtomatikong tinakpan ang personal data (telepono, ID numbers, atbp.). Hindi apektado ang pagsusuri.',
+    wnByulji: 'Hindi kasama sa pagsusuri ang nilalaman pagkatapos ng attachment. Kung mahalaga, i-paste ito nang hiwalay.',
+    wnLowCoverage: 'May bahagi ng dokumento na hindi nahati sa mga probisyon. Itugma sa orihinal.',
+    wnInjection: 'May natuklasang tekstong nagtatangkang manipulahin ang AI. Suriin ang orihinal na teksto.',
+  },
+  ne: {
+    wnPii: 'व्यक्तिगत जानकारी (फोन, परिचय नम्बर आदि) स्वतः लुकाइयो। विश्लेषणमा असर छैन।',
+    wnByulji: 'संलग्नपछिको सामग्री विश्लेषणबाट हटाइयो। महत्त्वपूर्ण भए त्यो भाग अलग टाँसेर पुनः विश्लेषण गर्नुहोस्।',
+    wnLowCoverage: 'कागजातको केही भाग दफामा छुट्टिएन। मूल पाठसँग दाँज्नुहोस्।',
+    wnInjection: 'एआई विश्लेषण बिगार्न खोज्ने पाठ भेटियो। निर्णय सिधै नपत्याई मूल पाठ जाँच्नुहोस्।',
+  },
+  km: {
+    wnPii: 'ព័ត៌មានផ្ទាល់ខ្លួន (ទូរស័ព្ទ លេខអត្តសញ្ញាណ...) ត្រូវបានបិទបាំងស្វ័យប្រវត្តិ។ មិនប៉ះពាល់ការវិភាគ។',
+    wnByulji: 'មាតិកាបន្ទាប់ពីឯកសារភ្ជាប់ត្រូវបានដកចេញ។ បើសំខាន់ សូមបិទភ្ជាប់ផ្នែកនោះដាច់ដោយឡែក ហើយវិភាគម្ដងទៀត។',
+    wnLowCoverage: 'ផ្នែកខ្លះនៃឯកសារមិនអាចបំបែកជាមាត្រា។ សូមផ្ទៀងជាមួយអត្ថបទដើម។',
+    wnInjection: 'រកឃើញអត្ថបទព្យាយាមរៀបចំការវិភាគ AI។ សូមពិនិត្យអត្ថបទដើមដោយផ្ទាល់។',
+  },
+  my: {
+    wnPii: 'ကိုယ်ရေးအချက်အလက် (ဖုန်း၊ မှတ်ပုံတင်နံပါတ်) ကို အလိုအလျောက်ဖုံးကွယ်ထားသည်။ စိစစ်မှုကို မထိခိုက်ပါ။',
+    wnByulji: 'နောက်ဆက်တွဲနောက်ပိုင်း အကြောင်းအရာကို မစိစစ်ပါ။ အရေးကြီးလျှင် ထိုအပိုင်းကို သီးခြားကူးထည့်၍ ပြန်စိစစ်ပါ။',
+    wnLowCoverage: 'စာရွက်စာတမ်းတစ်စိတ်တစ်ပိုင်း အပိုဒ်အဖြစ်မခွဲနိုင်ပါ။ မူရင်းနှင့်တိုက်ဆိုင်ပါ။',
+    wnInjection: 'AI စိစစ်မှုကို လှည့်စားရန်ကြိုးစားသောစာသားတွေ့ရှိ။ မူရင်းကို ကိုယ်တိုင်စစ်ပါ။',
+  },
+  mn: {
+    wnPii: 'Хувийн мэдээллийг (утас, бүртгэлийн дугаар г.м.) автоматаар нуулаа. Шинжилгээнд нөлөөгүй.',
+    wnByulji: 'Хавсралтын дараах агуулгыг шинжилгээнээс хассан. Чухал бол тэр хэсгийг тусад нь буулгаж дахин шинжилнэ үү.',
+    wnLowCoverage: 'Баримтын зарим хэсэг заалт болж салгагдсангүй. Эх бичвэртэй тулгана уу.',
+    wnInjection: 'AI шинжилгээг удирдах гэсэн бичвэр илэрлээ. Шийдвэрт шууд бүү итгэ — эхийг шалгаарай.',
+  },
+  uz: {
+    wnPii: 'Shaxsiy maʼlumotlar (telefon, ID raqamlar) avtomatik yashirildi. Tahlilga taʼsir qilmaydi.',
+    wnByulji: 'Ilovadan keyingi mazmun tahlildan chiqarildi. Muhim boʻlsa, oʻsha qismni alohida joylab qayta tahlil qiling.',
+    wnLowCoverage: 'Hujjatning bir qismi bandlarga boʻlinmadi. Asl matn bilan solishtiring.',
+    wnInjection: 'AI tahlilini boshqarishga urinuvchi matn aniqlandi. Asl matnni oʻzingiz tekshiring.',
+  },
+  si: {
+    wnPii: 'පුද්ගලික තොරතුරු (දුරකථන, හැඳුනුම් අංක ආදිය) ස්වයංක්‍රීයව වසන ලදි. විශ්ලේෂණයට බලපෑමක් නැත.',
+    wnByulji: 'ඇමුණුම්වලට පසු අන්තර්ගතය විශ්ලේෂණයෙන් බැහැර විය. වැදගත් නම් එම කොටස වෙනම අලවා නැවත විශ්ලේෂණය කරන්න.',
+    wnLowCoverage: 'ලේඛනයේ කොටසක් වගන්තිවලට වෙන් නොවිණි. මුල් පිටපත සමඟ සසඳන්න.',
+    wnInjection: 'AI විශ්ලේෂණය හසුරුවන්න උත්සාහ කරන පෙළ හමු විය. මුල් පිටපත ඔබම පරීක්ෂා කරන්න.',
+  },
+  bn: {
+    wnPii: 'ব্যক্তিগত তথ্য (ফোন, পরিচয় নম্বর ইত্যাদি) স্বয়ংক্রিয়ভাবে ঢাকা হয়েছে। বিশ্লেষণে প্রভাব নেই।',
+    wnByulji: 'সংযুক্তির পরের বিষয়বস্তু বিশ্লেষণ থেকে বাদ। গুরুত্বপূর্ণ হলে ওই অংশ আলাদা পেস্ট করে আবার বিশ্লেষণ করুন।',
+    wnLowCoverage: 'নথির কিছু অংশ ধারায় ভাগ হয়নি। মূল লেখার সাথে মিলিয়ে দেখুন।',
+    wnInjection: 'এআই বিশ্লেষণ প্রভাবিত করার চেষ্টার লেখা পাওয়া গেছে। মূল লেখা নিজে যাচাই করুন।',
+  },
+  ru: {
+    wnPii: 'Личные данные (телефон, идентификационные номера и т.п.) скрыты автоматически. На анализ не влияет.',
+    wnByulji: 'Содержимое после приложений исключено из анализа. Если оно важно — вставьте его отдельно и проанализируйте снова.',
+    wnLowCoverage: 'Часть документа не удалось разделить на пункты. Сверьте с оригиналом.',
+    wnInjection: 'Обнаружен текст, пытающийся манипулировать анализом ИИ. Проверьте оригинал самостоятельно.',
+  },
+  ja: {
+    wnPii: '個人情報（電話・登録番号など）を自動でマスキングしました。分析に影響はありません。',
+    wnByulji: '別紙（添付文書）以降の内容は分析から除外しました。重要な内容があれば、その部分だけ貼り付けて再分析してください。',
+    wnLowCoverage: '文書の一部を条項に分割できませんでした。漏れがないか原文と照合してください。',
+    wnInjection: 'AI分析を操作しようとする文言を検出しました。判定を鵜呑みにせず、原文を直接ご確認ください。',
+  },
+}
+
+export const WARNING_CODE_KEYS: Record<string, WarnKey> = {
+  pii_masked: 'wnPii', byulji_excluded: 'wnByulji', low_coverage: 'wnLowCoverage', injection_detected: 'wnInjection',
+}
+
 type LearnKey =
   | 'lnNav' | 'lnTitle' | 'lnDesc' | 'lnSignal' | 'lnOutside' | 'lnCase' | 'lnKoNote'
 
@@ -2388,7 +2495,7 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | LearnKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | LearnKey | WarnKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2398,7 +2505,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_LEARN] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_LEARN, UI_WARNINGS] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

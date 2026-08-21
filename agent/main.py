@@ -103,7 +103,9 @@ class ClauseResult(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     clause_count: int
-    parse_warnings: List[str] = []  # 추출 누락 가능성 고지 (자문 §2)
+    parse_warnings: List[str] = []
+    # 경고별 기계 판독 코드 (#86-② — 인덱스가 parse_warnings와 정렬, 미분류는 None)
+    parse_warning_codes: List[Optional[str]] = []  # 추출 누락 가능성 고지 (자문 §2)
     retry_count: int
     needs_review: bool
     judge_scores: dict
@@ -134,9 +136,12 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     # 있다 — 백엔드 DTO는 Map<String, Double>이므로 숫자만 내보낸다.
     judge_scores = {k: v for k, v in state["judge_scores"].items() if isinstance(v, (int, float))}
 
+    from src.warning_codes import classify_all
+
     return AnalyzeResponse(
         clause_count=len(state["clauses"]),
         parse_warnings=state.get("parse_warnings", []),
+        parse_warning_codes=classify_all(state.get("parse_warnings", [])),
         retry_count=state["retry_count"],
         needs_review=state["needs_review"],
         judge_scores=judge_scores,
