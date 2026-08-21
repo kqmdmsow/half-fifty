@@ -32,6 +32,7 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
+from src.learn_content import SCAMS
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
@@ -102,7 +103,9 @@ class ClauseResult(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     clause_count: int
-    parse_warnings: List[str] = []  # 추출 누락 가능성 고지 (자문 §2)
+    parse_warnings: List[str] = []
+    # 경고별 기계 판독 코드 (#86-② — 인덱스가 parse_warnings와 정렬, 미분류는 None)
+    parse_warning_codes: List[Optional[str]] = []  # 추출 누락 가능성 고지 (자문 §2)
     retry_count: int
     needs_review: bool
     judge_scores: dict
@@ -133,14 +136,28 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     # 있다 — 백엔드 DTO는 Map<String, Double>이므로 숫자만 내보낸다.
     judge_scores = {k: v for k, v in state["judge_scores"].items() if isinstance(v, (int, float))}
 
+    from src.warning_codes import classify_all
+
     return AnalyzeResponse(
         clause_count=len(state["clauses"]),
         parse_warnings=state.get("parse_warnings", []),
+        parse_warning_codes=classify_all(state.get("parse_warnings", [])),
         retry_count=state["retry_count"],
         needs_review=state["needs_review"],
         judge_scores=judge_scores,
         results=results,
     )
+
+
+@app.get("/learn")
+def learn() -> dict:
+    """교육 콘텐츠 단일 원천 — 프론트가 표시용으로 가져간다 (#104).
+
+    내장 챗봇(/learn-chat, #103)은 세션당 대화 횟수 상한과 인젝션 방어
+    (#131 규칙 탐지기 재사용 또는 #149식 프롬프트 방어 블록) 조건을 걸고
+    나서 별도 PR로 합류한다 — 지금은 정적 콘텐츠만 노출.
+    """
+    return {"scams": SCAMS}
 
 
 @app.get("/health")
