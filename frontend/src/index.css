@@ -130,13 +130,20 @@
     transform: none;
   }
   /* 회전 헤드라인 단어 교체 (#134) — 아래에서 살짝 떠오르며 교체 */
-  .word-swap {
+  /* 회전 헤드라인 — 사라짐(0.7s)과 나타남(0.8s)을 따로 둔다.
+     한쪽만 애니메이션하면 옛 글자가 즉시 없어져 '깜빡'하고 바뀐다(#134). */
+  .word-enter,
+  .word-leave {
     display: inline-block;
-    /* 교체 자체도 천천히 — 0.5s는 툭 튀는 느낌이라 0.8s로 늘리고 이동 폭을 줄였다 */
-    animation: word-swap 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .word-enter {
+    animation: word-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .word-leave {
+    animation: word-leave 0.7s cubic-bezier(0.4, 0, 0.6, 1) both;
   }
 
-  @keyframes word-swap {
+  @keyframes word-enter {
     from {
       opacity: 0;
       transform: translateY(14px);
@@ -144,6 +151,17 @@
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+  @keyframes word-leave {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
     }
   }
 

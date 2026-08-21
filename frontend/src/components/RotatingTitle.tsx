@@ -38,17 +38,33 @@ const CONFIG: Partial<Record<LangCode, Config>> = {
   ru: { hl: 'легко', order: ['a', 'hl', 'b'], pairs: [['Договор аренды —', 'понять'], ['Условия кредита —', 'прочитать'], ['Трудовой договор —', 'разобрать'], ['Условия страховки —', 'проверить']] },
 }
 
+/** 교체 주기 4.8초 — 문구 4종이라 한 바퀴 약 19초. */
+const CYCLE_MS = 4800
+/** 사라지는 데 쓰는 시간. 이 시간이 지난 뒤에 다음 문구가 올라온다.
+ *  예전에는 옛 글자가 즉시 사라져 '깜빡'하고 바뀌는 느낌이었다(#134 피드백). */
+const FADE_OUT_MS = 700
+
 export function RotatingTitle({ language = 'ko' }: { language?: LangCode }) {
   const [idx, setIdx] = useState(0)
+  const [leaving, setLeaving] = useState(false)
   const cfg = CONFIG[language] ?? CONFIG.ko!
 
   useEffect(() => {
     setIdx(0)
+    setLeaving(false)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    // 교체 주기 4.8초 — 2.6초는 읽기도 전에 넘어가 산만하다는 피드백(레퍼런스
-    // imweb 히어로도 이 정도로 느리게 돈다). 문구가 4종이라 한 바퀴 ≈ 19초.
-    const timer = setInterval(() => setIdx((i) => (i + 1) % cfg.pairs.length), 4800)
-    return () => clearInterval(timer)
+    let swapTimer: number | undefined
+    const timer = setInterval(() => {
+      setLeaving(true) // ① 천천히 사라지고
+      swapTimer = window.setTimeout(() => {
+        setIdx((i) => (i + 1) % cfg.pairs.length) // ② 다음 문구로 바꾼 뒤
+        setLeaving(false) // ③ 천천히 올라온다
+      }, FADE_OUT_MS)
+    }, CYCLE_MS)
+    return () => {
+      clearInterval(timer)
+      if (swapTimer) clearTimeout(swapTimer)
+    }
   }, [language, cfg.pairs.length])
 
   const [a, b] = cfg.pairs[idx % cfg.pairs.length]
@@ -73,7 +89,7 @@ export function RotatingTitle({ language = 'ko' }: { language?: LangCode }) {
       <span
         key={`${part}-${idx}-${language}`}
         aria-hidden
-        className={`word-swap ${part === 'b' ? 'text-brand-500' : ''}`}
+        className={`${leaving ? 'word-leave' : 'word-enter'} ${part === 'b' ? 'text-brand-500' : ''}`}
       >
         {text}
       </span>
