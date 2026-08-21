@@ -5,9 +5,11 @@ import { LANGUAGES, riskLevelLabel, t, type LangCode } from '../i18n'
 
 export function LandingScreen({
   onStart,
+  onApiInfo,
   language = 'ko',
 }: {
   onStart: () => void
+  onApiInfo?: () => void // 제휴·API 안내 (#85) — 미전달 시 링크 숨김
   language?: LangCode
 }) {
   return (
@@ -42,7 +44,9 @@ export function LandingScreen({
         {/* 실물 계약서 목업 — 국토부·법무부 표준계약서 실제 문안 + 법 조항 칩.
             주의: 칩·카드 위치는 transform이 아니라 left/right 오프셋으로 —
             float 애니메이션이 transform을 덮어쓰기 때문 (실측 버그). */}
-        <div className="relative mx-auto mt-10 w-full max-w-2xl px-6 pb-24">
+        {/* 장식이므로 스크린리더에서 통째로 제외 (#82 2차 결정 유지) —
+            가짜 파일명·위험 배지가 실제 결과처럼 낭독되면 혼란만 준다 */}
+        <div aria-hidden className="relative mx-auto mt-10 w-full max-w-2xl px-6 pb-24">
           <div className="relative">
             {/* 뒷장 — 종이 크기에 맞춤 (컨테이너 h-full이면 아래로 길게 샘) */}
             <div
@@ -200,7 +204,18 @@ export function LandingScreen({
       {/* 푸터 */}
       <footer className="border-t border-ink-50 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-[13px] text-ink-400 md:flex-row">
-          <span className="font-semibold">© 조목조목</span>
+          <span className="flex items-center gap-4">
+            <span className="font-semibold">© 조목조목</span>
+            {onApiInfo && (
+              <button
+                type="button"
+                onClick={onApiInfo}
+                className="font-semibold text-ink-600 underline underline-offset-2 hover:text-ink-900"
+              >
+                {t(language, 'apiFooterLink')}
+              </button>
+            )}
+          </span>
           <span className="max-w-md text-center leading-relaxed md:text-right">
             {t(language, 'footerDisclaimer')}
           </span>
