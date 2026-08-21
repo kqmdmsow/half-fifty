@@ -449,6 +449,7 @@ export default function App() {
                 : undefined
             }
             domain={domain}
+            persona={persona}
             judgeScores={data?.judge_scores ?? {}}
             retryCount={data?.retry_count ?? 0}
             needsReview={data?.needs_review ?? false}

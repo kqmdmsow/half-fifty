@@ -56,6 +56,12 @@ public class ContractController {
                 .body(body);
     }
 
+    /** 이해 확인 퀴즈 프록시 (#92) — 에이전트 /quiz 중계. */
+    @PostMapping("/quiz")
+    public String quiz(@RequestBody String request) {
+        return agentClient.quiz(request);
+    }
+
     /** 업로드 허용 최대 크기 (application.yml multipart 한도와 함께 이중 방어). */
     private static final long MAX_PDF_BYTES = 10 * 1024 * 1024;
 

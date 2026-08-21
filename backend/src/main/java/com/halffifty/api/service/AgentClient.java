@@ -66,6 +66,16 @@ public class AgentClient {
                 .body(AnalyzeResponse.class);
     }
 
+    /** 이해 확인 퀴즈 프록시 (#92) — JSON 그대로 중계. */
+    public String quiz(String requestJson) {
+        return restClient.post()
+                .uri("/quiz")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
     /**
      * PDF 업로드 프록시. 전문가 자문 §7 반영 — 모든 요청이 백엔드를 거치도록
      * 프론트→에이전트 직통 경로를 제거하고 이 메서드로 일원화한다.
