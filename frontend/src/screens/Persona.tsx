@@ -3,10 +3,10 @@ import { Button, Card, PageTitle, Switch } from '../components/ui'
 import { LANGUAGES, t } from '../i18n'
 
 // 라벨·설명은 i18n(UI_PERSONA)에서 — 이 화면만 하드코딩 한국어로 남아 있었다
-const PERSONAS: Array<{ id: Persona; emoji: string; titleKey: 'psAdult' | 'psSenior' | 'psForeigner'; descKey: 'psAdultDesc' | 'psSeniorDesc' | 'psForeignerDesc' }> = [
-  { id: 'adult', emoji: '🙂', titleKey: 'psAdult', descKey: 'psAdultDesc' },
-  { id: 'senior', emoji: '👵', titleKey: 'psSenior', descKey: 'psSeniorDesc' },
-  { id: 'foreigner', emoji: '🌏', titleKey: 'psForeigner', descKey: 'psForeignerDesc' },
+const PERSONAS: Array<{ id: Persona; titleKey: 'psAdult' | 'psSenior' | 'psForeigner'; descKey: 'psAdultDesc' | 'psSeniorDesc' | 'psForeignerDesc' }> = [
+  { id: 'adult', titleKey: 'psAdult', descKey: 'psAdultDesc' },
+  { id: 'senior', titleKey: 'psSenior', descKey: 'psSeniorDesc' },
+  { id: 'foreigner', titleKey: 'psForeigner', descKey: 'psForeignerDesc' },
 ]
 
 // 언어 목록은 i18n.ts에서 관리 (2025 체류외국인·E-9·유학생 통계 기반 16종)
@@ -58,7 +58,7 @@ export function PersonaScreen({
               }`}
             >
               <div className="flex items-start justify-between">
-                <span className="text-[28px]">{item.emoji}</span>
+
                 <span
                   className={`flex h-6 w-6 items-center justify-center rounded-full text-[13px] font-bold text-white transition-colors ${
                     active ? 'bg-brand-500' : 'bg-ink-100'

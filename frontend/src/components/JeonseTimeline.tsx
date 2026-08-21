@@ -28,15 +28,15 @@ export function JeonseTimeline({ language = 'ko' }: { language?: LangCode }) {
   }
 
   const steps = [
-    { offset: -1, key: 'jtBefore' as const, icon: '📋' },
-    { offset: 0, key: 'jtDay' as const, icon: '🏠' },
-    { offset: 1, key: 'jtNext' as const, icon: '🔍' },
-    { offset: 7, key: 'jtLater' as const, icon: '🛡️' },
+    { offset: -1, key: 'jtBefore' as const },
+    { offset: 0, key: 'jtDay' as const },
+    { offset: 1, key: 'jtNext' as const },
+    { offset: 7, key: 'jtLater' as const },
   ]
 
   return (
     <Card className="px-5 py-5">
-      <p className="text-[15px] font-bold text-ink-900"><span aria-hidden>📅</span> {t(language, 'jtTitle')}</p>
+      <p className="text-[15px] font-bold text-ink-900">{t(language, 'jtTitle')}</p>
       <p className="mt-1 text-[13px] leading-relaxed text-ink-400">{t(language, 'jtDesc')}</p>
 
       <label className="mt-4 block max-w-xs">
@@ -53,7 +53,12 @@ export function JeonseTimeline({ language = 'ko' }: { language?: LangCode }) {
         <ol className="mt-4 space-y-2.5">
           {steps.map((step) => (
             <li key={step.key} className="flex gap-3 rounded-2xl bg-ink-25 px-4 py-3">
-              <span className="text-[18px]">{step.icon}</span>
+              <span
+                aria-hidden
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[13px] font-extrabold text-brand-600"
+              >
+                {steps.indexOf(step) + 1}
+              </span>
               <div className="min-w-0">
                 <p className="text-[12px] font-bold text-brand-600">{fmt(step.offset)}</p>
                 <p className="mt-0.5 text-[13px] leading-relaxed text-ink-700">
