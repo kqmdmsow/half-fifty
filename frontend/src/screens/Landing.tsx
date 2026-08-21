@@ -36,8 +36,9 @@ export function LandingScreen({
           </div>
         </div>
 
-        {/* 미리보기 목업 */}
-        <div className="relative mx-auto w-full max-w-md">
+        {/* 미리보기 목업 — 순수 장식이라 스크린리더에서 통째로 제외 (#82 2차):
+            가짜 파일명·위험 배지가 실제 결과처럼 낭독되면 혼란만 준다 */}
+        <div className="relative mx-auto w-full max-w-md" aria-hidden="true">
           <div className="rounded-3xl border border-ink-100 bg-white p-7 shadow-card">
             <p className="text-[13px] font-bold text-ink-400">전세계약서.pdf</p>
             <div className="mt-4 space-y-2.5">

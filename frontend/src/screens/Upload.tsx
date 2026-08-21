@@ -84,7 +84,7 @@ export function UploadScreen({
       <Card className="mt-6 px-5 py-4">
         <p className="text-[14px] font-bold text-ink-900">{t(language, 'spTitle')}</p>
         <p className="mt-1 text-[13px] leading-relaxed text-ink-400">{t(language, 'spDesc')}</p>
-        <div className="mt-3 grid gap-2 md:grid-cols-2">
+        <div className="mt-3 grid gap-2 md:grid-cols-2" role="group" aria-label={t(language, 'spTitle')}>
           {DEMO_SAMPLES.map((sample) => (
             <button
               key={sample.id}
@@ -133,7 +133,12 @@ export function UploadScreen({
             role="button"
             tabIndex={0}
             onClick={() => inputRef.current?.click()}
-            onKeyDown={(event) => event.key === 'Enter' && inputRef.current?.click()}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                inputRef.current?.click()
+              }
+            }}
             onDragOver={(event) => {
               event.preventDefault()
               setDragging(true)
@@ -203,7 +208,7 @@ export function UploadScreen({
         <p className="mt-1 text-[13px] leading-relaxed text-ink-400">
           {t(language, 'upDomainDesc')}
         </p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label={t(language, 'upDomainTitle')}>
           <button
             type="button"
             aria-pressed={domain === ''}
