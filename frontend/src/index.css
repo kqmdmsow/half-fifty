@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   KRDS (대한민국 정부 디지털 서비스 디자인시스템) 토큰 이식
+   원본: KRDS-uiux/krds-uiux resources/css/token/krds_tokens.css
+         + resources/css/common/common.css (2024-12-09 생성본, 2026-08-20 수집)
+
+   ◦ 색은 RGB 트리플릿(예: 11 80 208)으로 둔다 — tailwind.config.js가
+     rgb(var(--c-*) / <alpha-value>)로 참조해 bg-white/90 같은
+     알파 수식이 그대로 동작하고, 모드 전환은 이 변수 스왑만으로 끝난다.
+   ◦ 치수 토큰은 rem→px 환산(×10). KRDS는 html {font-size: 62.5%}
+     (1rem=10px) 전제인데 이 앱은 Tailwind 기본(1rem=16px)이라
+     rem을 그대로 옮기면 전부 62.5% 크기로 깨진다. 루트 62.5% 전환은
+     기존 px 유틸리티 전면 재검토가 필요해 px 환산을 택했다.
+   ◦ 각 값의 KRDS 출처 토큰명을 주석으로 병기 — 심사 대응 근거.
+   ============================================================ */
+:root {
+  /* --- 색 (light 세트) --- */
+  --c-white: 255 255 255; /* #ffffff — --krds-color-light-gray-0 */
+  --c-ink-900: 19 20 22; /* #131416 — --krds-light-color-text-bolder (gray-95) */
+  --c-ink-700: 30 33 36; /* #1e2124 — --krds-light-color-text-basic (gray-90) */
+  --c-ink-600: 70 76 83; /* #464c53 — --krds-light-color-text-subtle (gray-70) */
+  --c-ink-400: 88 97 106; /* #58616a — --krds-color-light-gray-60 */
+  --c-ink-300: 109 120 130; /* #6d7882 — --krds-color-light-gray-50 (4.68:1 — gray-40은 3.1:1이라 미채택) */
+  --c-ink-200: 205 209 213; /* #cdd1d5 — --krds-light-color-border-gray-light (gray-20) */
+  --c-ink-100: 230 232 234; /* #e6e8ea — --krds-color-light-gray-10 */
+  --c-ink-50: 244 245 246; /* #f4f5f6 — --krds-light-color-surface-gray-subtler (gray-5) */
+  --c-ink-25: 244 245 246; /* #f4f5f6 — --krds-color-light-gray-5 */
+  --c-brand-50: 236 242 254; /* #ecf2fe — --krds-light-color-surface-primary-subtler (primary-5) */
+  --c-brand-100: 216 229 253; /* #d8e5fd — --krds-light-color-element-primary-light (primary-10) */
+  --c-brand-500: 11 80 208; /* #0b50d0 — --krds-light-color-text-primary (primary-60; primary-50은 흰글자 4.2:1이라 미채택) */
+  --c-brand-600: 8 56 145; /* #083891 — --krds-color-light-primary-70 (hover) */
+  --c-brand-700: 5 37 97; /* #052561 — --krds-color-light-primary-80 (active) */
+  --c-danger-50: 253 239 236; /* #fdefec — --krds-light-color-surface-danger-subtler (danger-5) */
+  --c-danger-500: 222 52 18; /* #de3412 — --krds-color-light-danger-50 (흰글자 4.56:1) */
+  --c-danger-600: 189 44 15; /* #bd2c0f — --krds-light-color-text-danger (danger-60) */
+  --c-caution-50: 255 243 219; /* #fff3db — --krds-light-color-surface-warning-subtler (warning-5) */
+  --c-caution-500: 158 106 0; /* #9e6a00 — --krds-color-light-warning-50 (흰글자 4.65:1) */
+  --c-caution-700: 138 92 0; /* #8a5c00 — --krds-light-color-text-warning (warning-60) */
+  --c-safe-50: 234 246 236; /* #eaf6ec — --krds-light-color-surface-success-subtler (success-5) */
+  --c-safe-500: 34 135 56; /* #228738 — --krds-color-light-success-50 (흰글자 4.57:1) */
+  --c-safe-700: 38 115 55; /* #267337 — --krds-light-color-text-success (success-60) */
+  --c-focus-ring: 11 80 208; /* #0b50d0 — --krds-light-color-border-primary 계열 (primary-60) */
+
+  /* --- 치수·효과 (KRDS common.css, rem→px 환산) --- */
+  --krds-size-height-7: 48px; /* --krds-size-height-7 = number-16 = 4.8rem — 터치 타깃 최소 */
+  --krds-size-height-5: 32px; /* number-12 = 3.2rem */
+  --krds-box-shadow-outline: 0 0 0 4px rgb(var(--c-focus-ring)); /* 0.4rem */
+  --krds-box-shadow-outline-inset: inset 0 0 0 2px rgb(var(--c-focus-ring)); /* 0.2rem */
+  --krds-font-underline-offset: 3px; /* 0.3rem */
+  /* 글자·화면 크기 5단계 (--krds-zoom-*) — App.tsx가 JS로 적용 */
+  --krds-zoom-small: 0.9;
+  --krds-zoom-medium: 1;
+  --krds-zoom-large: 1.1;
+  --krds-zoom-xlarge: 1.3;
+  --krds-zoom-xxlarge: 1.5;
+  /* 그림자 색 (--krds-light-color-alpha-shadow1/2/3) */
+  --c-shadow-1: rgba(0, 0, 0, 0.05);
+  --c-shadow-2: rgba(0, 0, 0, 0.08);
+  --c-shadow-3: rgba(0, 0, 0, 0.12);
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
@@ -20,30 +80,148 @@
   button {
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* KRDS 포커스 링 — 얇은 outline 대신 4px box-shadow(--krds-box-shadow-outline).
+     키보드 사용자(:focus-visible)에게만 표시, 모든 인터랙티브 요소 공통. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--krds-box-shadow-outline);
+  }
+
+  /* 화면 전환 시 스크린리더용 프로그램 포커스(h1 tabindex=-1)는 시각적
+     링을 그리지 않는다 — 키보드 조작이 아닌 내비게이션 알림용 포커스 */
+  [tabindex='-1']:focus,
+  [tabindex='-1']:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* KRDS 터치 타깃 최소 48px (--krds-size-height-7).
+     인라인 텍스트 링크는 min-height가 무효(인라인 박스)라 영향 없고,
+     버튼·셀렉트·입력 필드가 대상이다. */
+  button,
+  select,
+  input[type='text'],
+  input[type='number'],
+  input[type='date'] {
+    min-height: var(--krds-size-height-7);
+  }
+  /* 체크박스·라디오는 높이 대신 크기 자체를 KRDS 아이콘 크기로 */
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 24px;
+    height: 24px;
+  }
 }
 
-/* 접근성: 높은 명암 모드 (#82 — 저시력 대응)
-   흐린 회색 텍스트·연한 테두리·연한 배지를 진하게 끌어올린다.
-   색상 시스템 전면 재설계는 스코프 밖 — 대비 부족 지점만 조준 사격 */
-.hc .text-ink-300,
-.hc .text-ink-400 {
-  color: #26303b;
+/* 스크롤 리빌·히어로 스태거 (#134 모션) — 움직임을 선호하는 사용자에게만.
+   reduced-motion이거나 IO 미지원이면 숨김 상태 자체가 적용되지 않아
+   콘텐츠는 항상 보인다 (Reveal.tsx 참조). */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  /* 회전 헤드라인 단어 교체 (#134) — 아래에서 살짝 떠오르며 교체 */
+  /* 회전 헤드라인 — 사라짐(0.7s)과 나타남(0.8s)을 따로 둔다.
+     한쪽만 애니메이션하면 옛 글자가 즉시 없어져 '깜빡'하고 바뀐다(#134). */
+  .word-enter,
+  .word-leave {
+    display: inline-block;
+  }
+  .word-enter {
+    animation: word-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .word-leave {
+    animation: word-leave 0.7s cubic-bezier(0.4, 0, 0.6, 1) both;
+  }
+
+  @keyframes word-enter {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes word-leave {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+  /* 히어로 로드 스태거 — 배지→제목→부제→CTA 순서로 떠오른다 */
+  .hero-stagger > * {
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+  .hero-stagger > *:nth-child(3) { animation-delay: 0.2s; }
+  .hero-stagger > *:nth-child(4) { animation-delay: 0.3s; }
 }
-.hc .text-ink-600 {
-  color: #191f28;
+
+/* 움직임 최소화 선호 대응 — 애니메이션·전환을 사실상 정지 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
-.hc .placeholder\:text-ink-300::placeholder,
-.hc .placeholder\:text-ink-200::placeholder {
-  color: #4e5968;
+
+/* ============================================================
+   높은 명암 모드 (또렷하게) — KRDS high-contrast 토큰 세트
+   KRDS의 고대비는 배경 반전형(검정 배경 + 밝은 텍스트)이다:
+   --krds-high-contrast-color-background-white: #000000,
+   text-basic: #f4f5f6. 기존의 "흰 배경에서 회색만 진하게" 땜빵(#82)을
+   삭제하고, 변수 스왑만으로 모드가 전환된다 — 클래스별 오버라이드 없음.
+   본문 계열 전부 검정 배경 대비 7:1 이상 (PR 대비표 참조).
+   ============================================================ */
+.hc {
+  --c-white: 0 0 0; /* #000000 — --krds-high-contrast-color-background-white */
+  --c-ink-900: 230 232 234; /* #e6e8ea — --krds-high-contrast-color-text-bolder (gray-10) */
+  --c-ink-700: 244 245 246; /* #f4f5f6 — --krds-high-contrast-color-text-basic (gray-5) */
+  --c-ink-600: 230 232 234; /* #e6e8ea — --krds-gray-10 — hc 위계 최상 보조 */
+  --c-ink-400: 205 209 213; /* #cdd1d5 — --krds-high-contrast-color-text-subtle (gray-20) */
+  --c-ink-300: 177 184 190; /* #b1b8be — --krds-gray-30 (10.5:1) */
+  --c-ink-200: 70 76 83; /* #464c53 — --krds-high-contrast-color-border-gray (gray-70) */
+  --c-ink-100: 51 54 61; /* #33363d — --krds-high-contrast-color-border-gray-light (gray-80) */
+  --c-ink-50: 30 33 36; /* #1e2124 — --krds-high-contrast-color-surface-gray-subtle (gray-90) */
+  --c-ink-25: 19 20 22; /* #131416 — --krds-high-contrast-color-surface-gray-subtler (gray-95) */
+  --c-brand-50: 2 15 39; /* #020f27 — --krds-hc surface-primary-subtler (primary-95) */
+  --c-brand-100: 3 22 58; /* #03163a — --krds-hc element-primary-light (primary-90) */
+  --c-brand-500: 134 175 249; /* #86aff9 — --krds-hc link-default (primary-30, 검정글자 9.5:1) */
+  --c-brand-600: 177 206 251; /* #b1cefb — --krds-hc text-primary (primary-20) */
+  --c-brand-700: 216 229 253; /* #d8e5fd — --krds-primary-10 */
+  --c-danger-50: 38 9 3; /* #260903 — --krds-hc surface-danger-subtler */
+  --c-danger-500: 244 135 113; /* #f48771 — --krds-danger-30 (검정글자 8.6:1) */
+  --c-danger-600: 247 175 161; /* #f7afa1 — --krds-hc text-danger (danger-20) */
+  --c-caution-50: 36 24 0; /* #241800 — --krds-hc surface-warning-subtler */
+  --c-caution-500: 255 177 20; /* #ffb114 — --krds-warning-30 (검정글자 11.6:1) */
+  --c-caution-700: 255 201 92; /* #ffc95c — --krds-hc text-warning (warning-20) */
+  --c-safe-50: 14 32 18; /* #0e2012 — --krds-hc surface-success-subtler */
+  --c-safe-500: 126 200 142; /* #7ec88e — --krds-success-30 (검정글자 10.5:1) */
+  --c-safe-700: 169 218 180; /* #a9dab4 — --krds-hc text-success (success-20) */
+  --c-focus-ring: 134 175 249; /* #86aff9 — --krds-hc primary-30 */
+  /* 그림자 (--krds-high-contrast-color-alpha-shadow1/2/3) */
+  --c-shadow-1: rgba(0, 0, 0, 0.12);
+  --c-shadow-2: rgba(0, 0, 0, 0.2);
+  --c-shadow-3: rgba(0, 0, 0, 0.4);
 }
-.hc .border-ink-100,
-.hc .border-ink-200 {
-  border-color: #6b7684;
-}
-.hc .bg-ink-25 {
-  background-color: #eef1f4;
-}
-.hc .text-danger-600 { color: #b3261e; }
-.hc .text-safe-700 { color: #14532d; }
-.hc .text-caution-700 { color: #7c3d00; }
-.hc .text-brand-600 { color: #1246a3; }

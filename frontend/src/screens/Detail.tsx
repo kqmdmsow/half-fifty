@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ClauseResult } from '../api'
-import { Button, CopyButton, RiskBadge } from '../components/ui'
+import { Button, CopyButton, RiskBadge, RiskIcon } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { FormattedText } from '../components/FormattedText'
+import { isVoiceSupported, startVoiceSession, type VoiceSession } from '../voiceCommands'
 import { speak, stopSpeaking, useVoiceAvailable, voiceAvailable } from '../tts'
 
 export function DetailScreen({
@@ -41,6 +42,34 @@ export function DetailScreen({
     setListening(false)
   }, [clause?.clause_id])
 
+  // 음성 명령 (#127) — Detail 문맥에서 6종: 다음/이전/읽어줘/멈춰/요약/더 쉽게.
+  // 인식 결과는 명령 해석 후 즉시 폐기 (전송·저장 없음).
+  const [micOn, setMicOn] = useState(false)
+  const voiceRef = useRef<VoiceSession | null>(null)
+  const stateRef = useRef({ clauseId: '', results: [] as ClauseResult[] })
+  stateRef.current = { clauseId: clause?.clause_id ?? '', results }
+
+  const toggleVoice = () => {
+    if (voiceRef.current) {
+      voiceRef.current.stop()
+      voiceRef.current = null
+      return
+    }
+    voiceRef.current = startVoiceSession((cmd) => {
+      const { clauseId: cur, results: rs } = stateRef.current
+      const idx = rs.findIndex((r) => r.clause_id === cur)
+      const current = rs[idx]
+      if (cmd === 'next' && idx < rs.length - 1) onSelectClause(rs[idx + 1].clause_id)
+      else if (cmd === 'prev' && idx > 0) onSelectClause(rs[idx - 1].clause_id)
+      else if (cmd === 'read' && current) speak(current.explanation, language)
+      else if (cmd === 'stop') stopSpeaking()
+      else if (cmd === 'summary') onBack()
+      // 'easier' 명령은 #133(다시 설명) 머지 후 requestReexplain('easier')로 연결
+    }, setMicOn)
+  }
+
+  useEffect(() => () => voiceRef.current?.stop(), [])
+
   // 결과가 아직 없으면 렌더링하지 않는다 (가짜 예시 폴백 제거 후의 방어선).
   // 훅 규칙 때문에 useEffect 뒤에 위치해야 한다.
   if (!clause) return null
@@ -58,6 +87,27 @@ export function DetailScreen({
       >
         ← {t(language, 'backToSummary')}
       </button>
+
+      {isVoiceSupported() && (
+        <span className="mb-6 ml-3 inline-flex items-center gap-2">
+          <button
+            type="button"
+            aria-pressed={micOn}
+            onClick={toggleVoice}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+              micOn ? 'bg-danger-500 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+            }`}
+          >
+            <span aria-hidden>🎤</span>
+            {micOn ? t(language, 'vcOff') : t(language, 'vcToggle')}
+          </button>
+          {micOn && (
+            <span className="text-[12px] font-semibold text-ink-400" role="status">
+              {t(language, 'vcListening')}
+            </span>
+          )}
+        </span>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
         {/* 조항 목록 */}
@@ -78,8 +128,11 @@ export function DetailScreen({
                       : 'bg-ink-25 text-ink-600 hover:bg-ink-50'
                   }`}
                 >
-                  <span
-                    className={`h-2 w-2 shrink-0 rounded-full ${RISK_META[result.risk_level].dot}`}
+                  {/* 3중 인코딩: 색 점만으로 위험도를 표시하지 않는다 —
+                      활성(어두운 배경) 칩에서는 현재색 상속으로 대비 유지 */}
+                  <RiskIcon
+                    level={result.risk_level}
+                    className={active ? '' : RISK_META[result.risk_level].text}
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
                     {clauseHeading(result.original_text, language, result.original_text_translated) ??

@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Iterator, List
 
 from src.case_footnotes import get_related_cases
+from src.injection_check import detect_injection, injection_warning
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import _MAX_CONCURRENCY, _analyze_clause
 from src.nodes.domain import domain_node
@@ -135,6 +136,11 @@ def stream_analysis(
     clauses, warnings = split_clauses_with_warnings(masked)
     if pii_counts:
         warnings = [masking_notice(pii_counts)] + warnings
+    # 인젝션 1층 방어 (#67): 조작 문구 탐지 시 경고를 최상단에 — 분석은
+    # 계속하되 사용자가 판정을 의심하고 원문을 대조하게 만든다
+    injections = detect_injection(masked)
+    if injections:
+        warnings = [injection_warning(injections)] + warnings
 
     # domain_node와 동일 로직(사용자 선택 우선, 자동판별은 opt-in) — graph.py와
     # 제어 흐름이 중복된다는 모듈 docstring 경고대로 여기도 함께 갱신해야 한다.
