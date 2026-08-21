@@ -68,7 +68,7 @@ export function SummaryScreen({
           key={warning}
           className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700"
         >
-          ⚠️ {warning}
+          {warning}
         </p>
       ))}
 
@@ -96,11 +96,11 @@ export function SummaryScreen({
           재시도 중에는 카드가 교체되는 이유를 명시한다 (#101) */}
       {live && retrying ? (
         <p className="mt-4 rounded-2xl bg-caution-50 px-4 py-3 text-[13px] font-semibold text-caution-700">
-          🔄 {t(language, 'retryNote')}
+          {t(language, 'retryNote')}
         </p>
       ) : live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 ? (
         <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
-          🛡️ {t(language, 'verifyingNote')}
+          {t(language, 'verifyingNote')}
         </p>
       ) : null}
 
@@ -182,7 +182,7 @@ export function SummaryScreen({
               reading ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
             }`}
           >
-            🔊 {t(language, reading ? 'readAllStop' : 'readAll')}
+            {t(language, reading ? 'readAllStop' : 'readAll')}
           </button>
           {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
         </div>

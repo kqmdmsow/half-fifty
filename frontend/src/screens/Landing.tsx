@@ -73,22 +73,18 @@ export function LandingScreen({
           </h2>
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             <Feature
-              emoji="📑"
               title={t(language, 'feat1Title')}
               body={t(language, 'feat1Body')}
             />
             <Feature
-              emoji="💬"
               title={t(language, 'feat2Title')}
               body={t(language, 'feat2Body')}
             />
             <Feature
-              emoji="🔍"
               title={t(language, 'feat3Title')}
               body={t(language, 'feat3Body')}
             />
             <Feature
-              emoji="✅"
               title={t(language, 'feat4Title')}
               body={t(language, 'feat4Body')}
             />
@@ -138,11 +134,10 @@ export function LandingScreen({
   )
 }
 
-function Feature({ emoji, title, body }: { emoji: string; title: string; body: string }) {
+function Feature({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-3xl bg-white p-7 shadow-card">
-      <span className="text-[28px]">{emoji}</span>
-      <p className="mt-4 text-[17px] font-bold text-ink-900">{title}</p>
+      <p className="text-[17px] font-bold text-ink-900">{title}</p>
       <p className="mt-2 text-[14px] leading-relaxed text-ink-400">{body}</p>
     </div>
   )
@@ -154,7 +149,7 @@ function Step({ no, title, body }: { no: string; title: string; body: string }) 
       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-[15px] font-extrabold text-brand-600">
         {no}
       </span>
-      <p className="mt-4 text-[17px] font-bold text-ink-900">{title}</p>
+      <p className="text-[17px] font-bold text-ink-900">{title}</p>
       <p className="mt-2 text-[14px] leading-relaxed text-ink-400">{body}</p>
     </div>
   )
