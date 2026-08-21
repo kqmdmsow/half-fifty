@@ -2235,9 +2235,267 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+type WarnKey =
+  | 'wnPii' | 'wnByulji' | 'wnLowCoverage' | 'wnInjection'
+
+// parse_warnings 현지화 (#86-② — agent warning_codes.py와 코드 정렬)
+const UI_WARNINGS: Record<LangCode, Record<WarnKey, string>> = {
+  ko: {
+    wnPii: '개인정보(전화번호·주민등록번호 등)를 자동으로 가렸어요. 분석에는 영향이 없어요.',
+    wnByulji: '별지(첨부 문서) 이후 내용은 분석에서 제외했어요. 중요한 내용이 있다면 그 부분만 따로 붙여넣어 다시 분석해 보세요.',
+    wnLowCoverage: '문서 일부가 조항으로 분리되지 않았어요. 빠진 조항이 없는지 원문과 대조해 확인하세요.',
+    wnInjection: '이 문서에서 AI 분석을 조작하려는 문구가 감지됐어요. 판정을 그대로 믿지 말고 원문을 직접 확인하세요.',
+  },
+  en: {
+    wnPii: 'Personal data (phone, ID numbers, etc.) was masked automatically. Analysis is unaffected.',
+    wnByulji: 'Content after attachments was excluded. If it matters, paste that part separately and re-analyze.',
+    wnLowCoverage: 'Part of the document couldn\'t be split into clauses. Cross-check the original for missing clauses.',
+    wnInjection: 'Text attempting to manipulate the AI analysis was detected. Don\'t take verdicts at face value — check the original.',
+  },
+  zh: {
+    wnPii: '已自动遮盖个人信息（电话、身份证号等），不影响分析。',
+    wnByulji: '附件之后的内容未纳入分析。如有重要内容，请单独粘贴后重新分析。',
+    wnLowCoverage: '文档部分内容未能拆分为条款。请对照原文确认有无遗漏。',
+    wnInjection: '检测到试图操纵AI分析的文字。请勿直接采信判定，务必核对原文。',
+  },
+  vi: {
+    wnPii: 'Thông tin cá nhân (điện thoại, số định danh...) đã được che tự động. Không ảnh hưởng phân tích.',
+    wnByulji: 'Nội dung sau phụ lục đã bị loại khỏi phân tích. Nếu quan trọng, dán riêng phần đó và phân tích lại.',
+    wnLowCoverage: 'Một phần tài liệu không tách được thành điều khoản. Đối chiếu nguyên văn xem có thiếu không.',
+    wnInjection: 'Phát hiện văn bản cố thao túng phân tích AI. Đừng tin ngay phán định — kiểm tra nguyên văn.',
+  },
+  th: {
+    wnPii: 'ปิดบังข้อมูลส่วนตัว (เบอร์โทร เลขประจำตัว ฯลฯ) โดยอัตโนมัติ ไม่กระทบการวิเคราะห์',
+    wnByulji: 'เนื้อหาหลังเอกสารแนบไม่ถูกวิเคราะห์ หากสำคัญ ให้วางส่วนนั้นแยกแล้ววิเคราะห์ใหม่',
+    wnLowCoverage: 'เอกสารบางส่วนแยกเป็นข้อไม่ได้ โปรดเทียบต้นฉบับว่าไม่มีข้อตกหล่น',
+    wnInjection: 'พบข้อความพยายามบิดเบือนการวิเคราะห์ AI อย่าเชื่อคำตัดสินทันที โปรดตรวจต้นฉบับ',
+  },
+  id: {
+    wnPii: 'Data pribadi (telepon, nomor identitas, dll.) ditutup otomatis. Analisis tidak terpengaruh.',
+    wnByulji: 'Konten setelah lampiran dikecualikan. Jika penting, tempel bagian itu terpisah dan analisis ulang.',
+    wnLowCoverage: 'Sebagian dokumen tidak bisa dipecah jadi pasal. Periksa naskah asli untuk pasal yang hilang.',
+    wnInjection: 'Terdeteksi teks yang mencoba memanipulasi analisis AI. Jangan langsung percaya — periksa naskah asli.',
+  },
+  tl: {
+    wnPii: 'Awtomatikong tinakpan ang personal data (telepono, ID numbers, atbp.). Hindi apektado ang pagsusuri.',
+    wnByulji: 'Hindi kasama sa pagsusuri ang nilalaman pagkatapos ng attachment. Kung mahalaga, i-paste ito nang hiwalay.',
+    wnLowCoverage: 'May bahagi ng dokumento na hindi nahati sa mga probisyon. Itugma sa orihinal.',
+    wnInjection: 'May natuklasang tekstong nagtatangkang manipulahin ang AI. Suriin ang orihinal na teksto.',
+  },
+  ne: {
+    wnPii: 'व्यक्तिगत जानकारी (फोन, परिचय नम्बर आदि) स्वतः लुकाइयो। विश्लेषणमा असर छैन।',
+    wnByulji: 'संलग्नपछिको सामग्री विश्लेषणबाट हटाइयो। महत्त्वपूर्ण भए त्यो भाग अलग टाँसेर पुनः विश्लेषण गर्नुहोस्।',
+    wnLowCoverage: 'कागजातको केही भाग दफामा छुट्टिएन। मूल पाठसँग दाँज्नुहोस्।',
+    wnInjection: 'एआई विश्लेषण बिगार्न खोज्ने पाठ भेटियो। निर्णय सिधै नपत्याई मूल पाठ जाँच्नुहोस्।',
+  },
+  km: {
+    wnPii: 'ព័ត៌មានផ្ទាល់ខ្លួន (ទូរស័ព្ទ លេខអត្តសញ្ញាណ...) ត្រូវបានបិទបាំងស្វ័យប្រវត្តិ។ មិនប៉ះពាល់ការវិភាគ។',
+    wnByulji: 'មាតិកាបន្ទាប់ពីឯកសារភ្ជាប់ត្រូវបានដកចេញ។ បើសំខាន់ សូមបិទភ្ជាប់ផ្នែកនោះដាច់ដោយឡែក ហើយវិភាគម្ដងទៀត។',
+    wnLowCoverage: 'ផ្នែកខ្លះនៃឯកសារមិនអាចបំបែកជាមាត្រា។ សូមផ្ទៀងជាមួយអត្ថបទដើម។',
+    wnInjection: 'រកឃើញអត្ថបទព្យាយាមរៀបចំការវិភាគ AI។ សូមពិនិត្យអត្ថបទដើមដោយផ្ទាល់។',
+  },
+  my: {
+    wnPii: 'ကိုယ်ရေးအချက်အလက် (ဖုန်း၊ မှတ်ပုံတင်နံပါတ်) ကို အလိုအလျောက်ဖုံးကွယ်ထားသည်။ စိစစ်မှုကို မထိခိုက်ပါ။',
+    wnByulji: 'နောက်ဆက်တွဲနောက်ပိုင်း အကြောင်းအရာကို မစိစစ်ပါ။ အရေးကြီးလျှင် ထိုအပိုင်းကို သီးခြားကူးထည့်၍ ပြန်စိစစ်ပါ။',
+    wnLowCoverage: 'စာရွက်စာတမ်းတစ်စိတ်တစ်ပိုင်း အပိုဒ်အဖြစ်မခွဲနိုင်ပါ။ မူရင်းနှင့်တိုက်ဆိုင်ပါ။',
+    wnInjection: 'AI စိစစ်မှုကို လှည့်စားရန်ကြိုးစားသောစာသားတွေ့ရှိ။ မူရင်းကို ကိုယ်တိုင်စစ်ပါ။',
+  },
+  mn: {
+    wnPii: 'Хувийн мэдээллийг (утас, бүртгэлийн дугаар г.м.) автоматаар нуулаа. Шинжилгээнд нөлөөгүй.',
+    wnByulji: 'Хавсралтын дараах агуулгыг шинжилгээнээс хассан. Чухал бол тэр хэсгийг тусад нь буулгаж дахин шинжилнэ үү.',
+    wnLowCoverage: 'Баримтын зарим хэсэг заалт болж салгагдсангүй. Эх бичвэртэй тулгана уу.',
+    wnInjection: 'AI шинжилгээг удирдах гэсэн бичвэр илэрлээ. Шийдвэрт шууд бүү итгэ — эхийг шалгаарай.',
+  },
+  uz: {
+    wnPii: 'Shaxsiy maʼlumotlar (telefon, ID raqamlar) avtomatik yashirildi. Tahlilga taʼsir qilmaydi.',
+    wnByulji: 'Ilovadan keyingi mazmun tahlildan chiqarildi. Muhim boʻlsa, oʻsha qismni alohida joylab qayta tahlil qiling.',
+    wnLowCoverage: 'Hujjatning bir qismi bandlarga boʻlinmadi. Asl matn bilan solishtiring.',
+    wnInjection: 'AI tahlilini boshqarishga urinuvchi matn aniqlandi. Asl matnni oʻzingiz tekshiring.',
+  },
+  si: {
+    wnPii: 'පුද්ගලික තොරතුරු (දුරකථන, හැඳුනුම් අංක ආදිය) ස්වයංක්‍රීයව වසන ලදි. විශ්ලේෂණයට බලපෑමක් නැත.',
+    wnByulji: 'ඇමුණුම්වලට පසු අන්තර්ගතය විශ්ලේෂණයෙන් බැහැර විය. වැදගත් නම් එම කොටස වෙනම අලවා නැවත විශ්ලේෂණය කරන්න.',
+    wnLowCoverage: 'ලේඛනයේ කොටසක් වගන්තිවලට වෙන් නොවිණි. මුල් පිටපත සමඟ සසඳන්න.',
+    wnInjection: 'AI විශ්ලේෂණය හසුරුවන්න උත්සාහ කරන පෙළ හමු විය. මුල් පිටපත ඔබම පරීක්ෂා කරන්න.',
+  },
+  bn: {
+    wnPii: 'ব্যক্তিগত তথ্য (ফোন, পরিচয় নম্বর ইত্যাদি) স্বয়ংক্রিয়ভাবে ঢাকা হয়েছে। বিশ্লেষণে প্রভাব নেই।',
+    wnByulji: 'সংযুক্তির পরের বিষয়বস্তু বিশ্লেষণ থেকে বাদ। গুরুত্বপূর্ণ হলে ওই অংশ আলাদা পেস্ট করে আবার বিশ্লেষণ করুন।',
+    wnLowCoverage: 'নথির কিছু অংশ ধারায় ভাগ হয়নি। মূল লেখার সাথে মিলিয়ে দেখুন।',
+    wnInjection: 'এআই বিশ্লেষণ প্রভাবিত করার চেষ্টার লেখা পাওয়া গেছে। মূল লেখা নিজে যাচাই করুন।',
+  },
+  ru: {
+    wnPii: 'Личные данные (телефон, идентификационные номера и т.п.) скрыты автоматически. На анализ не влияет.',
+    wnByulji: 'Содержимое после приложений исключено из анализа. Если оно важно — вставьте его отдельно и проанализируйте снова.',
+    wnLowCoverage: 'Часть документа не удалось разделить на пункты. Сверьте с оригиналом.',
+    wnInjection: 'Обнаружен текст, пытающийся манипулировать анализом ИИ. Проверьте оригинал самостоятельно.',
+  },
+  ja: {
+    wnPii: '個人情報（電話・登録番号など）を自動でマスキングしました。分析に影響はありません。',
+    wnByulji: '別紙（添付文書）以降の内容は分析から除外しました。重要な内容があれば、その部分だけ貼り付けて再分析してください。',
+    wnLowCoverage: '文書の一部を条項に分割できませんでした。漏れがないか原文と照合してください。',
+    wnInjection: 'AI分析を操作しようとする文言を検出しました。判定を鵜呑みにせず、原文を直接ご確認ください。',
+  },
+}
+
+export const WARNING_CODE_KEYS: Record<string, WarnKey> = {
+  pii_masked: 'wnPii', byulji_excluded: 'wnByulji', low_coverage: 'wnLowCoverage', injection_detected: 'wnInjection',
+}
+
+type LearnKey =
+  | 'lnNav' | 'lnTitle' | 'lnDesc' | 'lnSignal' | 'lnOutside' | 'lnCase' | 'lnKoNote'
+
+// 교육 페이지 (#104) — 챗봇(#103)은 세션당 대화 상한·인젝션 방어 조건 충족 후 별도 PR
+const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
+  ko: {
+    lnNav: '위험 조항 배우기',
+    lnTitle: '전세사기 5대 수법',
+    lnDesc: '실제 분쟁 사례와 실증 연구로 정리한 대표 수법이에요. 계약 전에 한 번만 읽어도 시야가 달라져요.',
+    lnSignal: '계약서에서 보이는 신호',
+    lnOutside: '계약서 밖에서 확인할 것',
+    lnCase: '근거·사례',
+    lnKoNote: '학습 콘텐츠는 한국어로 제공돼요',
+  },
+  en: {
+    lnNav: 'Learn risky clauses',
+    lnTitle: '5 common jeonse fraud schemes',
+    lnDesc: 'Key schemes compiled from real disputes and empirical research. One read before signing changes what you see.',
+    lnSignal: 'Signals in the contract',
+    lnOutside: 'What to check outside the contract',
+    lnCase: 'Evidence & cases',
+    lnKoNote: 'Learning content is provided in Korean',
+  },
+  zh: {
+    lnNav: '学习危险条款',
+    lnTitle: '全租房诈骗5大手法',
+    lnDesc: '基于真实纠纷案例和实证研究整理的代表性手法。签约前读一遍，眼界就不一样。',
+    lnSignal: '合同中可见的信号',
+    lnOutside: '合同之外要确认的事',
+    lnCase: '依据·案例',
+    lnKoNote: '学习内容以韩语提供',
+  },
+  vi: {
+    lnNav: 'Học điều khoản rủi ro',
+    lnTitle: '5 thủ đoạn lừa đảo jeonse',
+    lnDesc: 'Các thủ đoạn tiêu biểu từ tranh chấp thực tế và nghiên cứu thực chứng. Đọc một lần trước khi ký, góc nhìn sẽ khác.',
+    lnSignal: 'Dấu hiệu trong hợp đồng',
+    lnOutside: 'Kiểm tra ngoài hợp đồng',
+    lnCase: 'Căn cứ·vụ việc',
+    lnKoNote: 'Nội dung học được cung cấp bằng tiếng Hàn',
+  },
+  th: {
+    lnNav: 'เรียนรู้ข้อสัญญาเสี่ยง',
+    lnTitle: 'กลโกงจอนเซ 5 รูปแบบ',
+    lnDesc: 'รูปแบบสำคัญจากข้อพิพาทจริงและงานวิจัย อ่านครั้งเดียวก่อนเซ็นมุมมองก็เปลี่ยน',
+    lnSignal: 'สัญญาณในสัญญา',
+    lnOutside: 'สิ่งที่ต้องเช็กนอกสัญญา',
+    lnCase: 'หลักฐาน·คดี',
+    lnKoNote: 'เนื้อหาการเรียนให้บริการเป็นภาษาเกาหลี',
+  },
+  id: {
+    lnNav: 'Pelajari pasal berisiko',
+    lnTitle: '5 modus penipuan jeonse',
+    lnDesc: 'Modus utama dari sengketa nyata dan riset empiris. Sekali baca sebelum tanda tangan, cara pandang berubah.',
+    lnSignal: 'Sinyal di kontrak',
+    lnOutside: 'Yang dicek di luar kontrak',
+    lnCase: 'Bukti·kasus',
+    lnKoNote: 'Konten pembelajaran tersedia dalam bahasa Korea',
+  },
+  tl: {
+    lnNav: 'Matuto ng risky clauses',
+    lnTitle: '5 jeonse fraud schemes',
+    lnDesc: 'Mga pangunahing scheme mula sa totoong dispute at empirical research. Isang basa bago pumirma, iba na ang makikita mo.',
+    lnSignal: 'Senyales sa kontrata',
+    lnOutside: 'Iche-check sa labas ng kontrata',
+    lnCase: 'Ebidensya·kaso',
+    lnKoNote: 'Ang learning content ay nasa Korean',
+  },
+  ne: {
+    lnNav: 'जोखिम दफा सिक्ने',
+    lnTitle: 'जोनसे ठगीका ५ मुख्य तरिका',
+    lnDesc: 'वास्तविक विवाद र अनुसन्धानबाट तयार मुख्य तरिकाहरू। हस्ताक्षर अघि एकपटक पढ्दा दृष्टि फरक हुन्छ।',
+    lnSignal: 'करारमा देखिने संकेत',
+    lnOutside: 'करारबाहिर जाँच्ने कुरा',
+    lnCase: 'आधार·मुद्दा',
+    lnKoNote: 'शिक्षण सामग्री कोरियालीमा उपलब्ध छ',
+  },
+  km: {
+    lnNav: 'រៀនអំពីមាត្រាហានិភ័យ',
+    lnTitle: 'ល្បិចក្លែងបន្លំ jeonse ៥ យ៉ាង',
+    lnDesc: 'ល្បិចសំខាន់ពីវិវាទពិត និងការស្រាវជ្រាវ។ អានម្ដងមុនចុះហត្ថលេខា ទស្សនៈផ្លាស់ប្ដូរ។',
+    lnSignal: 'សញ្ញាក្នុងកិច្ចសន្យា',
+    lnOutside: 'អ្វីត្រូវពិនិត្យក្រៅកិច្ចសន្យា',
+    lnCase: 'ភស្តុតាង·ករណី',
+    lnKoNote: 'មាតិកាសិក្សាផ្ដល់ជាភាសាកូរ៉េ',
+  },
+  my: {
+    lnNav: 'အန္တရာယ်အပိုဒ်များလေ့လာရန်',
+    lnTitle: 'jeonse လိမ်နည်း ၅ မျိုး',
+    lnDesc: 'အမှန်တကယ်အငြင်းပွားမှုနှင့် သုတေသနမှ စုစည်းထားသော အဓိကနည်းများ။ လက်မှတ်မထိုးမီ တစ်ကြိမ်ဖတ်လျှင် အမြင်ပြောင်းသည်။',
+    lnSignal: 'စာချုပ်ထဲက အချက်ပြများ',
+    lnOutside: 'စာချုပ်ပြင်ပ စစ်ဆေးရန်',
+    lnCase: 'အထောက်အထား·အမှု',
+    lnKoNote: 'သင်ခန်းစာကို ကိုရီးယားဘာသာဖြင့် ပေးသည်',
+  },
+  mn: {
+    lnNav: 'Эрсдэлтэй заалт сурах',
+    lnTitle: 'Жонсэ залилангийн 5 гол арга',
+    lnDesc: 'Бодит маргаан, судалгаанд үндэслэсэн гол аргууд. Гарын үсэг зурахаас өмнө нэг уншихад л харах өнцөг өөрчлөгдөнө.',
+    lnSignal: 'Гэрээн дэх дохио',
+    lnOutside: 'Гэрээнээс гадуур шалгах зүйл',
+    lnCase: 'Үндэслэл·хэрэг',
+    lnKoNote: 'Сургалтын агуулга солонгос хэлээр',
+  },
+  uz: {
+    lnNav: 'Xavfli bandlarni oʻrganish',
+    lnTitle: 'Jeonse firibgarligining 5 usuli',
+    lnDesc: 'Haqiqiy nizolar va tadqiqotlardan jamlangan asosiy usullar. Imzodan oldin bir oʻqish qarashni oʻzgartiradi.',
+    lnSignal: 'Shartnomadagi belgilar',
+    lnOutside: 'Shartnomadan tashqari tekshirish',
+    lnCase: 'Asos·ishlar',
+    lnKoNote: 'Oʻquv kontenti koreys tilida',
+  },
+  si: {
+    lnNav: 'අවදානම් වගන්ති ඉගෙනීම',
+    lnTitle: 'ජොන්සේ වංචාවේ ප්‍රධාන ක්‍රම 5',
+    lnDesc: 'සැබෑ ආරවුල් සහ පර්යේෂණවලින් සම්පාදිත ප්‍රධාන ක්‍රම. අත්සනට පෙර වරක් කියවීමෙන් දැක්ම වෙනස් වේ.',
+    lnSignal: 'ගිවිසුමේ පෙනෙන සංඥා',
+    lnOutside: 'ගිවිසුමෙන් පිටත පරීක්ෂා කළ යුතු දේ',
+    lnCase: 'සාක්ෂි·නඩු',
+    lnKoNote: 'ඉගෙනුම් අන්තර්ගතය කොරියානු බසින්',
+  },
+  bn: {
+    lnNav: 'ঝুঁকির ধারা শিখুন',
+    lnTitle: 'জনসে প্রতারণার ৫টি প্রধান কৌশল',
+    lnDesc: 'বাস্তব বিরোধ ও গবেষণা থেকে সংকলিত প্রধান কৌশল। স্বাক্ষরের আগে একবার পড়লেই দৃষ্টি বদলে যায়।',
+    lnSignal: 'চুক্তিতে দৃশ্যমান সংকেত',
+    lnOutside: 'চুক্তির বাইরে যা যাচাই করবেন',
+    lnCase: 'ভিত্তি·মামলা',
+    lnKoNote: 'শেখার বিষয়বস্তু কোরিয়ান ভাষায়',
+  },
+  ru: {
+    lnNav: 'Изучить опасные пункты',
+    lnTitle: '5 главных схем мошенничества с чонсе',
+    lnDesc: 'Ключевые схемы из реальных споров и исследований. Одно прочтение перед подписанием меняет взгляд.',
+    lnSignal: 'Сигналы в договоре',
+    lnOutside: 'Что проверить вне договора',
+    lnCase: 'Основания·дела',
+    lnKoNote: 'Учебный контент на корейском языке',
+  },
+  ja: {
+    lnNav: '危険条項を学ぶ',
+    lnTitle: 'ジョンセ詐欺の5大手口',
+    lnDesc: '実際の紛争事例と実証研究から整理した代表的手口。署名前に一度読むだけで見え方が変わります。',
+    lnSignal: '契約書に見えるシグナル',
+    lnOutside: '契約書の外で確認すること',
+    lnCase: '根拠・事例',
+    lnKoNote: '学習コンテンツは韓国語で提供されます',
+  },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | LearnKey | WarnKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2247,7 +2505,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_LEARN, UI_WARNINGS] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
