@@ -95,19 +95,19 @@ export function LandingScreen({
             aria-hidden
             className="animate-float-delay absolute -left-8 top-24 hidden rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
           >
-            📖 주택임대차보호법 제3조의2
+            주택임대차보호법 제3조의2
           </div>
           <div
             aria-hidden
             className="animate-float absolute -right-6 top-14 hidden rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
           >
-            ⚖️ 민법 제623조
+            민법 제623조
           </div>
           <div
             aria-hidden
             className="animate-float-delay absolute -right-2 bottom-40 hidden rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
           >
-            📌 상가건물 임대차보호법 제10조
+            상가건물 임대차보호법 제10조
           </div>
 
           {/* 위험 경고 카드 — 종이 위에 겹침 */}
@@ -149,14 +149,14 @@ export function LandingScreen({
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {(
               [
-                ['📑', 'feat1Title', 'feat1Body'],
-                ['💬', 'feat2Title', 'feat2Body'],
-                ['🔍', 'feat3Title', 'feat3Body'],
-                ['✅', 'feat4Title', 'feat4Body'],
+                ['feat1Title', 'feat1Body'],
+                ['feat2Title', 'feat2Body'],
+                ['feat3Title', 'feat3Body'],
+                ['feat4Title', 'feat4Body'],
               ] as const
-            ).map(([emoji, titleKey, bodyKey], i) => (
+            ).map(([titleKey, bodyKey], i) => (
               <Reveal key={titleKey} delay={i * 90}>
-                <Feature emoji={emoji} title={t(language, titleKey)} body={t(language, bodyKey)} />
+                <Feature title={t(language, titleKey)} body={t(language, bodyKey)} />
               </Reveal>
             ))}
           </div>
@@ -217,11 +217,10 @@ export function LandingScreen({
   )
 }
 
-function Feature({ emoji, title, body }: { emoji: string; title: string; body: string }) {
+function Feature({ title, body }: { title: string; body: string }) {
   return (
     <div className="h-full rounded-3xl bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1.5 hover:shadow-float">
-      <span className="text-[28px]">{emoji}</span>
-      <p className="mt-4 text-[17px] font-bold text-ink-900">{title}</p>
+      <p className="text-[17px] font-bold text-ink-900">{title}</p>
       <p className="mt-2 text-[14px] leading-relaxed text-ink-400">{body}</p>
     </div>
   )
@@ -233,7 +232,7 @@ function Step({ no, title, body }: { no: string; title: string; body: string }) 
       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-[15px] font-extrabold text-brand-600">
         {no}
       </span>
-      <p className="mt-4 text-[17px] font-bold text-ink-900">{title}</p>
+      <p className="text-[17px] font-bold text-ink-900">{title}</p>
       <p className="mt-2 text-[14px] leading-relaxed text-ink-400">{body}</p>
     </div>
   )
