@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ClauseResult } from '../api'
-import { Button, CopyButton, RiskBadge } from '../components/ui'
+import { Button, CopyButton, RiskBadge, RiskIcon } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
@@ -128,8 +128,11 @@ export function DetailScreen({
                       : 'bg-ink-25 text-ink-600 hover:bg-ink-50'
                   }`}
                 >
-                  <span
-                    className={`h-2 w-2 shrink-0 rounded-full ${RISK_META[result.risk_level].dot}`}
+                  {/* 3중 인코딩: 색 점만으로 위험도를 표시하지 않는다 —
+                      활성(어두운 배경) 칩에서는 현재색 상속으로 대비 유지 */}
+                  <RiskIcon
+                    level={result.risk_level}
+                    className={active ? '' : RISK_META[result.risk_level].text}
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
                     {clauseHeading(result.original_text, language, result.original_text_translated) ??

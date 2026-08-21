@@ -2251,6 +2251,28 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+/* --- KRDS 글자·화면 크기 조절 (#134) --- */
+type ZoomKey = 'zoomLabel' | 'zoomOut' | 'zoomIn'
+
+const UI_ZOOM: Record<LangCode, Record<ZoomKey, string>> = {
+  ko: { zoomLabel: '글자·화면 크기', zoomOut: '글자 작게', zoomIn: '글자 크게' },
+  en: { zoomLabel: 'Text & display size', zoomOut: 'Smaller text', zoomIn: 'Larger text' },
+  zh: { zoomLabel: '字体与画面大小', zoomOut: '缩小字体', zoomIn: '放大字体' },
+  vi: { zoomLabel: 'Cỡ chữ và màn hình', zoomOut: 'Thu nhỏ chữ', zoomIn: 'Phóng to chữ' },
+  th: { zoomLabel: 'ขนาดตัวอักษรและหน้าจอ', zoomOut: 'ลดขนาดตัวอักษร', zoomIn: 'เพิ่มขนาดตัวอักษร' },
+  id: { zoomLabel: 'Ukuran teks & tampilan', zoomOut: 'Perkecil teks', zoomIn: 'Perbesar teks' },
+  tl: { zoomLabel: 'Laki ng teksto at screen', zoomOut: 'Paliitin ang teksto', zoomIn: 'Palakihin ang teksto' },
+  ne: { zoomLabel: 'अक्षर र स्क्रिन आकार', zoomOut: 'अक्षर सानो', zoomIn: 'अक्षर ठूलो' },
+  km: { zoomLabel: 'ទំហំអក្សរ និងអេក្រង់', zoomOut: 'បង្រួមអក្សរ', zoomIn: 'ពង្រីកអក្សរ' },
+  my: { zoomLabel: 'စာလုံးနှင့် မျက်နှာပြင်အရွယ်', zoomOut: 'စာလုံးချုံ့ရန်', zoomIn: 'စာလုံးချဲ့ရန်' },
+  mn: { zoomLabel: 'Үсэг ба дэлгэцийн хэмжээ', zoomOut: 'Үсэг багасгах', zoomIn: 'Үсэг томсгох' },
+  uz: { zoomLabel: "Matn va ekran o'lchami", zoomOut: 'Matnni kichraytirish', zoomIn: 'Matnni kattalashtirish' },
+  si: { zoomLabel: 'අකුරු සහ තිර ප්‍රමාණය', zoomOut: 'අකුරු කුඩා කරන්න', zoomIn: 'අකුරු ලොකු කරන්න' },
+  bn: { zoomLabel: 'লেখা ও স্ক্রিনের আকার', zoomOut: 'লেখা ছোট করুন', zoomIn: 'লেখা বড় করুন' },
+  ru: { zoomLabel: 'Размер текста и экрана', zoomOut: 'Уменьшить текст', zoomIn: 'Увеличить текст' },
+  ja: { zoomLabel: '文字・画面サイズ', zoomOut: '文字を小さく', zoomIn: '文字を大きく' },
+}
+
 type VoiceKey =
   | 'vcToggle' | 'vcListening' | 'vcOff'
 
@@ -3083,7 +3105,7 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ZoomKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3093,7 +3115,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

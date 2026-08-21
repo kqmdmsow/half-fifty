@@ -25,6 +25,9 @@ import { RecordsScreen } from './screens/Records'
 
 import { LearnScreen } from './screens/Learn'
 
+// KRDS --krds-zoom-small/medium/large/xlarge/xxlarge (common.css)
+const ZOOM_LEVELS = [0.9, 1, 1.1, 1.3, 1.5]
+
 type Screen =
   | 'landing'
   | 'api'
@@ -50,7 +53,12 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('ko')
 
   // 접근성 설정
-  const [largeText, setLargeText] = useState(false)
+  // 글자·화면 크기 5단계 (KRDS --krds-zoom-*: 0.9/1/1.1/1.3/1.5) —
+  // KRDS 사이트 우상단 '글자·화면 설정'과 같은 사고방식, 선택값은 저장.
+  const [zoom, setZoom] = useState<number>(() => {
+    const saved = Number(localStorage.getItem('jmjm_zoom'))
+    return ZOOM_LEVELS.includes(saved) ? saved : 1
+  })
   const [highContrast, setHighContrast] = useState(false)
   const [voiceGuide, setVoiceGuide] = useState(false)
 
@@ -93,6 +101,8 @@ export default function App() {
   const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
   hasResultsRef.current = results.length > 0
 
+  // 글자·화면 크기: KRDS zoom 토큰 값을 문서 루트에 적용 — 텍스트만이 아니라
+  // 레이아웃·아이콘·터치 타깃이 함께 커져 저시력 사용자에게 일관적이다.
   // 결과가 확정되면 읽기 시작 시각 기록 (사람 평가 소요시간 지표)
   useEffect(() => {
     if (data) setResultsShownAt(Date.now())
@@ -100,8 +110,9 @@ export default function App() {
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
-    document.documentElement.style.fontSize = largeText ? '18px' : '16px'
-  }, [largeText])
+    document.documentElement.style.zoom = String(zoom)
+    localStorage.setItem('jmjm_zoom', String(zoom))
+  }, [zoom])
 
   // 접근성(#82): 화면 전환 시 스크린리더 포커스를 새 화면 제목으로 이동 —
   // SPA는 페이지 로드가 없어 전환을 알리지 않으면 리더가 침묵한다
@@ -254,9 +265,11 @@ export default function App() {
         {t(language, 'skipToMain')}
       </a>
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* 좁은 폭(375px)에서는 컨트롤이 둘째 줄로 내려간다 — 고정 h-16이면
+            zoom 스테퍼가 추가된 뒤 오버플로로 '또렷하게'가 잘림 (실측) */}
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-y-1 px-4 py-1.5 md:px-6">
           <Logo onClick={() => go('landing')} />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
             <button
               type="button"
               aria-pressed={screen === 'learn'}
@@ -282,18 +295,36 @@ export default function App() {
                 ))}
               </select>
             </label>
-            <button
-              type="button"
-              aria-pressed={largeText}
-              onClick={() => setLargeText((value) => !value)}
-              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                largeText
-                  ? 'bg-ink-900 text-white'
-                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-              }`}
+            {/* 글자·화면 크기 (KRDS zoom 5단계) — 값은 aria-live로 낭독 */}
+            <div
+              role="group"
+              aria-label={t(language, 'zoomLabel')}
+              className="flex items-center gap-0.5 rounded-full bg-ink-50 px-1.5 py-1 text-[13px] font-bold text-ink-600"
             >
-              {t(language, 'largeText')}
-            </button>
+              <button
+                type="button"
+                aria-label={t(language, 'zoomOut')}
+                disabled={zoom === ZOOM_LEVELS[0]}
+                onClick={() => setZoom(ZOOM_LEVELS[Math.max(0, ZOOM_LEVELS.indexOf(zoom) - 1)])}
+                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+              >
+                가−
+              </button>
+              <span aria-live="polite" className="min-w-[42px] text-center tabular-nums">
+                {Math.round(zoom * 100)}%
+              </span>
+              <button
+                type="button"
+                aria-label={t(language, 'zoomIn')}
+                disabled={zoom === ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
+                onClick={() =>
+                  setZoom(ZOOM_LEVELS[Math.min(ZOOM_LEVELS.length - 1, ZOOM_LEVELS.indexOf(zoom) + 1)])
+                }
+                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+              >
+                가+
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => go('records')}
@@ -378,12 +409,12 @@ export default function App() {
           <PersonaScreen
             persona={persona}
             language={language}
-            largeText={largeText}
+            largeText={zoom > 1}
             highContrast={highContrast}
             voiceGuide={voiceGuide}
             onPersonaChange={setPersona}
             onLanguageChange={setLanguage}
-            onToggleLargeText={() => setLargeText((value) => !value)}
+            onToggleLargeText={() => setZoom((value) => (value > 1 ? 1 : 1.3))}
             onToggleHighContrast={() => setHighContrast((value) => !value)}
             onToggleVoiceGuide={() => setVoiceGuide((value) => !value)}
             onPrev={() => go('extract')}
