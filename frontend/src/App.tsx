@@ -62,6 +62,8 @@ export default function App() {
   // 결과가 생성된 언어 — 결과를 보다가 언어를 바꾸면 UI 라벨만 바뀌고 설명은
   // 분석 시점 언어로 남는다. 불일치를 감지해 재분석 안내 배너를 띄운다.
   const [analyzedLanguage, setAnalyzedLanguage] = useState<Language>('ko')
+  // 사람 평가 지표(자문 §6): 결과 표시 시각 — 만족도 응답까지의 '읽는 시간' 측정용
+  const [resultsShownAt, setResultsShownAt] = useState<number | null>(null)
   // judge 재시도로 조항이 다시 생성되는 중 — 카드가 소리 없이 교체되는 대신
   // 배너로 알린다 (#101 '새로고침 느낌' 피드백)
   const [retrying, setRetrying] = useState(false)
@@ -81,6 +83,11 @@ export default function App() {
       : []
   const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
   hasResultsRef.current = results.length > 0
+
+  // 결과가 확정되면 읽기 시작 시각 기록 (사람 평가 소요시간 지표)
+  useEffect(() => {
+    if (data) setResultsShownAt(Date.now())
+  }, [data])
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
@@ -387,7 +394,14 @@ export default function App() {
             onDone={() => go('done')}
           />
         )}
-        {screen === 'done' && <DoneScreen results={results} language={language} onRestart={restart} />}
+        {screen === 'done' && (
+          <DoneScreen
+            results={results}
+            language={language}
+            resultsShownAt={resultsShownAt}
+            onRestart={restart}
+          />
+        )}
       </main>
     </div>
   )
