@@ -41,6 +41,7 @@ export interface ClauseResult {
 export interface AnalyzeResponse {
   clause_count: number
   parse_warnings?: string[]
+  parse_warning_codes?: Array<string | null>
   retry_count: number
   needs_review: boolean
   judge_scores: Record<string, number>
@@ -78,7 +79,7 @@ export async function analyzeContract(
 export interface StreamHandlers {
   // 파일 경로 전용: 텍스트 추출(OCR 포함) 시작 알림
   onExtract?: () => void
-  onMeta?: (meta: { clause_count: number; parse_warnings: string[] }) => void
+  onMeta?: (meta: { clause_count: number; parse_warnings: string[]; parse_warning_codes?: Array<string | null> }) => void
   onClause?: (payload: { done: number; total: number; revision: number; result: ClauseResult }) => void
   onRetry?: (payload: { retry_count: number; reason: string }) => void
 }
@@ -143,6 +144,7 @@ async function consumeAnalysisStream(
 
   let clauseCount = 0
   let warnings: string[] = []
+  let warningCodes: Array<string | null> = []
   const resultsById = new Map<string, ClauseResult>()
   // TS는 클로저 내부 할당으로 let 변수의 narrowing을 못 풀므로 홀더 객체를 쓴다
   const final: {
@@ -162,6 +164,7 @@ async function consumeAnalysisStream(
       case 'meta':
         clauseCount = event.clause_count
         warnings = event.parse_warnings ?? []
+        warningCodes = event.parse_warning_codes ?? []
         handlers.onMeta?.(event)
         break
       case 'clause':
@@ -194,6 +197,7 @@ async function consumeAnalysisStream(
   return {
     clause_count: clauseCount || results.length,
     parse_warnings: warnings,
+    parse_warning_codes: warningCodes,
     retry_count: final.judge?.retry_count ?? 0,
     needs_review: final.judge?.needs_review ?? false,
     judge_scores: final.judge?.judge_scores ?? {},
