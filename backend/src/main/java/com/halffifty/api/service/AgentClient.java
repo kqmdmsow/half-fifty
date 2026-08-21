@@ -66,6 +66,16 @@ public class AgentClient {
                 .body(AnalyzeResponse.class);
     }
 
+    /** 이해 확인 퀴즈 프록시 (#92) — JSON 그대로 중계. */
+    public String quiz(String requestJson) {
+        return restClient.post()
+                .uri("/quiz")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
     /** 재설명 프록시 (#76) — JSON 그대로 중계. */
     public String reexplain(String requestJson) {
         return restClient.post()

@@ -35,6 +35,7 @@ from src.graph import run_pipeline
 from src.learn_content import SCAMS
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
+from src.quiz import generate_quiz
 from src.reexplain import reexplain
 from src.state import PipelineState
 from src.stream import stream_analysis
@@ -150,6 +151,14 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     )
 
 
+class QuizRequest(BaseModel):
+    """이해 확인 퀴즈 생성 요청 (#92) — 프론트가 분석 결과에서 발췌해 보낸다."""
+
+    items: List[dict] = Field(..., description="위험도순 조항 분석 발췌 (최대 3개 사용)")
+    persona: Literal["adult", "senior", "foreigner"] = "adult"
+    language: Optional[Language] = "ko"
+
+
 class ReexplainRequest(BaseModel):
     """사용자 트리거 재설명 (#76) — explanation만 재생성, 판정 불변."""
 
@@ -161,11 +170,19 @@ class ReexplainRequest(BaseModel):
     language: Optional[Language] = "ko"
 
 
+@app.post("/quiz")
+def quiz(req: QuizRequest) -> dict:
+    """객관식 3문항 생성 — 코드 가드 통과분만, 미달 시 빈 목록 (src/quiz.py)."""
+    return {"questions": generate_quiz(req.items, req.persona, req.language or "ko")}  # type: ignore[arg-type]
+
+
 @app.post("/reexplain")
 def reexplain_endpoint(req: ReexplainRequest) -> dict:
     """judge 게이트 통과분만 반환 — 실패 시 ok=False (프론트는 기존 설명 유지)."""
     return reexplain(req.clause_id, req.clause_text, req.analysis,
                      req.mode, req.persona, req.language or "ko")
+
+
 @app.get("/learn")
 def learn() -> dict:
     """교육 콘텐츠 단일 원천 — 프론트가 표시용으로 가져간다 (#104).

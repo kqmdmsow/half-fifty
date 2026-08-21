@@ -56,6 +56,12 @@ public class ContractController {
                 .body(body);
     }
 
+    /** 이해 확인 퀴즈 프록시 (#92) — 에이전트 /quiz 중계. */
+    @PostMapping("/quiz")
+    public String quiz(@RequestBody String request) {
+        return agentClient.quiz(request);
+    }
+
     /** 재설명 프록시 (#76) — 에이전트 /reexplain 중계. */
     @PostMapping("/reexplain")
     public String reexplain(@RequestBody String request) {
