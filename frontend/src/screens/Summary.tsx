@@ -6,7 +6,7 @@ import { riskLevelLabel, riskTypeLabel, t, WARNING_CODE_KEYS, type LangCode } fr
 import { clauseHeading } from '../clauseTitle'
 import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
-import { speak, stopSpeaking } from '../tts'
+import { speak, stopSpeaking, useVoiceAvailable } from '../tts'
 import { FormattedText } from '../components/FormattedText'
 import { JudgeReport } from '../components/JudgeReport'
 
@@ -44,6 +44,7 @@ export function SummaryScreen({
 }) {
   const [filter, setFilter] = useState<Filter>('전체')
   const [reading, setReading] = useState(false)
+  const voiceReady = useVoiceAvailable(language)
 
   // 화면을 떠나면 낭독도 멈춘다
   useEffect(() => () => stopSpeaking(), [])
@@ -198,7 +199,9 @@ export function SummaryScreen({
           })}
         </div>
         <div className="flex items-center gap-2">
-          {/* 전체 낭독 (#82) — 조항별: 표제 → 판정 → 쉬운 설명 → 확인 질문 순 */}
+          {/* 전체 낭독 (#82) — 조항별: 표제 → 판정 → 쉬운 설명 → 확인 질문 순.
+              선택 언어 보이스가 기기에 없으면 숨김 (#86-①) */}
+          {voiceReady && (
           <button
             type="button"
             aria-pressed={reading}
@@ -225,6 +228,7 @@ export function SummaryScreen({
           >
             <span aria-hidden>🔊</span> {t(language, reading ? 'readAllStop' : 'readAll')}
           </button>
+          )}
           {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
         </div>
       </div>
