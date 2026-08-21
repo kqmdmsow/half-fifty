@@ -19,9 +19,11 @@ import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
+import { LearnScreen } from './screens/Learn'
 
 type Screen =
   | 'landing'
+  | 'learn'
   | 'upload'
   | 'extract'
   | 'persona'
@@ -218,10 +220,27 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
+      {/* 스크린리더·키보드 사용자용 스킵 링크 (#82 2차) — 포커스될 때만 보임 */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-brand-500 focus:px-4 focus:py-2 focus:text-white"
+      >
+        {t(language, 'skipToMain')}
+      </a>
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo onClick={() => go('landing')} />
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-pressed={screen === 'learn'}
+              onClick={() => go('learn')}
+              className={`rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+                screen === 'learn' ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              📖 {t(language, 'lnNav')}
+            </button>
             <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
               <span aria-hidden>🌐</span>
               <select
@@ -265,7 +284,7 @@ export default function App() {
         </div>
       </header>
 
-      <main>
+      <main id="main">
         {/* 결과 열람 중 언어 변경 감지 — 설명은 분석 시점 언어로 생성되므로
             바꾼 언어로 받으려면 재분석이 필요하다. 입력(텍스트·파일)은 상태에
             남아 있어 버튼 한 번으로 같은 계약서를 다시 분석한다. */}
@@ -287,6 +306,7 @@ export default function App() {
           </div>
         )}
         {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
+        {screen === 'learn' && <LearnScreen language={language} onStart={() => go('upload')} />}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}
@@ -351,6 +371,7 @@ export default function App() {
             retryCount={data?.retry_count ?? 0}
             needsReview={data?.needs_review ?? false}
             warnings={data?.parse_warnings ?? []}
+            warningCodes={data?.parse_warning_codes ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
           />

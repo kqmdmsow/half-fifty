@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
-import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { riskLevelLabel, riskTypeLabel, t, WARNING_CODE_KEYS, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
@@ -23,6 +23,7 @@ export function SummaryScreen({
   retryCount = 0,
   needsReview = false,
   warnings = [],
+  warningCodes = [],
   onSelectClause,
   onDone,
 }: {
@@ -37,6 +38,7 @@ export function SummaryScreen({
   retryCount?: number
   needsReview?: boolean
   warnings?: string[]
+  warningCodes?: Array<string | null>
   onSelectClause: (clauseId: string) => void
   onDone: () => void
 }) {
@@ -70,14 +72,34 @@ export function SummaryScreen({
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
-      {warnings.map((warning) => (
+      {warnings.map((warning, wi) => {
+        const code = warningCodes[wi]
+        const key = code ? WARNING_CODE_KEYS[code] : undefined
+        const text = key ? t(language, key) : warning
+        return (
         <p
           key={warning}
           className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700"
         >
-          ⚠️ {warning}
+          <span aria-hidden>⚠️</span> {text}
         </p>
-      ))}
+        )
+      })}
+
+      {/* 스크린리더 실황 중계 (#82 2차) — 스트리밍 진행·재시도·완료가 침묵하던
+          문제. 텍스트가 바뀔 때마다 리더가 낭독한다(polite: 사용자 발화 안 끊음) */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {live
+          ? retrying
+            ? t(language, 'retryNote')
+            : liveProgress && liveProgress.total > 0 && liveProgress.done >= liveProgress.total
+              ? t(language, 'verifyingNote')
+              : t(language, 'analyzingLive', {
+                  done: liveProgress?.done ?? 0,
+                  total: liveProgress?.total ?? 0,
+                })
+          : `${t(language, 'analysisDone')}. ${t(language, 'headlineTotal', { total: clauseCount })} ${t(language, 'headlineNeed', { need: needCheck })}`}
+      </p>
 
       {live && liveProgress ? (
         <div className="flex items-center gap-2.5">
@@ -103,11 +125,11 @@ export function SummaryScreen({
           재시도 중에는 카드가 교체되는 이유를 명시한다 (#101) */}
       {live && retrying ? (
         <p className="mt-4 rounded-2xl bg-caution-50 px-4 py-3 text-[13px] font-semibold text-caution-700">
-          🔄 {t(language, 'retryNote')}
+          <span aria-hidden>🔄</span> {t(language, 'retryNote')}
         </p>
       ) : live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 ? (
         <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
-          🛡️ {t(language, 'verifyingNote')}
+          <span aria-hidden>🛡️</span> {t(language, 'verifyingNote')}
         </p>
       ) : null}
 
@@ -201,7 +223,7 @@ export function SummaryScreen({
               reading ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
             }`}
           >
-            🔊 {t(language, reading ? 'readAllStop' : 'readAll')}
+            <span aria-hidden>🔊</span> {t(language, reading ? 'readAllStop' : 'readAll')}
           </button>
           {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
         </div>
