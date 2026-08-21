@@ -174,6 +174,15 @@ public class ContractController {
                 .body(body);
     }
 
+    /**
+     * 교육 콘텐츠 프록시 (#104). 내장 챗봇(#103)은 세션당 대화 상한·인젝션
+     * 방어 조건을 걸고 나서 별도 PR로 합류한다.
+     */
+    @org.springframework.web.bind.annotation.GetMapping("/learn")
+    public String learn() {
+        return agentClient.learn();
+    }
+
     /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */
     private static MediaType sniffImageType(byte[] b) {
         if (b.length >= 3 && (b[0] & 0xFF) == 0xFF && (b[1] & 0xFF) == 0xD8 && (b[2] & 0xFF) == 0xFF) {
