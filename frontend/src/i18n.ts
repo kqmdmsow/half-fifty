@@ -2235,7 +2235,6 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
-
 type WarnKey =
   | 'wnPii' | 'wnByulji' | 'wnLowCoverage' | 'wnInjection'
 
@@ -2343,9 +2342,160 @@ export const WARNING_CODE_KEYS: Record<string, WarnKey> = {
   pii_masked: 'wnPii', byulji_excluded: 'wnByulji', low_coverage: 'wnLowCoverage', injection_detected: 'wnInjection',
 }
 
+type LearnKey =
+  | 'lnNav' | 'lnTitle' | 'lnDesc' | 'lnSignal' | 'lnOutside' | 'lnCase' | 'lnKoNote'
+
+// 교육 페이지 (#104) — 챗봇(#103)은 세션당 대화 상한·인젝션 방어 조건 충족 후 별도 PR
+const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
+  ko: {
+    lnNav: '위험 조항 배우기',
+    lnTitle: '전세사기 5대 수법',
+    lnDesc: '실제 분쟁 사례와 실증 연구로 정리한 대표 수법이에요. 계약 전에 한 번만 읽어도 시야가 달라져요.',
+    lnSignal: '계약서에서 보이는 신호',
+    lnOutside: '계약서 밖에서 확인할 것',
+    lnCase: '근거·사례',
+    lnKoNote: '학습 콘텐츠는 한국어로 제공돼요',
+  },
+  en: {
+    lnNav: 'Learn risky clauses',
+    lnTitle: '5 common jeonse fraud schemes',
+    lnDesc: 'Key schemes compiled from real disputes and empirical research. One read before signing changes what you see.',
+    lnSignal: 'Signals in the contract',
+    lnOutside: 'What to check outside the contract',
+    lnCase: 'Evidence & cases',
+    lnKoNote: 'Learning content is provided in Korean',
+  },
+  zh: {
+    lnNav: '学习危险条款',
+    lnTitle: '全租房诈骗5大手法',
+    lnDesc: '基于真实纠纷案例和实证研究整理的代表性手法。签约前读一遍，眼界就不一样。',
+    lnSignal: '合同中可见的信号',
+    lnOutside: '合同之外要确认的事',
+    lnCase: '依据·案例',
+    lnKoNote: '学习内容以韩语提供',
+  },
+  vi: {
+    lnNav: 'Học điều khoản rủi ro',
+    lnTitle: '5 thủ đoạn lừa đảo jeonse',
+    lnDesc: 'Các thủ đoạn tiêu biểu từ tranh chấp thực tế và nghiên cứu thực chứng. Đọc một lần trước khi ký, góc nhìn sẽ khác.',
+    lnSignal: 'Dấu hiệu trong hợp đồng',
+    lnOutside: 'Kiểm tra ngoài hợp đồng',
+    lnCase: 'Căn cứ·vụ việc',
+    lnKoNote: 'Nội dung học được cung cấp bằng tiếng Hàn',
+  },
+  th: {
+    lnNav: 'เรียนรู้ข้อสัญญาเสี่ยง',
+    lnTitle: 'กลโกงจอนเซ 5 รูปแบบ',
+    lnDesc: 'รูปแบบสำคัญจากข้อพิพาทจริงและงานวิจัย อ่านครั้งเดียวก่อนเซ็นมุมมองก็เปลี่ยน',
+    lnSignal: 'สัญญาณในสัญญา',
+    lnOutside: 'สิ่งที่ต้องเช็กนอกสัญญา',
+    lnCase: 'หลักฐาน·คดี',
+    lnKoNote: 'เนื้อหาการเรียนให้บริการเป็นภาษาเกาหลี',
+  },
+  id: {
+    lnNav: 'Pelajari pasal berisiko',
+    lnTitle: '5 modus penipuan jeonse',
+    lnDesc: 'Modus utama dari sengketa nyata dan riset empiris. Sekali baca sebelum tanda tangan, cara pandang berubah.',
+    lnSignal: 'Sinyal di kontrak',
+    lnOutside: 'Yang dicek di luar kontrak',
+    lnCase: 'Bukti·kasus',
+    lnKoNote: 'Konten pembelajaran tersedia dalam bahasa Korea',
+  },
+  tl: {
+    lnNav: 'Matuto ng risky clauses',
+    lnTitle: '5 jeonse fraud schemes',
+    lnDesc: 'Mga pangunahing scheme mula sa totoong dispute at empirical research. Isang basa bago pumirma, iba na ang makikita mo.',
+    lnSignal: 'Senyales sa kontrata',
+    lnOutside: 'Iche-check sa labas ng kontrata',
+    lnCase: 'Ebidensya·kaso',
+    lnKoNote: 'Ang learning content ay nasa Korean',
+  },
+  ne: {
+    lnNav: 'जोखिम दफा सिक्ने',
+    lnTitle: 'जोनसे ठगीका ५ मुख्य तरिका',
+    lnDesc: 'वास्तविक विवाद र अनुसन्धानबाट तयार मुख्य तरिकाहरू। हस्ताक्षर अघि एकपटक पढ्दा दृष्टि फरक हुन्छ।',
+    lnSignal: 'करारमा देखिने संकेत',
+    lnOutside: 'करारबाहिर जाँच्ने कुरा',
+    lnCase: 'आधार·मुद्दा',
+    lnKoNote: 'शिक्षण सामग्री कोरियालीमा उपलब्ध छ',
+  },
+  km: {
+    lnNav: 'រៀនអំពីមាត្រាហានិភ័យ',
+    lnTitle: 'ល្បិចក្លែងបន្លំ jeonse ៥ យ៉ាង',
+    lnDesc: 'ល្បិចសំខាន់ពីវិវាទពិត និងការស្រាវជ្រាវ។ អានម្ដងមុនចុះហត្ថលេខា ទស្សនៈផ្លាស់ប្ដូរ។',
+    lnSignal: 'សញ្ញាក្នុងកិច្ចសន្យា',
+    lnOutside: 'អ្វីត្រូវពិនិត្យក្រៅកិច្ចសន្យា',
+    lnCase: 'ភស្តុតាង·ករណី',
+    lnKoNote: 'មាតិកាសិក្សាផ្ដល់ជាភាសាកូរ៉េ',
+  },
+  my: {
+    lnNav: 'အန္တရာယ်အပိုဒ်များလေ့လာရန်',
+    lnTitle: 'jeonse လိမ်နည်း ၅ မျိုး',
+    lnDesc: 'အမှန်တကယ်အငြင်းပွားမှုနှင့် သုတေသနမှ စုစည်းထားသော အဓိကနည်းများ။ လက်မှတ်မထိုးမီ တစ်ကြိမ်ဖတ်လျှင် အမြင်ပြောင်းသည်။',
+    lnSignal: 'စာချုပ်ထဲက အချက်ပြများ',
+    lnOutside: 'စာချုပ်ပြင်ပ စစ်ဆေးရန်',
+    lnCase: 'အထောက်အထား·အမှု',
+    lnKoNote: 'သင်ခန်းစာကို ကိုရီးယားဘာသာဖြင့် ပေးသည်',
+  },
+  mn: {
+    lnNav: 'Эрсдэлтэй заалт сурах',
+    lnTitle: 'Жонсэ залилангийн 5 гол арга',
+    lnDesc: 'Бодит маргаан, судалгаанд үндэслэсэн гол аргууд. Гарын үсэг зурахаас өмнө нэг уншихад л харах өнцөг өөрчлөгдөнө.',
+    lnSignal: 'Гэрээн дэх дохио',
+    lnOutside: 'Гэрээнээс гадуур шалгах зүйл',
+    lnCase: 'Үндэслэл·хэрэг',
+    lnKoNote: 'Сургалтын агуулга солонгос хэлээр',
+  },
+  uz: {
+    lnNav: 'Xavfli bandlarni oʻrganish',
+    lnTitle: 'Jeonse firibgarligining 5 usuli',
+    lnDesc: 'Haqiqiy nizolar va tadqiqotlardan jamlangan asosiy usullar. Imzodan oldin bir oʻqish qarashni oʻzgartiradi.',
+    lnSignal: 'Shartnomadagi belgilar',
+    lnOutside: 'Shartnomadan tashqari tekshirish',
+    lnCase: 'Asos·ishlar',
+    lnKoNote: 'Oʻquv kontenti koreys tilida',
+  },
+  si: {
+    lnNav: 'අවදානම් වගන්ති ඉගෙනීම',
+    lnTitle: 'ජොන්සේ වංචාවේ ප්‍රධාන ක්‍රම 5',
+    lnDesc: 'සැබෑ ආරවුල් සහ පර්යේෂණවලින් සම්පාදිත ප්‍රධාන ක්‍රම. අත්සනට පෙර වරක් කියවීමෙන් දැක්ම වෙනස් වේ.',
+    lnSignal: 'ගිවිසුමේ පෙනෙන සංඥා',
+    lnOutside: 'ගිවිසුමෙන් පිටත පරීක්ෂා කළ යුතු දේ',
+    lnCase: 'සාක්ෂි·නඩු',
+    lnKoNote: 'ඉගෙනුම් අන්තර්ගතය කොරියානු බසින්',
+  },
+  bn: {
+    lnNav: 'ঝুঁকির ধারা শিখুন',
+    lnTitle: 'জনসে প্রতারণার ৫টি প্রধান কৌশল',
+    lnDesc: 'বাস্তব বিরোধ ও গবেষণা থেকে সংকলিত প্রধান কৌশল। স্বাক্ষরের আগে একবার পড়লেই দৃষ্টি বদলে যায়।',
+    lnSignal: 'চুক্তিতে দৃশ্যমান সংকেত',
+    lnOutside: 'চুক্তির বাইরে যা যাচাই করবেন',
+    lnCase: 'ভিত্তি·মামলা',
+    lnKoNote: 'শেখার বিষয়বস্তু কোরিয়ান ভাষায়',
+  },
+  ru: {
+    lnNav: 'Изучить опасные пункты',
+    lnTitle: '5 главных схем мошенничества с чонсе',
+    lnDesc: 'Ключевые схемы из реальных споров и исследований. Одно прочтение перед подписанием меняет взгляд.',
+    lnSignal: 'Сигналы в договоре',
+    lnOutside: 'Что проверить вне договора',
+    lnCase: 'Основания·дела',
+    lnKoNote: 'Учебный контент на корейском языке',
+  },
+  ja: {
+    lnNav: '危険条項を学ぶ',
+    lnTitle: 'ジョンセ詐欺の5大手口',
+    lnDesc: '実際の紛争事例と実証研究から整理した代表的手口。署名前に一度読むだけで見え方が変わります。',
+    lnSignal: '契約書に見えるシグナル',
+    lnOutside: '契約書の外で確認すること',
+    lnCase: '根拠・事例',
+    lnKoNote: '学習コンテンツは韓国語で提供されます',
+  },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | WarnKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | LearnKey | WarnKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2355,7 +2505,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_WARNINGS] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_LEARN, UI_WARNINGS] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
