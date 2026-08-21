@@ -5,6 +5,30 @@ import { riskLevelLabel, riskLevelLabel as rl, riskTypeLabel, t, type LangCode }
 import { clauseHeading } from '../clauseTitle'
 import { FeedbackCard } from '../components/FeedbackCard'
 
+
+/** 점역기가 헷갈리는 기호를 평이한 문자로 바꾼다 (#126).
+ *
+ * 점자정보단말기는 텍스트를 자체 점역하는데, 장식 기호(■)나 전각 인용부호
+ * (「」)는 점역기·규정판마다 처리가 갈려 정체불명 점형이나 잡음으로 읽힌다.
+ * LLM이 근거에 쓰는 「」까지 걸러야 해서 출력 직전에 일괄 정리한다.
+ */
+function braillePlain(text: string): string {
+  return text
+    .replace(/[「」『』]/g, '"')
+    .replace(/[—–]/g, '-')
+    .replace(/[■◆●▶▲]/g, '')
+    .replace(/·/g, ', ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim()
+}
+
+/** 머리말 날짜 표기용 로케일 (i18n LangCode → BCP-47). */
+const LOCALE: Record<string, string> = {
+  ko: 'ko-KR', en: 'en-US', zh: 'zh-CN', vi: 'vi-VN', th: 'th-TH', id: 'id-ID',
+  tl: 'fil-PH', ne: 'ne-NP', km: 'km-KH', my: 'my-MM', mn: 'mn-MN', uz: 'uz-UZ',
+  si: 'si-LK', bn: 'bn-BD', ru: 'ru-RU', ja: 'ja-JP',
+}
+
 export function DoneScreen({
   results,
   language = 'ko',
@@ -75,15 +99,35 @@ export function DoneScreen({
           type="button"
           onClick={() => {
             const lines: string[] = []
+            // 머리말 — 점자단말기는 화면을 한눈에 훑을 수 없어 한 줄씩 읽는다.
+            // 무엇을·언제·몇 건인지 맨 앞에서 알려줘야 방향을 잡을 수 있다.
+            const counts = results.reduce(
+              (acc, r) => ({ ...acc, [r.risk_level]: (acc[r.risk_level] ?? 0) + 1 }),
+              {} as Record<string, number>,
+            )
+            lines.push(braillePlain(t(language, 'dlDocTitle')))
+            lines.push(new Intl.DateTimeFormat(LOCALE[language] ?? 'ko-KR', {
+              year: 'numeric', month: 'long', day: 'numeric',
+            }).format(new Date()))
+            lines.push(
+              braillePlain(
+                t(language, 'dlDocSummary', {
+                  total: results.length,
+                  danger: counts['위험'] ?? 0,
+                  caution: counts['주의'] ?? 0,
+                }),
+              ),
+            )
+            lines.push('')
             results.forEach((r) => {
               const head = clauseHeading(r.original_text, language, r.original_text_translated) ?? r.clause_id
-              lines.push(`■ ${head} — ${rl(language, r.risk_level)}`)
-              lines.push(r.explanation)
+              lines.push(braillePlain(`[${t(language, 'dlClauseLabel')}] ${head} - ${rl(language, r.risk_level)}`))
+              lines.push(braillePlain(r.explanation))
               if (r.risk_level !== '안전' && !r.analysis_failed) {
-                lines.push(`[근거] ${r.risk_evidence_translated || r.risk_evidence}`)
+                lines.push(braillePlain(`[근거] ${r.risk_evidence_translated || r.risk_evidence}`))
               }
-              r.check_questions.forEach((q, i) => lines.push(`[질문${i + 1}] ${q}`))
-              lines.push(`[원문] ${r.original_text}`)
+              r.check_questions.forEach((q, i) => lines.push(braillePlain(`[질문${i + 1}] ${q}`)))
+              lines.push(braillePlain(`[원문] ${r.original_text}`))
               lines.push('')
             })
             const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/plain;charset=utf-8' })
@@ -96,7 +140,7 @@ export function DoneScreen({
           }}
           className="rounded-xl bg-ink-50 px-4 py-2.5 text-[14px] font-bold text-ink-700 transition-colors hover:bg-ink-100"
         >
-          <span aria-hidden>💾</span> {t(language, 'dlBtn')}
+          {t(language, 'dlBtn')}
         </button>
         <p className="mt-1.5 text-[12px] text-ink-400">{t(language, 'dlNote')}</p>
       </div>

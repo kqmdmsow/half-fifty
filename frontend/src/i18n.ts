@@ -2309,26 +2309,26 @@ const UI_API: Partial<Record<LangCode, Record<ApiKey, string>>> = {
 }
 
 type DownloadKey =
-  | 'dlBtn' | 'dlNote' | 'dlFilename'
+  | 'dlBtn' | 'dlNote' | 'dlFilename' | 'dlDocTitle' | 'dlDocSummary' | 'dlClauseLabel'
 
 // 결과 텍스트 다운로드 (#126 v1 — 점자단말기는 txt를 자체 점역하는 게 표준 사용)
 const UI_DOWNLOAD: Record<LangCode, Record<DownloadKey, string>> = {
-  ko: { dlBtn: '결과를 텍스트 파일로 저장', dlNote: '점자정보단말기·문서 앱에서 그대로 읽을 수 있어요. 단말기는 텍스트를 자체 점역해요.', dlFilename: '조목조목_분석결과' },
-  en: { dlBtn: 'Save results as a text file', dlNote: 'Readable on braille displays and document apps — braille devices transcribe text themselves.', dlFilename: 'jomokjomok_results' },
-  zh: { dlBtn: '将结果保存为文本文件', dlNote: '可在点字信息终端和文档应用中直接阅读 — 终端会自行转换点字。', dlFilename: 'jomokjomok_结果' },
-  vi: { dlBtn: 'Lưu kết quả thành tệp văn bản', dlNote: 'Đọc được trên thiết bị chữ nổi và ứng dụng tài liệu — thiết bị tự chuyển chữ nổi.', dlFilename: 'jomokjomok_ketqua' },
-  th: { dlBtn: 'บันทึกผลเป็นไฟล์ข้อความ', dlNote: 'อ่านได้บนเครื่องอ่านอักษรเบรลล์และแอปเอกสาร — เครื่องแปลงเป็นเบรลล์เอง', dlFilename: 'jomokjomok_ผลลัพธ์' },
-  id: { dlBtn: 'Simpan hasil sebagai berkas teks', dlNote: 'Terbaca di perangkat braille dan aplikasi dokumen — perangkat mentranskripsi sendiri.', dlFilename: 'jomokjomok_hasil' },
-  tl: { dlBtn: 'I-save ang resulta bilang text file', dlNote: 'Nababasa sa braille display at document apps — ang device mismo ang nagta-transcribe.', dlFilename: 'jomokjomok_resulta' },
-  ne: { dlBtn: 'नतिजा टेक्स्ट फाइलमा सेभ', dlNote: 'ब्रेल उपकरण र कागजात एपमा पढ्न मिल्छ — उपकरणले आफैँ ब्रेलमा बदल्छ।', dlFilename: 'jomokjomok_natija' },
-  km: { dlBtn: 'រក្សាទុកលទ្ធផលជាឯកសារអត្ថបទ', dlNote: 'អានបានលើឧបករណ៍អក្សរផុស និងកម្មវិធីឯកសារ — ឧបករណ៍បម្លែងខ្លួនឯង។', dlFilename: 'jomokjomok_lotphol' },
-  my: { dlBtn: 'ရလဒ်ကို စာသားဖိုင်အဖြစ်သိမ်းရန်', dlNote: 'braille ကိရိယာနှင့် စာရွက်စာတမ်းအက်ပ်တွင် ဖတ်နိုင် — ကိရိယာက ကိုယ်တိုင်ပြောင်းသည်။', dlFilename: 'jomokjomok_ရလဒ်' },
-  mn: { dlBtn: 'Үр дүнг текст файлаар хадгалах', dlNote: 'Брайл төхөөрөмж болон баримтын аппаар уншина — төхөөрөмж өөрөө хөрвүүлнэ.', dlFilename: 'jomokjomok_urdun' },
-  uz: { dlBtn: 'Natijani matn fayli sifatida saqlash', dlNote: 'Brayl qurilmalari va hujjat ilovalarida oʻqiladi — qurilma oʻzi transkripsiya qiladi.', dlFilename: 'jomokjomok_natija' },
-  si: { dlBtn: 'ප්‍රතිඵල පෙළ ගොනුවක් ලෙස සුරකින්න', dlNote: 'බ්‍රේල් උපකරණ සහ ලේඛන යෙදුම්වල කියවිය හැක — උපකරණය තනිව පරිවර්තනය කරයි.', dlFilename: 'jomokjomok_prathipala' },
-  bn: { dlBtn: 'ফলাফল টেক্সট ফাইলে সংরক্ষণ', dlNote: 'ব্রেইল ডিভাইস ও ডকুমেন্ট অ্যাপে পড়া যায় — ডিভাইস নিজেই ব্রেইলে রূপান্তর করে।', dlFilename: 'jomokjomok_folafol' },
-  ru: { dlBtn: 'Сохранить результаты текстовым файлом', dlNote: 'Читается на брайлевских дисплеях и в приложениях — устройство само транскрибирует.', dlFilename: 'jomokjomok_rezultaty' },
-  ja: { dlBtn: '結果をテキストファイルで保存', dlNote: '点字情報端末や文書アプリでそのまま読めます — 端末が自動で点訳します。', dlFilename: 'jomokjomok_結果' },
+  ko: { dlBtn: '결과를 텍스트 파일로 저장', dlNote: '점자정보단말기·문서 앱에서 그대로 읽을 수 있어요. 단말기는 텍스트를 자체 점역해요.', dlFilename: '조목조목_분석결과', dlDocTitle: '조목조목 계약서 분석 결과', dlDocSummary: '전체 {total}개 조항 / 위험 {danger}건, 주의 {caution}건', dlClauseLabel: '조항', },
+  en: { dlBtn: 'Save results as a text file', dlNote: 'Readable on braille displays and document apps — braille devices transcribe text themselves.', dlFilename: 'jomokjomok_results', dlDocTitle: 'Jomokjomok contract analysis result', dlDocSummary: '{total} clauses / {danger} risky, {caution} to check', dlClauseLabel: 'Clause', },
+  zh: { dlBtn: '将结果保存为文本文件', dlNote: '可在点字信息终端和文档应用中直接阅读 — 终端会自行转换点字。', dlFilename: 'jomokjomok_结果', dlDocTitle: '条目条目 合同分析结果', dlDocSummary: '共{total}条 / 危险{danger}条，注意{caution}条', dlClauseLabel: '条款', },
+  vi: { dlBtn: 'Lưu kết quả thành tệp văn bản', dlNote: 'Đọc được trên thiết bị chữ nổi và ứng dụng tài liệu — thiết bị tự chuyển chữ nổi.', dlFilename: 'jomokjomok_ketqua', dlDocTitle: 'Kết quả phân tích hợp đồng Jomokjomok', dlDocSummary: '{total} điều khoản / {danger} nguy hiểm, {caution} cần lưu ý', dlClauseLabel: 'Điều khoản', },
+  th: { dlBtn: 'บันทึกผลเป็นไฟล์ข้อความ', dlNote: 'อ่านได้บนเครื่องอ่านอักษรเบรลล์และแอปเอกสาร — เครื่องแปลงเป็นเบรลล์เอง', dlFilename: 'jomokjomok_ผลลัพธ์', dlDocTitle: 'ผลวิเคราะห์สัญญา Jomokjomok', dlDocSummary: 'ทั้งหมด {total} ข้อ / เสี่ยง {danger} ข้อ ควรระวัง {caution} ข้อ', dlClauseLabel: 'ข้อ', },
+  id: { dlBtn: 'Simpan hasil sebagai berkas teks', dlNote: 'Terbaca di perangkat braille dan aplikasi dokumen — perangkat mentranskripsi sendiri.', dlFilename: 'jomokjomok_hasil', dlDocTitle: 'Hasil analisis kontrak Jomokjomok', dlDocSummary: '{total} pasal / {danger} berisiko, {caution} perlu dicek', dlClauseLabel: 'Pasal', },
+  tl: { dlBtn: 'I-save ang resulta bilang text file', dlNote: 'Nababasa sa braille display at document apps — ang device mismo ang nagta-transcribe.', dlFilename: 'jomokjomok_resulta', dlDocTitle: 'Resulta ng pagsusuri ng kontrata ng Jomokjomok', dlDocSummary: '{total} sugnay / {danger} mapanganib, {caution} suriin', dlClauseLabel: 'Sugnay', },
+  ne: { dlBtn: 'नतिजा टेक्स्ट फाइलमा सेभ', dlNote: 'ब्रेल उपकरण र कागजात एपमा पढ्न मिल्छ — उपकरणले आफैँ ब्रेलमा बदल्छ।', dlFilename: 'jomokjomok_natija', dlDocTitle: 'जोमोकजोमोक सम्झौता विश्लेषण नतिजा', dlDocSummary: 'जम्मा {total} दफा / जोखिम {danger}, ध्यान {caution}', dlClauseLabel: 'दफा', },
+  km: { dlBtn: 'រក្សាទុកលទ្ធផលជាឯកសារអត្ថបទ', dlNote: 'អានបានលើឧបករណ៍អក្សរផុស និងកម្មវិធីឯកសារ — ឧបករណ៍បម្លែងខ្លួនឯង។', dlFilename: 'jomokjomok_lotphol', dlDocTitle: 'លទ្ធផលវិភាគកិច្ចសន្យា Jomokjomok', dlDocSummary: 'សរុប {total} ប្រការ / ហានិភ័យ {danger}, ប្រុងប្រយ័ត្ន {caution}', dlClauseLabel: 'ប្រការ', },
+  my: { dlBtn: 'ရလဒ်ကို စာသားဖိုင်အဖြစ်သိမ်းရန်', dlNote: 'braille ကိရိယာနှင့် စာရွက်စာတမ်းအက်ပ်တွင် ဖတ်နိုင် — ကိရိယာက ကိုယ်တိုင်ပြောင်းသည်။', dlFilename: 'jomokjomok_ရလဒ်', dlDocTitle: 'Jomokjomok စာချုပ်ခွဲခြမ်းစိတ်ဖြာမှုရလဒ်', dlDocSummary: 'စုစုပေါင်း {total} ပိုဒ် / အန္တရာယ် {danger}၊ သတိ {caution}', dlClauseLabel: 'အပိုဒ်', },
+  mn: { dlBtn: 'Үр дүнг текст файлаар хадгалах', dlNote: 'Брайл төхөөрөмж болон баримтын аппаар уншина — төхөөрөмж өөрөө хөрвүүлнэ.', dlFilename: 'jomokjomok_urdun', dlDocTitle: 'Jomokjomok гэрээний шинжилгээний үр дүн', dlDocSummary: 'Нийт {total} заалт / эрсдэлтэй {danger}, анхаарах {caution}', dlClauseLabel: 'Заалт', },
+  uz: { dlBtn: 'Natijani matn fayli sifatida saqlash', dlNote: 'Brayl qurilmalari va hujjat ilovalarida oʻqiladi — qurilma oʻzi transkripsiya qiladi.', dlFilename: 'jomokjomok_natija', dlDocTitle: 'Jomokjomok shartnoma tahlili natijasi', dlDocSummary: 'Jami {total} band / xavfli {danger}, diqqat {caution}', dlClauseLabel: 'Band', },
+  si: { dlBtn: 'ප්‍රතිඵල පෙළ ගොනුවක් ලෙස සුරකින්න', dlNote: 'බ්‍රේල් උපකරණ සහ ලේඛන යෙදුම්වල කියවිය හැක — උපකරණය තනිව පරිවර්තනය කරයි.', dlFilename: 'jomokjomok_prathipala', dlDocTitle: 'Jomokjomok ගිවිසුම් විශ්ලේෂණ ප්\u200dරතිඵලය', dlDocSummary: 'මුළු වගන්ති {total} / අවදානම් {danger}, අවධානය {caution}', dlClauseLabel: 'වගන්තිය', },
+  bn: { dlBtn: 'ফলাফল টেক্সট ফাইলে সংরক্ষণ', dlNote: 'ব্রেইল ডিভাইস ও ডকুমেন্ট অ্যাপে পড়া যায় — ডিভাইস নিজেই ব্রেইলে রূপান্তর করে।', dlFilename: 'jomokjomok_folafol', dlDocTitle: 'Jomokjomok চুক্তি বিশ্লেষণের ফলাফল', dlDocSummary: 'মোট {total} ধারা / ঝুঁকি {danger}, সতর্কতা {caution}', dlClauseLabel: 'ধারা', },
+  ru: { dlBtn: 'Сохранить результаты текстовым файлом', dlNote: 'Читается на брайлевских дисплеях и в приложениях — устройство само транскрибирует.', dlFilename: 'jomokjomok_rezultaty', dlDocTitle: 'Результат анализа договора Jomokjomok', dlDocSummary: 'Всего {total} пунктов / рискованных {danger}, требуют внимания {caution}', dlClauseLabel: 'Пункт', },
+  ja: { dlBtn: '結果をテキストファイルで保存', dlNote: '点字情報端末や文書アプリでそのまま読めます — 端末が自動で点訳します。', dlFilename: 'jomokjomok_結果', dlDocTitle: '条目条目 契約書分析結果', dlDocSummary: '全{total}条項 / 危険{danger}件、注意{caution}件', dlClauseLabel: '条項', },
 }
 
 type FeedbackKey =
