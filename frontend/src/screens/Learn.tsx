@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Card, PageTitle } from '../components/ui'
-import { t, type LangCode } from '../i18n'
+import { riskTypeLabel, t, type LangCode } from '../i18n'
 
 /** 교육 페이지 (#104) + 내장 챗봇 (#103) — 분석 도구를 넘어선 상설 학습 탭.
  *
@@ -55,15 +55,19 @@ export function LearnScreen({
   const [chat, setChat] = useState<ChatTurn[]>([])
   const [asking, setAsking] = useState(false)
 
+  // 콘텐츠는 언어별 정적 번역본 — 언어를 바꾸면 다시 받아온다.
+  // content_language가 ko로 돌아오면(번역 미보유 언어) 한국어 안내문을 띄운다.
+  const [contentLanguage, setContentLanguage] = useState('ko')
   useEffect(() => {
-    fetch(`${BASE_URL}/api/contracts/learn`)
+    fetch(`${BASE_URL}/api/contracts/learn?language=${language}`)
       .then((r) => r.json())
       .then((d) => {
         setScams(d.scams ?? [])
         setRiskTypes(d.risk_types ?? [])
+        setContentLanguage(d.content_language ?? 'ko')
       })
       .catch(() => setScams([]))
-  }, [])
+  }, [language])
 
   const ask = async () => {
     const q = question.trim()
@@ -92,7 +96,7 @@ export function LearnScreen({
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
       <PageTitle title={t(language, 'lnPageTitle')} desc={t(language, 'lnPageDesc')} />
-      {language !== 'ko' && (
+      {language !== 'ko' && contentLanguage === 'ko' && (
         <p className="mt-2 text-[13px] font-semibold text-ink-400">{t(language, 'lnKoNote')}</p>
       )}
 
@@ -114,7 +118,7 @@ export function LearnScreen({
                     : 'border-ink-100 bg-white text-ink-900 hover:border-brand-500/40 hover:bg-brand-50/50'
                 }`}
               >
-                {rt.title}
+                {riskTypeLabel(language, rt.title)}
                 <span aria-hidden className="text-[13px] text-ink-300">
                   {open ? '−' : '+'}
                 </span>

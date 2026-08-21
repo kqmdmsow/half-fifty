@@ -67,8 +67,11 @@ public class AgentClient {
     }
 
     /** 교육 콘텐츠 프록시 (#104). */
-    public String learn() {
-        return restClient.get().uri("/learn").retrieve().body(String.class);
+    public String learn(String language) {
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/learn")
+                        .queryParam("language", language == null ? "ko" : language).build())
+                .retrieve().body(String.class);
     }
 
     /** 교육 챗봇 프록시 (#103). */

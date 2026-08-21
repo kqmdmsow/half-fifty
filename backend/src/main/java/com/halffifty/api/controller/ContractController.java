@@ -58,8 +58,9 @@ public class ContractController {
 
     /** 교육 콘텐츠 프록시 (#104). */
     @org.springframework.web.bind.annotation.GetMapping("/learn")
-    public String learn() {
-        return agentClient.learn();
+    public String learn(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "ko") String language) {
+        return agentClient.learn(language);
     }
 
     /** 교육 챗봇 프록시 (#103). */
