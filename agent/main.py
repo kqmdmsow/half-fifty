@@ -32,7 +32,7 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
-from src.learn_content import SCAMS
+from src.learn_content import SCAMS, risk_types_with_cases
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.quiz import generate_quiz
@@ -170,7 +170,7 @@ def learn() -> dict:
     (#131 규칙 탐지기 재사용 또는 #149식 프롬프트 방어 블록) 조건을 걸고
     나서 별도 PR로 합류한다 — 지금은 정적 콘텐츠만 노출.
     """
-    return {"scams": SCAMS}
+    return {"scams": SCAMS, "risk_types": risk_types_with_cases()}
 
 
 @app.get("/health")
