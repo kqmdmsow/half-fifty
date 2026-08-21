@@ -24,15 +24,7 @@ export function LandingScreen({
             {t(language, 'heroBadge')}
           </span>
           <h1 className="mt-7 text-[38px] font-bold leading-[1.22] tracking-[-0.02em] text-ink-900 md:text-[58px]">
-            {language === 'ko' ? (
-              <RotatingTitle />
-            ) : (
-              <>
-                {t(language, 'landingTitle1')}
-                <br />
-                {t(language, 'landingTitle2')}
-              </>
-            )}
+            <RotatingTitle language={language} />
           </h1>
           <p className="mx-auto mt-5 max-w-md text-[17px] leading-relaxed text-ink-600">
             {t(language, 'landingSubtitle')}
