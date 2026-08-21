@@ -3,9 +3,11 @@ import { riskLevelLabel, t, type LangCode } from '../i18n'
 
 export function LandingScreen({
   onStart,
+  onApiInfo,
   language = 'ko',
 }: {
   onStart: () => void
+  onApiInfo?: () => void // 제휴·API 안내 (#85) — 미전달 시 링크 숨김
   language?: LangCode
 }) {
   return (
@@ -34,8 +36,9 @@ export function LandingScreen({
           </div>
         </div>
 
-        {/* 미리보기 목업 */}
-        <div className="relative mx-auto w-full max-w-md">
+        {/* 미리보기 목업 — 순수 장식이라 스크린리더에서 통째로 제외 (#82 2차):
+            가짜 파일명·위험 배지가 실제 결과처럼 낭독되면 혼란만 준다 */}
+        <div className="relative mx-auto w-full max-w-md" aria-hidden="true">
           <div className="rounded-3xl border border-ink-100 bg-white p-7 shadow-card">
             <p className="text-[13px] font-bold text-ink-400">전세계약서.pdf</p>
             <div className="mt-4 space-y-2.5">
@@ -124,7 +127,18 @@ export function LandingScreen({
       {/* 푸터 */}
       <footer className="border-t border-ink-50 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-[13px] text-ink-400 md:flex-row">
-          <span className="font-semibold">© 조목조목</span>
+          <span className="flex items-center gap-4">
+            <span className="font-semibold">© 조목조목</span>
+            {onApiInfo && (
+              <button
+                type="button"
+                onClick={onApiInfo}
+                className="font-semibold text-ink-600 underline underline-offset-2 hover:text-ink-900"
+              >
+                {t(language, 'apiFooterLink')}
+              </button>
+            )}
+          </span>
           <span className="max-w-md text-center leading-relaxed md:text-right">
             {t(language, 'footerDisclaimer')}
           </span>

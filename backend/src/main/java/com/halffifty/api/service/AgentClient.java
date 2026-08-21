@@ -179,6 +179,11 @@ public class AgentClient {
                 + value + "\r\n").getBytes(StandardCharsets.UTF_8));
     }
 
+    /** 교육 콘텐츠 프록시 (#104). */
+    public String learn() {
+        return restClient.get().uri("/learn").retrieve().body(String.class);
+    }
+
     /** 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다. */
     private void pipeStream(HttpRequest httpRequest, OutputStream out) throws IOException {
         try {

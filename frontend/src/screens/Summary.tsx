@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
-import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { riskLevelLabel, riskTypeLabel, t, WARNING_CODE_KEYS, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
-import { speak, stopSpeaking } from '../tts'
+import { speak, stopSpeaking, useVoiceAvailable } from '../tts'
 import { FormattedText } from '../components/FormattedText'
+import { JudgeReport } from '../components/JudgeReport'
 
 type Filter = '전체' | RiskLevel
 
@@ -18,7 +19,11 @@ export function SummaryScreen({
   liveProgress = null,
   retrying = false,
   domain = '',
+  judgeScores = {},
+  retryCount = 0,
+  needsReview = false,
   warnings = [],
+  warningCodes = [],
   onSelectClause,
   onDone,
 }: {
@@ -29,12 +34,17 @@ export function SummaryScreen({
   liveProgress?: { done: number; total: number } | null
   retrying?: boolean
   domain?: string
+  judgeScores?: Record<string, number>
+  retryCount?: number
+  needsReview?: boolean
   warnings?: string[]
+  warningCodes?: Array<string | null>
   onSelectClause: (clauseId: string) => void
   onDone: () => void
 }) {
   const [filter, setFilter] = useState<Filter>('전체')
   const [reading, setReading] = useState(false)
+  const voiceReady = useVoiceAvailable(language)
 
   // 화면을 떠나면 낭독도 멈춘다
   useEffect(() => () => stopSpeaking(), [])
@@ -63,14 +73,35 @@ export function SummaryScreen({
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
-      {warnings.map((warning) => (
+      {warnings.map((warning, wi) => {
+        const code = warningCodes[wi]
+        const key = code ? WARNING_CODE_KEYS[code] : undefined
+        const text = key ? t(language, key) : warning
+        return (
         <p
           key={warning}
           className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700"
         >
           {warning}
+          <span aria-hidden>⚠️</span> {text}
         </p>
-      ))}
+        )
+      })}
+
+      {/* 스크린리더 실황 중계 (#82 2차) — 스트리밍 진행·재시도·완료가 침묵하던
+          문제. 텍스트가 바뀔 때마다 리더가 낭독한다(polite: 사용자 발화 안 끊음) */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {live
+          ? retrying
+            ? t(language, 'retryNote')
+            : liveProgress && liveProgress.total > 0 && liveProgress.done >= liveProgress.total
+              ? t(language, 'verifyingNote')
+              : t(language, 'analyzingLive', {
+                  done: liveProgress?.done ?? 0,
+                  total: liveProgress?.total ?? 0,
+                })
+          : `${t(language, 'analysisDone')}. ${t(language, 'headlineTotal', { total: clauseCount })} ${t(language, 'headlineNeed', { need: needCheck })}`}
+      </p>
 
       {live && liveProgress ? (
         <div className="flex items-center gap-2.5">
@@ -101,6 +132,11 @@ export function SummaryScreen({
       ) : live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 ? (
         <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
           {t(language, 'verifyingNote')}
+          <span aria-hidden>🔄</span> {t(language, 'retryNote')}
+        </p>
+      ) : live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 ? (
+        <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
+          <span aria-hidden>🛡️</span> {t(language, 'verifyingNote')}
         </p>
       ) : null}
 
@@ -110,6 +146,18 @@ export function SummaryScreen({
         <StatCard label={riskLevelLabel(language, '주의')} value={counts.주의} tone="caution" />
         <StatCard label={riskLevelLabel(language, '안전')} value={counts.안전} tone="safe" />
       </div>
+
+      {/* AI 검증 리포트 (#53) — judge 확정 후에만 */}
+      {!live && (
+        <div className="mt-5">
+          <JudgeReport
+            scores={judgeScores}
+            retryCount={retryCount}
+            needsReview={needsReview}
+            language={language}
+          />
+        </div>
+      )}
 
       {/* 최우선 확인 */}
       {topRisk && (
@@ -157,7 +205,9 @@ export function SummaryScreen({
           })}
         </div>
         <div className="flex items-center gap-2">
-          {/* 전체 낭독 (#82) — 조항별: 표제 → 판정 → 쉬운 설명 → 확인 질문 순 */}
+          {/* 전체 낭독 (#82) — 조항별: 표제 → 판정 → 쉬운 설명 → 확인 질문 순.
+              선택 언어 보이스가 기기에 없으면 숨김 (#86-①) */}
+          {voiceReady && (
           <button
             type="button"
             aria-pressed={reading}
@@ -183,7 +233,9 @@ export function SummaryScreen({
             }`}
           >
             {t(language, reading ? 'readAllStop' : 'readAll')}
+            <span aria-hidden>🔊</span> {t(language, reading ? 'readAllStop' : 'readAll')}
           </button>
+          )}
           {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
         </div>
       </div>

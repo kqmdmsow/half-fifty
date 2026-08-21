@@ -37,6 +37,7 @@ export function JeonseTimeline({ language = 'ko' }: { language?: LangCode }) {
   return (
     <Card className="px-5 py-5">
       <p className="text-[15px] font-bold text-ink-900">{t(language, 'jtTitle')}</p>
+      <p className="text-[15px] font-bold text-ink-900"><span aria-hidden>📅</span> {t(language, 'jtTitle')}</p>
       <p className="mt-1 text-[13px] leading-relaxed text-ink-400">{t(language, 'jtDesc')}</p>
 
       <label className="mt-4 block max-w-xs">
