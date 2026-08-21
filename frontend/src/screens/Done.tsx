@@ -3,14 +3,17 @@ import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton } from '../components/ui'
 import { riskLevelLabel, riskLevelLabel as rl, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
+import { FeedbackCard } from '../components/FeedbackCard'
 
 export function DoneScreen({
   results,
   language = 'ko',
+  resultsShownAt = null,
   onRestart,
 }: {
   results: ClauseResult[]
   language?: LangCode
+  resultsShownAt?: number | null
   onRestart: () => void
 }) {
   const [deleted, setDeleted] = useState(false)
@@ -96,6 +99,11 @@ export function DoneScreen({
           <span aria-hidden>💾</span> {t(language, 'dlBtn')}
         </button>
         <p className="mt-1.5 text-[12px] text-ink-400">{t(language, 'dlNote')}</p>
+      </div>
+
+      {/* 사람 평가 수집 (자문 §6) — 만족도 + 읽기 시간, 로컬 익명 집계 */}
+      <div className="mx-auto mt-8 max-w-md">
+        <FeedbackCard resultsShownAt={resultsShownAt} language={language} />
       </div>
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
