@@ -10,6 +10,7 @@ import {
 import { Logo } from './components/ui'
 import { LANGUAGES, t } from './i18n'
 import { saveRecord, type SavedRecord } from './records'
+import { currentSession, pushServerRecord, signOut, type Session } from './auth'
 import type { DemoSample } from './data/samples'
 import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
@@ -20,11 +21,13 @@ import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
+import { LoginScreen } from './screens/Login'
 import { RecordsScreen } from './screens/Records'
 
 type Screen =
   | 'landing'
   | 'records'
+  | 'login'
   | 'upload'
   | 'extract'
   | 'persona'
@@ -68,6 +71,11 @@ export default function App() {
   const [retrying, setRetrying] = useState(false)
   // 옵트인 로컬 기록 (#102 v1) — 현재 결과의 저장 여부
   const [recordSaved, setRecordSaved] = useState(false)
+  // 로그인 세션 (#102) — 로그인이 여는 기능은 '결과를 계정에 보관' 하나뿐이다.
+  const [session, setSession] = useState<Session | null>(() => currentSession())
+  const [savedToAccount, setSavedToAccount] = useState(false)
+  // 로그인 후 자동으로 이어서 보관할지 (끝내기 화면에서 로그인으로 보낸 경우)
+  const pendingKeepRef = useRef(false)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
@@ -136,6 +144,7 @@ export default function App() {
     setAnalyzedLanguage(language)
     setRetrying(false)
     setRecordSaved(false)
+    setSavedToAccount(false)
     go('progress')
 
     try {
@@ -229,6 +238,26 @@ export default function App() {
     go('detail')
   }
 
+  /** 분석 결과를 계정에 보관 (#102). 계약서 원문이 아니라 결과를, 그것도
+   *  이 기기에서 암호화한 뒤 올린다 — 서버는 열 수 없다(crypto.ts). */
+  const keepInAccount = async () => {
+    if (!data) return
+    const active = session ?? currentSession()
+    if (!active) {
+      pendingKeepRef.current = true
+      go('login')
+      return
+    }
+    const record = saveRecord(data, { domain, language })
+    try {
+      await pushServerRecord(active, record)
+      setSavedToAccount(true)
+    } catch {
+      // 업로드 실패해도 기기 보관본은 남는다 — 기록을 잃지 않게
+      setSavedToAccount(false)
+    }
+  }
+
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
@@ -271,6 +300,20 @@ export default function App() {
             </button>
             <button
               type="button"
+              onClick={() => {
+                if (session) {
+                  signOut()
+                  setSession(null)
+                } else {
+                  go('login')
+                }
+              }}
+              className="rounded-full bg-ink-50 px-4 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+            >
+              {t(language, session ? 'lgOut' : 'lgNav')}
+            </button>
+            <button
+              type="button"
               aria-pressed={highContrast}
               onClick={() => setHighContrast((value) => !value)}
               className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
@@ -307,7 +350,25 @@ export default function App() {
           </div>
         )}
         {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
-        {screen === 'records' && <RecordsScreen language={language} onOpen={openRecord} />}
+        {screen === 'records' && (
+          <RecordsScreen language={language} session={session} onOpen={openRecord} />
+        )}
+        {screen === 'login' && (
+          <LoginScreen
+            language={language}
+            onDone={(next) => {
+              setSession(next)
+              // 끝내기 화면에서 '로그인하고 보관하기'로 왔다면 이어서 보관한다
+              if (pendingKeepRef.current) {
+                pendingKeepRef.current = false
+                go('done')
+                void keepInAccount()
+              } else {
+                go('landing')
+              }
+            }}
+          />
+        )}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}
@@ -393,7 +454,16 @@ export default function App() {
             onDone={() => go('done')}
           />
         )}
-        {screen === 'done' && <DoneScreen results={results} language={language} onRestart={restart} />}
+        {screen === 'done' && (
+          <DoneScreen
+            results={results}
+            language={language}
+            onRestart={restart}
+            signedIn={Boolean(session)}
+            savedToAccount={savedToAccount}
+            onKeepInAccount={data ? keepInAccount : undefined}
+          />
+        )}
       </main>
     </div>
   )

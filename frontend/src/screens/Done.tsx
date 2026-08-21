@@ -7,10 +7,18 @@ export function DoneScreen({
   results,
   language = 'ko',
   onRestart,
+  savedToAccount = false,
+  signedIn = false,
+  onKeepInAccount,
 }: {
   results: ClauseResult[]
   language?: LangCode
   onRestart: () => void
+  /** 이번 결과를 이미 계정에 보관했는지 (#102) */
+  savedToAccount?: boolean
+  signedIn?: boolean
+  /** 누르면 암호화해서 계정에 올린다. 미로그인 상태면 로그인 화면으로 보낸다. */
+  onKeepInAccount?: () => void
 }) {
   const [deleted, setDeleted] = useState(false)
   const [confirming, setConfirming] = useState(false)
@@ -128,7 +136,24 @@ export function DoneScreen({
             {t(language, 'doDeleteBtn')}
           </Button>
         )}
-      </Card>
+                {/* 결과를 계정에 보관 (#102) — 계약서 원본이 아니라 '해석 결과'만,
+              그것도 이 기기에서 암호화한 뒤 올라간다. */}
+          <div className="mt-4 rounded-2xl bg-brand-50 px-5 py-4">
+            <p className="text-[15px] font-bold text-ink-900">{t(language, 'doSaveWeb')}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-ink-600">
+              {t(language, 'doSaveWebNote')} {t(language, 'lgPrivacy')}
+            </p>
+            {savedToAccount ? (
+              <p className="mt-3 text-[14px] font-bold text-safe-700">
+                ✓ {t(language, 'doSaveWebDone')}
+              </p>
+            ) : (
+              <Button className="mt-3" onClick={onKeepInAccount} disabled={!onKeepInAccount}>
+                {t(language, signedIn ? 'doSaveWeb' : 'doSaveWebLogin')}
+              </Button>
+            )}
+          </div>
+</Card>
 
       <div className="mt-9 text-center">
         <Button variant="secondary" onClick={onRestart}>

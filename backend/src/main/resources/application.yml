@@ -2,6 +2,17 @@ server:
   port: ${PORT:8080}
 
 spring:
+  # DB: 기본은 파일 없는 H2(로컬·테스트), 배포는 SPRING_DATASOURCE_URL로 Postgres 주입.
+  # 저장 대상은 계정(이메일+인증해시)과 **복호화 불가능한 암호문**뿐이다 — 계약
+  # 내용·분석 결과는 서버가 평문으로 갖지 않는다(#102 영지식 설계).
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:halffifty;DB_CLOSE_DELAY=-1}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
   mvc:
     async:
       # 스트리밍(analyze-stream)은 judge 재시도 포함 시 수 분까지 걸린다 —
@@ -19,3 +30,9 @@ agent:
 # 프론트 오리진 (배포 시 CORS_ALLOWED_ORIGIN 환경변수로 주입)
 cors:
   allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+
+# 로그인 토큰 서명 키 (#102). 미주입 시 부팅마다 랜덤 — 개발 편의용이며
+# 배포에서는 반드시 JWT_SECRET을 주입해야 재시작 후에도 세션이 유지된다.
+auth:
+  jwt-secret: ${JWT_SECRET:}
+  token-days: 30

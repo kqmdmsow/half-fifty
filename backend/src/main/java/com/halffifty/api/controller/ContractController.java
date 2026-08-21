@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
  */
 @RestController
 @RequestMapping("/api/contracts")
-@CrossOrigin(origins = "${cors.allowed-origin:http://localhost:5173}")
 public class ContractController {
 
     private final AgentClient agentClient;

@@ -32,6 +32,19 @@ services:
         value: https://halffifty-agent.onrender.com
       - key: CORS_ALLOWED_ORIGIN
         value: https://halffifty.onrender.com
+      # 로그인 세션 서명 키 (#102). 미주입 시 재시작마다 전원 로그아웃된다.
+      - key: JWT_SECRET
+        generateValue: true
+      # 계정·기록 보관용 DB. 미주입이면 인메모리 H2로 뜨므로 기능은 동작하되
+      # 재시작 시 계정이 사라진다 — 심사 기간 전 반드시 Postgres를 붙일 것.
+      # 주의: Render가 주는 connectionString은 postgres:// 형식이라 Spring이
+      # 그대로 읽지 못한다. jdbc:postgresql://HOST:PORT/DB 로 바꿔 넣는다.
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
 
   - type: web
     name: halffifty
