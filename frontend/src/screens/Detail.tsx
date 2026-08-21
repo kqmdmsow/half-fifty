@@ -5,8 +5,8 @@ import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { FormattedText } from '../components/FormattedText'
-import { speak, stopSpeaking } from '../tts'
 import { isVoiceSupported, startVoiceSession, type VoiceSession } from '../voiceCommands'
+import { speak, stopSpeaking, useVoiceAvailable, voiceAvailable } from '../tts'
 
 export function DetailScreen({
   clauseId,
@@ -27,10 +27,11 @@ export function DetailScreen({
 }) {
   const clause = results.find((result) => result.clause_id === clauseId) ?? results[0]
   const [listening, setListening] = useState(false)
+  const voiceReady = useVoiceAvailable(language)
 
   // 음성 안내: 화면 진입 시 설명 읽기 (기기 최적 한국어 보이스 자동 선택 — src/tts.ts)
   useEffect(() => {
-    if (!voiceGuide || !clause) return
+    if (!voiceGuide || !clause || !voiceAvailable(language)) return
     speak(clause.explanation, language)
     return () => stopSpeaking()
   }, [voiceGuide, clause, language])
@@ -161,7 +162,9 @@ export function DetailScreen({
                 </p>
               )}
             </div>
-            {/* 수동 낭독 버튼 (#118) — 자동 재생 토글과 별개로 누구나 즉시 재생 가능 */}
+            {/* 수동 낭독 버튼 (#118) — 자동 재생 토글과 별개로 누구나 즉시 재생 가능.
+                선택 언어 보이스가 기기에 없으면 숨김 (#86-①) */}
+            {voiceReady && (
             <button
               type="button"
               aria-pressed={listening}
@@ -180,6 +183,7 @@ export function DetailScreen({
             >
               🔊 {t(language, listening ? 'readAllStop' : 'listenClause')}
             </button>
+            )}
           </div>
 
           <Section title={t(language, 'explainSimply')}>

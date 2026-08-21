@@ -27,6 +27,19 @@ jobs:
           # 키는 전부 지연 초기화라 테스트에선 호출되지 않는다 — import 안전용 더미
           ANTHROPIC_API_KEY: dummy-for-ci
           UPSTAGE_API_KEY: dummy-for-ci
+      # 배포 크래셔 방지 (#125 실사례): Render 에이전트 컨테이너는 rootDir=agent라
+      # 레포 루트(data/ 등)가 없다 — agent 디렉터리만 있는 환경에서 import가
+      # 되는지 검증. 로컬·CI 전체 체크아웃에서는 안 잡히고 배포에서만 터지는
+      # 컨텍스트-밖-경로 참조를 여기서 잡는다.
+      - name: agent-only import smoke (Render 컨테이너 시뮬레이션)
+        run: |
+          mkdir -p /tmp/agent-only
+          cp -r . /tmp/agent-only/agent
+          cd /tmp/agent-only/agent
+          python -c "import main; print('agent-only import OK')"
+        env:
+          ANTHROPIC_API_KEY: dummy-for-ci
+          UPSTAGE_API_KEY: dummy-for-ci
 
   backend:
     name: backend (gradle build)
