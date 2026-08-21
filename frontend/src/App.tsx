@@ -296,7 +296,7 @@ export default function App() {
               onClick={() => go('records')}
               className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
             >
-              🗂 {t(language, 'rcNav')}
+              {t(language, 'rcNav')}
             </button>
             <button
               type="button"
