@@ -66,7 +66,6 @@ public class AgentClient {
                 .body(AnalyzeResponse.class);
     }
 
-<<<<<<< HEAD
     /** 교육 콘텐츠 프록시 (#104). */
     public String learn(String language) {
         return restClient.get()
@@ -75,8 +74,6 @@ public class AgentClient {
                 .retrieve().body(String.class);
     }
 
-=======
->>>>>>> origin/feat/104-learn-page
     /** 교육 챗봇 프록시 (#103). */
     public String learnChat(String requestJson) {
         return restClient.post()
@@ -180,11 +177,6 @@ public class AgentClient {
         body.write(("--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n"
                 + value + "\r\n").getBytes(StandardCharsets.UTF_8));
-    }
-
-    /** 교육 콘텐츠 프록시 (#104). */
-    public String learn() {
-        return restClient.get().uri("/learn").retrieve().body(String.class);
     }
 
     /** 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다. */
