@@ -40,7 +40,7 @@ export function LandingScreen({
         </div>
 
         {/* 실물 계약서 목업 — 국토부·법무부 표준계약서 실제 문안 + 법 조항 칩 */}
-        <div className="relative mx-auto mt-16 w-full max-w-2xl px-6 pb-32">
+        <div className="relative mx-auto mt-10 w-full max-w-2xl px-6 pb-40">
           {/* 뒷장 */}
           <div
             aria-hidden
@@ -85,7 +85,7 @@ export function LandingScreen({
           {/* 법 조항 칩 — 실제 근거 법령 (md 이상, 장식) */}
           <div
             aria-hidden
-            className="animate-float-delay absolute -left-8 top-24 hidden rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
+            className="animate-float-delay absolute left-0 top-24 hidden -translate-x-[calc(100%+14px)] rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
           >
             주택임대차보호법 제3조의2
           </div>
@@ -97,7 +97,7 @@ export function LandingScreen({
           </div>
           <div
             aria-hidden
-            className="animate-float-delay absolute -right-2 bottom-40 hidden rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
+            className="animate-float-delay absolute bottom-40 right-0 hidden translate-x-[calc(100%+14px)] rounded-full border border-ink-100 bg-white px-4 py-2.5 text-[12px] font-bold text-ink-600 shadow-card lg:block"
           >
             상가건물 임대차보호법 제10조
           </div>
