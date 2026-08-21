@@ -14,10 +14,9 @@ export function ApiInfoScreen({
   language?: LangCode
   onBack: () => void
 }) {
-  const point = (emoji: string, titleKey: Parameters<typeof t>[1], bodyKey: Parameters<typeof t>[1]) => (
+  const point = (titleKey: Parameters<typeof t>[1], bodyKey: Parameters<typeof t>[1]) => (
     <Card className="p-6">
-      <span aria-hidden className="text-[26px]">{emoji}</span>
-      <p className="mt-3 text-[16px] font-bold text-ink-900">{t(language, titleKey)}</p>
+      <p className="text-[16px] font-bold text-ink-900">{t(language, titleKey)}</p>
       <p className="mt-1.5 text-[14px] leading-relaxed text-ink-600">{t(language, bodyKey)}</p>
     </Card>
   )
@@ -33,9 +32,9 @@ export function ApiInfoScreen({
 
       {/* 왜 이 API인가 — 서비스 차별점이 그대로 상품성 */}
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {point('🛡️', 'apiPoint1Title', 'apiPoint1Body')}
-        {point('🔍', 'apiPoint2Title', 'apiPoint2Body')}
-        {point('🗑️', 'apiPoint3Title', 'apiPoint3Body')}
+        {point('apiPoint1Title', 'apiPoint1Body')}
+        {point('apiPoint2Title', 'apiPoint2Body')}
+        {point('apiPoint3Title', 'apiPoint3Body')}
       </div>
 
       {/* 사용처 */}
