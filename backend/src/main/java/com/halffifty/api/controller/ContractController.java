@@ -174,7 +174,7 @@ public class ContractController {
                 .body(body);
     }
 
-    /**
+    /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */
     private static MediaType sniffImageType(byte[] b) {
         if (b.length >= 3 && (b[0] & 0xFF) == 0xFF && (b[1] & 0xFF) == 0xD8 && (b[2] & 0xFF) == 0xFF) {
             return MediaType.IMAGE_JPEG;
