@@ -402,118 +402,118 @@ const RISK_TYPES: Record<LangCode, Record<string, string>> = {
 
 type ExtraKey =
   | 'translationLabel' | 'inKorean' | 'largeText'
-  | 'landingTitle1' | 'landingTitle2' | 'landingSubtitle' | 'landingCta' | 'hcToggle' | 'readAll' | 'readAllStop'
+  | 'landingTitle1' | 'landingTitle2' | 'landingSubtitle' | 'landingCta' | 'hcToggle' | 'readAll' | 'readAllStop' | 'skipToMain'
 
 /** 뒤에 추가된 키 — UI 본 사전과 분리해 유지보수 (t()가 양쪽을 조회). */
 const UI_EXTRA: Record<LangCode, Record<ExtraKey, string>> = {
   ko: {
     translationLabel: '번역', inKorean: '한국어 원문', largeText: '가 글자 크게',
-    hcToggle: '또렷하게', readAll: '결과 전체 읽어주기', readAllStop: '낭독 멈추기',
+    hcToggle: '또렷하게', readAll: '결과 전체 읽어주기', readAllStop: '낭독 멈추기', skipToMain: '본문으로 바로가기',
     landingTitle1: '어려운 계약서,', landingTitle2: '쉬운 말로 확인하세요',
     landingSubtitle: '불리할 수 있는 조항과 그 근거를 찾아, 계약 전에 꼭 물어볼 질문까지 알려드려요.',
     landingCta: '계약서 분석 시작하기',
   },
   en: {
     translationLabel: 'Translation', inKorean: 'In Korean', largeText: 'Aa Larger text',
-    hcToggle: 'Clearer view', readAll: 'Read all results aloud', readAllStop: 'Stop reading',
+    hcToggle: 'Clearer view', readAll: 'Read all results aloud', readAllStop: 'Stop reading', skipToMain: 'Skip to content',
     landingTitle1: 'Difficult contracts,', landingTitle2: 'explained in plain words',
     landingSubtitle: 'We find risky clauses with evidence, and give you the questions to ask before signing.',
     landingCta: 'Analyze my contract',
   },
   zh: {
     translationLabel: '翻译', inKorean: '韩语原文', largeText: 'Aa 放大字体',
-    hcToggle: '更清晰', readAll: '朗读全部结果', readAllStop: '停止朗读',
+    hcToggle: '更清晰', readAll: '朗读全部结果', readAllStop: '停止朗读', skipToMain: '跳到正文',
     landingTitle1: '难懂的合同，', landingTitle2: '用简单的话确认',
     landingSubtitle: '找出可能不利的条款和依据，并告诉您签约前要问的问题。',
     landingCta: '开始分析合同',
   },
   vi: {
     translationLabel: 'Bản dịch', inKorean: 'Nguyên văn tiếng Hàn', largeText: 'Aa Chữ to hơn',
-    hcToggle: 'Rõ nét hơn', readAll: 'Đọc toàn bộ kết quả', readAllStop: 'Dừng đọc',
+    hcToggle: 'Rõ nét hơn', readAll: 'Đọc toàn bộ kết quả', readAllStop: 'Dừng đọc', skipToMain: 'Bỏ qua tới nội dung',
     landingTitle1: 'Hợp đồng khó hiểu,', landingTitle2: 'hãy xem bằng lời dễ hiểu',
     landingSubtitle: 'Tìm các điều khoản bất lợi kèm căn cứ, và cho bạn câu hỏi cần hỏi trước khi ký.',
     landingCta: 'Bắt đầu phân tích hợp đồng',
   },
   th: {
     translationLabel: 'คำแปล', inKorean: 'ต้นฉบับภาษาเกาหลี', largeText: 'Aa ตัวอักษรใหญ่ขึ้น',
-    hcToggle: 'ชัดขึ้น', readAll: 'อ่านผลทั้งหมด', readAllStop: 'หยุดอ่าน',
+    hcToggle: 'ชัดขึ้น', readAll: 'อ่านผลทั้งหมด', readAllStop: 'หยุดอ่าน', skipToMain: 'ข้ามไปยังเนื้อหา',
     landingTitle1: 'สัญญาที่เข้าใจยาก', landingTitle2: 'ตรวจสอบด้วยภาษาง่าย ๆ',
     landingSubtitle: 'ค้นหาข้อสัญญาที่อาจเสียเปรียบพร้อมหลักฐาน และบอกคำถามที่ควรถามก่อนเซ็น',
     landingCta: 'เริ่มวิเคราะห์สัญญา',
   },
   id: {
     translationLabel: 'Terjemahan', inKorean: 'Teks asli Korea', largeText: 'Aa Perbesar teks',
-    hcToggle: 'Lebih jelas', readAll: 'Bacakan semua hasil', readAllStop: 'Berhenti membaca',
+    hcToggle: 'Lebih jelas', readAll: 'Bacakan semua hasil', readAllStop: 'Berhenti membaca', skipToMain: 'Lewati ke konten',
     landingTitle1: 'Kontrak yang sulit,', landingTitle2: 'dipahami dengan bahasa sederhana',
     landingSubtitle: 'Kami menemukan pasal berisiko beserta dasarnya, dan memberi pertanyaan yang perlu diajukan sebelum tanda tangan.',
     landingCta: 'Mulai analisis kontrak',
   },
   tl: {
     translationLabel: 'Salin', inKorean: 'Orihinal sa Korean', largeText: 'Aa Palakihin ang teksto',
-    hcToggle: 'Mas malinaw', readAll: 'Basahin lahat ng resulta', readAllStop: 'Itigil ang pagbasa',
+    hcToggle: 'Mas malinaw', readAll: 'Basahin lahat ng resulta', readAllStop: 'Itigil ang pagbasa', skipToMain: 'Lumaktaw sa nilalaman',
     landingTitle1: 'Mahirap na kontrata,', landingTitle2: 'ipaliwanag sa simpleng salita',
     landingSubtitle: 'Hinahanap namin ang mga mapanganib na sugnay na may batayan, at ibinibigay ang mga tanong bago pumirma.',
     landingCta: 'Simulan ang pagsusuri',
   },
   ne: {
     translationLabel: 'अनुवाद', inKorean: 'कोरियाली मूल', largeText: 'Aa ठूलो अक्षर',
-    hcToggle: 'स्पष्ट रूप', readAll: 'सबै नतिजा सुनाउने', readAllStop: 'पढ्न रोक्ने',
+    hcToggle: 'स्पष्ट रूप', readAll: 'सबै नतिजा सुनाउने', readAllStop: 'पढ्न रोक्ने', skipToMain: 'सामग्रीमा जानुहोस्',
     landingTitle1: 'गाह्रो सम्झौता,', landingTitle2: 'सजिलो भाषामा जाँच्नुहोस्',
     landingSubtitle: 'जोखिमपूर्ण धारा र आधार खोजेर, हस्ताक्षर अघि सोध्नुपर्ने प्रश्न पनि दिन्छौं।',
     landingCta: 'सम्झौता विश्लेषण सुरु गर्नुहोस्',
   },
   km: {
     translationLabel: 'ការបកប្រែ', inKorean: 'អត្ថបទដើមកូរ៉េ', largeText: 'Aa អក្សរធំជាង',
-    hcToggle: 'ច្បាស់ជាង', readAll: 'អានលទ្ធផលទាំងអស់', readAllStop: 'ឈប់អាន',
+    hcToggle: 'ច្បាស់ជាង', readAll: 'អានលទ្ធផលទាំងអស់', readAllStop: 'ឈប់អាន', skipToMain: 'រំលងទៅមាតិកា',
     landingTitle1: 'កិច្ចសន្យាពិបាកយល់', landingTitle2: 'ពិនិត្យដោយពាក្យងាយៗ',
     landingSubtitle: 'យើងរកប្រការដែលអាចខាតបង់ព្រមទាំងភស្តុតាង និងផ្តល់សំណួរដែលគួរសួរមុនចុះហត្ថលេខា។',
     landingCta: 'ចាប់ផ្តើមវិភាគកិច្ចសន្យា',
   },
   my: {
     translationLabel: 'ဘာသာပြန်', inKorean: 'ကိုရီးယား မူရင်း', largeText: 'Aa စာလုံးကြီး',
-    hcToggle: 'ပိုကြည်လင်', readAll: 'ရလဒ်အားလုံးဖတ်ပြရန်', readAllStop: 'ဖတ်ခြင်းရပ်ရန်',
+    hcToggle: 'ပိုကြည်လင်', readAll: 'ရလဒ်အားလုံးဖတ်ပြရန်', readAllStop: 'ဖတ်ခြင်းရပ်ရန်', skipToMain: 'အကြောင်းအရာသို့ ကျော်ရန်',
     landingTitle1: 'နားလည်ရခက်သော စာချုပ်ကို', landingTitle2: 'ရိုးရှင်းသောစကားဖြင့် စစ်ဆေးပါ',
     landingSubtitle: 'အန္တရာယ်ရှိနိုင်သောအပိုဒ်နှင့် အထောက်အထားကိုရှာပြီး လက်မှတ်မထိုးမီ မေးသင့်သောမေးခွန်းများကိုပေးသည်။',
     landingCta: 'စာချုပ်စိစစ်မှု စတင်ရန်',
   },
   mn: {
     translationLabel: 'Орчуулга', inKorean: 'Солонгос эх', largeText: 'Aa Томруулах',
-    hcToggle: 'Тодруулах', readAll: 'Бүх үр дүнг унших', readAllStop: 'Уншихыг зогсоох',
+    hcToggle: 'Тодруулах', readAll: 'Бүх үр дүнг унших', readAllStop: 'Уншихыг зогсоох', skipToMain: 'Агуулга руу алгасах',
     landingTitle1: 'Ойлгоход хэцүү гэрээг', landingTitle2: 'энгийн үгээр шалгаарай',
     landingSubtitle: 'Эрсдэлтэй заалт, үндэслэлийг олж, гарын үсэг зурахын өмнө асуух асуултыг өгнө.',
     landingCta: 'Гэрээ шинжлэх',
   },
   uz: {
     translationLabel: 'Tarjima', inKorean: 'Koreyscha asl matn', largeText: 'Aa Kattaroq matn',
-    hcToggle: 'Aniqroq', readAll: 'Barcha natijani o‘qish', readAllStop: 'O‘qishni to‘xtatish',
+    hcToggle: 'Aniqroq', readAll: 'Barcha natijani o‘qish', readAllStop: 'O‘qishni to‘xtatish', skipToMain: 'Kontentga oʻtish',
     landingTitle1: 'Murakkab shartnomani', landingTitle2: 'sodda tilda tekshiring',
     landingSubtitle: 'Xavfli bandlarni asosi bilan topamiz va imzolashdan oldin so‘raladigan savollarni beramiz.',
     landingCta: 'Shartnoma tahlilini boshlash',
   },
   si: {
     translationLabel: 'පරිවර්තනය', inKorean: 'කොරියානු මුල් පිටපත', largeText: 'Aa විශාල අකුරු',
-    hcToggle: 'පැහැදිලිව', readAll: 'සියලු ප්‍රතිඵල කියවන්න', readAllStop: 'කියවීම නවත්වන්න',
+    hcToggle: 'පැහැදිලිව', readAll: 'සියලු ප්‍රතිඵල කියවන්න', readAllStop: 'කියවීම නවත්වන්න', skipToMain: 'අන්තර්ගතයට යන්න',
     landingTitle1: 'තේරුම්ගත නොහැකි ගිවිසුම්,', landingTitle2: 'සරල වචනවලින් පරීක්ෂා කරන්න',
     landingSubtitle: 'අවදානම් වගන්ති සහ පදනම සොයා, අත්සන් කිරීමට පෙර ඇසිය යුතු ප්‍රශ්නද ලබා දෙමු.',
     landingCta: 'ගිවිසුම විශ්ලේෂණය අරඹන්න',
   },
   bn: {
     translationLabel: 'অনুবাদ', inKorean: 'কোরীয় মূল', largeText: 'Aa বড় অক্ষর',
-    hcToggle: 'আরও স্পষ্ট', readAll: 'সব ফলাফল পড়ে শোনান', readAllStop: 'পড়া বন্ধ করুন',
+    hcToggle: 'আরও স্পষ্ট', readAll: 'সব ফলাফল পড়ে শোনান', readAllStop: 'পড়া বন্ধ করুন', skipToMain: 'মূল বিষয়ে যান',
     landingTitle1: 'কঠিন চুক্তি,', landingTitle2: 'সহজ ভাষায় যাচাই করুন',
     landingSubtitle: 'ঝুঁকিপূর্ণ ধারা ও তার ভিত্তি খুঁজে বের করি, এবং সই করার আগে জিজ্ঞাসার প্রশ্নও দিই।',
     landingCta: 'চুক্তি বিশ্লেষণ শুরু করুন',
   },
   ru: {
     translationLabel: 'Перевод', inKorean: 'Корейский оригинал', largeText: 'Aa Крупнее шрифт',
-    hcToggle: 'Чётче', readAll: 'Озвучить все результаты', readAllStop: 'Остановить озвучивание',
+    hcToggle: 'Чётче', readAll: 'Озвучить все результаты', readAllStop: 'Остановить озвучивание', skipToMain: 'К содержимому',
     landingTitle1: 'Сложный договор —', landingTitle2: 'проверьте простыми словами',
     landingSubtitle: 'Находим рискованные пункты с обоснованием и даём вопросы, которые стоит задать до подписания.',
     landingCta: 'Начать анализ договора',
   },
   ja: {
     translationLabel: '翻訳', inKorean: '韓国語原文', largeText: 'Aa 文字を大きく',
-    hcToggle: 'くっきり表示', readAll: '結果をすべて読み上げ', readAllStop: '読み上げを停止',
+    hcToggle: 'くっきり表示', readAll: '結果をすべて読み上げ', readAllStop: '読み上げを停止', skipToMain: '本文へスキップ',
     landingTitle1: '難しい契約書を、', landingTitle2: 'やさしい言葉で確認',
     landingSubtitle: '不利になり得る条項と根拠を見つけ、署名前に聞くべき質問までお伝えします。',
     landingCta: '契約書の分析を始める',
@@ -838,7 +838,7 @@ type ScreenKey =
   | 'doConsultTitle' | 'doConsultDesc'
   | 'doSvcKlac' | 'doSvcKlaw' | 'doSvcJeonse' | 'doSvcFss'
   | 'doOpen' | 'doCopyOpen' | 'doCall'
-  | 'doDeleteTitle' | 'doDeleteDesc' | 'doDeleteBtn' | 'doCancel' | 'doConfirmDel'
+  | 'doDeleteTitle' | 'doDeleteDesc' | 'doDeleteTitleSaved' | 'doDeleteDescSaved' | 'doDeleteBtn' | 'doCancel' | 'doConfirmDel'
   | 'doDeletedTitle' | 'doDeletedDesc' | 'doNew'
   | 'prTitle' | 'prSummary' | 'prOriginal' | 'prExplain' | 'prCheck'
 
@@ -873,6 +873,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: '전세사기·보증금 피해 전문 상담 (국토교통부)', doSvcFss: '대출·보험·금융상품 분쟁과 피해 상담',
     doOpen: '홈페이지 열기', doCopyOpen: "'{keyword}' 복사하고 열기", doCall: '전화',
     doDeleteTitle: '서버에 저장되지 않아요', doDeleteDesc: '화면을 닫으면 결과가 사라져요. 지금 바로 지울 수도 있어요.',
+    doDeleteTitleSaved: '이 기기에 기록을 저장했어요', doDeleteDescSaved: "'내 기록'에서 언제든 확인·삭제할 수 있어요.",
     doDeleteBtn: '지금 모두 삭제', doCancel: '취소', doConfirmDel: '정말 삭제하기',
     doDeletedTitle: '모든 데이터를 삭제했어요', doDeletedDesc: '계약서 원본과 분석 결과가 모두 지워졌어요. 필요할 때 언제든 다시 이용하세요.', doNew: '새 계약서 분석하기',
     prTitle: '조목조목 계약서 분석 결과', prSummary: '전체 {total}개 조항 중 확인이 필요한 조항 {need}개 · 본 결과는 참고용 안내이며 법률 자문이 아닙니다. 중요한 결정은 반드시 전문가와 상담하세요.',
@@ -907,6 +908,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Jeonse fraud & deposit damage counseling (MOLIT)', doSvcFss: 'Disputes over loans, insurance, and financial products',
     doOpen: 'Open website', doCopyOpen: "Copy '{keyword}' & open", doCall: 'Call',
     doDeleteTitle: 'Not stored on our server', doDeleteDesc: 'Results disappear when you close this screen. You can also clear them now.',
+    doDeleteTitleSaved: 'Saved to this device', doDeleteDescSaved: "You can view or delete it anytime from 'My records'.",
     doDeleteBtn: 'Delete all now', doCancel: 'Cancel', doConfirmDel: 'Yes, delete',
     doDeletedTitle: 'All data deleted', doDeletedDesc: 'The contract and results are gone. Come back anytime.', doNew: 'Analyze a new contract',
     prTitle: 'Jomokjomok Contract Analysis Report', prSummary: '{need} of {total} clauses need attention · For reference only, not legal advice. Consult a professional for important decisions.',
@@ -941,6 +943,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: '全租房诈骗·押金受害专业咨询（国土交通部）', doSvcFss: '贷款、保险、金融产品纠纷咨询',
     doOpen: '打开官网', doCopyOpen: "复制'{keyword}'并打开", doCall: '电话',
     doDeleteTitle: '不会保存在服务器上', doDeleteDesc: '关闭页面后结果会消失。也可以现在立即清除。',
+    doDeleteTitleSaved: '已保存到此设备', doDeleteDescSaved: '您可以随时在"我的记录"中查看或删除。',
     doDeleteBtn: '立即全部删除', doCancel: '取消', doConfirmDel: '确认删除',
     doDeletedTitle: '已删除全部数据', doDeletedDesc: '合同原件和分析结果均已清除。需要时随时再来。', doNew: '分析新合同',
     prTitle: 'Jomokjomok 合同分析结果', prSummary: '共{total}条中{need}条需注意 · 仅供参考，非法律意见。重要决定请咨询专业人士。',
@@ -975,6 +978,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Tư vấn lừa đảo jeonse & thiệt hại tiền cọc (Bộ Đất đai)', doSvcFss: 'Tranh chấp vay vốn, bảo hiểm, sản phẩm tài chính',
     doOpen: 'Mở trang web', doCopyOpen: "Sao chép '{keyword}' & mở", doCall: 'Gọi',
     doDeleteTitle: 'Không lưu trên máy chủ', doDeleteDesc: 'Kết quả sẽ biến mất khi bạn đóng màn hình này. Bạn cũng có thể xoá ngay bây giờ.',
+    doDeleteTitleSaved: 'Đã lưu vào thiết bị này', doDeleteDescSaved: "Bạn có thể xem hoặc xoá bất cứ lúc nào trong 'Bản ghi của tôi'.",
     doDeleteBtn: 'Xoá tất cả ngay', doCancel: 'Huỷ', doConfirmDel: 'Xoá thật',
     doDeletedTitle: 'Đã xoá toàn bộ dữ liệu', doDeletedDesc: 'Hợp đồng gốc và kết quả đã bị xoá. Hãy quay lại bất cứ lúc nào.', doNew: 'Phân tích hợp đồng mới',
     prTitle: 'Báo cáo phân tích hợp đồng Jomokjomok', prSummary: '{need}/{total} điều khoản cần chú ý · Chỉ để tham khảo, không phải tư vấn pháp lý. Quyết định quan trọng hãy hỏi chuyên gia.',
@@ -1009,6 +1013,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'ปรึกษาการฉ้อโกงจอนเซ·ความเสียหายเงินมัดจำ (กระทรวงที่ดิน)', doSvcFss: 'ข้อพิพาทสินเชื่อ ประกัน ผลิตภัณฑ์การเงิน',
     doOpen: 'เปิดเว็บไซต์', doCopyOpen: "คัดลอก '{keyword}' แล้วเปิด", doCall: 'โทร',
     doDeleteTitle: 'ไม่ถูกจัดเก็บบนเซิร์ฟเวอร์', doDeleteDesc: 'ผลลัพธ์จะหายไปเมื่อคุณปิดหน้าจอนี้ คุณสามารถลบตอนนี้ได้เช่นกัน',
+    doDeleteTitleSaved: 'บันทึกไว้ในเครื่องนี้แล้ว', doDeleteDescSaved: "คุณสามารถดูหรือลบได้ทุกเมื่อใน 'บันทึกของฉัน'",
     doDeleteBtn: 'ลบทั้งหมดตอนนี้', doCancel: 'ยกเลิก', doConfirmDel: 'ยืนยันลบ',
     doDeletedTitle: 'ลบข้อมูลทั้งหมดแล้ว', doDeletedDesc: 'ต้นฉบับและผลวิเคราะห์ถูกลบหมดแล้ว กลับมาใช้ได้ทุกเมื่อ', doNew: 'วิเคราะห์สัญญาใหม่',
     prTitle: 'รายงานวิเคราะห์สัญญา Jomokjomok', prSummary: '{need} จาก {total} ข้อควรตรวจสอบ · เพื่ออ้างอิงเท่านั้น ไม่ใช่คำปรึกษากฎหมาย',
@@ -1043,6 +1048,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Konsultasi penipuan jeonse & kerugian deposit (MOLIT)', doSvcFss: 'Sengketa pinjaman, asuransi, produk keuangan',
     doOpen: 'Buka situs', doCopyOpen: "Salin '{keyword}' & buka", doCall: 'Telepon',
     doDeleteTitle: 'Tidak disimpan di server', doDeleteDesc: 'Hasil akan hilang saat Anda menutup layar ini. Anda juga bisa menghapusnya sekarang.',
+    doDeleteTitleSaved: 'Disimpan ke perangkat ini', doDeleteDescSaved: "Anda dapat melihat atau menghapusnya kapan saja di 'Catatan saya'.",
     doDeleteBtn: 'Hapus semua sekarang', doCancel: 'Batal', doConfirmDel: 'Ya, hapus',
     doDeletedTitle: 'Semua data terhapus', doDeletedDesc: 'Kontrak asli dan hasil sudah dihapus. Kembali kapan saja.', doNew: 'Analisis kontrak baru',
     prTitle: 'Laporan Analisis Kontrak Jomokjomok', prSummary: '{need} dari {total} pasal perlu perhatian · Hanya referensi, bukan nasihat hukum.',
@@ -1077,6 +1083,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Konsultasyon sa jeonse scam at deposito (MOLIT)', doSvcFss: 'Alitan sa utang, insurance, produktong pinansyal',
     doOpen: 'Buksan ang site', doCopyOpen: "Kopyahin ang '{keyword}' at buksan", doCall: 'Tawag',
     doDeleteTitle: 'Hindi naka-imbak sa server', doDeleteDesc: 'Mawawala ang resulta kapag isinara mo ang screen na ito. Puwede mo ring burahin ngayon.',
+    doDeleteTitleSaved: 'Na-save sa device na ito', doDeleteDescSaved: "Puwede mong tingnan o burahin anumang oras sa 'Mga Tala Ko'.",
     doDeleteBtn: 'Burahin lahat ngayon', doCancel: 'Kanselahin', doConfirmDel: 'Oo, burahin',
     doDeletedTitle: 'Nabura na ang lahat ng data', doDeletedDesc: 'Nabura na ang kontrata at resulta. Bumalik anumang oras.', doNew: 'Suriin ang bagong kontrata',
     prTitle: 'Ulat ng Pagsusuri ng Kontrata — Jomokjomok', prSummary: '{need} sa {total} sugnay ang dapat pansinin · Sanggunian lamang, hindi legal na payo.',
@@ -1111,6 +1118,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'जोन्से ठगी·धरौटी क्षति परामर्श (भूमि मन्त्रालय)', doSvcFss: 'ऋण, बीमा, वित्तीय उत्पादन विवाद',
     doOpen: 'वेबसाइट खोल्नुहोस्', doCopyOpen: "'{keyword}' कपी गरी खोल्नुहोस्", doCall: 'फोन',
     doDeleteTitle: 'सर्भरमा भण्डारण हुँदैन', doDeleteDesc: 'यो स्क्रिन बन्द गर्दा नतिजा हराउँछ। तपाईं अहिले नै मेटाउन पनि सक्नुहुन्छ।',
+    doDeleteTitleSaved: 'यो उपकरणमा सुरक्षित गरियो', doDeleteDescSaved: "तपाईं जुनसुकै बेला 'मेरो रेकर्ड' मा हेर्न वा मेटाउन सक्नुहुन्छ।",
     doDeleteBtn: 'अहिले सबै मेट्नुहोस्', doCancel: 'रद्द', doConfirmDel: 'पक्कै मेट्ने',
     doDeletedTitle: 'सबै डेटा मेटियो', doDeletedDesc: 'मूल सम्झौता र नतिजा मेटिए। जहिले पनि फेरि आउनुहोस्।', doNew: 'नयाँ सम्झौता विश्लेषण',
     prTitle: 'Jomokjomok सम्झौता विश्लेषण प्रतिवेदन', prSummary: '{total} मध्ये {need} धारामा ध्यान चाहिन्छ · सन्दर्भका लागि मात्र, कानुनी सल्लाह होइन।',
@@ -1145,6 +1153,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'ប្រឹក្សាការបោកប្រាស់ jeonse·ខូចខាតប្រាក់កក់ (MOLIT)', doSvcFss: 'វិវាទកម្ចី ធានារ៉ាប់រង ផលិតផលហិរញ្ញវត្ថុ',
     doOpen: 'បើកគេហទំព័រ', doCopyOpen: "ចម្លង '{keyword}' ហើយបើក", doCall: 'ទូរស័ព្ទ',
     doDeleteTitle: 'មិនរក្សាទុកនៅលើម៉ាស៊ីនមេទេ', doDeleteDesc: 'លទ្ធផលនឹងបាត់នៅពេលអ្នកបិទអេក្រង់នេះ។ អ្នកក៏អាចលុបវាឥឡូវនេះបានដែរ។',
+    doDeleteTitleSaved: 'បានរក្សាទុកនៅឧបករណ៍នេះ', doDeleteDescSaved: "អ្នកអាចមើល ឬលុបបានគ្រប់ពេលនៅ 'កំណត់ត្រារបស់ខ្ញុំ'។",
     doDeleteBtn: 'លុបទាំងអស់ឥឡូវ', doCancel: 'បោះបង់', doConfirmDel: 'ពិតជាលុប',
     doDeletedTitle: 'បានលុបទិន្នន័យទាំងអស់', doDeletedDesc: 'ច្បាប់ដើមនិងលទ្ធផលត្រូវបានលុប។ ត្រឡប់មកវិញបានគ្រប់ពេល។', doNew: 'វិភាគកិច្ចសន្យាថ្មី',
     prTitle: 'របាយការណ៍វិភាគកិច្ចសន្យា Jomokjomok', prSummary: '{need} ក្នុងចំណោម {total} ប្រការត្រូវប្រុងប្រយ័ត្ន · សម្រាប់យោងប៉ុណ្ណោះ មិនមែនដំបូន្មានច្បាប់ទេ។',
@@ -1179,6 +1188,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'jeonse လိမ်လည်မှု·အာမခံငွေ ဆုံးရှုံးမှု အကြံပေး (MOLIT)', doSvcFss: 'ချေးငွေ၊ အာမခံ၊ ဘဏ္ဍာရေးထုတ်ကုန် အငြင်းပွားမှု',
     doOpen: 'ဝက်ဘ်ဆိုက်ဖွင့်ရန်', doCopyOpen: "'{keyword}' ကူး၍ဖွင့်ရန်", doCall: 'ဖုန်း',
     doDeleteTitle: 'ဆာဗာတွင် သိမ်းဆည်းမထားပါ', doDeleteDesc: 'ဤစခရင်ကို ပိတ်လိုက်လျှင် ရလဒ်များ ပျောက်သွားမည်ဖြစ်သည်။ ယခုပင် ဖျက်နိုင်ပါသည်။',
+    doDeleteTitleSaved: 'ဤကိရိယာတွင် သိမ်းဆည်းထားသည်', doDeleteDescSaved: "'ကျွန်ုပ်၏မှတ်တမ်းများ' တွင် အချိန်မရွေး ကြည့်ရှု သို့မဟုတ် ဖျက်နိုင်ပါသည်။",
     doDeleteBtn: 'ယခုအားလုံးဖျက်ရန်', doCancel: 'ပယ်ဖျက်', doConfirmDel: 'သေချာဖျက်မည်',
     doDeletedTitle: 'ဒေတာအားလုံးဖျက်ပြီးပြီ', doDeletedDesc: 'မူရင်းနှင့်ရလဒ်များ ဖျက်ပြီးပြီ။ အချိန်မရွေး ပြန်လာနိုင်သည်။', doNew: 'စာချုပ်အသစ် စိစစ်ရန်',
     prTitle: 'Jomokjomok စာချုပ်စိစစ်ချက် အစီရင်ခံစာ', prSummary: 'အပိုဒ် {total} ခုအနက် {need} ခု သတိပြုရန် · ကိုးကားရန်သာ၊ ဥပဒေအကြံမဟုတ်ပါ။',
@@ -1213,6 +1223,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Жонсэ залилан·барьцааны хохирлын зөвлөгөө (MOLIT)', doSvcFss: 'Зээл, даатгал, санхүүгийн бүтээгдэхүүний маргаан',
     doOpen: 'Вэб нээх', doCopyOpen: "'{keyword}' хуулаад нээх", doCall: 'Утас',
     doDeleteTitle: 'Серверт хадгалагдахгүй', doDeleteDesc: 'Энэ дэлгэцийг хаахад үр дүн алга болно. Одоо ч устгаж болно.',
+    doDeleteTitleSaved: 'Энэ төхөөрөмжид хадгалагдлаа', doDeleteDescSaved: "Та 'Миний бүртгэл'-ээс хүссэн үедээ харах, устгах боломжтой.",
     doDeleteBtn: 'Одоо бүгдийг устгах', doCancel: 'Болих', doConfirmDel: 'Тийм, устгах',
     doDeletedTitle: 'Бүх өгөгдөл устлаа', doDeletedDesc: 'Эх гэрээ, үр дүн бүгд устсан. Хэзээ ч дахин ирж болно.', doNew: 'Шинэ гэрээ шинжлэх',
     prTitle: 'Jomokjomok гэрээний шинжилгээний тайлан', prSummary: 'Нийт {total} заалтаас {need}-д анхаарал хэрэгтэй · Зөвхөн лавлагаа, хуулийн зөвлөгөө биш.',
@@ -1247,6 +1258,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Jeonse firibgarligi·garov zarari maslahatlari (MOLIT)', doSvcFss: 'Kredit, sugʻurta, moliyaviy mahsulot nizolari',
     doOpen: 'Saytni ochish', doCopyOpen: "'{keyword}'ni nusxalab ochish", doCall: 'Qoʻngʻiroq',
     doDeleteTitle: 'Serverda saqlanmaydi', doDeleteDesc: 'Bu ekranni yopganingizda natijalar yoʻqoladi. Hozir ham oʻchirib tashlashingiz mumkin.',
+    doDeleteTitleSaved: 'Ushbu qurilmaga saqlandi', doDeleteDescSaved: "Uni istalgan vaqtda 'Mening yozuvlarim'da koʻrishingiz yoki oʻchirishingiz mumkin.",
     doDeleteBtn: 'Hozir hammasini oʻchirish', doCancel: 'Bekor', doConfirmDel: 'Ha, oʻchirish',
     doDeletedTitle: 'Barcha maʼlumot oʻchirildi', doDeletedDesc: 'Asl shartnoma va natijalar oʻchdi. Istalgan payt qayting.', doNew: 'Yangi shartnoma tahlili',
     prTitle: 'Jomokjomok shartnoma tahlili hisoboti', prSummary: '{total} banddan {need} tasiga eʼtibor kerak · Faqat maʼlumot uchun, yuridik maslahat emas.',
@@ -1281,6 +1293,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'ජොන්සේ වංචා·තැන්පතු හානි උපදේශන (MOLIT)', doSvcFss: 'ණය, රක්ෂණ, මූල්‍ය නිෂ්පාදන ආරවුල්',
     doOpen: 'වෙබ් අඩවිය විවෘත', doCopyOpen: "'{keyword}' පිටපත් කර විවෘත", doCall: 'ඇමතුම',
     doDeleteTitle: 'සේවාදායකයේ ගබඩා නොවේ', doDeleteDesc: 'මෙම තිරය වසන විට ප්‍රතිඵල අතුරුදහන් වේ. ඔබට දැන්ම එය මකා දැමිය හැක.',
+    doDeleteTitleSaved: 'මෙම උපකරණයේ සුරකින ලදී', doDeleteDescSaved: "ඔබට ඕනෑම වේලාවක 'මගේ වාර්තා'වෙන් බලා හෝ මකා දැමිය හැක.",
     doDeleteBtn: 'දැන් සියල්ල මකන්න', doCancel: 'අවලංගු', doConfirmDel: 'ඔව්, මකන්න',
     doDeletedTitle: 'සියලු දත්ත මකා දමන ලදි', doDeletedDesc: 'මුල් ගිවිසුම සහ ප්‍රතිඵල මැකිණි. ඕනෑම විටෙක නැවත එන්න.', doNew: 'නව ගිවිසුමක් විශ්ලේෂණය',
     prTitle: 'Jomokjomok ගිවිසුම් විශ්ලේෂණ වාර්තාව', prSummary: 'වගන්ති {total}න් {need}කට අවධානය අවශ්‍යයි · යොමුවට පමණි, නීති උපදෙසක් නොවේ.',
@@ -1315,6 +1328,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'জনসে প্রতারণা·জামানত ক্ষতির পরামর্শ (MOLIT)', doSvcFss: 'ঋণ, বিমা, আর্থিক পণ্যের বিরোধ',
     doOpen: 'ওয়েবসাইট খুলুন', doCopyOpen: "'{keyword}' কপি করে খুলুন", doCall: 'কল',
     doDeleteTitle: 'সার্ভারে সংরক্ষণ করা হয় না', doDeleteDesc: 'এই স্ক্রিন বন্ধ করলে ফলাফল অদৃশ্য হয়ে যাবে। আপনি এখনই মুছেও ফেলতে পারেন।',
+    doDeleteTitleSaved: 'এই ডিভাইসে সংরক্ষিত হয়েছে', doDeleteDescSaved: "আপনি 'আমার রেকর্ড' থেকে যেকোনো সময় দেখতে বা মুছতে পারেন।",
     doDeleteBtn: 'এখনই সব মুছুন', doCancel: 'বাতিল', doConfirmDel: 'হ্যাঁ, মুছুন',
     doDeletedTitle: 'সব ডেটা মুছে ফেলা হয়েছে', doDeletedDesc: 'মূল চুক্তি ও ফলাফল মুছে গেছে। যেকোনো সময় আবার আসুন।', doNew: 'নতুন চুক্তি বিশ্লেষণ',
     prTitle: 'Jomokjomok চুক্তি বিশ্লেষণ প্রতিবেদন', prSummary: '{total}টির মধ্যে {need}টি ধারায় মনোযোগ দরকার · শুধুই সহায়ক তথ্য, আইনি পরামর্শ নয়।',
@@ -1349,6 +1363,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Мошенничество с чонсе и ущерб по депозиту (MOLIT)', doSvcFss: 'Споры по кредитам, страховкам, финпродуктам',
     doOpen: 'Открыть сайт', doCopyOpen: "Скопировать '{keyword}' и открыть", doCall: 'Позвонить',
     doDeleteTitle: 'Не хранится на сервере', doDeleteDesc: 'Результаты исчезнут при закрытии экрана. Можно удалить и сейчас.',
+    doDeleteTitleSaved: 'Сохранено на этом устройстве', doDeleteDescSaved: "Вы можете просмотреть или удалить это в любое время в разделе 'Мои записи'.",
     doDeleteBtn: 'Удалить всё сейчас', doCancel: 'Отмена', doConfirmDel: 'Да, удалить',
     doDeletedTitle: 'Все данные удалены', doDeletedDesc: 'Договор и результаты стёрты. Возвращайтесь в любое время.', doNew: 'Анализировать новый договор',
     prTitle: 'Отчёт анализа договора Jomokjomok', prSummary: '{need} из {total} пунктов требуют внимания · Только для справки, не юридическая консультация.',
@@ -1383,6 +1398,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'チョンセ詐欺・保証金被害の専門相談（国土交通部）', doSvcFss: 'ローン・保険・金融商品の紛争相談',
     doOpen: 'サイトを開く', doCopyOpen: "'{keyword}'をコピーして開く", doCall: '電話',
     doDeleteTitle: 'サーバーには保存されません', doDeleteDesc: 'この画面を閉じると結果は消えます。今すぐ削除することもできます。',
+    doDeleteTitleSaved: 'この端末に保存しました', doDeleteDescSaved: '「マイ記録」からいつでも確認・削除できます。',
     doDeleteBtn: '今すべて削除', doCancel: 'キャンセル', doConfirmDel: '削除する',
     doDeletedTitle: 'すべてのデータを削除しました', doDeletedDesc: '契約書原本と結果は消去されました。いつでもまたどうぞ。', doNew: '新しい契約書を分析',
     prTitle: 'Jomokjomok 契約書分析レポート', prSummary: '全{total}条項中{need}件に注意 · 参考情報であり法律相談ではありません。',
@@ -2235,9 +2251,861 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+/* --- KRDS 글자·화면 크기 조절 (#134) --- */
+type ZoomKey = 'zoomLabel' | 'zoomOut' | 'zoomIn'
+
+const UI_ZOOM: Record<LangCode, Record<ZoomKey, string>> = {
+  ko: { zoomLabel: '글자·화면 크기', zoomOut: '글자 작게', zoomIn: '글자 크게' },
+  en: { zoomLabel: 'Text & display size', zoomOut: 'Smaller text', zoomIn: 'Larger text' },
+  zh: { zoomLabel: '字体与画面大小', zoomOut: '缩小字体', zoomIn: '放大字体' },
+  vi: { zoomLabel: 'Cỡ chữ và màn hình', zoomOut: 'Thu nhỏ chữ', zoomIn: 'Phóng to chữ' },
+  th: { zoomLabel: 'ขนาดตัวอักษรและหน้าจอ', zoomOut: 'ลดขนาดตัวอักษร', zoomIn: 'เพิ่มขนาดตัวอักษร' },
+  id: { zoomLabel: 'Ukuran teks & tampilan', zoomOut: 'Perkecil teks', zoomIn: 'Perbesar teks' },
+  tl: { zoomLabel: 'Laki ng teksto at screen', zoomOut: 'Paliitin ang teksto', zoomIn: 'Palakihin ang teksto' },
+  ne: { zoomLabel: 'अक्षर र स्क्रिन आकार', zoomOut: 'अक्षर सानो', zoomIn: 'अक्षर ठूलो' },
+  km: { zoomLabel: 'ទំហំអក្សរ និងអេក្រង់', zoomOut: 'បង្រួមអក្សរ', zoomIn: 'ពង្រីកអក្សរ' },
+  my: { zoomLabel: 'စာလုံးနှင့် မျက်နှာပြင်အရွယ်', zoomOut: 'စာလုံးချုံ့ရန်', zoomIn: 'စာလုံးချဲ့ရန်' },
+  mn: { zoomLabel: 'Үсэг ба дэлгэцийн хэмжээ', zoomOut: 'Үсэг багасгах', zoomIn: 'Үсэг томсгох' },
+  uz: { zoomLabel: "Matn va ekran o'lchami", zoomOut: 'Matnni kichraytirish', zoomIn: 'Matnni kattalashtirish' },
+  si: { zoomLabel: 'අකුරු සහ තිර ප්‍රමාණය', zoomOut: 'අකුරු කුඩා කරන්න', zoomIn: 'අකුරු ලොකු කරන්න' },
+  bn: { zoomLabel: 'লেখা ও স্ক্রিনের আকার', zoomOut: 'লেখা ছোট করুন', zoomIn: 'লেখা বড় করুন' },
+  ru: { zoomLabel: 'Размер текста и экрана', zoomOut: 'Уменьшить текст', zoomIn: 'Увеличить текст' },
+  ja: { zoomLabel: '文字・画面サイズ', zoomOut: '文字を小さく', zoomIn: '文字を大きく' },
+}
+
+type VoiceKey =
+  | 'vcToggle' | 'vcListening' | 'vcOff'
+
+// 앱 내 음성 명령 (#127)
+const UI_VOICE: Record<LangCode, Record<VoiceKey, string>> = {
+  ko: { vcToggle: '음성 명령', vcListening: '듣고 있어요 — "다음", "이전", "읽어줘", "멈춰", "더 쉽게"', vcOff: '음성 명령 끄기' },
+  en: { vcToggle: 'Voice commands', vcListening: 'Listening — "next", "previous", "read", "stop", "simpler"', vcOff: 'Turn off voice commands' },
+  zh: { vcToggle: '语音命令', vcListening: '正在听 — “下一个”“上一个”“读一下”“停止”“更简单”', vcOff: '关闭语音命令' },
+  vi: { vcToggle: 'Lệnh giọng nói', vcListening: 'Đang nghe — "tiếp", "trước", "đọc", "dừng", "dễ hơn"', vcOff: 'Tắt lệnh giọng nói' },
+  th: { vcToggle: 'คำสั่งเสียง', vcListening: 'กำลังฟัง — "ถัดไป" "ก่อนหน้า" "อ่าน" "หยุด" "ง่ายขึ้น"', vcOff: 'ปิดคำสั่งเสียง' },
+  id: { vcToggle: 'Perintah suara', vcListening: 'Mendengarkan — "berikutnya", "sebelumnya", "baca", "berhenti", "lebih mudah"', vcOff: 'Matikan perintah suara' },
+  tl: { vcToggle: 'Voice commands', vcListening: 'Nakikinig — "next", "previous", "basahin", "tigil", "mas simple"', vcOff: 'I-off ang voice commands' },
+  ne: { vcToggle: 'आवाज आदेश', vcListening: 'सुन्दै — "अर्को", "अघिल्लो", "पढ", "रोक", "सजिलो"', vcOff: 'आवाज आदेश बन्द' },
+  km: { vcToggle: 'ពាក្យបញ្ជាសំឡេង', vcListening: 'កំពុងស្ដាប់ — "បន្ទាប់" "មុន" "អាន" "ឈប់" "ងាយជាង"', vcOff: 'បិទពាក្យបញ្ជាសំឡេង' },
+  my: { vcToggle: 'အသံအမိန့်', vcListening: 'နားထောင်နေသည် — "နောက်တစ်ခု" "အရင်" "ဖတ်ပြ" "ရပ်" "ပိုလွယ်"', vcOff: 'အသံအမိန့်ပိတ်ရန်' },
+  mn: { vcToggle: 'Дуут тушаал', vcListening: 'Сонсож байна — "дараах", "өмнөх", "унш", "зогс", "хялбар"', vcOff: 'Дуут тушаал унтраах' },
+  uz: { vcToggle: 'Ovozli buyruq', vcListening: 'Tinglamoqda — "keyingi", "oldingi", "oʻqi", "toʻxta", "osonroq"', vcOff: 'Ovozli buyruqni oʻchirish' },
+  si: { vcToggle: 'හඬ විධාන', vcListening: 'අසමින් — "ඊළඟ", "පෙර", "කියවන්න", "නවත්වන්න", "සරලව"', vcOff: 'හඬ විධාන වසන්න' },
+  bn: { vcToggle: 'ভয়েস কমান্ড', vcListening: 'শুনছে — "পরের", "আগের", "পড়ো", "থামো", "সহজে"', vcOff: 'ভয়েস কমান্ড বন্ধ' },
+  ru: { vcToggle: 'Голосовые команды', vcListening: 'Слушаю — «дальше», «назад», «прочитай», «стоп», «проще»', vcOff: 'Выключить голосовые команды' },
+  ja: { vcToggle: '音声コマンド', vcListening: '聞いています — 「次」「前」「読んで」「止めて」「もっと簡単に」', vcOff: '音声コマンドをオフ' },
+}
+
+type RecordKey =
+  | 'rcNav' | 'rcSave' | 'rcSaved' | 'rcTitle' | 'rcNote' | 'rcEmpty' | 'rcView' | 'rcDelete' | 'rcMeta'
+
+// 옵트인 로컬 기록 보관함 (#102 v1)
+const UI_RECORDS: Record<LangCode, Record<RecordKey, string>> = {
+  ko: {
+    rcNav: '내 기록',
+    rcSave: '이 기기에 기록 남기기',
+    rcSaved: '기록됐어요 — 이 기기에만 저장돼요',
+    rcTitle: '저장된 기록',
+    rcNote: '서버에는 아무것도 전송되지 않아요. 기록은 이 기기에만 있고 언제든 삭제할 수 있어요.',
+    rcEmpty: '기록이 아직 없어요. 분석 결과 화면에서 \'이 기기에 기록 남기기\'를 누르면 여기에 쌓여요.',
+    rcView: '다시 보기',
+    rcDelete: '삭제',
+    rcMeta: '위험 {n}건 · 조항 {total}개',
+  },
+  en: {
+    rcNav: 'My records',
+    rcSave: 'Save to this device',
+    rcSaved: 'Saved — stored on this device only',
+    rcTitle: 'Saved records',
+    rcNote: 'Nothing is sent to a server. Records live only on this device and can be deleted anytime.',
+    rcEmpty: 'No records yet. Tap \'Save to this device\' on a results screen to collect them here.',
+    rcView: 'View again',
+    rcDelete: 'Delete',
+    rcMeta: '{n} risk · {total} clauses',
+  },
+  zh: {
+    rcNav: '我的记录',
+    rcSave: '保存到此设备',
+    rcSaved: '已保存 — 仅存储在此设备上',
+    rcTitle: '已保存的记录',
+    rcNote: '不会向服务器发送任何内容。记录仅在此设备上，可随时删除。',
+    rcEmpty: '还没有记录。在结果页点击“保存到此设备”即可收集到这里。',
+    rcView: '再次查看',
+    rcDelete: '删除',
+    rcMeta: '危险{n}项 · 条款{total}条',
+  },
+  vi: {
+    rcNav: 'Hồ sơ của tôi',
+    rcSave: 'Lưu vào thiết bị này',
+    rcSaved: 'Đã lưu — chỉ trên thiết bị này',
+    rcTitle: 'Hồ sơ đã lưu',
+    rcNote: 'Không gửi gì lên máy chủ. Hồ sơ chỉ ở thiết bị này và xoá được bất cứ lúc nào.',
+    rcEmpty: 'Chưa có hồ sơ. Nhấn \'Lưu vào thiết bị này\' ở màn kết quả để gom về đây.',
+    rcView: 'Xem lại',
+    rcDelete: 'Xoá',
+    rcMeta: '{n} rủi ro · {total} điều khoản',
+  },
+  th: {
+    rcNav: 'บันทึกของฉัน',
+    rcSave: 'บันทึกลงอุปกรณ์นี้',
+    rcSaved: 'บันทึกแล้ว — เก็บบนอุปกรณ์นี้เท่านั้น',
+    rcTitle: 'รายการที่บันทึก',
+    rcNote: 'ไม่ส่งอะไรไปเซิร์ฟเวอร์ บันทึกอยู่บนอุปกรณ์นี้เท่านั้นและลบได้ทุกเมื่อ',
+    rcEmpty: 'ยังไม่มีบันทึก กด \'บันทึกลงอุปกรณ์นี้\' ที่หน้าผลลัพธ์เพื่อเก็บไว้ที่นี่',
+    rcView: 'ดูอีกครั้ง',
+    rcDelete: 'ลบ',
+    rcMeta: 'เสี่ยง {n} · {total} ข้อ',
+  },
+  id: {
+    rcNav: 'Catatan saya',
+    rcSave: 'Simpan di perangkat ini',
+    rcSaved: 'Tersimpan — hanya di perangkat ini',
+    rcTitle: 'Catatan tersimpan',
+    rcNote: 'Tidak ada yang dikirim ke server. Catatan hanya di perangkat ini dan bisa dihapus kapan saja.',
+    rcEmpty: 'Belum ada catatan. Tekan \'Simpan di perangkat ini\' di layar hasil untuk mengumpulkannya di sini.',
+    rcView: 'Lihat lagi',
+    rcDelete: 'Hapus',
+    rcMeta: '{n} risiko · {total} pasal',
+  },
+  tl: {
+    rcNav: 'Mga record ko',
+    rcSave: 'I-save sa device na ito',
+    rcSaved: 'Na-save — sa device na ito lang',
+    rcTitle: 'Mga naka-save na record',
+    rcNote: 'Walang ipinapadala sa server. Nasa device na ito lang ang records at pwedeng burahin anumang oras.',
+    rcEmpty: 'Wala pang record. Pindutin ang \'I-save sa device na ito\' sa results screen.',
+    rcView: 'Tingnan muli',
+    rcDelete: 'Burahin',
+    rcMeta: '{n} panganib · {total} probisyon',
+  },
+  ne: {
+    rcNav: 'मेरो रेकर्ड',
+    rcSave: 'यो यन्त्रमा रेकर्ड राख्ने',
+    rcSaved: 'सेभ भयो — यही यन्त्रमा मात्र',
+    rcTitle: 'सेभ गरिएका रेकर्ड',
+    rcNote: 'सर्भरमा केही पठाइँदैन। रेकर्ड यही यन्त्रमा मात्र रहन्छ र जहिले पनि मेटाउन मिल्छ।',
+    rcEmpty: 'रेकर्ड छैन। नतिजा पृष्ठमा \'यो यन्त्रमा रेकर्ड राख्ने\' थिच्नुहोस्।',
+    rcView: 'फेरि हेर्ने',
+    rcDelete: 'मेटाउने',
+    rcMeta: 'जोखिम {n} · दफा {total}',
+  },
+  km: {
+    rcNav: 'កំណត់ត្រារបស់ខ្ញុំ',
+    rcSave: 'រក្សាទុកក្នុងឧបករណ៍នេះ',
+    rcSaved: 'បានរក្សាទុក — តែក្នុងឧបករណ៍នេះ',
+    rcTitle: 'កំណត់ត្រាដែលរក្សាទុក',
+    rcNote: 'គ្មានអ្វីផ្ញើទៅម៉ាស៊ីនមេទេ។ កំណត់ត្រានៅតែក្នុងឧបករណ៍នេះ ហើយលុបបានគ្រប់ពេល។',
+    rcEmpty: 'មិនទាន់មានកំណត់ត្រា។ ចុច \'រក្សាទុកក្នុងឧបករណ៍នេះ\' នៅអេក្រង់លទ្ធផល។',
+    rcView: 'មើលម្ដងទៀត',
+    rcDelete: 'លុប',
+    rcMeta: 'ហានិភ័យ {n} · មាត្រា {total}',
+  },
+  my: {
+    rcNav: 'ကျွန်ုပ်၏မှတ်တမ်း',
+    rcSave: 'ဤစက်တွင်သိမ်းရန်',
+    rcSaved: 'သိမ်းပြီး — ဤစက်တွင်သာ',
+    rcTitle: 'သိမ်းထားသောမှတ်တမ်း',
+    rcNote: 'ဆာဗာသို့ ဘာမျှမပို့ပါ။ မှတ်တမ်းသည် ဤစက်တွင်သာရှိပြီး အချိန်မရွေးဖျက်နိုင်သည်။',
+    rcEmpty: 'မှတ်တမ်းမရှိသေးပါ။ ရလဒ်စာမျက်နှာတွင် \'ဤစက်တွင်သိမ်းရန်\' နှိပ်ပါ။',
+    rcView: 'ပြန်ကြည့်ရန်',
+    rcDelete: 'ဖျက်ရန်',
+    rcMeta: 'အန္တရာယ် {n} · အပိုဒ် {total}',
+  },
+  mn: {
+    rcNav: 'Миний бүртгэл',
+    rcSave: 'Энэ төхөөрөмжид хадгалах',
+    rcSaved: 'Хадгаллаа — зөвхөн энэ төхөөрөмжид',
+    rcTitle: 'Хадгалсан бүртгэл',
+    rcNote: 'Сервер рүү юу ч илгээгдэхгүй. Бүртгэл зөвхөн энэ төхөөрөмжид байх ба хэзээд устгаж болно.',
+    rcEmpty: 'Бүртгэл алга. Үр дүнгийн дэлгэцээс \'Энэ төхөөрөмжид хадгалах\' дарна уу.',
+    rcView: 'Дахин үзэх',
+    rcDelete: 'Устгах',
+    rcMeta: 'эрсдэл {n} · заалт {total}',
+  },
+  uz: {
+    rcNav: 'Yozuvlarim',
+    rcSave: 'Shu qurilmaga saqlash',
+    rcSaved: 'Saqlandi — faqat shu qurilmada',
+    rcTitle: 'Saqlangan yozuvlar',
+    rcNote: 'Serverga hech narsa yuborilmaydi. Yozuvlar faqat shu qurilmada, istalgan payt oʻchiriladi.',
+    rcEmpty: 'Hali yozuv yoʻq. Natija ekranida \'Shu qurilmaga saqlash\' tugmasini bosing.',
+    rcView: 'Qayta koʻrish',
+    rcDelete: 'Oʻchirish',
+    rcMeta: 'xavf {n} · band {total}',
+  },
+  si: {
+    rcNav: 'මගේ වාර්තා',
+    rcSave: 'මෙම උපකරණයේ සුරකින්න',
+    rcSaved: 'සුරැකිණි — මෙම උපකරණයේ පමණි',
+    rcTitle: 'සුරැකි වාර්තා',
+    rcNote: 'සර්වරයට කිසිවක් නොයවයි. වාර්තා මෙම උපකරණයේ පමණක් ඇති අතර ඕනෑම විටෙක මැකිය හැක.',
+    rcEmpty: 'තවම වාර්තා නැත. ප්‍රතිඵල තිරයේ \'මෙම උපකරණයේ සුරකින්න\' ඔබන්න.',
+    rcView: 'නැවත බලන්න',
+    rcDelete: 'මකන්න',
+    rcMeta: 'අවදානම් {n} · වගන්ති {total}',
+  },
+  bn: {
+    rcNav: 'আমার রেকর্ড',
+    rcSave: 'এই ডিভাইসে সংরক্ষণ',
+    rcSaved: 'সংরক্ষিত — শুধু এই ডিভাইসে',
+    rcTitle: 'সংরক্ষিত রেকর্ড',
+    rcNote: 'সার্ভারে কিছুই পাঠানো হয় না। রেকর্ড শুধু এই ডিভাইসে থাকে, যখন খুশি মুছতে পারেন।',
+    rcEmpty: 'এখনো রেকর্ড নেই। ফলাফল স্ক্রিনে \'এই ডিভাইসে সংরক্ষণ\' চাপুন।',
+    rcView: 'আবার দেখুন',
+    rcDelete: 'মুছুন',
+    rcMeta: 'ঝুঁকি {n} · ধারা {total}',
+  },
+  ru: {
+    rcNav: 'Мои записи',
+    rcSave: 'Сохранить на этом устройстве',
+    rcSaved: 'Сохранено — только на этом устройстве',
+    rcTitle: 'Сохранённые записи',
+    rcNote: 'На сервер ничего не отправляется. Записи только на этом устройстве, удалить можно в любой момент.',
+    rcEmpty: 'Записей пока нет. Нажмите «Сохранить на этом устройстве» на экране результатов.',
+    rcView: 'Открыть снова',
+    rcDelete: 'Удалить',
+    rcMeta: 'риск {n} · пунктов {total}',
+  },
+  ja: {
+    rcNav: 'マイ記録',
+    rcSave: 'この端末に保存',
+    rcSaved: '保存しました — この端末のみ',
+    rcTitle: '保存された記録',
+    rcNote: 'サーバーには何も送信されません。記録はこの端末のみにあり、いつでも削除できます。',
+    rcEmpty: 'まだ記録がありません。結果画面で「この端末に保存」を押すとここに貯まります。',
+    rcView: 'もう一度見る',
+    rcDelete: '削除',
+    rcMeta: '危険{n}件 · 条項{total}件',
+  },
+}
+
+/* --- 제휴·API 안내 (#85 BM v1) ---
+   대상이 사업자(B2B)라 ko/en만 실번역 — 나머지 14개 언어는 t()의 en 폴백을
+   그대로 쓴다(Partial). 일반 사용자 플로우가 아니므로 전 언어 번역 대비
+   유지비를 줄이는 명시적 결정. */
+type ApiKey =
+  | 'apiTitle' | 'apiSubtitle'
+  | 'apiPoint1Title' | 'apiPoint1Body' | 'apiPoint2Title' | 'apiPoint2Body'
+  | 'apiPoint3Title' | 'apiPoint3Body'
+  | 'apiUseTitle' | 'apiUse1' | 'apiUse2' | 'apiUse3'
+  | 'apiHowTitle' | 'apiHowBody' | 'apiStageTitle' | 'apiStageBody'
+  | 'apiLegal' | 'apiContactCta' | 'apiBack' | 'apiFooterLink'
+
+const UI_API: Partial<Record<LangCode, Record<ApiKey, string>>> = {
+  ko: {
+    apiTitle: '조목조목 API — 계약서 위험분석을 당신의 서비스에',
+    apiSubtitle:
+      '이 사이트가 쓰는 분석 파이프라인을 그대로 API로 제공합니다. 조항 분리부터 위험 판정·쉬운 설명·확인 질문 생성까지, 검증 게이트를 통과한 결과만 반환합니다.',
+    apiPoint1Title: '검증된 결과만 반환',
+    apiPoint1Body:
+      '모든 응답은 LLM 심사(judge)의 충실성 하드페일 게이트를 통과해야 나갑니다. 기준 미달이면 재생성하거나 "검토 필요"로 표시합니다.',
+    apiPoint2Title: '인용은 코드로 검사',
+    apiPoint2Body:
+      '위험 근거의 원문 인용이 실제 조항에 존재하는지 확률이 아니라 규칙 코드로 검사해, 창작된 인용이 응답에 실리지 않습니다.',
+    apiPoint3Title: '무저장 원칙',
+    apiPoint3Body:
+      '계약서 내용을 서버에 저장하지 않고, 외부 LLM 전송 전에 주민번호·전화·계좌를 규칙으로 마스킹합니다. 로그에는 계약 내용을 남기지 않습니다.',
+    apiUseTitle: '이런 곳에 붙일 수 있어요',
+    apiUse1: '부동산 중개 플랫폼 — 매물 계약서 업로드 시 위험 조항 배지·요약 표시',
+    apiUse2: '금융사 비대면 대출·보험 약정 화면 — 서명 전 쉬운 설명과 확인 질문 자동 제공',
+    apiUse3: '전자계약·전자서명 서비스 — 서명 직전 위험 조항 하이라이트 단계 추가',
+    apiHowTitle: '어떻게 동작하나요',
+    apiHowBody:
+      '이 데모 사이트가 지금 쓰는 것과 동일한 계약(NDJSON 스트리밍)입니다. 조항이 분석되는 대로 결과가 스트리밍되고, 마지막에 검증 점수가 붙습니다.',
+    apiStageTitle: '도입 단계',
+    apiStageBody:
+      '현재는 챌린지 기간 무료 공개 단계이며, 파트너 파일럿을 거쳐 정식 과금 조건을 확정할 예정입니다. 과금 체계는 파일럿 결과와 함께 공개합니다.',
+    apiLegal:
+      '본 API의 결과는 참고용 정보이며 법률 자문이 아닙니다. 최종 판단과 고객 고지 책임은 도입 서비스에 있으며, 위험 조항에는 전문가 확인 안내를 함께 노출하는 것을 권장합니다.',
+    apiContactCta: '도입 문의 (GitHub Issues)',
+    apiBack: '홈으로',
+    apiFooterLink: '제휴·API 안내',
+  },
+  en: {
+    apiTitle: 'Jomokjomok API — contract risk analysis for your service',
+    apiSubtitle:
+      'The same pipeline behind this site, offered as an API: clause splitting, risk verdicts, plain-language explanations and check questions — only results that pass our verification gate are returned.',
+    apiPoint1Title: 'Only verified results',
+    apiPoint1Body:
+      'Every response must pass an LLM-judge faithfulness hard-fail gate. Below-threshold outputs are regenerated or flagged "needs review".',
+    apiPoint2Title: 'Citations checked by code',
+    apiPoint2Body:
+      'Whether quoted evidence actually exists in the clause is verified by rule-based code, not probability — fabricated quotes never ship.',
+    apiPoint3Title: 'Zero retention',
+    apiPoint3Body:
+      'Contract content is never stored server-side. Personal identifiers are masked by rules before any LLM call, and logs contain no contract text.',
+    apiUseTitle: 'Where it fits',
+    apiUse1: 'Real-estate platforms — risk badges and summaries when a lease contract is uploaded',
+    apiUse2: 'Digital lending / insurance flows — plain explanations and check questions before signing',
+    apiUse3: 'E-contract / e-signature services — a risk-highlight step right before signature',
+    apiHowTitle: 'How it works',
+    apiHowBody:
+      'Identical contract to what this demo site uses (NDJSON streaming): clause results stream as they are analyzed, followed by verification scores.',
+    apiStageTitle: 'Rollout',
+    apiStageBody:
+      'Currently free during the challenge period; pricing will be finalized and published after partner pilots.',
+    apiLegal:
+      'API results are informational and not legal advice. Final judgment and end-user disclosure remain the integrating service\'s responsibility; we recommend surfacing "consult a professional" guidance on risky clauses.',
+    apiContactCta: 'Contact us (GitHub Issues)',
+    apiBack: 'Back to home',
+    apiFooterLink: 'Partners & API',
+  },
+}
+
+type DownloadKey =
+  | 'dlBtn' | 'dlNote' | 'dlFilename'
+
+// 결과 텍스트 다운로드 (#126 v1 — 점자단말기는 txt를 자체 점역하는 게 표준 사용)
+const UI_DOWNLOAD: Record<LangCode, Record<DownloadKey, string>> = {
+  ko: { dlBtn: '결과를 텍스트 파일로 저장', dlNote: '점자정보단말기·문서 앱에서 그대로 읽을 수 있어요. 단말기는 텍스트를 자체 점역해요.', dlFilename: '조목조목_분석결과' },
+  en: { dlBtn: 'Save results as a text file', dlNote: 'Readable on braille displays and document apps — braille devices transcribe text themselves.', dlFilename: 'jomokjomok_results' },
+  zh: { dlBtn: '将结果保存为文本文件', dlNote: '可在点字信息终端和文档应用中直接阅读 — 终端会自行转换点字。', dlFilename: 'jomokjomok_结果' },
+  vi: { dlBtn: 'Lưu kết quả thành tệp văn bản', dlNote: 'Đọc được trên thiết bị chữ nổi và ứng dụng tài liệu — thiết bị tự chuyển chữ nổi.', dlFilename: 'jomokjomok_ketqua' },
+  th: { dlBtn: 'บันทึกผลเป็นไฟล์ข้อความ', dlNote: 'อ่านได้บนเครื่องอ่านอักษรเบรลล์และแอปเอกสาร — เครื่องแปลงเป็นเบรลล์เอง', dlFilename: 'jomokjomok_ผลลัพธ์' },
+  id: { dlBtn: 'Simpan hasil sebagai berkas teks', dlNote: 'Terbaca di perangkat braille dan aplikasi dokumen — perangkat mentranskripsi sendiri.', dlFilename: 'jomokjomok_hasil' },
+  tl: { dlBtn: 'I-save ang resulta bilang text file', dlNote: 'Nababasa sa braille display at document apps — ang device mismo ang nagta-transcribe.', dlFilename: 'jomokjomok_resulta' },
+  ne: { dlBtn: 'नतिजा टेक्स्ट फाइलमा सेभ', dlNote: 'ब्रेल उपकरण र कागजात एपमा पढ्न मिल्छ — उपकरणले आफैँ ब्रेलमा बदल्छ।', dlFilename: 'jomokjomok_natija' },
+  km: { dlBtn: 'រក្សាទុកលទ្ធផលជាឯកសារអត្ថបទ', dlNote: 'អានបានលើឧបករណ៍អក្សរផុស និងកម្មវិធីឯកសារ — ឧបករណ៍បម្លែងខ្លួនឯង។', dlFilename: 'jomokjomok_lotphol' },
+  my: { dlBtn: 'ရလဒ်ကို စာသားဖိုင်အဖြစ်သိမ်းရန်', dlNote: 'braille ကိရိယာနှင့် စာရွက်စာတမ်းအက်ပ်တွင် ဖတ်နိုင် — ကိရိယာက ကိုယ်တိုင်ပြောင်းသည်။', dlFilename: 'jomokjomok_ရလဒ်' },
+  mn: { dlBtn: 'Үр дүнг текст файлаар хадгалах', dlNote: 'Брайл төхөөрөмж болон баримтын аппаар уншина — төхөөрөмж өөрөө хөрвүүлнэ.', dlFilename: 'jomokjomok_urdun' },
+  uz: { dlBtn: 'Natijani matn fayli sifatida saqlash', dlNote: 'Brayl qurilmalari va hujjat ilovalarida oʻqiladi — qurilma oʻzi transkripsiya qiladi.', dlFilename: 'jomokjomok_natija' },
+  si: { dlBtn: 'ප්‍රතිඵල පෙළ ගොනුවක් ලෙස සුරකින්න', dlNote: 'බ්‍රේල් උපකරණ සහ ලේඛන යෙදුම්වල කියවිය හැක — උපකරණය තනිව පරිවර්තනය කරයි.', dlFilename: 'jomokjomok_prathipala' },
+  bn: { dlBtn: 'ফলাফল টেক্সট ফাইলে সংরক্ষণ', dlNote: 'ব্রেইল ডিভাইস ও ডকুমেন্ট অ্যাপে পড়া যায় — ডিভাইস নিজেই ব্রেইলে রূপান্তর করে।', dlFilename: 'jomokjomok_folafol' },
+  ru: { dlBtn: 'Сохранить результаты текстовым файлом', dlNote: 'Читается на брайлевских дисплеях и в приложениях — устройство само транскрибирует.', dlFilename: 'jomokjomok_rezultaty' },
+  ja: { dlBtn: '結果をテキストファイルで保存', dlNote: '点字情報端末や文書アプリでそのまま読めます — 端末が自動で点訳します。', dlFilename: 'jomokjomok_結果' },
+}
+
+type FeedbackKey =
+  | 'fbTitle' | 'fbNote' | 'fbBad' | 'fbOkay' | 'fbGood' | 'fbThanks'
+
+// 사람 평가 수집 카드 (자문 §6 — 만족도·소요시간)
+const UI_FEEDBACK: Record<LangCode, Record<FeedbackKey, string>> = {
+  ko: {
+    fbTitle: '이 분석이 도움이 됐나요?', fbNote: '의견은 이 기기에만 익명으로 저장돼요 — 서비스 개선에 사용됩니다.', fbBad: '아쉬워요', fbOkay: '보통이에요', fbGood: '도움됐어요', fbThanks: '의견 감사해요!',
+  },
+  en: {
+    fbTitle: 'Was this analysis helpful?', fbNote: 'Feedback is stored anonymously on this device only — used to improve the service.', fbBad: 'Not really', fbOkay: 'It was okay', fbGood: 'Helpful', fbThanks: 'Thanks for your feedback!',
+  },
+  zh: {
+    fbTitle: '这次分析有帮助吗？', fbNote: '反馈仅匿名保存在本设备上，用于改进服务。', fbBad: '不太行', fbOkay: '一般', fbGood: '有帮助', fbThanks: '感谢您的反馈！',
+  },
+  vi: {
+    fbTitle: 'Phân tích này có hữu ích không?', fbNote: 'Phản hồi chỉ được lưu ẩn danh trên thiết bị này — dùng để cải thiện dịch vụ.', fbBad: 'Chưa tốt', fbOkay: 'Bình thường', fbGood: 'Hữu ích', fbThanks: 'Cảm ơn phản hồi của bạn!',
+  },
+  th: {
+    fbTitle: 'การวิเคราะห์นี้มีประโยชน์ไหม?', fbNote: 'ความเห็นถูกเก็บแบบไม่ระบุตัวตนบนอุปกรณ์นี้เท่านั้น เพื่อปรับปรุงบริการ', fbBad: 'ยังไม่ดี', fbOkay: 'พอใช้', fbGood: 'มีประโยชน์', fbThanks: 'ขอบคุณสำหรับความเห็น!',
+  },
+  id: {
+    fbTitle: 'Apakah analisis ini membantu?', fbNote: 'Masukan disimpan anonim hanya di perangkat ini — untuk perbaikan layanan.', fbBad: 'Kurang', fbOkay: 'Biasa saja', fbGood: 'Membantu', fbThanks: 'Terima kasih atas masukannya!',
+  },
+  tl: {
+    fbTitle: 'Nakatulong ba ang pagsusuring ito?', fbNote: 'Ang feedback ay naka-save nang anonymous sa device na ito lamang — gagamitin sa pagpapabuti.', fbBad: 'Hindi gaano', fbOkay: 'Okay lang', fbGood: 'Nakatulong', fbThanks: 'Salamat sa feedback!',
+  },
+  ne: {
+    fbTitle: 'यो विश्लेषण उपयोगी थियो?', fbNote: 'प्रतिक्रिया यही यन्त्रमा मात्र गुमनाम रूपमा सुरक्षित हुन्छ — सेवा सुधारमा प्रयोग हुन्छ।', fbBad: 'राम्रो भएन', fbOkay: 'ठिकै', fbGood: 'उपयोगी', fbThanks: 'प्रतिक्रियाका लागि धन्यवाद!',
+  },
+  km: {
+    fbTitle: 'ការវិភាគនេះមានប្រយោជន៍ទេ?', fbNote: 'មតិរក្សាទុកអនាមិកតែក្នុងឧបករណ៍នេះ — ប្រើសម្រាប់កែលម្អសេវា។', fbBad: 'មិនសូវល្អ', fbOkay: 'ធម្មតា', fbGood: 'មានប្រយោជន៍', fbThanks: 'អរគុណចំពោះមតិ!',
+  },
+  my: {
+    fbTitle: 'ဤစိစစ်မှုက အထောက်အကူဖြစ်ခဲ့လား?', fbNote: 'အကြံပြုချက်ကို ဤစက်တွင်သာ အမည်မသိသိမ်းပြီး ဝန်ဆောင်မှုတိုးတက်ရေးအတွက် သုံးသည်။', fbBad: 'သိပ်မကောင်း', fbOkay: 'အသင့်အတင့်', fbGood: 'အထောက်အကူဖြစ်', fbThanks: 'အကြံပြုချက်အတွက် ကျေးဇူးတင်ပါသည်!',
+  },
+  mn: {
+    fbTitle: 'Энэ шинжилгээ тус болсон уу?', fbNote: 'Санал зөвхөн энэ төхөөрөмжид нэргүйгээр хадгалагдана — үйлчилгээг сайжруулахад ашиглана.', fbBad: 'Тааруухан', fbOkay: 'Дунд зэрэг', fbGood: 'Тус болсон', fbThanks: 'Санал өгсөнд баярлалаа!',
+  },
+  uz: {
+    fbTitle: 'Bu tahlil foydali boʻldimi?', fbNote: 'Fikr faqat shu qurilmada anonim saqlanadi — xizmatni yaxshilashga ishlatiladi.', fbBad: 'Unchalik emas', fbOkay: 'Oʻrtacha', fbGood: 'Foydali', fbThanks: 'Fikringiz uchun rahmat!',
+  },
+  si: {
+    fbTitle: 'මෙම විශ්ලේෂණය ප්‍රයෝජනවත් වුණාද?', fbNote: 'අදහස මෙම උපකරණයේ පමණක් නිර්නාමිකව සුරැකේ — සේවා වැඩිදියුණුවට යොදාගැනේ.', fbBad: 'එතරම් නැහැ', fbOkay: 'සාමාන්‍යයි', fbGood: 'ප්‍රයෝජනවත්', fbThanks: 'අදහසට ස්තුතියි!',
+  },
+  bn: {
+    fbTitle: 'এই বিশ্লেষণ কি সহায়ক ছিল?', fbNote: 'মতামত শুধু এই ডিভাইসে বেনামে সংরক্ষিত হয় — সেবা উন্নতিতে ব্যবহৃত হয়।', fbBad: 'তেমন না', fbOkay: 'মোটামুটি', fbGood: 'সহায়ক', fbThanks: 'মতামতের জন্য ধন্যবাদ!',
+  },
+  ru: {
+    fbTitle: 'Был ли этот анализ полезен?', fbNote: 'Отзыв хранится анонимно только на этом устройстве — для улучшения сервиса.', fbBad: 'Не очень', fbOkay: 'Нормально', fbGood: 'Полезно', fbThanks: 'Спасибо за отзыв!',
+  },
+  ja: {
+    fbTitle: 'この分析は役に立ちましたか？', fbNote: 'フィードバックはこの端末にのみ匿名で保存され、サービス改善に使われます。', fbBad: 'いまいち', fbOkay: 'ふつう', fbGood: '役に立った', fbThanks: 'フィードバックありがとうございます！',
+  },
+}
+
+type JudgeKey =
+  | 'jgTitle' | 'jgDesc' | 'jgPass' | 'jgNeedsReview' | 'jgRetryNone' | 'jgRetryN' | 'jgClarity' | 'jgFaith' | 'jgCoverage' | 'jgAction' | 'jgScale'
+
+// AI 검증 리포트 카드 (#53)
+const UI_JUDGE: Record<LangCode, Record<JudgeKey, string>> = {
+  ko: {
+    jgTitle: 'AI 검증 리포트',
+    jgDesc: '별도의 채점 AI가 4가지 기준으로 이 결과를 검증했어요. 기준 미달이면 다시 생성하고, 끝까지 미달이면 \'검토 필요\'로 표시해요.',
+    jgPass: '검증 통과',
+    jgNeedsReview: '기준 미달 — 검토 필요: 판정을 그대로 믿지 말고 원문을 함께 확인하세요',
+    jgRetryNone: '한 번에 통과',
+    jgRetryN: '재생성 {n}회 후 결과',
+    jgClarity: '이해 쉬움',
+    jgFaith: '원문 충실',
+    jgCoverage: '위험 포착',
+    jgAction: '행동 안내',
+    jgScale: '5점 만점',
+  },
+  en: {
+    jgTitle: 'AI verification report',
+    jgDesc: 'A separate judge AI verified this result on 4 criteria. Below-threshold results are regenerated; if still failing, marked \'needs review\'.',
+    jgPass: 'Verification passed',
+    jgNeedsReview: 'Below threshold — needs review: don\'t take verdicts at face value, check the original text',
+    jgRetryNone: 'Passed on first try',
+    jgRetryN: 'Result after {n} regeneration(s)',
+    jgClarity: 'Clarity',
+    jgFaith: 'Faithfulness',
+    jgCoverage: 'Risk coverage',
+    jgAction: 'Actionability',
+    jgScale: 'out of 5',
+  },
+  zh: {
+    jgTitle: 'AI 验证报告',
+    jgDesc: '独立的评审 AI 按 4 项标准验证了本结果。未达标会重新生成，仍未达标则标记为\'需复核\'。',
+    jgPass: '验证通过',
+    jgNeedsReview: '未达标 — 需复核：请勿直接采信判定，务必对照原文',
+    jgRetryNone: '一次通过',
+    jgRetryN: '重新生成 {n} 次后的结果',
+    jgClarity: '易懂性',
+    jgFaith: '忠实原文',
+    jgCoverage: '风险覆盖',
+    jgAction: '行动指引',
+    jgScale: '满分5分',
+  },
+  vi: {
+    jgTitle: 'Báo cáo kiểm chứng AI',
+    jgDesc: 'Một AI chấm điểm riêng đã kiểm chứng kết quả theo 4 tiêu chí. Dưới ngưỡng sẽ tạo lại; vẫn không đạt thì đánh dấu \'cần xem xét\'.',
+    jgPass: 'Đã qua kiểm chứng',
+    jgNeedsReview: 'Dưới ngưỡng — cần xem xét: đừng tin ngay phán định, hãy đối chiếu nguyên văn',
+    jgRetryNone: 'Đạt ngay lần đầu',
+    jgRetryN: 'Kết quả sau {n} lần tạo lại',
+    jgClarity: 'Dễ hiểu',
+    jgFaith: 'Trung thực nguyên văn',
+    jgCoverage: 'Bao quát rủi ro',
+    jgAction: 'Hướng dẫn hành động',
+    jgScale: 'trên 5 điểm',
+  },
+  th: {
+    jgTitle: 'รายงานการตรวจสอบ AI',
+    jgDesc: 'AI ผู้ตรวจแยกต่างหากตรวจผลนี้ตาม 4 เกณฑ์ ต่ำกว่าเกณฑ์จะสร้างใหม่ หากยังไม่ผ่านจะติดป้าย \'ต้องตรวจทาน\'',
+    jgPass: 'ผ่านการตรวจสอบ',
+    jgNeedsReview: 'ต่ำกว่าเกณฑ์ — ต้องตรวจทาน: อย่าเชื่อคำตัดสินทันที โปรดเทียบต้นฉบับ',
+    jgRetryNone: 'ผ่านในครั้งเดียว',
+    jgRetryN: 'ผลหลังสร้างใหม่ {n} ครั้ง',
+    jgClarity: 'เข้าใจง่าย',
+    jgFaith: 'ตรงต้นฉบับ',
+    jgCoverage: 'ครอบคลุมความเสี่ยง',
+    jgAction: 'แนวทางปฏิบัติ',
+    jgScale: 'เต็ม 5 คะแนน',
+  },
+  id: {
+    jgTitle: 'Laporan verifikasi AI',
+    jgDesc: 'AI penilai terpisah memverifikasi hasil ini dengan 4 kriteria. Di bawah ambang dibuat ulang; jika tetap gagal, ditandai \'perlu ditinjau\'.',
+    jgPass: 'Lolos verifikasi',
+    jgNeedsReview: 'Di bawah ambang — perlu ditinjau: jangan langsung percaya, periksa teks asli',
+    jgRetryNone: 'Lolos sekali jalan',
+    jgRetryN: 'Hasil setelah {n} kali regenerasi',
+    jgClarity: 'Mudah dipahami',
+    jgFaith: 'Setia pada teks',
+    jgCoverage: 'Cakupan risiko',
+    jgAction: 'Panduan tindakan',
+    jgScale: 'dari 5',
+  },
+  tl: {
+    jgTitle: 'Ulat ng AI verification',
+    jgDesc: 'Hiwalay na judge AI ang nag-verify sa resulta ayon sa 4 na pamantayan. Kapag kulang, muling bubuo; kapag bagsak pa rin, mamarkahang \'needs review\'.',
+    jgPass: 'Pumasa sa verification',
+    jgNeedsReview: 'Kulang sa pamantayan — needs review: huwag basta paniwalaan, itugma sa orihinal na teksto',
+    jgRetryNone: 'Pumasa agad',
+    jgRetryN: 'Resulta pagkatapos ng {n} regeneration',
+    jgClarity: 'Kalinawan',
+    jgFaith: 'Tapat sa teksto',
+    jgCoverage: 'Saklaw ng panganib',
+    jgAction: 'Gabay sa aksyon',
+    jgScale: 'sa 5',
+  },
+  ne: {
+    jgTitle: 'एआई प्रमाणीकरण रिपोर्ट',
+    jgDesc: 'छुट्टै जज एआईले ४ मापदण्डमा यो नतिजा जाँच्यो। मापदण्ड नपुगे पुनः बनाइन्छ; अझै नपुगे \'समीक्षा आवश्यक\' चिन्ह लाग्छ।',
+    jgPass: 'प्रमाणीकरण पास',
+    jgNeedsReview: 'मापदण्ड नपुगेको — समीक्षा आवश्यक: निर्णय सिधै नपत्याउनुहोस्, मूल पाठ हेर्नुहोस्',
+    jgRetryNone: 'एकै पटकमा पास',
+    jgRetryN: '{n} पटक पुनः बनाएपछिको नतिजा',
+    jgClarity: 'बुझ्न सजिलो',
+    jgFaith: 'मूलप्रति निष्ठा',
+    jgCoverage: 'जोखिम समेटाइ',
+    jgAction: 'कार्य मार्गदर्शन',
+    jgScale: '५ मध्ये',
+  },
+  km: {
+    jgTitle: 'របាយការណ៍ផ្ទៀងផ្ទាត់ AI',
+    jgDesc: 'AI វិនិច្ឆ័យដាច់ដោយឡែកបានផ្ទៀងផ្ទាត់លទ្ធផលនេះតាមលក្ខណៈវិនិច្ឆ័យ ៤។ ក្រោមកម្រិតនឹងបង្កើតឡើងវិញ; បើនៅតែមិនគ្រប់ នឹងសម្គាល់ \'ត្រូវពិនិត្យ\'។',
+    jgPass: 'ឆ្លងការផ្ទៀងផ្ទាត់',
+    jgNeedsReview: 'ក្រោមកម្រិត — ត្រូវពិនិត្យ: កុំជឿការវិនិច្ឆ័យភ្លាមៗ សូមផ្ទៀងអត្ថបទដើម',
+    jgRetryNone: 'ឆ្លងតែម្ដង',
+    jgRetryN: 'លទ្ធផលក្រោយបង្កើតឡើងវិញ {n} ដង',
+    jgClarity: 'ងាយយល់',
+    jgFaith: 'ស្មោះនឹងអត្ថបទ',
+    jgCoverage: 'គ្របដណ្ដប់ហានិភ័យ',
+    jgAction: 'ការណែនាំសកម្មភាព',
+    jgScale: 'ក្នុង ៥ ពិន្ទុ',
+  },
+  my: {
+    jgTitle: 'AI စိစစ်မှုအစီရင်ခံစာ',
+    jgDesc: 'သီးခြားအကဲဖြတ် AI က ဤရလဒ်ကို စံ ၄ ခုဖြင့် စိစစ်သည်။ စံမမီလျှင် ပြန်ဖန်တီးပြီး နောက်ဆုံးမမီလျှင် \'ပြန်စစ်ရန်\' တံဆိပ်တပ်သည်။',
+    jgPass: 'စိစစ်မှုအောင်',
+    jgNeedsReview: 'စံမမီ — ပြန်စစ်ရန်: ဆုံးဖြတ်ချက်ကို ချက်ချင်းမယုံပါနှင့်၊ မူရင်းနှင့်တိုက်ဆိုင်ပါ',
+    jgRetryNone: 'တစ်ကြိမ်တည်းအောင်',
+    jgRetryN: '{n} ကြိမ်ပြန်ဖန်တီးပြီးနောက်ရလဒ်',
+    jgClarity: 'နားလည်လွယ်',
+    jgFaith: 'မူရင်းသစ္စာ',
+    jgCoverage: 'အန္တရာယ်လွှမ်းခြုံ',
+    jgAction: 'လုပ်ဆောင်လမ်းညွှန်',
+    jgScale: '၅ မှတ်အပြည့်',
+  },
+  mn: {
+    jgTitle: 'AI баталгаажуулалтын тайлан',
+    jgDesc: 'Тусдаа шүүгч AI энэ үр дүнг 4 шалгуураар баталгаажууллаа. Босго хүрэхгүй бол дахин үүсгэж, эцэст нь хүрэхгүй бол \'хянах шаардлагатай\' гэж тэмдэглэнэ.',
+    jgPass: 'Баталгаажуулалт давсан',
+    jgNeedsReview: 'Босго хүрээгүй — хянах шаардлагатай: шийдвэрт шууд бүү итгэ, эх бичвэртэй тулга',
+    jgRetryNone: 'Нэг удаад давсан',
+    jgRetryN: '{n} удаа дахин үүсгэсний дараах үр дүн',
+    jgClarity: 'Ойлгомжтой',
+    jgFaith: 'Эхэд үнэнч',
+    jgCoverage: 'Эрсдэл хамрах',
+    jgAction: 'Үйлдлийн заавар',
+    jgScale: '5 онооноос',
+  },
+  uz: {
+    jgTitle: 'AI tekshiruv hisoboti',
+    jgDesc: 'Alohida baholovchi AI bu natijani 4 mezon boʻyicha tekshirdi. Chegaradan past boʻlsa qayta yaratiladi; baribir oʻtmasa \'koʻrib chiqish kerak\' belgisi qoʻyiladi.',
+    jgPass: 'Tekshiruvdan oʻtdi',
+    jgNeedsReview: 'Chegaradan past — koʻrib chiqish kerak: hukmga darhol ishonmang, asl matn bilan solishtiring',
+    jgRetryNone: 'Bir urinishda oʻtdi',
+    jgRetryN: '{n} marta qayta yaratishdan keyingi natija',
+    jgClarity: 'Tushunarlilik',
+    jgFaith: 'Matnga sodiqlik',
+    jgCoverage: 'Xavf qamrovi',
+    jgAction: 'Harakat yoʻriqnomasi',
+    jgScale: '5 balldan',
+  },
+  si: {
+    jgTitle: 'AI සත්‍යාපන වාර්තාව',
+    jgDesc: 'වෙනම විනිශ්චය AI මෙම ප්‍රතිඵලය නිර්ණායක 4කින් සත්‍යාපනය කළා. සීමාවට අඩු නම් නැවත සාදයි; තවමත් අසමත් නම් \'සමාලෝචනය අවශ්‍යයි\' ලෙස සලකුණු වේ.',
+    jgPass: 'සත්‍යාපනය සමත්',
+    jgNeedsReview: 'සීමාවට අඩුයි — සමාලෝචනය අවශ්‍යයි: තීන්දුව කෙළින්ම විශ්වාස නොකර මුල් පිටපත සසඳන්න',
+    jgRetryNone: 'එක් වරකින් සමත්',
+    jgRetryN: '{n} වරක් නැවත සෑදීමෙන් පසු ප්‍රතිඵලය',
+    jgClarity: 'පහසුවෙන් තේරෙන',
+    jgFaith: 'මුල් පිටපතට විශ්වාසී',
+    jgCoverage: 'අවදානම් ආවරණය',
+    jgAction: 'ක්‍රියා මාර්ගෝපදේශ',
+    jgScale: 'ලකුණු 5න්',
+  },
+  bn: {
+    jgTitle: 'এআই যাচাই প্রতিবেদন',
+    jgDesc: 'আলাদা বিচারক এআই ৪টি মানদণ্ডে এই ফলাফল যাচাই করেছে। মান না হলে আবার তৈরি হয়; তবুও ব্যর্থ হলে \'পর্যালোচনা দরকার\' চিহ্ন পড়ে।',
+    jgPass: 'যাচাই পাস',
+    jgNeedsReview: 'মানের নিচে — পর্যালোচনা দরকার: রায় সরাসরি বিশ্বাস না করে মূল লেখার সাথে মিলিয়ে দেখুন',
+    jgRetryNone: 'একবারেই পাস',
+    jgRetryN: '{n} বার পুনঃতৈরির পরের ফলাফল',
+    jgClarity: 'সহজবোধ্যতা',
+    jgFaith: 'মূলের প্রতি বিশ্বস্ত',
+    jgCoverage: 'ঝুঁকি কভারেজ',
+    jgAction: 'করণীয় নির্দেশনা',
+    jgScale: '৫-এর মধ্যে',
+  },
+  ru: {
+    jgTitle: 'Отчёт проверки ИИ',
+    jgDesc: 'Отдельный ИИ-судья проверил результат по 4 критериям. Ниже порога — повторная генерация; если снова не прошло — пометка \'требует проверки\'.',
+    jgPass: 'Проверка пройдена',
+    jgNeedsReview: 'Ниже порога — требует проверки: не принимайте вердикты на веру, сверяйте с оригиналом',
+    jgRetryNone: 'Пройдено с первого раза',
+    jgRetryN: 'Результат после {n} регенерации(й)',
+    jgClarity: 'Понятность',
+    jgFaith: 'Верность тексту',
+    jgCoverage: 'Охват рисков',
+    jgAction: 'Практические шаги',
+    jgScale: 'из 5',
+  },
+  ja: {
+    jgTitle: 'AI検証レポート',
+    jgDesc: '別の採点AIが4つの基準でこの結果を検証しました。基準未達なら再生成し、それでも未達なら「要確認」と表示します。',
+    jgPass: '検証通過',
+    jgNeedsReview: '基準未達 — 要確認：判定を鵜呑みにせず、原文と照合してください',
+    jgRetryNone: '一発通過',
+    jgRetryN: '再生成{n}回後の結果',
+    jgClarity: 'わかりやすさ',
+    jgFaith: '原文への忠実さ',
+    jgCoverage: 'リスク網羅',
+    jgAction: '行動の指針',
+    jgScale: '5点満点',
+  },
+}
+
+type WarnKey =
+  | 'wnPii' | 'wnByulji' | 'wnLowCoverage' | 'wnInjection'
+
+// parse_warnings 현지화 (#86-② — agent warning_codes.py와 코드 정렬)
+const UI_WARNINGS: Record<LangCode, Record<WarnKey, string>> = {
+  ko: {
+    wnPii: '개인정보(전화번호·주민등록번호 등)를 자동으로 가렸어요. 분석에는 영향이 없어요.',
+    wnByulji: '별지(첨부 문서) 이후 내용은 분석에서 제외했어요. 중요한 내용이 있다면 그 부분만 따로 붙여넣어 다시 분석해 보세요.',
+    wnLowCoverage: '문서 일부가 조항으로 분리되지 않았어요. 빠진 조항이 없는지 원문과 대조해 확인하세요.',
+    wnInjection: '이 문서에서 AI 분석을 조작하려는 문구가 감지됐어요. 판정을 그대로 믿지 말고 원문을 직접 확인하세요.',
+  },
+  en: {
+    wnPii: 'Personal data (phone, ID numbers, etc.) was masked automatically. Analysis is unaffected.',
+    wnByulji: 'Content after attachments was excluded. If it matters, paste that part separately and re-analyze.',
+    wnLowCoverage: 'Part of the document couldn\'t be split into clauses. Cross-check the original for missing clauses.',
+    wnInjection: 'Text attempting to manipulate the AI analysis was detected. Don\'t take verdicts at face value — check the original.',
+  },
+  zh: {
+    wnPii: '已自动遮盖个人信息（电话、身份证号等），不影响分析。',
+    wnByulji: '附件之后的内容未纳入分析。如有重要内容，请单独粘贴后重新分析。',
+    wnLowCoverage: '文档部分内容未能拆分为条款。请对照原文确认有无遗漏。',
+    wnInjection: '检测到试图操纵AI分析的文字。请勿直接采信判定，务必核对原文。',
+  },
+  vi: {
+    wnPii: 'Thông tin cá nhân (điện thoại, số định danh...) đã được che tự động. Không ảnh hưởng phân tích.',
+    wnByulji: 'Nội dung sau phụ lục đã bị loại khỏi phân tích. Nếu quan trọng, dán riêng phần đó và phân tích lại.',
+    wnLowCoverage: 'Một phần tài liệu không tách được thành điều khoản. Đối chiếu nguyên văn xem có thiếu không.',
+    wnInjection: 'Phát hiện văn bản cố thao túng phân tích AI. Đừng tin ngay phán định — kiểm tra nguyên văn.',
+  },
+  th: {
+    wnPii: 'ปิดบังข้อมูลส่วนตัว (เบอร์โทร เลขประจำตัว ฯลฯ) โดยอัตโนมัติ ไม่กระทบการวิเคราะห์',
+    wnByulji: 'เนื้อหาหลังเอกสารแนบไม่ถูกวิเคราะห์ หากสำคัญ ให้วางส่วนนั้นแยกแล้ววิเคราะห์ใหม่',
+    wnLowCoverage: 'เอกสารบางส่วนแยกเป็นข้อไม่ได้ โปรดเทียบต้นฉบับว่าไม่มีข้อตกหล่น',
+    wnInjection: 'พบข้อความพยายามบิดเบือนการวิเคราะห์ AI อย่าเชื่อคำตัดสินทันที โปรดตรวจต้นฉบับ',
+  },
+  id: {
+    wnPii: 'Data pribadi (telepon, nomor identitas, dll.) ditutup otomatis. Analisis tidak terpengaruh.',
+    wnByulji: 'Konten setelah lampiran dikecualikan. Jika penting, tempel bagian itu terpisah dan analisis ulang.',
+    wnLowCoverage: 'Sebagian dokumen tidak bisa dipecah jadi pasal. Periksa naskah asli untuk pasal yang hilang.',
+    wnInjection: 'Terdeteksi teks yang mencoba memanipulasi analisis AI. Jangan langsung percaya — periksa naskah asli.',
+  },
+  tl: {
+    wnPii: 'Awtomatikong tinakpan ang personal data (telepono, ID numbers, atbp.). Hindi apektado ang pagsusuri.',
+    wnByulji: 'Hindi kasama sa pagsusuri ang nilalaman pagkatapos ng attachment. Kung mahalaga, i-paste ito nang hiwalay.',
+    wnLowCoverage: 'May bahagi ng dokumento na hindi nahati sa mga probisyon. Itugma sa orihinal.',
+    wnInjection: 'May natuklasang tekstong nagtatangkang manipulahin ang AI. Suriin ang orihinal na teksto.',
+  },
+  ne: {
+    wnPii: 'व्यक्तिगत जानकारी (फोन, परिचय नम्बर आदि) स्वतः लुकाइयो। विश्लेषणमा असर छैन।',
+    wnByulji: 'संलग्नपछिको सामग्री विश्लेषणबाट हटाइयो। महत्त्वपूर्ण भए त्यो भाग अलग टाँसेर पुनः विश्लेषण गर्नुहोस्।',
+    wnLowCoverage: 'कागजातको केही भाग दफामा छुट्टिएन। मूल पाठसँग दाँज्नुहोस्।',
+    wnInjection: 'एआई विश्लेषण बिगार्न खोज्ने पाठ भेटियो। निर्णय सिधै नपत्याई मूल पाठ जाँच्नुहोस्।',
+  },
+  km: {
+    wnPii: 'ព័ត៌មានផ្ទាល់ខ្លួន (ទូរស័ព្ទ លេខអត្តសញ្ញាណ...) ត្រូវបានបិទបាំងស្វ័យប្រវត្តិ។ មិនប៉ះពាល់ការវិភាគ។',
+    wnByulji: 'មាតិកាបន្ទាប់ពីឯកសារភ្ជាប់ត្រូវបានដកចេញ។ បើសំខាន់ សូមបិទភ្ជាប់ផ្នែកនោះដាច់ដោយឡែក ហើយវិភាគម្ដងទៀត។',
+    wnLowCoverage: 'ផ្នែកខ្លះនៃឯកសារមិនអាចបំបែកជាមាត្រា។ សូមផ្ទៀងជាមួយអត្ថបទដើម។',
+    wnInjection: 'រកឃើញអត្ថបទព្យាយាមរៀបចំការវិភាគ AI។ សូមពិនិត្យអត្ថបទដើមដោយផ្ទាល់។',
+  },
+  my: {
+    wnPii: 'ကိုယ်ရေးအချက်အလက် (ဖုန်း၊ မှတ်ပုံတင်နံပါတ်) ကို အလိုအလျောက်ဖုံးကွယ်ထားသည်။ စိစစ်မှုကို မထိခိုက်ပါ။',
+    wnByulji: 'နောက်ဆက်တွဲနောက်ပိုင်း အကြောင်းအရာကို မစိစစ်ပါ။ အရေးကြီးလျှင် ထိုအပိုင်းကို သီးခြားကူးထည့်၍ ပြန်စိစစ်ပါ။',
+    wnLowCoverage: 'စာရွက်စာတမ်းတစ်စိတ်တစ်ပိုင်း အပိုဒ်အဖြစ်မခွဲနိုင်ပါ။ မူရင်းနှင့်တိုက်ဆိုင်ပါ။',
+    wnInjection: 'AI စိစစ်မှုကို လှည့်စားရန်ကြိုးစားသောစာသားတွေ့ရှိ။ မူရင်းကို ကိုယ်တိုင်စစ်ပါ။',
+  },
+  mn: {
+    wnPii: 'Хувийн мэдээллийг (утас, бүртгэлийн дугаар г.м.) автоматаар нуулаа. Шинжилгээнд нөлөөгүй.',
+    wnByulji: 'Хавсралтын дараах агуулгыг шинжилгээнээс хассан. Чухал бол тэр хэсгийг тусад нь буулгаж дахин шинжилнэ үү.',
+    wnLowCoverage: 'Баримтын зарим хэсэг заалт болж салгагдсангүй. Эх бичвэртэй тулгана уу.',
+    wnInjection: 'AI шинжилгээг удирдах гэсэн бичвэр илэрлээ. Шийдвэрт шууд бүү итгэ — эхийг шалгаарай.',
+  },
+  uz: {
+    wnPii: 'Shaxsiy maʼlumotlar (telefon, ID raqamlar) avtomatik yashirildi. Tahlilga taʼsir qilmaydi.',
+    wnByulji: 'Ilovadan keyingi mazmun tahlildan chiqarildi. Muhim boʻlsa, oʻsha qismni alohida joylab qayta tahlil qiling.',
+    wnLowCoverage: 'Hujjatning bir qismi bandlarga boʻlinmadi. Asl matn bilan solishtiring.',
+    wnInjection: 'AI tahlilini boshqarishga urinuvchi matn aniqlandi. Asl matnni oʻzingiz tekshiring.',
+  },
+  si: {
+    wnPii: 'පුද්ගලික තොරතුරු (දුරකථන, හැඳුනුම් අංක ආදිය) ස්වයංක්‍රීයව වසන ලදි. විශ්ලේෂණයට බලපෑමක් නැත.',
+    wnByulji: 'ඇමුණුම්වලට පසු අන්තර්ගතය විශ්ලේෂණයෙන් බැහැර විය. වැදගත් නම් එම කොටස වෙනම අලවා නැවත විශ්ලේෂණය කරන්න.',
+    wnLowCoverage: 'ලේඛනයේ කොටසක් වගන්තිවලට වෙන් නොවිණි. මුල් පිටපත සමඟ සසඳන්න.',
+    wnInjection: 'AI විශ්ලේෂණය හසුරුවන්න උත්සාහ කරන පෙළ හමු විය. මුල් පිටපත ඔබම පරීක්ෂා කරන්න.',
+  },
+  bn: {
+    wnPii: 'ব্যক্তিগত তথ্য (ফোন, পরিচয় নম্বর ইত্যাদি) স্বয়ংক্রিয়ভাবে ঢাকা হয়েছে। বিশ্লেষণে প্রভাব নেই।',
+    wnByulji: 'সংযুক্তির পরের বিষয়বস্তু বিশ্লেষণ থেকে বাদ। গুরুত্বপূর্ণ হলে ওই অংশ আলাদা পেস্ট করে আবার বিশ্লেষণ করুন।',
+    wnLowCoverage: 'নথির কিছু অংশ ধারায় ভাগ হয়নি। মূল লেখার সাথে মিলিয়ে দেখুন।',
+    wnInjection: 'এআই বিশ্লেষণ প্রভাবিত করার চেষ্টার লেখা পাওয়া গেছে। মূল লেখা নিজে যাচাই করুন।',
+  },
+  ru: {
+    wnPii: 'Личные данные (телефон, идентификационные номера и т.п.) скрыты автоматически. На анализ не влияет.',
+    wnByulji: 'Содержимое после приложений исключено из анализа. Если оно важно — вставьте его отдельно и проанализируйте снова.',
+    wnLowCoverage: 'Часть документа не удалось разделить на пункты. Сверьте с оригиналом.',
+    wnInjection: 'Обнаружен текст, пытающийся манипулировать анализом ИИ. Проверьте оригинал самостоятельно.',
+  },
+  ja: {
+    wnPii: '個人情報（電話・登録番号など）を自動でマスキングしました。分析に影響はありません。',
+    wnByulji: '別紙（添付文書）以降の内容は分析から除外しました。重要な内容があれば、その部分だけ貼り付けて再分析してください。',
+    wnLowCoverage: '文書の一部を条項に分割できませんでした。漏れがないか原文と照合してください。',
+    wnInjection: 'AI分析を操作しようとする文言を検出しました。判定を鵜呑みにせず、原文を直接ご確認ください。',
+  },
+}
+
+export const WARNING_CODE_KEYS: Record<string, WarnKey> = {
+  pii_masked: 'wnPii', byulji_excluded: 'wnByulji', low_coverage: 'wnLowCoverage', injection_detected: 'wnInjection',
+}
+
+type LearnKey =
+  | 'lnNav' | 'lnTitle' | 'lnDesc' | 'lnSignal' | 'lnOutside' | 'lnCase' | 'lnKoNote'
+
+// 교육 페이지 (#104) — 챗봇(#103)은 세션당 대화 상한·인젝션 방어 조건 충족 후 별도 PR
+const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
+  ko: {
+    lnNav: '위험 조항 배우기',
+    lnTitle: '전세사기 5대 수법',
+    lnDesc: '실제 분쟁 사례와 실증 연구로 정리한 대표 수법이에요. 계약 전에 한 번만 읽어도 시야가 달라져요.',
+    lnSignal: '계약서에서 보이는 신호',
+    lnOutside: '계약서 밖에서 확인할 것',
+    lnCase: '근거·사례',
+    lnKoNote: '학습 콘텐츠는 한국어로 제공돼요',
+  },
+  en: {
+    lnNav: 'Learn risky clauses',
+    lnTitle: '5 common jeonse fraud schemes',
+    lnDesc: 'Key schemes compiled from real disputes and empirical research. One read before signing changes what you see.',
+    lnSignal: 'Signals in the contract',
+    lnOutside: 'What to check outside the contract',
+    lnCase: 'Evidence & cases',
+    lnKoNote: 'Learning content is provided in Korean',
+  },
+  zh: {
+    lnNav: '学习危险条款',
+    lnTitle: '全租房诈骗5大手法',
+    lnDesc: '基于真实纠纷案例和实证研究整理的代表性手法。签约前读一遍，眼界就不一样。',
+    lnSignal: '合同中可见的信号',
+    lnOutside: '合同之外要确认的事',
+    lnCase: '依据·案例',
+    lnKoNote: '学习内容以韩语提供',
+  },
+  vi: {
+    lnNav: 'Học điều khoản rủi ro',
+    lnTitle: '5 thủ đoạn lừa đảo jeonse',
+    lnDesc: 'Các thủ đoạn tiêu biểu từ tranh chấp thực tế và nghiên cứu thực chứng. Đọc một lần trước khi ký, góc nhìn sẽ khác.',
+    lnSignal: 'Dấu hiệu trong hợp đồng',
+    lnOutside: 'Kiểm tra ngoài hợp đồng',
+    lnCase: 'Căn cứ·vụ việc',
+    lnKoNote: 'Nội dung học được cung cấp bằng tiếng Hàn',
+  },
+  th: {
+    lnNav: 'เรียนรู้ข้อสัญญาเสี่ยง',
+    lnTitle: 'กลโกงจอนเซ 5 รูปแบบ',
+    lnDesc: 'รูปแบบสำคัญจากข้อพิพาทจริงและงานวิจัย อ่านครั้งเดียวก่อนเซ็นมุมมองก็เปลี่ยน',
+    lnSignal: 'สัญญาณในสัญญา',
+    lnOutside: 'สิ่งที่ต้องเช็กนอกสัญญา',
+    lnCase: 'หลักฐาน·คดี',
+    lnKoNote: 'เนื้อหาการเรียนให้บริการเป็นภาษาเกาหลี',
+  },
+  id: {
+    lnNav: 'Pelajari pasal berisiko',
+    lnTitle: '5 modus penipuan jeonse',
+    lnDesc: 'Modus utama dari sengketa nyata dan riset empiris. Sekali baca sebelum tanda tangan, cara pandang berubah.',
+    lnSignal: 'Sinyal di kontrak',
+    lnOutside: 'Yang dicek di luar kontrak',
+    lnCase: 'Bukti·kasus',
+    lnKoNote: 'Konten pembelajaran tersedia dalam bahasa Korea',
+  },
+  tl: {
+    lnNav: 'Matuto ng risky clauses',
+    lnTitle: '5 jeonse fraud schemes',
+    lnDesc: 'Mga pangunahing scheme mula sa totoong dispute at empirical research. Isang basa bago pumirma, iba na ang makikita mo.',
+    lnSignal: 'Senyales sa kontrata',
+    lnOutside: 'Iche-check sa labas ng kontrata',
+    lnCase: 'Ebidensya·kaso',
+    lnKoNote: 'Ang learning content ay nasa Korean',
+  },
+  ne: {
+    lnNav: 'जोखिम दफा सिक्ने',
+    lnTitle: 'जोनसे ठगीका ५ मुख्य तरिका',
+    lnDesc: 'वास्तविक विवाद र अनुसन्धानबाट तयार मुख्य तरिकाहरू। हस्ताक्षर अघि एकपटक पढ्दा दृष्टि फरक हुन्छ।',
+    lnSignal: 'करारमा देखिने संकेत',
+    lnOutside: 'करारबाहिर जाँच्ने कुरा',
+    lnCase: 'आधार·मुद्दा',
+    lnKoNote: 'शिक्षण सामग्री कोरियालीमा उपलब्ध छ',
+  },
+  km: {
+    lnNav: 'រៀនអំពីមាត្រាហានិភ័យ',
+    lnTitle: 'ល្បិចក្លែងបន្លំ jeonse ៥ យ៉ាង',
+    lnDesc: 'ល្បិចសំខាន់ពីវិវាទពិត និងការស្រាវជ្រាវ។ អានម្ដងមុនចុះហត្ថលេខា ទស្សនៈផ្លាស់ប្ដូរ។',
+    lnSignal: 'សញ្ញាក្នុងកិច្ចសន្យា',
+    lnOutside: 'អ្វីត្រូវពិនិត្យក្រៅកិច្ចសន្យា',
+    lnCase: 'ភស្តុតាង·ករណី',
+    lnKoNote: 'មាតិកាសិក្សាផ្ដល់ជាភាសាកូរ៉េ',
+  },
+  my: {
+    lnNav: 'အန္တရာယ်အပိုဒ်များလေ့လာရန်',
+    lnTitle: 'jeonse လိမ်နည်း ၅ မျိုး',
+    lnDesc: 'အမှန်တကယ်အငြင်းပွားမှုနှင့် သုတေသနမှ စုစည်းထားသော အဓိကနည်းများ။ လက်မှတ်မထိုးမီ တစ်ကြိမ်ဖတ်လျှင် အမြင်ပြောင်းသည်။',
+    lnSignal: 'စာချုပ်ထဲက အချက်ပြများ',
+    lnOutside: 'စာချုပ်ပြင်ပ စစ်ဆေးရန်',
+    lnCase: 'အထောက်အထား·အမှု',
+    lnKoNote: 'သင်ခန်းစာကို ကိုရီးယားဘာသာဖြင့် ပေးသည်',
+  },
+  mn: {
+    lnNav: 'Эрсдэлтэй заалт сурах',
+    lnTitle: 'Жонсэ залилангийн 5 гол арга',
+    lnDesc: 'Бодит маргаан, судалгаанд үндэслэсэн гол аргууд. Гарын үсэг зурахаас өмнө нэг уншихад л харах өнцөг өөрчлөгдөнө.',
+    lnSignal: 'Гэрээн дэх дохио',
+    lnOutside: 'Гэрээнээс гадуур шалгах зүйл',
+    lnCase: 'Үндэслэл·хэрэг',
+    lnKoNote: 'Сургалтын агуулга солонгос хэлээр',
+  },
+  uz: {
+    lnNav: 'Xavfli bandlarni oʻrganish',
+    lnTitle: 'Jeonse firibgarligining 5 usuli',
+    lnDesc: 'Haqiqiy nizolar va tadqiqotlardan jamlangan asosiy usullar. Imzodan oldin bir oʻqish qarashni oʻzgartiradi.',
+    lnSignal: 'Shartnomadagi belgilar',
+    lnOutside: 'Shartnomadan tashqari tekshirish',
+    lnCase: 'Asos·ishlar',
+    lnKoNote: 'Oʻquv kontenti koreys tilida',
+  },
+  si: {
+    lnNav: 'අවදානම් වගන්ති ඉගෙනීම',
+    lnTitle: 'ජොන්සේ වංචාවේ ප්‍රධාන ක්‍රම 5',
+    lnDesc: 'සැබෑ ආරවුල් සහ පර්යේෂණවලින් සම්පාදිත ප්‍රධාන ක්‍රම. අත්සනට පෙර වරක් කියවීමෙන් දැක්ම වෙනස් වේ.',
+    lnSignal: 'ගිවිසුමේ පෙනෙන සංඥා',
+    lnOutside: 'ගිවිසුමෙන් පිටත පරීක්ෂා කළ යුතු දේ',
+    lnCase: 'සාක්ෂි·නඩු',
+    lnKoNote: 'ඉගෙනුම් අන්තර්ගතය කොරියානු බසින්',
+  },
+  bn: {
+    lnNav: 'ঝুঁকির ধারা শিখুন',
+    lnTitle: 'জনসে প্রতারণার ৫টি প্রধান কৌশল',
+    lnDesc: 'বাস্তব বিরোধ ও গবেষণা থেকে সংকলিত প্রধান কৌশল। স্বাক্ষরের আগে একবার পড়লেই দৃষ্টি বদলে যায়।',
+    lnSignal: 'চুক্তিতে দৃশ্যমান সংকেত',
+    lnOutside: 'চুক্তির বাইরে যা যাচাই করবেন',
+    lnCase: 'ভিত্তি·মামলা',
+    lnKoNote: 'শেখার বিষয়বস্তু কোরিয়ান ভাষায়',
+  },
+  ru: {
+    lnNav: 'Изучить опасные пункты',
+    lnTitle: '5 главных схем мошенничества с чонсе',
+    lnDesc: 'Ключевые схемы из реальных споров и исследований. Одно прочтение перед подписанием меняет взгляд.',
+    lnSignal: 'Сигналы в договоре',
+    lnOutside: 'Что проверить вне договора',
+    lnCase: 'Основания·дела',
+    lnKoNote: 'Учебный контент на корейском языке',
+  },
+  ja: {
+    lnNav: '危険条項を学ぶ',
+    lnTitle: 'ジョンセ詐欺の5大手口',
+    lnDesc: '実際の紛争事例と実証研究から整理した代表的手口。署名前に一度読むだけで見え方が変わります。',
+    lnSignal: '契約書に見えるシグナル',
+    lnOutside: '契約書の外で確認すること',
+    lnCase: '根拠・事例',
+    lnKoNote: '学習コンテンツは韓国語で提供されます',
+  },
+}
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ZoomKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2247,7 +3115,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

@@ -1,15 +1,27 @@
 import { useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, Card, CopyButton } from '../components/ui'
-import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
+import { riskLevelLabel, riskLevelLabel as rl, riskTypeLabel, t, type LangCode } from '../i18n'
+import { clauseHeading } from '../clauseTitle'
+import { FeedbackCard } from '../components/FeedbackCard'
+import { deleteRecord } from '../records'
 
 export function DoneScreen({
   results,
   language = 'ko',
+  resultsShownAt = null,
+  recordSaved = false,
+  savedRecordId = null,
   onRestart,
 }: {
   results: ClauseResult[]
   language?: LangCode
+  resultsShownAt?: number | null
+  /** 옵트인 로컬 기록(#102 v1)으로 이 결과를 저장했는지 — 삭제 안내 문구 분기용 */
+  recordSaved?: boolean
+  /** 저장된 기록의 id — '지금 삭제'를 누르면 이 기록도 함께 지운다(문구·실제
+      동작 불일치 방지: "모든 데이터를 삭제했어요"인데 내 기록에 남아있으면 안 됨) */
+  savedRecordId?: string | null
   onRestart: () => void
 }) {
   const [deleted, setDeleted] = useState(false)
@@ -63,6 +75,45 @@ export function DoneScreen({
         </p>
       </div>
 
+      {/* 결과 텍스트 다운로드 (#126 v1) — 점자정보단말기·문서 앱은 txt를
+          그대로 읽는다(단말기 자체 점역이 표준 사용). 자체 BRF 점역은
+          한국 점자 규정 오변환 위험이 있어 후속(liblouis 검증 후). */}
+      <div className="mx-auto mt-4 max-w-md text-center">
+        <button
+          type="button"
+          onClick={() => {
+            const lines: string[] = []
+            results.forEach((r) => {
+              const head = clauseHeading(r.original_text, language, r.original_text_translated) ?? r.clause_id
+              lines.push(`■ ${head} — ${rl(language, r.risk_level)}`)
+              lines.push(r.explanation)
+              if (r.risk_level !== '안전' && !r.analysis_failed) {
+                lines.push(`[근거] ${r.risk_evidence_translated || r.risk_evidence}`)
+              }
+              r.check_questions.forEach((q, i) => lines.push(`[질문${i + 1}] ${q}`))
+              lines.push(`[원문] ${r.original_text}`)
+              lines.push('')
+            })
+            const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `${t(language, 'dlFilename')}.txt`
+            a.click()
+            URL.revokeObjectURL(url)
+          }}
+          className="rounded-xl bg-ink-50 px-4 py-2.5 text-[14px] font-bold text-ink-700 transition-colors hover:bg-ink-100"
+        >
+          <span aria-hidden>💾</span> {t(language, 'dlBtn')}
+        </button>
+        <p className="mt-1.5 text-[12px] text-ink-400">{t(language, 'dlNote')}</p>
+      </div>
+
+      {/* 사람 평가 수집 (자문 §6) — 만족도 + 읽기 시간, 로컬 익명 집계 */}
+      <div className="mx-auto mt-8 max-w-md">
+        <FeedbackCard resultsShownAt={resultsShownAt} language={language} />
+      </div>
+
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         <ActionCard
           emoji="💬"
@@ -109,9 +160,14 @@ export function DoneScreen({
 
       <Card className="mt-8 flex flex-col items-start justify-between gap-4 p-6 md:flex-row md:items-center">
         <div>
-          <p className="text-[15px] font-bold text-ink-900">{t(language, 'doDeleteTitle')}</p>
+          {/* 옵트인 로컬 기록(#102 v1)으로 저장한 경우 "화면을 닫으면 사라져요"가
+              더 이상 사실이 아니므로 문구를 분기한다 — 모호한 절충 문구 대신
+              두 상황 각각 정확한 문구를 쓴다(프라이버시 문구는 모호하면 불신). */}
+          <p className="text-[15px] font-bold text-ink-900">
+            {t(language, recordSaved ? 'doDeleteTitleSaved' : 'doDeleteTitle')}
+          </p>
           <p className="mt-1 text-[14px] leading-relaxed text-ink-400">
-            {t(language, 'doDeleteDesc')}
+            {t(language, recordSaved ? 'doDeleteDescSaved' : 'doDeleteDesc')}
           </p>
         </div>
         {confirming ? (
@@ -119,7 +175,14 @@ export function DoneScreen({
             <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>
               {t(language, 'doCancel')}
             </Button>
-            <Button variant="danger" size="sm" onClick={() => setDeleted(true)}>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => {
+                if (savedRecordId) deleteRecord(savedRecordId)
+                setDeleted(true)
+              }}
+            >
               {t(language, 'doConfirmDel')}
             </Button>
           </div>
