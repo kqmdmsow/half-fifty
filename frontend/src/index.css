@@ -88,6 +88,14 @@
     box-shadow: var(--krds-box-shadow-outline);
   }
 
+  /* 화면 전환 시 스크린리더용 프로그램 포커스(h1 tabindex=-1)는 시각적
+     링을 그리지 않는다 — 키보드 조작이 아닌 내비게이션 알림용 포커스 */
+  [tabindex='-1']:focus,
+  [tabindex='-1']:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
   /* KRDS 터치 타깃 최소 48px (--krds-size-height-7).
      인라인 텍스트 링크는 min-height가 무효(인라인 박스)라 영향 없고,
      버튼·셀렉트·입력 필드가 대상이다. */
@@ -104,6 +112,66 @@
     width: 24px;
     height: 24px;
   }
+}
+
+/* 스크롤 리빌·히어로 스태거 (#134 모션) — 움직임을 선호하는 사용자에게만.
+   reduced-motion이거나 IO 미지원이면 숨김 상태 자체가 적용되지 않아
+   콘텐츠는 항상 보인다 (Reveal.tsx 참조). */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  /* 회전 헤드라인 단어 교체 (#134) — 아래에서 살짝 떠오르며 교체 */
+  /* 회전 헤드라인 — 사라짐(0.7s)과 나타남(0.8s)을 따로 둔다.
+     한쪽만 애니메이션하면 옛 글자가 즉시 없어져 '깜빡'하고 바뀐다(#134). */
+  .word-enter,
+  .word-leave {
+    display: inline-block;
+  }
+  .word-enter {
+    animation: word-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .word-leave {
+    animation: word-leave 0.7s cubic-bezier(0.4, 0, 0.6, 1) both;
+  }
+
+  @keyframes word-enter {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes word-leave {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+  /* 히어로 로드 스태거 — 배지→제목→부제→CTA 순서로 떠오른다 */
+  .hero-stagger > * {
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+  .hero-stagger > *:nth-child(3) { animation-delay: 0.2s; }
+  .hero-stagger > *:nth-child(4) { animation-delay: 0.3s; }
 }
 
 /* 움직임 최소화 선호 대응 — 애니메이션·전환을 사실상 정지 */

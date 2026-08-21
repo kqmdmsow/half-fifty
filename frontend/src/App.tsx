@@ -369,7 +369,6 @@ export default function App() {
             </div>
           </div>
         )}
-        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
         {screen === 'records' && <RecordsScreen language={language} onOpen={openRecord} />}
         {screen === 'api' && <ApiInfoScreen language={language} onBack={() => go('landing')} />}
         {screen === 'landing' && (
