@@ -32,6 +32,11 @@ _PROMPT_TEMPLATE = PROMPT_PATH.read_text(encoding="utf-8")
 _PARSE_ATTEMPTS = 2  # 최초 시도 + 재시도 1회
 _FALLBACK_EVIDENCE = "분석 실패 (수동 확인 필요)"
 
+# 구조적 위험 체크리스트 본체는 제거됐지만(#65) eval.py가 이 clause_id로
+# 리콜·오탐 집계에서 방어적으로 필터링하고 있어(STRUCTURAL_RISK_CLAUSE_ID
+# import) 상수만 남긴다 — 지우면 eval.py가 ImportError로 죽는다.
+STRUCTURAL_RISK_CLAUSE_ID = "checklist_structural_risk"
+
 # 프롬프트 캐싱: {clause_text} 앞의 정적 부분(위험 유형 정의·규칙·앵커 예시)은
 # 조항 호출 간 동일하므로 캐시 블록으로 분리한다. 도메인 컨텍스트는 프리픽스에
 # 주입되지만 문서당 상수라 캐시 효율을 해치지 않는다 (_build_prompt_parts 참조).
