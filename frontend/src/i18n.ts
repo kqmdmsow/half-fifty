@@ -838,7 +838,7 @@ type ScreenKey =
   | 'doConsultTitle' | 'doConsultDesc'
   | 'doSvcKlac' | 'doSvcKlaw' | 'doSvcJeonse' | 'doSvcFss'
   | 'doOpen' | 'doCopyOpen' | 'doCall'
-  | 'doDeleteTitle' | 'doDeleteDesc' | 'doDeleteBtn' | 'doCancel' | 'doConfirmDel'
+  | 'doDeleteTitle' | 'doDeleteDesc' | 'doDeleteTitleSaved' | 'doDeleteDescSaved' | 'doDeleteBtn' | 'doCancel' | 'doConfirmDel'
   | 'doDeletedTitle' | 'doDeletedDesc' | 'doNew'
   | 'prTitle' | 'prSummary' | 'prOriginal' | 'prExplain' | 'prCheck'
 
@@ -873,6 +873,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: '전세사기·보증금 피해 전문 상담 (국토교통부)', doSvcFss: '대출·보험·금융상품 분쟁과 피해 상담',
     doOpen: '홈페이지 열기', doCopyOpen: "'{keyword}' 복사하고 열기", doCall: '전화',
     doDeleteTitle: '서버에 저장되지 않아요', doDeleteDesc: '화면을 닫으면 결과가 사라져요. 지금 바로 지울 수도 있어요.',
+    doDeleteTitleSaved: '이 기기에 기록을 저장했어요', doDeleteDescSaved: "'내 기록'에서 언제든 확인·삭제할 수 있어요.",
     doDeleteBtn: '지금 모두 삭제', doCancel: '취소', doConfirmDel: '정말 삭제하기',
     doDeletedTitle: '모든 데이터를 삭제했어요', doDeletedDesc: '계약서 원본과 분석 결과가 모두 지워졌어요. 필요할 때 언제든 다시 이용하세요.', doNew: '새 계약서 분석하기',
     prTitle: '조목조목 계약서 분석 결과', prSummary: '전체 {total}개 조항 중 확인이 필요한 조항 {need}개 · 본 결과는 참고용 안내이며 법률 자문이 아닙니다. 중요한 결정은 반드시 전문가와 상담하세요.',
@@ -907,6 +908,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Jeonse fraud & deposit damage counseling (MOLIT)', doSvcFss: 'Disputes over loans, insurance, and financial products',
     doOpen: 'Open website', doCopyOpen: "Copy '{keyword}' & open", doCall: 'Call',
     doDeleteTitle: 'Not stored on our server', doDeleteDesc: 'Results disappear when you close this screen. You can also clear them now.',
+    doDeleteTitleSaved: 'Saved to this device', doDeleteDescSaved: "You can view or delete it anytime from 'My records'.",
     doDeleteBtn: 'Delete all now', doCancel: 'Cancel', doConfirmDel: 'Yes, delete',
     doDeletedTitle: 'All data deleted', doDeletedDesc: 'The contract and results are gone. Come back anytime.', doNew: 'Analyze a new contract',
     prTitle: 'Jomokjomok Contract Analysis Report', prSummary: '{need} of {total} clauses need attention · For reference only, not legal advice. Consult a professional for important decisions.',
@@ -941,6 +943,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: '全租房诈骗·押金受害专业咨询（国土交通部）', doSvcFss: '贷款、保险、金融产品纠纷咨询',
     doOpen: '打开官网', doCopyOpen: "复制'{keyword}'并打开", doCall: '电话',
     doDeleteTitle: '不会保存在服务器上', doDeleteDesc: '关闭页面后结果会消失。也可以现在立即清除。',
+    doDeleteTitleSaved: '已保存到此设备', doDeleteDescSaved: '您可以随时在"我的记录"中查看或删除。',
     doDeleteBtn: '立即全部删除', doCancel: '取消', doConfirmDel: '确认删除',
     doDeletedTitle: '已删除全部数据', doDeletedDesc: '合同原件和分析结果均已清除。需要时随时再来。', doNew: '分析新合同',
     prTitle: 'Jomokjomok 合同分析结果', prSummary: '共{total}条中{need}条需注意 · 仅供参考，非法律意见。重要决定请咨询专业人士。',
@@ -975,6 +978,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Tư vấn lừa đảo jeonse & thiệt hại tiền cọc (Bộ Đất đai)', doSvcFss: 'Tranh chấp vay vốn, bảo hiểm, sản phẩm tài chính',
     doOpen: 'Mở trang web', doCopyOpen: "Sao chép '{keyword}' & mở", doCall: 'Gọi',
     doDeleteTitle: 'Không lưu trên máy chủ', doDeleteDesc: 'Kết quả sẽ biến mất khi bạn đóng màn hình này. Bạn cũng có thể xoá ngay bây giờ.',
+    doDeleteTitleSaved: 'Đã lưu vào thiết bị này', doDeleteDescSaved: "Bạn có thể xem hoặc xoá bất cứ lúc nào trong 'Bản ghi của tôi'.",
     doDeleteBtn: 'Xoá tất cả ngay', doCancel: 'Huỷ', doConfirmDel: 'Xoá thật',
     doDeletedTitle: 'Đã xoá toàn bộ dữ liệu', doDeletedDesc: 'Hợp đồng gốc và kết quả đã bị xoá. Hãy quay lại bất cứ lúc nào.', doNew: 'Phân tích hợp đồng mới',
     prTitle: 'Báo cáo phân tích hợp đồng Jomokjomok', prSummary: '{need}/{total} điều khoản cần chú ý · Chỉ để tham khảo, không phải tư vấn pháp lý. Quyết định quan trọng hãy hỏi chuyên gia.',
@@ -1009,6 +1013,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'ปรึกษาการฉ้อโกงจอนเซ·ความเสียหายเงินมัดจำ (กระทรวงที่ดิน)', doSvcFss: 'ข้อพิพาทสินเชื่อ ประกัน ผลิตภัณฑ์การเงิน',
     doOpen: 'เปิดเว็บไซต์', doCopyOpen: "คัดลอก '{keyword}' แล้วเปิด", doCall: 'โทร',
     doDeleteTitle: 'ไม่ถูกจัดเก็บบนเซิร์ฟเวอร์', doDeleteDesc: 'ผลลัพธ์จะหายไปเมื่อคุณปิดหน้าจอนี้ คุณสามารถลบตอนนี้ได้เช่นกัน',
+    doDeleteTitleSaved: 'บันทึกไว้ในเครื่องนี้แล้ว', doDeleteDescSaved: "คุณสามารถดูหรือลบได้ทุกเมื่อใน 'บันทึกของฉัน'",
     doDeleteBtn: 'ลบทั้งหมดตอนนี้', doCancel: 'ยกเลิก', doConfirmDel: 'ยืนยันลบ',
     doDeletedTitle: 'ลบข้อมูลทั้งหมดแล้ว', doDeletedDesc: 'ต้นฉบับและผลวิเคราะห์ถูกลบหมดแล้ว กลับมาใช้ได้ทุกเมื่อ', doNew: 'วิเคราะห์สัญญาใหม่',
     prTitle: 'รายงานวิเคราะห์สัญญา Jomokjomok', prSummary: '{need} จาก {total} ข้อควรตรวจสอบ · เพื่ออ้างอิงเท่านั้น ไม่ใช่คำปรึกษากฎหมาย',
@@ -1043,6 +1048,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Konsultasi penipuan jeonse & kerugian deposit (MOLIT)', doSvcFss: 'Sengketa pinjaman, asuransi, produk keuangan',
     doOpen: 'Buka situs', doCopyOpen: "Salin '{keyword}' & buka", doCall: 'Telepon',
     doDeleteTitle: 'Tidak disimpan di server', doDeleteDesc: 'Hasil akan hilang saat Anda menutup layar ini. Anda juga bisa menghapusnya sekarang.',
+    doDeleteTitleSaved: 'Disimpan ke perangkat ini', doDeleteDescSaved: "Anda dapat melihat atau menghapusnya kapan saja di 'Catatan saya'.",
     doDeleteBtn: 'Hapus semua sekarang', doCancel: 'Batal', doConfirmDel: 'Ya, hapus',
     doDeletedTitle: 'Semua data terhapus', doDeletedDesc: 'Kontrak asli dan hasil sudah dihapus. Kembali kapan saja.', doNew: 'Analisis kontrak baru',
     prTitle: 'Laporan Analisis Kontrak Jomokjomok', prSummary: '{need} dari {total} pasal perlu perhatian · Hanya referensi, bukan nasihat hukum.',
@@ -1077,6 +1083,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Konsultasyon sa jeonse scam at deposito (MOLIT)', doSvcFss: 'Alitan sa utang, insurance, produktong pinansyal',
     doOpen: 'Buksan ang site', doCopyOpen: "Kopyahin ang '{keyword}' at buksan", doCall: 'Tawag',
     doDeleteTitle: 'Hindi naka-imbak sa server', doDeleteDesc: 'Mawawala ang resulta kapag isinara mo ang screen na ito. Puwede mo ring burahin ngayon.',
+    doDeleteTitleSaved: 'Na-save sa device na ito', doDeleteDescSaved: "Puwede mong tingnan o burahin anumang oras sa 'Mga Tala Ko'.",
     doDeleteBtn: 'Burahin lahat ngayon', doCancel: 'Kanselahin', doConfirmDel: 'Oo, burahin',
     doDeletedTitle: 'Nabura na ang lahat ng data', doDeletedDesc: 'Nabura na ang kontrata at resulta. Bumalik anumang oras.', doNew: 'Suriin ang bagong kontrata',
     prTitle: 'Ulat ng Pagsusuri ng Kontrata — Jomokjomok', prSummary: '{need} sa {total} sugnay ang dapat pansinin · Sanggunian lamang, hindi legal na payo.',
@@ -1111,6 +1118,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'जोन्से ठगी·धरौटी क्षति परामर्श (भूमि मन्त्रालय)', doSvcFss: 'ऋण, बीमा, वित्तीय उत्पादन विवाद',
     doOpen: 'वेबसाइट खोल्नुहोस्', doCopyOpen: "'{keyword}' कपी गरी खोल्नुहोस्", doCall: 'फोन',
     doDeleteTitle: 'सर्भरमा भण्डारण हुँदैन', doDeleteDesc: 'यो स्क्रिन बन्द गर्दा नतिजा हराउँछ। तपाईं अहिले नै मेटाउन पनि सक्नुहुन्छ।',
+    doDeleteTitleSaved: 'यो उपकरणमा सुरक्षित गरियो', doDeleteDescSaved: "तपाईं जुनसुकै बेला 'मेरो रेकर्ड' मा हेर्न वा मेटाउन सक्नुहुन्छ।",
     doDeleteBtn: 'अहिले सबै मेट्नुहोस्', doCancel: 'रद्द', doConfirmDel: 'पक्कै मेट्ने',
     doDeletedTitle: 'सबै डेटा मेटियो', doDeletedDesc: 'मूल सम्झौता र नतिजा मेटिए। जहिले पनि फेरि आउनुहोस्।', doNew: 'नयाँ सम्झौता विश्लेषण',
     prTitle: 'Jomokjomok सम्झौता विश्लेषण प्रतिवेदन', prSummary: '{total} मध्ये {need} धारामा ध्यान चाहिन्छ · सन्दर्भका लागि मात्र, कानुनी सल्लाह होइन।',
@@ -1145,6 +1153,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'ប្រឹក្សាការបោកប្រាស់ jeonse·ខូចខាតប្រាក់កក់ (MOLIT)', doSvcFss: 'វិវាទកម្ចី ធានារ៉ាប់រង ផលិតផលហិរញ្ញវត្ថុ',
     doOpen: 'បើកគេហទំព័រ', doCopyOpen: "ចម្លង '{keyword}' ហើយបើក", doCall: 'ទូរស័ព្ទ',
     doDeleteTitle: 'មិនរក្សាទុកនៅលើម៉ាស៊ីនមេទេ', doDeleteDesc: 'លទ្ធផលនឹងបាត់នៅពេលអ្នកបិទអេក្រង់នេះ។ អ្នកក៏អាចលុបវាឥឡូវនេះបានដែរ។',
+    doDeleteTitleSaved: 'បានរក្សាទុកនៅឧបករណ៍នេះ', doDeleteDescSaved: "អ្នកអាចមើល ឬលុបបានគ្រប់ពេលនៅ 'កំណត់ត្រារបស់ខ្ញុំ'។",
     doDeleteBtn: 'លុបទាំងអស់ឥឡូវ', doCancel: 'បោះបង់', doConfirmDel: 'ពិតជាលុប',
     doDeletedTitle: 'បានលុបទិន្នន័យទាំងអស់', doDeletedDesc: 'ច្បាប់ដើមនិងលទ្ធផលត្រូវបានលុប។ ត្រឡប់មកវិញបានគ្រប់ពេល។', doNew: 'វិភាគកិច្ចសន្យាថ្មី',
     prTitle: 'របាយការណ៍វិភាគកិច្ចសន្យា Jomokjomok', prSummary: '{need} ក្នុងចំណោម {total} ប្រការត្រូវប្រុងប្រយ័ត្ន · សម្រាប់យោងប៉ុណ្ណោះ មិនមែនដំបូន្មានច្បាប់ទេ។',
@@ -1179,6 +1188,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'jeonse လိမ်လည်မှု·အာမခံငွေ ဆုံးရှုံးမှု အကြံပေး (MOLIT)', doSvcFss: 'ချေးငွေ၊ အာမခံ၊ ဘဏ္ဍာရေးထုတ်ကုန် အငြင်းပွားမှု',
     doOpen: 'ဝက်ဘ်ဆိုက်ဖွင့်ရန်', doCopyOpen: "'{keyword}' ကူး၍ဖွင့်ရန်", doCall: 'ဖုန်း',
     doDeleteTitle: 'ဆာဗာတွင် သိမ်းဆည်းမထားပါ', doDeleteDesc: 'ဤစခရင်ကို ပိတ်လိုက်လျှင် ရလဒ်များ ပျောက်သွားမည်ဖြစ်သည်။ ယခုပင် ဖျက်နိုင်ပါသည်။',
+    doDeleteTitleSaved: 'ဤကိရိယာတွင် သိမ်းဆည်းထားသည်', doDeleteDescSaved: "'ကျွန်ုပ်၏မှတ်တမ်းများ' တွင် အချိန်မရွေး ကြည့်ရှု သို့မဟုတ် ဖျက်နိုင်ပါသည်။",
     doDeleteBtn: 'ယခုအားလုံးဖျက်ရန်', doCancel: 'ပယ်ဖျက်', doConfirmDel: 'သေချာဖျက်မည်',
     doDeletedTitle: 'ဒေတာအားလုံးဖျက်ပြီးပြီ', doDeletedDesc: 'မူရင်းနှင့်ရလဒ်များ ဖျက်ပြီးပြီ။ အချိန်မရွေး ပြန်လာနိုင်သည်။', doNew: 'စာချုပ်အသစ် စိစစ်ရန်',
     prTitle: 'Jomokjomok စာချုပ်စိစစ်ချက် အစီရင်ခံစာ', prSummary: 'အပိုဒ် {total} ခုအနက် {need} ခု သတိပြုရန် · ကိုးကားရန်သာ၊ ဥပဒေအကြံမဟုတ်ပါ။',
@@ -1213,6 +1223,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Жонсэ залилан·барьцааны хохирлын зөвлөгөө (MOLIT)', doSvcFss: 'Зээл, даатгал, санхүүгийн бүтээгдэхүүний маргаан',
     doOpen: 'Вэб нээх', doCopyOpen: "'{keyword}' хуулаад нээх", doCall: 'Утас',
     doDeleteTitle: 'Серверт хадгалагдахгүй', doDeleteDesc: 'Энэ дэлгэцийг хаахад үр дүн алга болно. Одоо ч устгаж болно.',
+    doDeleteTitleSaved: 'Энэ төхөөрөмжид хадгалагдлаа', doDeleteDescSaved: "Та 'Миний бүртгэл'-ээс хүссэн үедээ харах, устгах боломжтой.",
     doDeleteBtn: 'Одоо бүгдийг устгах', doCancel: 'Болих', doConfirmDel: 'Тийм, устгах',
     doDeletedTitle: 'Бүх өгөгдөл устлаа', doDeletedDesc: 'Эх гэрээ, үр дүн бүгд устсан. Хэзээ ч дахин ирж болно.', doNew: 'Шинэ гэрээ шинжлэх',
     prTitle: 'Jomokjomok гэрээний шинжилгээний тайлан', prSummary: 'Нийт {total} заалтаас {need}-д анхаарал хэрэгтэй · Зөвхөн лавлагаа, хуулийн зөвлөгөө биш.',
@@ -1247,6 +1258,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Jeonse firibgarligi·garov zarari maslahatlari (MOLIT)', doSvcFss: 'Kredit, sugʻurta, moliyaviy mahsulot nizolari',
     doOpen: 'Saytni ochish', doCopyOpen: "'{keyword}'ni nusxalab ochish", doCall: 'Qoʻngʻiroq',
     doDeleteTitle: 'Serverda saqlanmaydi', doDeleteDesc: 'Bu ekranni yopganingizda natijalar yoʻqoladi. Hozir ham oʻchirib tashlashingiz mumkin.',
+    doDeleteTitleSaved: 'Ushbu qurilmaga saqlandi', doDeleteDescSaved: "Uni istalgan vaqtda 'Mening yozuvlarim'da koʻrishingiz yoki oʻchirishingiz mumkin.",
     doDeleteBtn: 'Hozir hammasini oʻchirish', doCancel: 'Bekor', doConfirmDel: 'Ha, oʻchirish',
     doDeletedTitle: 'Barcha maʼlumot oʻchirildi', doDeletedDesc: 'Asl shartnoma va natijalar oʻchdi. Istalgan payt qayting.', doNew: 'Yangi shartnoma tahlili',
     prTitle: 'Jomokjomok shartnoma tahlili hisoboti', prSummary: '{total} banddan {need} tasiga eʼtibor kerak · Faqat maʼlumot uchun, yuridik maslahat emas.',
@@ -1281,6 +1293,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'ජොන්සේ වංචා·තැන්පතු හානි උපදේශන (MOLIT)', doSvcFss: 'ණය, රක්ෂණ, මූල්‍ය නිෂ්පාදන ආරවුල්',
     doOpen: 'වෙබ් අඩවිය විවෘත', doCopyOpen: "'{keyword}' පිටපත් කර විවෘත", doCall: 'ඇමතුම',
     doDeleteTitle: 'සේවාදායකයේ ගබඩා නොවේ', doDeleteDesc: 'මෙම තිරය වසන විට ප්‍රතිඵල අතුරුදහන් වේ. ඔබට දැන්ම එය මකා දැමිය හැක.',
+    doDeleteTitleSaved: 'මෙම උපකරණයේ සුරකින ලදී', doDeleteDescSaved: "ඔබට ඕනෑම වේලාවක 'මගේ වාර්තා'වෙන් බලා හෝ මකා දැමිය හැක.",
     doDeleteBtn: 'දැන් සියල්ල මකන්න', doCancel: 'අවලංගු', doConfirmDel: 'ඔව්, මකන්න',
     doDeletedTitle: 'සියලු දත්ත මකා දමන ලදි', doDeletedDesc: 'මුල් ගිවිසුම සහ ප්‍රතිඵල මැකිණි. ඕනෑම විටෙක නැවත එන්න.', doNew: 'නව ගිවිසුමක් විශ්ලේෂණය',
     prTitle: 'Jomokjomok ගිවිසුම් විශ්ලේෂණ වාර්තාව', prSummary: 'වගන්ති {total}න් {need}කට අවධානය අවශ්‍යයි · යොමුවට පමණි, නීති උපදෙසක් නොවේ.',
@@ -1315,6 +1328,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'জনসে প্রতারণা·জামানত ক্ষতির পরামর্শ (MOLIT)', doSvcFss: 'ঋণ, বিমা, আর্থিক পণ্যের বিরোধ',
     doOpen: 'ওয়েবসাইট খুলুন', doCopyOpen: "'{keyword}' কপি করে খুলুন", doCall: 'কল',
     doDeleteTitle: 'সার্ভারে সংরক্ষণ করা হয় না', doDeleteDesc: 'এই স্ক্রিন বন্ধ করলে ফলাফল অদৃশ্য হয়ে যাবে। আপনি এখনই মুছেও ফেলতে পারেন।',
+    doDeleteTitleSaved: 'এই ডিভাইসে সংরক্ষিত হয়েছে', doDeleteDescSaved: "আপনি 'আমার রেকর্ড' থেকে যেকোনো সময় দেখতে বা মুছতে পারেন।",
     doDeleteBtn: 'এখনই সব মুছুন', doCancel: 'বাতিল', doConfirmDel: 'হ্যাঁ, মুছুন',
     doDeletedTitle: 'সব ডেটা মুছে ফেলা হয়েছে', doDeletedDesc: 'মূল চুক্তি ও ফলাফল মুছে গেছে। যেকোনো সময় আবার আসুন।', doNew: 'নতুন চুক্তি বিশ্লেষণ',
     prTitle: 'Jomokjomok চুক্তি বিশ্লেষণ প্রতিবেদন', prSummary: '{total}টির মধ্যে {need}টি ধারায় মনোযোগ দরকার · শুধুই সহায়ক তথ্য, আইনি পরামর্শ নয়।',
@@ -1349,6 +1363,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'Мошенничество с чонсе и ущерб по депозиту (MOLIT)', doSvcFss: 'Споры по кредитам, страховкам, финпродуктам',
     doOpen: 'Открыть сайт', doCopyOpen: "Скопировать '{keyword}' и открыть", doCall: 'Позвонить',
     doDeleteTitle: 'Не хранится на сервере', doDeleteDesc: 'Результаты исчезнут при закрытии экрана. Можно удалить и сейчас.',
+    doDeleteTitleSaved: 'Сохранено на этом устройстве', doDeleteDescSaved: "Вы можете просмотреть или удалить это в любое время в разделе 'Мои записи'.",
     doDeleteBtn: 'Удалить всё сейчас', doCancel: 'Отмена', doConfirmDel: 'Да, удалить',
     doDeletedTitle: 'Все данные удалены', doDeletedDesc: 'Договор и результаты стёрты. Возвращайтесь в любое время.', doNew: 'Анализировать новый договор',
     prTitle: 'Отчёт анализа договора Jomokjomok', prSummary: '{need} из {total} пунктов требуют внимания · Только для справки, не юридическая консультация.',
@@ -1383,6 +1398,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
     doSvcJeonse: 'チョンセ詐欺・保証金被害の専門相談（国土交通部）', doSvcFss: 'ローン・保険・金融商品の紛争相談',
     doOpen: 'サイトを開く', doCopyOpen: "'{keyword}'をコピーして開く", doCall: '電話',
     doDeleteTitle: 'サーバーには保存されません', doDeleteDesc: 'この画面を閉じると結果は消えます。今すぐ削除することもできます。',
+    doDeleteTitleSaved: 'この端末に保存しました', doDeleteDescSaved: '「マイ記録」からいつでも確認・削除できます。',
     doDeleteBtn: '今すべて削除', doCancel: 'キャンセル', doConfirmDel: '削除する',
     doDeletedTitle: 'すべてのデータを削除しました', doDeletedDesc: '契約書原本と結果は消去されました。いつでもまたどうぞ。', doNew: '新しい契約書を分析',
     prTitle: 'Jomokjomok 契約書分析レポート', prSummary: '全{total}条項中{need}件に注意 · 参考情報であり法律相談ではありません。',
@@ -2235,7 +2251,6 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
-
 type VoiceKey =
   | 'vcToggle' | 'vcListening' | 'vcOff'
 
@@ -2257,6 +2272,189 @@ const UI_VOICE: Record<LangCode, Record<VoiceKey, string>> = {
   bn: { vcToggle: 'ভয়েস কমান্ড', vcListening: 'শুনছে — "পরের", "আগের", "পড়ো", "থামো", "সহজে"', vcOff: 'ভয়েস কমান্ড বন্ধ' },
   ru: { vcToggle: 'Голосовые команды', vcListening: 'Слушаю — «дальше», «назад», «прочитай», «стоп», «проще»', vcOff: 'Выключить голосовые команды' },
   ja: { vcToggle: '音声コマンド', vcListening: '聞いています — 「次」「前」「読んで」「止めて」「もっと簡単に」', vcOff: '音声コマンドをオフ' },
+}
+
+type RecordKey =
+  | 'rcNav' | 'rcSave' | 'rcSaved' | 'rcTitle' | 'rcNote' | 'rcEmpty' | 'rcView' | 'rcDelete' | 'rcMeta'
+
+// 옵트인 로컬 기록 보관함 (#102 v1)
+const UI_RECORDS: Record<LangCode, Record<RecordKey, string>> = {
+  ko: {
+    rcNav: '내 기록',
+    rcSave: '이 기기에 기록 남기기',
+    rcSaved: '기록됐어요 — 이 기기에만 저장돼요',
+    rcTitle: '저장된 기록',
+    rcNote: '서버에는 아무것도 전송되지 않아요. 기록은 이 기기에만 있고 언제든 삭제할 수 있어요.',
+    rcEmpty: '기록이 아직 없어요. 분석 결과 화면에서 \'이 기기에 기록 남기기\'를 누르면 여기에 쌓여요.',
+    rcView: '다시 보기',
+    rcDelete: '삭제',
+    rcMeta: '위험 {n}건 · 조항 {total}개',
+  },
+  en: {
+    rcNav: 'My records',
+    rcSave: 'Save to this device',
+    rcSaved: 'Saved — stored on this device only',
+    rcTitle: 'Saved records',
+    rcNote: 'Nothing is sent to a server. Records live only on this device and can be deleted anytime.',
+    rcEmpty: 'No records yet. Tap \'Save to this device\' on a results screen to collect them here.',
+    rcView: 'View again',
+    rcDelete: 'Delete',
+    rcMeta: '{n} risk · {total} clauses',
+  },
+  zh: {
+    rcNav: '我的记录',
+    rcSave: '保存到此设备',
+    rcSaved: '已保存 — 仅存储在此设备上',
+    rcTitle: '已保存的记录',
+    rcNote: '不会向服务器发送任何内容。记录仅在此设备上，可随时删除。',
+    rcEmpty: '还没有记录。在结果页点击“保存到此设备”即可收集到这里。',
+    rcView: '再次查看',
+    rcDelete: '删除',
+    rcMeta: '危险{n}项 · 条款{total}条',
+  },
+  vi: {
+    rcNav: 'Hồ sơ của tôi',
+    rcSave: 'Lưu vào thiết bị này',
+    rcSaved: 'Đã lưu — chỉ trên thiết bị này',
+    rcTitle: 'Hồ sơ đã lưu',
+    rcNote: 'Không gửi gì lên máy chủ. Hồ sơ chỉ ở thiết bị này và xoá được bất cứ lúc nào.',
+    rcEmpty: 'Chưa có hồ sơ. Nhấn \'Lưu vào thiết bị này\' ở màn kết quả để gom về đây.',
+    rcView: 'Xem lại',
+    rcDelete: 'Xoá',
+    rcMeta: '{n} rủi ro · {total} điều khoản',
+  },
+  th: {
+    rcNav: 'บันทึกของฉัน',
+    rcSave: 'บันทึกลงอุปกรณ์นี้',
+    rcSaved: 'บันทึกแล้ว — เก็บบนอุปกรณ์นี้เท่านั้น',
+    rcTitle: 'รายการที่บันทึก',
+    rcNote: 'ไม่ส่งอะไรไปเซิร์ฟเวอร์ บันทึกอยู่บนอุปกรณ์นี้เท่านั้นและลบได้ทุกเมื่อ',
+    rcEmpty: 'ยังไม่มีบันทึก กด \'บันทึกลงอุปกรณ์นี้\' ที่หน้าผลลัพธ์เพื่อเก็บไว้ที่นี่',
+    rcView: 'ดูอีกครั้ง',
+    rcDelete: 'ลบ',
+    rcMeta: 'เสี่ยง {n} · {total} ข้อ',
+  },
+  id: {
+    rcNav: 'Catatan saya',
+    rcSave: 'Simpan di perangkat ini',
+    rcSaved: 'Tersimpan — hanya di perangkat ini',
+    rcTitle: 'Catatan tersimpan',
+    rcNote: 'Tidak ada yang dikirim ke server. Catatan hanya di perangkat ini dan bisa dihapus kapan saja.',
+    rcEmpty: 'Belum ada catatan. Tekan \'Simpan di perangkat ini\' di layar hasil untuk mengumpulkannya di sini.',
+    rcView: 'Lihat lagi',
+    rcDelete: 'Hapus',
+    rcMeta: '{n} risiko · {total} pasal',
+  },
+  tl: {
+    rcNav: 'Mga record ko',
+    rcSave: 'I-save sa device na ito',
+    rcSaved: 'Na-save — sa device na ito lang',
+    rcTitle: 'Mga naka-save na record',
+    rcNote: 'Walang ipinapadala sa server. Nasa device na ito lang ang records at pwedeng burahin anumang oras.',
+    rcEmpty: 'Wala pang record. Pindutin ang \'I-save sa device na ito\' sa results screen.',
+    rcView: 'Tingnan muli',
+    rcDelete: 'Burahin',
+    rcMeta: '{n} panganib · {total} probisyon',
+  },
+  ne: {
+    rcNav: 'मेरो रेकर्ड',
+    rcSave: 'यो यन्त्रमा रेकर्ड राख्ने',
+    rcSaved: 'सेभ भयो — यही यन्त्रमा मात्र',
+    rcTitle: 'सेभ गरिएका रेकर्ड',
+    rcNote: 'सर्भरमा केही पठाइँदैन। रेकर्ड यही यन्त्रमा मात्र रहन्छ र जहिले पनि मेटाउन मिल्छ।',
+    rcEmpty: 'रेकर्ड छैन। नतिजा पृष्ठमा \'यो यन्त्रमा रेकर्ड राख्ने\' थिच्नुहोस्।',
+    rcView: 'फेरि हेर्ने',
+    rcDelete: 'मेटाउने',
+    rcMeta: 'जोखिम {n} · दफा {total}',
+  },
+  km: {
+    rcNav: 'កំណត់ត្រារបស់ខ្ញុំ',
+    rcSave: 'រក្សាទុកក្នុងឧបករណ៍នេះ',
+    rcSaved: 'បានរក្សាទុក — តែក្នុងឧបករណ៍នេះ',
+    rcTitle: 'កំណត់ត្រាដែលរក្សាទុក',
+    rcNote: 'គ្មានអ្វីផ្ញើទៅម៉ាស៊ីនមេទេ។ កំណត់ត្រានៅតែក្នុងឧបករណ៍នេះ ហើយលុបបានគ្រប់ពេល។',
+    rcEmpty: 'មិនទាន់មានកំណត់ត្រា។ ចុច \'រក្សាទុកក្នុងឧបករណ៍នេះ\' នៅអេក្រង់លទ្ធផល។',
+    rcView: 'មើលម្ដងទៀត',
+    rcDelete: 'លុប',
+    rcMeta: 'ហានិភ័យ {n} · មាត្រា {total}',
+  },
+  my: {
+    rcNav: 'ကျွန်ုပ်၏မှတ်တမ်း',
+    rcSave: 'ဤစက်တွင်သိမ်းရန်',
+    rcSaved: 'သိမ်းပြီး — ဤစက်တွင်သာ',
+    rcTitle: 'သိမ်းထားသောမှတ်တမ်း',
+    rcNote: 'ဆာဗာသို့ ဘာမျှမပို့ပါ။ မှတ်တမ်းသည် ဤစက်တွင်သာရှိပြီး အချိန်မရွေးဖျက်နိုင်သည်။',
+    rcEmpty: 'မှတ်တမ်းမရှိသေးပါ။ ရလဒ်စာမျက်နှာတွင် \'ဤစက်တွင်သိမ်းရန်\' နှိပ်ပါ။',
+    rcView: 'ပြန်ကြည့်ရန်',
+    rcDelete: 'ဖျက်ရန်',
+    rcMeta: 'အန္တရာယ် {n} · အပိုဒ် {total}',
+  },
+  mn: {
+    rcNav: 'Миний бүртгэл',
+    rcSave: 'Энэ төхөөрөмжид хадгалах',
+    rcSaved: 'Хадгаллаа — зөвхөн энэ төхөөрөмжид',
+    rcTitle: 'Хадгалсан бүртгэл',
+    rcNote: 'Сервер рүү юу ч илгээгдэхгүй. Бүртгэл зөвхөн энэ төхөөрөмжид байх ба хэзээд устгаж болно.',
+    rcEmpty: 'Бүртгэл алга. Үр дүнгийн дэлгэцээс \'Энэ төхөөрөмжид хадгалах\' дарна уу.',
+    rcView: 'Дахин үзэх',
+    rcDelete: 'Устгах',
+    rcMeta: 'эрсдэл {n} · заалт {total}',
+  },
+  uz: {
+    rcNav: 'Yozuvlarim',
+    rcSave: 'Shu qurilmaga saqlash',
+    rcSaved: 'Saqlandi — faqat shu qurilmada',
+    rcTitle: 'Saqlangan yozuvlar',
+    rcNote: 'Serverga hech narsa yuborilmaydi. Yozuvlar faqat shu qurilmada, istalgan payt oʻchiriladi.',
+    rcEmpty: 'Hali yozuv yoʻq. Natija ekranida \'Shu qurilmaga saqlash\' tugmasini bosing.',
+    rcView: 'Qayta koʻrish',
+    rcDelete: 'Oʻchirish',
+    rcMeta: 'xavf {n} · band {total}',
+  },
+  si: {
+    rcNav: 'මගේ වාර්තා',
+    rcSave: 'මෙම උපකරණයේ සුරකින්න',
+    rcSaved: 'සුරැකිණි — මෙම උපකරණයේ පමණි',
+    rcTitle: 'සුරැකි වාර්තා',
+    rcNote: 'සර්වරයට කිසිවක් නොයවයි. වාර්තා මෙම උපකරණයේ පමණක් ඇති අතර ඕනෑම විටෙක මැකිය හැක.',
+    rcEmpty: 'තවම වාර්තා නැත. ප්‍රතිඵල තිරයේ \'මෙම උපකරණයේ සුරකින්න\' ඔබන්න.',
+    rcView: 'නැවත බලන්න',
+    rcDelete: 'මකන්න',
+    rcMeta: 'අවදානම් {n} · වගන්ති {total}',
+  },
+  bn: {
+    rcNav: 'আমার রেকর্ড',
+    rcSave: 'এই ডিভাইসে সংরক্ষণ',
+    rcSaved: 'সংরক্ষিত — শুধু এই ডিভাইসে',
+    rcTitle: 'সংরক্ষিত রেকর্ড',
+    rcNote: 'সার্ভারে কিছুই পাঠানো হয় না। রেকর্ড শুধু এই ডিভাইসে থাকে, যখন খুশি মুছতে পারেন।',
+    rcEmpty: 'এখনো রেকর্ড নেই। ফলাফল স্ক্রিনে \'এই ডিভাইসে সংরক্ষণ\' চাপুন।',
+    rcView: 'আবার দেখুন',
+    rcDelete: 'মুছুন',
+    rcMeta: 'ঝুঁকি {n} · ধারা {total}',
+  },
+  ru: {
+    rcNav: 'Мои записи',
+    rcSave: 'Сохранить на этом устройстве',
+    rcSaved: 'Сохранено — только на этом устройстве',
+    rcTitle: 'Сохранённые записи',
+    rcNote: 'На сервер ничего не отправляется. Записи только на этом устройстве, удалить можно в любой момент.',
+    rcEmpty: 'Записей пока нет. Нажмите «Сохранить на этом устройстве» на экране результатов.',
+    rcView: 'Открыть снова',
+    rcDelete: 'Удалить',
+    rcMeta: 'риск {n} · пунктов {total}',
+  },
+  ja: {
+    rcNav: 'マイ記録',
+    rcSave: 'この端末に保存',
+    rcSaved: '保存しました — この端末のみ',
+    rcTitle: '保存された記録',
+    rcNote: 'サーバーには何も送信されません。記録はこの端末のみにあり、いつでも削除できます。',
+    rcEmpty: 'まだ記録がありません。結果画面で「この端末に保存」を押すとここに貯まります。',
+    rcView: 'もう一度見る',
+    rcDelete: '削除',
+    rcMeta: '危険{n}件 · 条項{total}件',
+  },
 }
 
 /* --- 제휴·API 안내 (#85 BM v1) ---
@@ -2885,7 +3083,7 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | VoiceKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2895,7 +3093,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_VOICE, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

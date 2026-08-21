@@ -18,6 +18,8 @@ export function SummaryScreen({
   language = 'ko',
   liveProgress = null,
   retrying = false,
+  recordSaved = false,
+  onSaveRecord,
   domain = '',
   judgeScores = {},
   retryCount = 0,
@@ -33,6 +35,8 @@ export function SummaryScreen({
   /** 스트리밍 분석 중이면 {done,total} — 완료 조항부터 이 화면에 바로 쌓인다 */
   liveProgress?: { done: number; total: number } | null
   retrying?: boolean
+  recordSaved?: boolean
+  onSaveRecord?: () => void
   domain?: string
   judgeScores?: Record<string, number>
   retryCount?: number
@@ -312,7 +316,19 @@ export function SummaryScreen({
         </div>
       )}
 
-      <div className="mt-9 flex justify-center">
+      <div className="mt-9 flex flex-wrap justify-center gap-2.5">
+        {/* 옵트인 로컬 기록 (#102 v1) — 서버 전송 없음, 이 기기에만 */}
+        {!live && onSaveRecord && (
+          recordSaved ? (
+            <span className="inline-flex items-center rounded-2xl bg-safe-50 px-5 py-3 text-[14px] font-bold text-safe-700" role="status">
+              ✅ {t(language, 'rcSaved')}
+            </span>
+          ) : (
+            <Button variant="secondary" onClick={onSaveRecord}>
+              🗂 {t(language, 'rcSave')}
+            </Button>
+          )
+        )}
         <Button variant="secondary" onClick={onDone} disabled={live}>
           {t(language, 'finish')}
         </Button>

@@ -9,6 +9,7 @@ import {
 } from './api'
 import { Logo } from './components/ui'
 import { LANGUAGES, t } from './i18n'
+import { saveRecord, type SavedRecord } from './records'
 import type { DemoSample } from './data/samples'
 import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
@@ -20,12 +21,15 @@ import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
+import { RecordsScreen } from './screens/Records'
+
 import { LearnScreen } from './screens/Learn'
 
 type Screen =
   | 'landing'
   | 'api'
   | 'learn'
+  | 'records'
   | 'upload'
   | 'extract'
   | 'persona'
@@ -69,6 +73,9 @@ export default function App() {
   // judge 재시도로 조항이 다시 생성되는 중 — 카드가 소리 없이 교체되는 대신
   // 배너로 알린다 (#101 '새로고침 느낌' 피드백)
   const [retrying, setRetrying] = useState(false)
+  // 옵트인 로컬 기록 (#102 v1) — 현재 결과의 저장 여부
+  const [recordSaved, setRecordSaved] = useState(false)
+  const [savedRecordId, setSavedRecordId] = useState<string | null>(null)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
@@ -141,6 +148,8 @@ export default function App() {
     setData(null)
     setAnalyzedLanguage(language)
     setRetrying(false)
+    setRecordSaved(false)
+    setSavedRecordId(null)
     go('progress')
 
     try {
@@ -222,6 +231,14 @@ export default function App() {
     }
   }
 
+  const openRecord = (record: SavedRecord) => {
+    setData(record.data)
+    setDomain(record.domain)
+    setRecordSaved(true) // 이미 저장된 기록이므로 중복 저장 버튼 숨김
+    setSavedRecordId(record.id) // Done 화면 '삭제' 시 이 기록도 함께 지우기 위해
+    go('summary')
+  }
+
   const openDetail = (clauseId: string) => {
     setSelectedClauseId(clauseId)
     go('detail')
@@ -279,6 +296,13 @@ export default function App() {
             </button>
             <button
               type="button"
+              onClick={() => go('records')}
+              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+            >
+              🗂 {t(language, 'rcNav')}
+            </button>
+            <button
+              type="button"
               aria-pressed={highContrast}
               onClick={() => setHighContrast((value) => !value)}
               className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
@@ -314,6 +338,8 @@ export default function App() {
             </div>
           </div>
         )}
+        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
+        {screen === 'records' && <RecordsScreen language={language} onOpen={openRecord} />}
         {screen === 'api' && <ApiInfoScreen language={language} onBack={() => go('landing')} />}
         {screen === 'landing' && (
           <LandingScreen
@@ -382,6 +408,16 @@ export default function App() {
             language={language}
             liveProgress={streamingLive ? streamProgress : null}
             retrying={retrying}
+            recordSaved={recordSaved}
+            onSaveRecord={
+              data
+                ? () => {
+                    const record = saveRecord(data, { domain, language })
+                    setRecordSaved(true)
+                    setSavedRecordId(record.id)
+                  }
+                : undefined
+            }
             domain={domain}
             judgeScores={data?.judge_scores ?? {}}
             retryCount={data?.retry_count ?? 0}
@@ -408,6 +444,8 @@ export default function App() {
             results={results}
             language={language}
             resultsShownAt={resultsShownAt}
+            recordSaved={recordSaved}
+            savedRecordId={savedRecordId}
             onRestart={restart}
           />
         )}
