@@ -367,6 +367,9 @@ export default function App() {
             liveProgress={streamingLive ? streamProgress : null}
             retrying={retrying}
             domain={domain}
+            judgeScores={data?.judge_scores ?? {}}
+            retryCount={data?.retry_count ?? 0}
+            needsReview={data?.needs_review ?? false}
             warnings={data?.parse_warnings ?? []}
             warningCodes={data?.parse_warning_codes ?? []}
             onSelectClause={openDetail}

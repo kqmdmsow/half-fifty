@@ -8,6 +8,7 @@ import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
 import { speak, stopSpeaking } from '../tts'
 import { FormattedText } from '../components/FormattedText'
+import { JudgeReport } from '../components/JudgeReport'
 
 type Filter = '전체' | RiskLevel
 
@@ -18,6 +19,9 @@ export function SummaryScreen({
   liveProgress = null,
   retrying = false,
   domain = '',
+  judgeScores = {},
+  retryCount = 0,
+  needsReview = false,
   warnings = [],
   warningCodes = [],
   onSelectClause,
@@ -30,6 +34,9 @@ export function SummaryScreen({
   liveProgress?: { done: number; total: number } | null
   retrying?: boolean
   domain?: string
+  judgeScores?: Record<string, number>
+  retryCount?: number
+  needsReview?: boolean
   warnings?: string[]
   warningCodes?: Array<string | null>
   onSelectClause: (clauseId: string) => void
@@ -132,6 +139,18 @@ export function SummaryScreen({
         <StatCard label={riskLevelLabel(language, '주의')} value={counts.주의} tone="caution" />
         <StatCard label={riskLevelLabel(language, '안전')} value={counts.안전} tone="safe" />
       </div>
+
+      {/* AI 검증 리포트 (#53) — judge 확정 후에만 */}
+      {!live && (
+        <div className="mt-5">
+          <JudgeReport
+            scores={judgeScores}
+            retryCount={retryCount}
+            needsReview={needsReview}
+            language={language}
+          />
+        </div>
+      )}
 
       {/* 최우선 확인 */}
       {topRisk && (
