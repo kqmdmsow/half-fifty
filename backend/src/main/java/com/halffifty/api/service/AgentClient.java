@@ -66,11 +66,6 @@ public class AgentClient {
                 .body(AnalyzeResponse.class);
     }
 
-    /** 교육 콘텐츠 프록시 (#104). */
-    public String learn() {
-        return restClient.get().uri("/learn").retrieve().body(String.class);
-    }
-
     /** 교육 챗봇 프록시 (#103). */
     public String learnChat(String requestJson) {
         return restClient.post()
