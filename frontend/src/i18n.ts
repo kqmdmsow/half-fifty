@@ -2235,6 +2235,79 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+/* --- 제휴·API 안내 (#85 BM v1) ---
+   대상이 사업자(B2B)라 ko/en만 실번역 — 나머지 14개 언어는 t()의 en 폴백을
+   그대로 쓴다(Partial). 일반 사용자 플로우가 아니므로 전 언어 번역 대비
+   유지비를 줄이는 명시적 결정. */
+type ApiKey =
+  | 'apiTitle' | 'apiSubtitle'
+  | 'apiPoint1Title' | 'apiPoint1Body' | 'apiPoint2Title' | 'apiPoint2Body'
+  | 'apiPoint3Title' | 'apiPoint3Body'
+  | 'apiUseTitle' | 'apiUse1' | 'apiUse2' | 'apiUse3'
+  | 'apiHowTitle' | 'apiHowBody' | 'apiStageTitle' | 'apiStageBody'
+  | 'apiLegal' | 'apiContactCta' | 'apiBack' | 'apiFooterLink'
+
+const UI_API: Partial<Record<LangCode, Record<ApiKey, string>>> = {
+  ko: {
+    apiTitle: '조목조목 API — 계약서 위험분석을 당신의 서비스에',
+    apiSubtitle:
+      '이 사이트가 쓰는 분석 파이프라인을 그대로 API로 제공합니다. 조항 분리부터 위험 판정·쉬운 설명·확인 질문 생성까지, 검증 게이트를 통과한 결과만 반환합니다.',
+    apiPoint1Title: '검증된 결과만 반환',
+    apiPoint1Body:
+      '모든 응답은 LLM 심사(judge)의 충실성 하드페일 게이트를 통과해야 나갑니다. 기준 미달이면 재생성하거나 "검토 필요"로 표시합니다.',
+    apiPoint2Title: '인용은 코드로 검사',
+    apiPoint2Body:
+      '위험 근거의 원문 인용이 실제 조항에 존재하는지 확률이 아니라 규칙 코드로 검사해, 창작된 인용이 응답에 실리지 않습니다.',
+    apiPoint3Title: '무저장 원칙',
+    apiPoint3Body:
+      '계약서 내용을 서버에 저장하지 않고, 외부 LLM 전송 전에 주민번호·전화·계좌를 규칙으로 마스킹합니다. 로그에는 계약 내용을 남기지 않습니다.',
+    apiUseTitle: '이런 곳에 붙일 수 있어요',
+    apiUse1: '부동산 중개 플랫폼 — 매물 계약서 업로드 시 위험 조항 배지·요약 표시',
+    apiUse2: '금융사 비대면 대출·보험 약정 화면 — 서명 전 쉬운 설명과 확인 질문 자동 제공',
+    apiUse3: '전자계약·전자서명 서비스 — 서명 직전 위험 조항 하이라이트 단계 추가',
+    apiHowTitle: '어떻게 동작하나요',
+    apiHowBody:
+      '이 데모 사이트가 지금 쓰는 것과 동일한 계약(NDJSON 스트리밍)입니다. 조항이 분석되는 대로 결과가 스트리밍되고, 마지막에 검증 점수가 붙습니다.',
+    apiStageTitle: '도입 단계',
+    apiStageBody:
+      '현재는 챌린지 기간 무료 공개 단계이며, 파트너 파일럿을 거쳐 정식 과금 조건을 확정할 예정입니다. 과금 체계는 파일럿 결과와 함께 공개합니다.',
+    apiLegal:
+      '본 API의 결과는 참고용 정보이며 법률 자문이 아닙니다. 최종 판단과 고객 고지 책임은 도입 서비스에 있으며, 위험 조항에는 전문가 확인 안내를 함께 노출하는 것을 권장합니다.',
+    apiContactCta: '도입 문의 (GitHub Issues)',
+    apiBack: '홈으로',
+    apiFooterLink: '제휴·API 안내',
+  },
+  en: {
+    apiTitle: 'Jomokjomok API — contract risk analysis for your service',
+    apiSubtitle:
+      'The same pipeline behind this site, offered as an API: clause splitting, risk verdicts, plain-language explanations and check questions — only results that pass our verification gate are returned.',
+    apiPoint1Title: 'Only verified results',
+    apiPoint1Body:
+      'Every response must pass an LLM-judge faithfulness hard-fail gate. Below-threshold outputs are regenerated or flagged "needs review".',
+    apiPoint2Title: 'Citations checked by code',
+    apiPoint2Body:
+      'Whether quoted evidence actually exists in the clause is verified by rule-based code, not probability — fabricated quotes never ship.',
+    apiPoint3Title: 'Zero retention',
+    apiPoint3Body:
+      'Contract content is never stored server-side. Personal identifiers are masked by rules before any LLM call, and logs contain no contract text.',
+    apiUseTitle: 'Where it fits',
+    apiUse1: 'Real-estate platforms — risk badges and summaries when a lease contract is uploaded',
+    apiUse2: 'Digital lending / insurance flows — plain explanations and check questions before signing',
+    apiUse3: 'E-contract / e-signature services — a risk-highlight step right before signature',
+    apiHowTitle: 'How it works',
+    apiHowBody:
+      'Identical contract to what this demo site uses (NDJSON streaming): clause results stream as they are analyzed, followed by verification scores.',
+    apiStageTitle: 'Rollout',
+    apiStageBody:
+      'Currently free during the challenge period; pricing will be finalized and published after partner pilots.',
+    apiLegal:
+      'API results are informational and not legal advice. Final judgment and end-user disclosure remain the integrating service\'s responsibility; we recommend surfacing "consult a professional" guidance on risky clauses.',
+    apiContactCta: 'Contact us (GitHub Issues)',
+    apiBack: 'Back to home',
+    apiFooterLink: 'Partners & API',
+  },
+}
+
 type DownloadKey =
   | 'dlBtn' | 'dlNote' | 'dlFilename'
 
@@ -2788,7 +2861,7 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -2798,7 +2871,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

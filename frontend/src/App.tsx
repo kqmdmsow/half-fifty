@@ -14,6 +14,7 @@ import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
 import { ExtractScreen } from './screens/Extract'
+import { ApiInfoScreen } from './screens/ApiInfo'
 import { LandingScreen } from './screens/Landing'
 import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
@@ -23,6 +24,7 @@ import { LearnScreen } from './screens/Learn'
 
 type Screen =
   | 'landing'
+  | 'api'
   | 'learn'
   | 'upload'
   | 'extract'
@@ -312,7 +314,14 @@ export default function App() {
             </div>
           </div>
         )}
-        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
+        {screen === 'api' && <ApiInfoScreen language={language} onBack={() => go('landing')} />}
+        {screen === 'landing' && (
+          <LandingScreen
+            language={language}
+            onStart={() => go('upload')}
+            onApiInfo={() => go('api')}
+          />
+        )}
         {screen === 'learn' && <LearnScreen language={language} onStart={() => go('upload')} />}
         {screen === 'upload' && (
           <UploadScreen
