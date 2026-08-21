@@ -75,6 +75,7 @@ export default function App() {
   const [retrying, setRetrying] = useState(false)
   // 옵트인 로컬 기록 (#102 v1) — 현재 결과의 저장 여부
   const [recordSaved, setRecordSaved] = useState(false)
+  const [savedRecordId, setSavedRecordId] = useState<string | null>(null)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
@@ -148,6 +149,7 @@ export default function App() {
     setAnalyzedLanguage(language)
     setRetrying(false)
     setRecordSaved(false)
+    setSavedRecordId(null)
     go('progress')
 
     try {
@@ -233,6 +235,7 @@ export default function App() {
     setData(record.data)
     setDomain(record.domain)
     setRecordSaved(true) // 이미 저장된 기록이므로 중복 저장 버튼 숨김
+    setSavedRecordId(record.id) // Done 화면 '삭제' 시 이 기록도 함께 지우기 위해
     go('summary')
   }
 
@@ -409,8 +412,9 @@ export default function App() {
             onSaveRecord={
               data
                 ? () => {
-                    saveRecord(data, { domain, language })
+                    const record = saveRecord(data, { domain, language })
                     setRecordSaved(true)
+                    setSavedRecordId(record.id)
                   }
                 : undefined
             }
@@ -440,6 +444,8 @@ export default function App() {
             results={results}
             language={language}
             resultsShownAt={resultsShownAt}
+            recordSaved={recordSaved}
+            savedRecordId={savedRecordId}
             onRestart={restart}
           />
         )}
