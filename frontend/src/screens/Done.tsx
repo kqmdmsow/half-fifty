@@ -4,16 +4,24 @@ import { Button, Card, CopyButton } from '../components/ui'
 import { riskLevelLabel, riskLevelLabel as rl, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { FeedbackCard } from '../components/FeedbackCard'
+import { deleteRecord } from '../records'
 
 export function DoneScreen({
   results,
   language = 'ko',
   resultsShownAt = null,
+  recordSaved = false,
+  savedRecordId = null,
   onRestart,
 }: {
   results: ClauseResult[]
   language?: LangCode
   resultsShownAt?: number | null
+  /** 옵트인 로컬 기록(#102 v1)으로 이 결과를 저장했는지 — 삭제 안내 문구 분기용 */
+  recordSaved?: boolean
+  /** 저장된 기록의 id — '지금 삭제'를 누르면 이 기록도 함께 지운다(문구·실제
+      동작 불일치 방지: "모든 데이터를 삭제했어요"인데 내 기록에 남아있으면 안 됨) */
+  savedRecordId?: string | null
   onRestart: () => void
 }) {
   const [deleted, setDeleted] = useState(false)
@@ -152,9 +160,14 @@ export function DoneScreen({
 
       <Card className="mt-8 flex flex-col items-start justify-between gap-4 p-6 md:flex-row md:items-center">
         <div>
-          <p className="text-[15px] font-bold text-ink-900">{t(language, 'doDeleteTitle')}</p>
+          {/* 옵트인 로컬 기록(#102 v1)으로 저장한 경우 "화면을 닫으면 사라져요"가
+              더 이상 사실이 아니므로 문구를 분기한다 — 모호한 절충 문구 대신
+              두 상황 각각 정확한 문구를 쓴다(프라이버시 문구는 모호하면 불신). */}
+          <p className="text-[15px] font-bold text-ink-900">
+            {t(language, recordSaved ? 'doDeleteTitleSaved' : 'doDeleteTitle')}
+          </p>
           <p className="mt-1 text-[14px] leading-relaxed text-ink-400">
-            {t(language, 'doDeleteDesc')}
+            {t(language, recordSaved ? 'doDeleteDescSaved' : 'doDeleteDesc')}
           </p>
         </div>
         {confirming ? (
@@ -162,7 +175,14 @@ export function DoneScreen({
             <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>
               {t(language, 'doCancel')}
             </Button>
-            <Button variant="danger" size="sm" onClick={() => setDeleted(true)}>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => {
+                if (savedRecordId) deleteRecord(savedRecordId)
+                setDeleted(true)
+              }}
+            >
               {t(language, 'doConfirmDel')}
             </Button>
           </div>
