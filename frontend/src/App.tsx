@@ -19,9 +19,11 @@ import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
+import { LearnScreen } from './screens/Learn'
 
 type Screen =
   | 'landing'
+  | 'learn'
   | 'upload'
   | 'extract'
   | 'persona'
@@ -222,6 +224,16 @@ export default function App() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo onClick={() => go('landing')} />
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-pressed={screen === 'learn'}
+              onClick={() => go('learn')}
+              className={`rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+                screen === 'learn' ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              📖 {t(language, 'lnNav')}
+            </button>
             <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
               <span aria-hidden>🌐</span>
               <select
@@ -287,6 +299,7 @@ export default function App() {
           </div>
         )}
         {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
+        {screen === 'learn' && <LearnScreen language={language} onStart={() => go('upload')} />}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}

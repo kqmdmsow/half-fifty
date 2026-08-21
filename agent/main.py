@@ -32,6 +32,7 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
+from src.learn_content import SCAMS
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
@@ -141,6 +142,17 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
         judge_scores=judge_scores,
         results=results,
     )
+
+
+@app.get("/learn")
+def learn() -> dict:
+    """교육 콘텐츠 단일 원천 — 프론트가 표시용으로 가져간다 (#104).
+
+    내장 챗봇(/learn-chat, #103)은 세션당 대화 횟수 상한과 인젝션 방어
+    (#131 규칙 탐지기 재사용 또는 #149식 프롬프트 방어 블록) 조건을 걸고
+    나서 별도 PR로 합류한다 — 지금은 정적 콘텐츠만 노출.
+    """
+    return {"scams": SCAMS}
 
 
 @app.get("/health")
