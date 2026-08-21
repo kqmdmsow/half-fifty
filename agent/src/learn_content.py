@@ -143,6 +143,46 @@ def risk_types_with_cases() -> list:
     return [{**g, "cases": get_related_cases(g["title"])} for g in RISK_TYPE_GUIDE]
 
 
+# --- 정적 번역본 서빙 (#104 콘텐츠 다국어화) ---
+# generate_learn_translations.py가 워커 LLM으로 한 번 생성해 커밋한 파일.
+# 없는 언어·필드는 한국어 원문 폴백 — 번역 실패가 페이지를 깨지 않는다.
+import json as _json
+from pathlib import Path as _Path
+
+_TRANSLATIONS_PATH = _Path(__file__).parent / "learn_translations.json"
+try:
+    _TRANSLATIONS: dict = _json.loads(_TRANSLATIONS_PATH.read_text(encoding="utf-8"))
+except FileNotFoundError:
+    _TRANSLATIONS = {}
+
+
+def localized_learn(language: str = "ko") -> dict:
+    """/learn 응답 — 요청 언어의 정적 번역본을 병합해 반환.
+
+    content_language로 실제 서빙 언어를 알려 프론트가 '한국어 제공' 안내를
+    번역이 있는 언어에서는 숨길 수 있게 한다. 사례의 기관명·사건번호는
+    원문 유지(표기 관례), 결과 요약(result)만 번역본으로 교체.
+    """
+    base = {"scams": SCAMS, "risk_types": risk_types_with_cases()}
+    tr = _TRANSLATIONS.get(language or "ko")
+    if not tr:
+        return {**base, "content_language": "ko"}
+    tr_types = {t["id"]: t for t in tr.get("risk_types", [])}
+    tr_scams = {t["id"]: t for t in tr.get("scams", [])}
+    tr_cases = tr.get("cases", {})
+    risk_types = []
+    for g in base["risk_types"]:
+        t = tr_types.get(g["id"], {})
+        cases = [{**c, "result": tr_cases.get(c["case_id"], c["result"])} for c in g["cases"]]
+        risk_types.append({**g, "what": t.get("what", g["what"]),
+                           "signals": t.get("signals", g["signals"]),
+                           "tip": t.get("tip", g["tip"]), "cases": cases})
+    scams = [{**s, **{k: tr_scams.get(s["id"], {}).get(k, s[k])
+                      for k in ("title", "what", "signal", "outside", "case")}}
+             for s in SCAMS]
+    return {"scams": scams, "risk_types": risk_types, "content_language": language}
+
+
 def content_as_context() -> str:
     """챗봇 프롬프트 주입용 직렬화 — 전세사기 수법 + 위험 유형 가이드 전체."""
     parts = []
