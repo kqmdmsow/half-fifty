@@ -294,52 +294,9 @@ export default function App() {
 
         {menuOpen && (
           <div id="site-menu" className="border-t border-ink-50 bg-white">
-            <div className="mx-auto max-w-6xl px-4 py-4 md:px-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600">
-                  <select
-                    aria-label="언어 선택 / Language"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value as Language)}
-                    className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
-                  >
-                    {LANGUAGES.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button
-                  type="button"
-                  aria-pressed={largeText}
-                  onClick={() => setLargeText((value) => !value)}
-                  className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                    largeText ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-                  }`}
-                >
-                  {t(language, 'largeText')}
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={highContrast}
-                  onClick={() => setHighContrast((value) => !value)}
-                  className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                    highContrast ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-                  }`}
-                >
-                  {t(language, 'hcToggle')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    go('records')
-                  }}
-                  className="rounded-full bg-ink-50 px-4 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
-                >
-                  {t(language, 'rcNav')}
-                </button>
+            <div className="mx-auto max-w-md px-4 py-2 md:max-w-lg md:px-6">
+              <div className="flex flex-col">
+                {/* 로그인 — 가장 위 */}
                 <button
                   type="button"
                   onClick={() => {
@@ -351,14 +308,67 @@ export default function App() {
                       go('login')
                     }
                   }}
-                  className="rounded-full bg-ink-50 px-4 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
                 >
                   {t(language, session ? 'lgOut' : 'lgNav')}
+                  {session && (
+                    <span className="text-[12px] font-semibold text-ink-400">{session.email}</span>
+                  )}
+                </button>
+                {/* 언어 */}
+                <div className="flex w-full items-center justify-between gap-3 border-b border-ink-50 px-2 py-3">
+                  <span className="text-[15px] font-bold text-ink-900">
+                    {t(language, 'languageLabel')}
+                  </span>
+                  <select
+                    aria-label="언어 선택 / Language"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as Language)}
+                    className="cursor-pointer rounded-xl bg-ink-50 px-3 py-2 text-[14px] font-bold text-ink-700 outline-none"
+                  >
+                    {LANGUAGES.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* 글자 크게 */}
+                <button
+                  type="button"
+                  aria-pressed={largeText}
+                  onClick={() => setLargeText((value) => !value)}
+                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
+                >
+                  {t(language, 'largeText')}
+                  <span className={`text-[13px] font-bold ${largeText ? 'text-brand-500' : 'text-ink-300'}`}>
+                    {largeText ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+                {/* 또렷하게 (고대비) */}
+                <button
+                  type="button"
+                  aria-pressed={highContrast}
+                  onClick={() => setHighContrast((value) => !value)}
+                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
+                >
+                  {t(language, 'hcToggle')}
+                  <span className={`text-[13px] font-bold ${highContrast ? 'text-brand-500' : 'text-ink-300'}`}>
+                    {highContrast ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+                {/* 내 기록 — 가장 아래 */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    go('records')
+                  }}
+                  className="flex w-full items-center px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
+                >
+                  {t(language, 'rcNav')}
                 </button>
               </div>
-              {session && (
-                <p className="mt-3 text-[12px] font-semibold text-ink-400">{session.email}</p>
-              )}
             </div>
           </div>
         )}
