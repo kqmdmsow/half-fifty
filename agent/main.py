@@ -33,7 +33,7 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
-from src.learn_content import SCAMS, content_as_context
+from src.learn_content import SCAMS, content_as_context, risk_types_with_cases
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.state import PipelineState
@@ -160,7 +160,7 @@ class LearnChatRequest(BaseModel):
 @app.get("/learn")
 def learn() -> dict:
     """교육 콘텐츠 단일 원천 — 프론트가 표시용으로 가져간다."""
-    return {"scams": SCAMS}
+    return {"scams": SCAMS, "risk_types": risk_types_with_cases()}
 
 
 @app.post("/learn-chat")
