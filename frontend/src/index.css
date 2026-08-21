@@ -132,7 +132,19 @@
   /* 회전 헤드라인 단어 교체 (#134) — 아래에서 살짝 떠오르며 교체 */
   .word-swap {
     display: inline-block;
-    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    /* 교체 자체도 천천히 — 0.5s는 툭 튀는 느낌이라 0.8s로 늘리고 이동 폭을 줄였다 */
+    animation: word-swap 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes word-swap {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* 히어로 로드 스태거 — 배지→제목→부제→CTA 순서로 떠오른다 */

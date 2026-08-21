@@ -45,7 +45,9 @@ export function RotatingTitle({ language = 'ko' }: { language?: LangCode }) {
   useEffect(() => {
     setIdx(0)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const timer = setInterval(() => setIdx((i) => (i + 1) % cfg.pairs.length), 2600)
+    // 교체 주기 4.8초 — 2.6초는 읽기도 전에 넘어가 산만하다는 피드백(레퍼런스
+    // imweb 히어로도 이 정도로 느리게 돈다). 문구가 4종이라 한 바퀴 ≈ 19초.
+    const timer = setInterval(() => setIdx((i) => (i + 1) % cfg.pairs.length), 4800)
     return () => clearInterval(timer)
   }, [language, cfg.pairs.length])
 
