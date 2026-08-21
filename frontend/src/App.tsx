@@ -9,19 +9,30 @@ import {
 } from './api'
 import { Logo } from './components/ui'
 import { LANGUAGES, t } from './i18n'
+import { saveRecord, type SavedRecord } from './records'
 import type { DemoSample } from './data/samples'
 import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
 import { ExtractScreen } from './screens/Extract'
+import { ApiInfoScreen } from './screens/ApiInfo'
 import { LandingScreen } from './screens/Landing'
 import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
+import { RecordsScreen } from './screens/Records'
+
+import { LearnScreen } from './screens/Learn'
+
+// KRDS --krds-zoom-small/medium/large/xlarge/xxlarge (common.css)
+const ZOOM_LEVELS = [0.9, 1, 1.1, 1.3, 1.5]
 
 type Screen =
   | 'landing'
+  | 'api'
+  | 'learn'
+  | 'records'
   | 'upload'
   | 'extract'
   | 'persona'
@@ -42,7 +53,12 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('ko')
 
   // 접근성 설정
-  const [largeText, setLargeText] = useState(false)
+  // 글자·화면 크기 5단계 (KRDS --krds-zoom-*: 0.9/1/1.1/1.3/1.5) —
+  // KRDS 사이트 우상단 '글자·화면 설정'과 같은 사고방식, 선택값은 저장.
+  const [zoom, setZoom] = useState<number>(() => {
+    const saved = Number(localStorage.getItem('jmjm_zoom'))
+    return ZOOM_LEVELS.includes(saved) ? saved : 1
+  })
   const [highContrast, setHighContrast] = useState(false)
   const [voiceGuide, setVoiceGuide] = useState(false)
 
@@ -60,9 +76,14 @@ export default function App() {
   // 결과가 생성된 언어 — 결과를 보다가 언어를 바꾸면 UI 라벨만 바뀌고 설명은
   // 분석 시점 언어로 남는다. 불일치를 감지해 재분석 안내 배너를 띄운다.
   const [analyzedLanguage, setAnalyzedLanguage] = useState<Language>('ko')
+  // 사람 평가 지표(자문 §6): 결과 표시 시각 — 만족도 응답까지의 '읽는 시간' 측정용
+  const [resultsShownAt, setResultsShownAt] = useState<number | null>(null)
   // judge 재시도로 조항이 다시 생성되는 중 — 카드가 소리 없이 교체되는 대신
   // 배너로 알린다 (#101 '새로고침 느낌' 피드백)
   const [retrying, setRetrying] = useState(false)
+  // 옵트인 로컬 기록 (#102 v1) — 현재 결과의 저장 여부
+  const [recordSaved, setRecordSaved] = useState(false)
+  const [savedRecordId, setSavedRecordId] = useState<string | null>(null)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
@@ -80,10 +101,18 @@ export default function App() {
   const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
   hasResultsRef.current = results.length > 0
 
+  // 글자·화면 크기: KRDS zoom 토큰 값을 문서 루트에 적용 — 텍스트만이 아니라
+  // 레이아웃·아이콘·터치 타깃이 함께 커져 저시력 사용자에게 일관적이다.
+  // 결과가 확정되면 읽기 시작 시각 기록 (사람 평가 소요시간 지표)
+  useEffect(() => {
+    if (data) setResultsShownAt(Date.now())
+  }, [data])
+
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
-    document.documentElement.style.fontSize = largeText ? '18px' : '16px'
-  }, [largeText])
+    document.documentElement.style.zoom = String(zoom)
+    localStorage.setItem('jmjm_zoom', String(zoom))
+  }, [zoom])
 
   // 접근성(#82): 화면 전환 시 스크린리더 포커스를 새 화면 제목으로 이동 —
   // SPA는 페이지 로드가 없어 전환을 알리지 않으면 리더가 침묵한다
@@ -130,6 +159,8 @@ export default function App() {
     setData(null)
     setAnalyzedLanguage(language)
     setRetrying(false)
+    setRecordSaved(false)
+    setSavedRecordId(null)
     go('progress')
 
     try {
@@ -211,6 +242,14 @@ export default function App() {
     }
   }
 
+  const openRecord = (record: SavedRecord) => {
+    setData(record.data)
+    setDomain(record.domain)
+    setRecordSaved(true) // 이미 저장된 기록이므로 중복 저장 버튼 숨김
+    setSavedRecordId(record.id) // Done 화면 '삭제' 시 이 기록도 함께 지우기 위해
+    go('summary')
+  }
+
   const openDetail = (clauseId: string) => {
     setSelectedClauseId(clauseId)
     go('detail')
@@ -218,10 +257,29 @@ export default function App() {
 
   return (
     <div className={`min-h-screen bg-white ${highContrast ? 'hc' : ''}`}>
+      {/* 스크린리더·키보드 사용자용 스킵 링크 (#82 2차) — 포커스될 때만 보임 */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-brand-500 focus:px-4 focus:py-2 focus:text-white"
+      >
+        {t(language, 'skipToMain')}
+      </a>
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* 좁은 폭(375px)에서는 컨트롤이 둘째 줄로 내려간다 — 고정 h-16이면
+            zoom 스테퍼가 추가된 뒤 오버플로로 '또렷하게'가 잘림 (실측) */}
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-y-1 px-4 py-1.5 md:px-6">
           <Logo onClick={() => go('landing')} />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+            <button
+              type="button"
+              aria-pressed={screen === 'learn'}
+              onClick={() => go('learn')}
+              className={`rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+                screen === 'learn' ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              📖 {t(language, 'lnNav')}
+            </button>
             <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
               <span aria-hidden>🌐</span>
               <select
@@ -237,17 +295,42 @@ export default function App() {
                 ))}
               </select>
             </label>
+            {/* 글자·화면 크기 (KRDS zoom 5단계) — 값은 aria-live로 낭독 */}
+            <div
+              role="group"
+              aria-label={t(language, 'zoomLabel')}
+              className="flex items-center gap-0.5 rounded-full bg-ink-50 px-1.5 py-1 text-[13px] font-bold text-ink-600"
+            >
+              <button
+                type="button"
+                aria-label={t(language, 'zoomOut')}
+                disabled={zoom === ZOOM_LEVELS[0]}
+                onClick={() => setZoom(ZOOM_LEVELS[Math.max(0, ZOOM_LEVELS.indexOf(zoom) - 1)])}
+                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+              >
+                가−
+              </button>
+              <span aria-live="polite" className="min-w-[42px] text-center tabular-nums">
+                {Math.round(zoom * 100)}%
+              </span>
+              <button
+                type="button"
+                aria-label={t(language, 'zoomIn')}
+                disabled={zoom === ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
+                onClick={() =>
+                  setZoom(ZOOM_LEVELS[Math.min(ZOOM_LEVELS.length - 1, ZOOM_LEVELS.indexOf(zoom) + 1)])
+                }
+                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+              >
+                가+
+              </button>
+            </div>
             <button
               type="button"
-              aria-pressed={largeText}
-              onClick={() => setLargeText((value) => !value)}
-              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                largeText
-                  ? 'bg-ink-900 text-white'
-                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-              }`}
+              onClick={() => go('records')}
+              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
             >
-              {t(language, 'largeText')}
+              🗂 {t(language, 'rcNav')}
             </button>
             <button
               type="button"
@@ -265,7 +348,7 @@ export default function App() {
         </div>
       </header>
 
-      <main>
+      <main id="main">
         {/* 결과 열람 중 언어 변경 감지 — 설명은 분석 시점 언어로 생성되므로
             바꾼 언어로 받으려면 재분석이 필요하다. 입력(텍스트·파일)은 상태에
             남아 있어 버튼 한 번으로 같은 계약서를 다시 분석한다. */}
@@ -286,7 +369,16 @@ export default function App() {
             </div>
           </div>
         )}
-        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
+        {screen === 'records' && <RecordsScreen language={language} onOpen={openRecord} />}
+        {screen === 'api' && <ApiInfoScreen language={language} onBack={() => go('landing')} />}
+        {screen === 'landing' && (
+          <LandingScreen
+            language={language}
+            onStart={() => go('upload')}
+            onApiInfo={() => go('api')}
+          />
+        )}
+        {screen === 'learn' && <LearnScreen language={language} onStart={() => go('upload')} />}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}
@@ -316,12 +408,12 @@ export default function App() {
           <PersonaScreen
             persona={persona}
             language={language}
-            largeText={largeText}
+            largeText={zoom > 1}
             highContrast={highContrast}
             voiceGuide={voiceGuide}
             onPersonaChange={setPersona}
             onLanguageChange={setLanguage}
-            onToggleLargeText={() => setLargeText((value) => !value)}
+            onToggleLargeText={() => setZoom((value) => (value > 1 ? 1 : 1.3))}
             onToggleHighContrast={() => setHighContrast((value) => !value)}
             onToggleVoiceGuide={() => setVoiceGuide((value) => !value)}
             onPrev={() => go('extract')}
@@ -346,8 +438,22 @@ export default function App() {
             language={language}
             liveProgress={streamingLive ? streamProgress : null}
             retrying={retrying}
+            recordSaved={recordSaved}
+            onSaveRecord={
+              data
+                ? () => {
+                    const record = saveRecord(data, { domain, language })
+                    setRecordSaved(true)
+                    setSavedRecordId(record.id)
+                  }
+                : undefined
+            }
             domain={domain}
+            judgeScores={data?.judge_scores ?? {}}
+            retryCount={data?.retry_count ?? 0}
+            needsReview={data?.needs_review ?? false}
             warnings={data?.parse_warnings ?? []}
+            warningCodes={data?.parse_warning_codes ?? []}
             onSelectClause={openDetail}
             onDone={() => go('done')}
           />
@@ -363,7 +469,16 @@ export default function App() {
             onDone={() => go('done')}
           />
         )}
-        {screen === 'done' && <DoneScreen results={results} language={language} onRestart={restart} />}
+        {screen === 'done' && (
+          <DoneScreen
+            results={results}
+            language={language}
+            resultsShownAt={resultsShownAt}
+            recordSaved={recordSaved}
+            savedRecordId={savedRecordId}
+            onRestart={restart}
+          />
+        )}
       </main>
     </div>
   )
