@@ -62,6 +62,12 @@ public class ContractController {
         return agentClient.quiz(request);
     }
 
+    /** 재설명 프록시 (#76) — 에이전트 /reexplain 중계. */
+    @PostMapping("/reexplain")
+    public String reexplain(@RequestBody String request) {
+        return agentClient.reexplain(request);
+    }
+
     /** 업로드 허용 최대 크기 (application.yml multipart 한도와 함께 이중 방어). */
     private static final long MAX_PDF_BYTES = 10 * 1024 * 1024;
 

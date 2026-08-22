@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ClauseResult } from '../api'
+import { reexplainClause } from '../api'
+import type { ClauseResult, Persona } from '../api'
 import { Button, CopyButton, RiskBadge, RiskIcon } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
@@ -13,6 +14,7 @@ export function DetailScreen({
   results,
   voiceGuide,
   language = 'ko',
+  persona = 'adult',
   onSelectClause,
   onBack,
   onDone,
@@ -21,11 +23,38 @@ export function DetailScreen({
   results: ClauseResult[]
   voiceGuide: boolean
   language?: LangCode
+  persona?: Persona
   onSelectClause: (clauseId: string) => void
   onBack: () => void
   onDone: () => void
 }) {
   const clause = results.find((result) => result.clause_id === clauseId) ?? results[0]
+
+  // 사용자 트리거 재설명 (#76) — judge 게이트 통과분만 반영, 조항당 2회 제한.
+  // 판정 불변: explanation 표시만 오버라이드, risk_* 필드는 원본 그대로.
+  const [reexplained, setReexplained] = useState<Record<string, { text: string; scores: Record<string, number> }>>({})
+  const [reCount, setReCount] = useState<Record<string, number>>({})
+  const [reState, setReState] = useState<'idle' | 'loading' | 'failed'>('idle')
+
+  const requestReexplain = async (mode: 'easier' | 'detailed') => {
+    if (!clause || reState === 'loading') return
+    setReState('loading')
+    try {
+      const out = await reexplainClause(clause, mode, persona, language)
+      setReCount((prev) => ({ ...prev, [clause.clause_id]: (prev[clause.clause_id] ?? 0) + 1 }))
+      if (out.ok && out.explanation) {
+        setReexplained((prev) => ({
+          ...prev,
+          [clause.clause_id]: { text: out.explanation!, scores: out.judge_scores ?? {} },
+        }))
+        setReState('idle')
+      } else {
+        setReState('failed')
+      }
+    } catch {
+      setReState('failed')
+    }
+  }
   const [listening, setListening] = useState(false)
   const voiceReady = useVoiceAvailable(language)
 
@@ -190,7 +219,60 @@ export function DetailScreen({
           </div>
 
           <Section title={t(language, 'explainSimply')}>
-            <FormattedText text={clause.explanation} lead />
+            {(() => {
+              const re = reexplained[clause.clause_id]
+              const showRe = Boolean(re)
+              return (
+                <>
+                  {showRe && (
+                    <p className="mb-2 inline-flex items-center gap-1.5 rounded-lg bg-safe-50 px-2.5 py-1 text-[12px] font-bold text-safe-700">
+                      <span aria-hidden>🛡️</span> {t(language, 'reVerified')}
+                      {re.scores.faithfulness != null && (
+                        <span className="font-semibold text-safe-700/70">
+                          (faithfulness {re.scores.faithfulness.toFixed(1)})
+                        </span>
+                      )}
+                    </p>
+                  )}
+                  <FormattedText text={showRe ? re.text : clause.explanation} lead />
+
+                </>
+              )
+            })()}
+
+            {/* 재설명 트리거 (#76) — judge 게이트 통과분만 반영 */}
+            <div className="mt-3.5">
+              {reState === 'loading' ? (
+                <p className="flex items-center gap-2 text-[13px] font-semibold text-brand-600" role="status">
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" aria-hidden />
+                  {t(language, 'reLoading')}
+                </p>
+              ) : (reCount[clause.clause_id] ?? 0) >= 2 ? (
+                <p className="text-[13px] font-semibold text-ink-400">{t(language, 'reLimit')}</p>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => requestReexplain('easier')}
+                    className="rounded-full bg-brand-50 px-3.5 py-2 text-[13px] font-bold text-brand-600 transition-colors hover:bg-brand-100"
+                  >
+                    {t(language, 'reEasier')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => requestReexplain('detailed')}
+                    className="rounded-full bg-brand-50 px-3.5 py-2 text-[13px] font-bold text-brand-600 transition-colors hover:bg-brand-100"
+                  >
+                    {t(language, 'reDetailed')}
+                  </button>
+                  {reState === 'failed' && (
+                    <span className="text-[13px] font-semibold text-caution-700" role="status">
+                      {t(language, 'reFailed')}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </Section>
 
           {clause.risk_level !== '안전' && (

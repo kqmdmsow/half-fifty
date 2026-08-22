@@ -36,6 +36,7 @@ from src.learn_content import localized_learn
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.quiz import generate_quiz
+from src.reexplain import reexplain
 from src.state import PipelineState
 from src.stream import stream_analysis
 
@@ -158,10 +159,30 @@ class QuizRequest(BaseModel):
     language: Optional[Language] = "ko"
 
 
+class ReexplainRequest(BaseModel):
+    """사용자 트리거 재설명 (#76) — explanation만 재생성, 판정 불변."""
+
+    clause_id: str
+    clause_text: str = Field(..., description="조항 원문 (judge faithfulness 채점 기준)")
+    analysis: dict = Field(..., description="기존 분석 결과 (risk_level 등 판정 필드 포함)")
+    mode: Literal["easier", "detailed"]
+    persona: Literal["adult", "senior", "foreigner"] = "adult"
+    language: Optional[Language] = "ko"
+
+
 @app.post("/quiz")
 def quiz(req: QuizRequest) -> dict:
     """객관식 3문항 생성 — 코드 가드 통과분만, 미달 시 빈 목록 (src/quiz.py)."""
     return {"questions": generate_quiz(req.items, req.persona, req.language or "ko")}  # type: ignore[arg-type]
+
+
+@app.post("/reexplain")
+def reexplain_endpoint(req: ReexplainRequest) -> dict:
+    """judge 게이트 통과분만 반환 — 실패 시 ok=False (프론트는 기존 설명 유지)."""
+    return reexplain(req.clause_id, req.clause_text, req.analysis,
+                     req.mode, req.persona, req.language or "ko")
+
+
 @app.get("/learn")
 def learn(language: str = "ko") -> dict:
     """교육 콘텐츠 단일 원천 — 정적 번역본이 있는 언어는 번역해서 반환 (#104).

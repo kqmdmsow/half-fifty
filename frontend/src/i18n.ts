@@ -2251,6 +2251,93 @@ const UI_CALC: Record<LangCode, Record<CalcKey, string>> = {
   },
 }
 
+type ReexplainKey =
+  | 'reEasier' | 'reDetailed' | 'reLoading' | 'reVerified' | 'reFailed' | 'reLimit' | 'reShowOriginal'
+
+// 사용자 트리거 재설명 (#76)
+const UI_REEXPLAIN: Record<LangCode, Record<ReexplainKey, string>> = {
+  ko: {
+    reEasier: '더 쉽게 설명해줘', reDetailed: '더 자세히 설명해줘',
+    reLoading: '다시 설명하는 중 — AI 검증을 통과해야 표시돼요', reVerified: 'AI 검증 통과 — 설명이 새로 바뀌었어요',
+    reFailed: '검증을 통과한 새 설명을 만들지 못했어요. 원래 설명을 유지할게요.', reLimit: '재설명은 조항당 2회까지예요. 더 궁금하면 아래 전문가 상담을 이용해 보세요.', reShowOriginal: '원래 설명 보기',
+  },
+  en: {
+    reEasier: 'Explain more simply', reDetailed: 'Explain in more detail',
+    reLoading: 'Re-explaining — shown only if it passes AI verification', reVerified: 'Passed AI verification — explanation updated',
+    reFailed: 'Couldn\'t produce a new explanation that passes verification. Keeping the original.', reLimit: 'Re-explanations are limited to 2 per clause. For more, try the expert help below.', reShowOriginal: 'View original explanation',
+  },
+  zh: {
+    reEasier: '再讲得简单点', reDetailed: '再讲得详细点',
+    reLoading: '正在重新说明 — 只有通过AI验证才会显示', reVerified: '已通过AI验证 — 说明已更新',
+    reFailed: '未能生成通过验证的新说明，保留原说明。', reLimit: '每个条款最多重新说明2次。如需更多，请使用下方专家咨询。', reShowOriginal: '查看原说明',
+  },
+  vi: {
+    reEasier: 'Giải thích dễ hơn', reDetailed: 'Giải thích chi tiết hơn',
+    reLoading: 'Đang giải thích lại — chỉ hiển thị khi qua kiểm chứng AI', reVerified: 'Đã qua kiểm chứng AI — giải thích được cập nhật',
+    reFailed: 'Không tạo được giải thích mới qua kiểm chứng. Giữ giải thích gốc.', reLimit: 'Tối đa 2 lần giải thích lại mỗi điều khoản. Cần thêm, hãy dùng tư vấn chuyên gia bên dưới.', reShowOriginal: 'Xem giải thích gốc',
+  },
+  th: {
+    reEasier: 'อธิบายให้ง่ายขึ้น', reDetailed: 'อธิบายละเอียดขึ้น',
+    reLoading: 'กำลังอธิบายใหม่ — แสดงเมื่อผ่านการตรวจ AI เท่านั้น', reVerified: 'ผ่านการตรวจ AI — อัปเดตคำอธิบายแล้ว',
+    reFailed: 'สร้างคำอธิบายใหม่ที่ผ่านการตรวจไม่ได้ คงคำอธิบายเดิม', reLimit: 'อธิบายใหม่ได้สูงสุด 2 ครั้งต่อข้อ หากต้องการเพิ่ม ใช้คำปรึกษาผู้เชี่ยวชาญด้านล่าง', reShowOriginal: 'ดูคำอธิบายเดิม',
+  },
+  id: {
+    reEasier: 'Jelaskan lebih sederhana', reDetailed: 'Jelaskan lebih rinci',
+    reLoading: 'Menjelaskan ulang — tampil hanya jika lolos verifikasi AI', reVerified: 'Lolos verifikasi AI — penjelasan diperbarui',
+    reFailed: 'Tidak bisa membuat penjelasan baru yang lolos verifikasi. Penjelasan asli dipertahankan.', reLimit: 'Maksimal 2 penjelasan ulang per pasal. Untuk lebih, gunakan konsultasi ahli di bawah.', reShowOriginal: 'Lihat penjelasan asli',
+  },
+  tl: {
+    reEasier: 'Ipaliwanag nang mas simple', reDetailed: 'Ipaliwanag nang mas detalyado',
+    reLoading: 'Nire-explain ulit — lalabas lang kapag pumasa sa AI verification', reVerified: 'Pumasa sa AI verification — na-update ang paliwanag',
+    reFailed: 'Hindi nakagawa ng bagong paliwanag na pumasa. Pananatilihin ang orihinal.', reLimit: 'Hanggang 2 beses lang ang re-explain kada probisyon. Gamitin ang expert help sa ibaba.', reShowOriginal: 'Tingnan ang orihinal',
+  },
+  ne: {
+    reEasier: 'अझ सजिलो गरी बुझाऊ', reDetailed: 'अझ विस्तारमा बुझाऊ',
+    reLoading: 'पुनः व्याख्या हुँदै — एआई प्रमाणीकरण पास भए मात्र देखिन्छ', reVerified: 'एआई प्रमाणीकरण पास — व्याख्या अद्यावधिक',
+    reFailed: 'प्रमाणीकरण पास हुने नयाँ व्याख्या बनेन। पुरानै राखिन्छ।', reLimit: 'प्रति दफा २ पटकसम्म मात्र। थपका लागि तलको विशेषज्ञ परामर्श।', reShowOriginal: 'पुरानो व्याख्या हेर्ने',
+  },
+  km: {
+    reEasier: 'ពន្យល់ងាយជាង', reDetailed: 'ពន្យល់លម្អិតជាង',
+    reLoading: 'កំពុងពន្យល់ឡើងវិញ — បង្ហាញតែពេលឆ្លងការផ្ទៀងផ្ទាត់ AI', reVerified: 'ឆ្លងការផ្ទៀងផ្ទាត់ AI — បានធ្វើបច្ចុប្បន្នភាព',
+    reFailed: 'មិនអាចបង្កើតការពន្យល់ថ្មីដែលឆ្លងបានទេ។ រក្សាការពន្យល់ដើម។', reLimit: 'ពន្យល់ឡើងវិញបានត្រឹម 2 ដងក្នុងមួយមាត្រា។ ប្រើការប្រឹក្សាអ្នកជំនាញខាងក្រោម។', reShowOriginal: 'មើលការពន្យល់ដើម',
+  },
+  my: {
+    reEasier: 'ပိုလွယ်အောင်ရှင်းပြပါ', reDetailed: 'ပိုအသေးစိတ်ရှင်းပြပါ',
+    reLoading: 'ပြန်ရှင်းနေသည် — AI စစ်ဆေးမှုအောင်မှသာ ပြသည်', reVerified: 'AI စစ်ဆေးမှုအောင် — ရှင်းလင်းချက်အသစ်',
+    reFailed: 'စစ်ဆေးမှုအောင်သော ရှင်းလင်းချက်အသစ် မဖန်တီးနိုင်ပါ။ မူရင်းကို ထားပါမည်။', reLimit: 'အပိုဒ်တစ်ခုလျှင် ၂ ကြိမ်သာ။ ထပ်လိုလျှင် အောက်က ကျွမ်းကျင်သူအကူအညီ။', reShowOriginal: 'မူရင်းရှင်းလင်းချက်ကြည့်ရန်',
+  },
+  mn: {
+    reEasier: 'Илүү энгийнээр тайлбарла', reDetailed: 'Илүү дэлгэрэнгүй тайлбарла',
+    reLoading: 'Дахин тайлбарлаж байна — AI баталгаажуулалт давсан үед л харагдана', reVerified: 'AI баталгаажуулалт давлаа — тайлбар шинэчлэгдсэн',
+    reFailed: 'Давсан шинэ тайлбар гаргаж чадсангүй. Хуучныг хадгална.', reLimit: 'Заалт бүрд 2 удаа л дахин тайлбарлана. Илүүг доорх мэргэжилтний зөвлөгөөнөөс.', reShowOriginal: 'Хуучин тайлбарыг үзэх',
+  },
+  uz: {
+    reEasier: 'Soddaroq tushuntir', reDetailed: 'Batafsilroq tushuntir',
+    reLoading: 'Qayta tushuntirilmoqda — faqat AI tekshiruvidan oʻtsa koʻrsatiladi', reVerified: 'AI tekshiruvidan oʻtdi — tushuntirish yangilandi',
+    reFailed: 'Tekshiruvdan oʻtgan yangi tushuntirish chiqmadi. Asli saqlanadi.', reLimit: 'Har bandga 2 martagacha. Koʻproq uchun quyidagi mutaxassis maslahati.', reShowOriginal: 'Asl tushuntirishni koʻrish',
+  },
+  si: {
+    reEasier: 'තව සරලව පැහැදිලි කරන්න', reDetailed: 'තව විස්තරෙන් පැහැදිලි කරන්න',
+    reLoading: 'නැවත පැහැදිලි කරමින් — AI සත්‍යාපනය සමත් වූ විට පමණක් පෙන්වයි', reVerified: 'AI සත්‍යාපනය සමත් — පැහැදිලි කිරීම යාවත්කාලීන විය',
+    reFailed: 'සමත් වන නව පැහැදිලි කිරීමක් සෑදිය නොහැකි විය. මුල් එක තබා ගනී.', reLimit: 'වගන්තියකට 2 වතාවක් පමණි. වැඩිදුරට පහත විශේෂඥ උපදෙස්.', reShowOriginal: 'මුල් පැහැදිලි කිරීම බලන්න',
+  },
+  bn: {
+    reEasier: 'আরও সহজে বোঝান', reDetailed: 'আরও বিস্তারিত বোঝান',
+    reLoading: 'আবার ব্যাখ্যা হচ্ছে — এআই যাচাই পাস করলে তবেই দেখাবে', reVerified: 'এআই যাচাই পাস — ব্যাখ্যা হালনাগাদ',
+    reFailed: 'যাচাই পাস করা নতুন ব্যাখ্যা হয়নি। আসলটাই থাকবে।', reLimit: 'প্রতি ধারায় সর্বোচ্চ ২ বার। আরও দরকার হলে নিচের বিশেষজ্ঞ পরামর্শ।', reShowOriginal: 'আসল ব্যাখ্যা দেখুন',
+  },
+  ru: {
+    reEasier: 'Объясни проще', reDetailed: 'Объясни подробнее',
+    reLoading: 'Повторное объяснение — показывается только после проверки ИИ', reVerified: 'Проверка ИИ пройдена — объяснение обновлено',
+    reFailed: 'Не удалось создать объяснение, прошедшее проверку. Оставляем исходное.', reLimit: 'Не более 2 раз на пункт. Далее — консультация специалиста ниже.', reShowOriginal: 'Показать исходное объяснение',
+  },
+  ja: {
+    reEasier: 'もっとやさしく説明して', reDetailed: 'もっと詳しく説明して',
+    reLoading: '再説明中 — AI検証を通過した場合のみ表示されます', reVerified: 'AI検証を通過 — 説明が更新されました',
+    reFailed: '検証を通過する新しい説明を作れませんでした。元の説明を維持します。', reLimit: '再説明は条項ごとに2回までです。さらに知りたい場合は下の専門家相談へ。', reShowOriginal: '元の説明を見る',
+  },
+}
+
 type QuizKey =
   | 'qzTitle' | 'qzDesc' | 'qzStart' | 'qzLoading' | 'qzUnavailable'
   | 'qzCorrect' | 'qzWrong' | 'qzGoClause' | 'qzScore' | 'qzRetry'
@@ -3345,7 +3432,7 @@ const UI_PROG: Record<LangCode, Record<ProgKey, string>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | QuizKey | ZoomKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3355,7 +3442,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
