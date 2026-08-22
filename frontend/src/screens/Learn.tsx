@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { Button, Card, PageTitle } from '../components/ui'
 import { riskTypeLabel, t, type LangCode } from '../i18n'
 
-/** 교육 페이지 (#104) — 분석 도구를 넘어선 상설 학습 탭.
+/** 교육 페이지 (#104) + 내장 챗봇 (#103) — 분석 도구를 넘어선 상설 학습 탭.
  *
- * 콘텐츠는 agent GET /learn 단일 원천(전세사기 5대 수법, 골든셋·실증 연구
- * 재활용) — 콘텐츠 본문은 한국어(단계적 현지화, UI 크롬만 16언어).
- *
- * 내장 챗봇(#103)은 별도 PR — 세션당 대화 횟수 상한 + 인젝션 방어(#131/#149
- * 재사용) 조건을 걸고 나서 합류 예정.
+ * - 콘텐츠는 agent GET /learn 단일 원천(전세사기 5대 수법·위험 유형 10종,
+ *   골든셋·실증 연구 재활용) — 정적 번역본이 있는 언어는 번역해서 받는다.
+ * - 챗봇 컨텍스트는 서버 사본만 사용 — 클라이언트는 질문 텍스트만 보낸다
+ *   (인젝션 방어 #67과 동일 원칙). 비용 상한(IP당 시간당 20회, 백엔드)과
+ *   인젝션 방어(#131 규칙 탐지기, 에이전트)를 통과한 질문만 LLM까지 간다.
+ *   개별 법률 자문은 전문가 상담 안내로 제한.
  */
 const BASE_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:8080'
 
@@ -37,6 +38,14 @@ interface RiskTypeGuide {
   cases: RiskCase[]
 }
 
+interface ChatTurn {
+  role: 'user' | 'bot'
+  text: string
+}
+
+// 연속 전송 방지용 클라이언트 쿨다운 — 서버측 시간당 상한의 보조 장치.
+const ASK_COOLDOWN_MS = 3000
+
 export function LearnScreen({
   language = 'ko',
   onStart,
@@ -61,6 +70,46 @@ export function LearnScreen({
       })
       .catch(() => setScams([]))
   }, [language])
+
+  // 내장 챗봇 (#103) — 서버가 비용 상한(429)·인젝션 방어(reason: 'blocked')를
+  // 판정하고, 여기서는 결과 문구만 언어별로 매핑한다.
+  const [question, setQuestion] = useState('')
+  const [chat, setChat] = useState<ChatTurn[]>([])
+  const [asking, setAsking] = useState(false)
+  const [cooldown, setCooldown] = useState(false)
+
+  const ask = async () => {
+    const q = question.trim()
+    if (!q || asking || cooldown) return
+    setAsking(true)
+    setQuestion('')
+    setChat((prev) => [...prev, { role: 'user', text: q }])
+    try {
+      const res = await fetch(`${BASE_URL}/api/contracts/learn-chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, language }),
+      })
+      let text: string
+      if (res.status === 429) {
+        text = t(language, 'lnChatLimited')
+      } else {
+        const data = await res.json()
+        text = data.ok
+          ? data.answer
+          : data.reason === 'blocked'
+            ? t(language, 'lnChatBlocked')
+            : t(language, 'lnChatFail')
+      }
+      setChat((prev) => [...prev, { role: 'bot', text }])
+    } catch {
+      setChat((prev) => [...prev, { role: 'bot', text: t(language, 'lnChatFail') }])
+    } finally {
+      setAsking(false)
+      setCooldown(true)
+      setTimeout(() => setCooldown(false), ASK_COOLDOWN_MS)
+    }
+  }
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
@@ -164,6 +213,57 @@ export function LearnScreen({
           </Card>
         ))}
       </div>
+
+      {/* 내장 챗봇 (#103) */}
+      <Card className="mt-8 p-6">
+        <h2 className="text-[16px] font-bold text-ink-900">
+          {t(language, 'lnChatTitle')}
+        </h2>
+        <p className="mt-1 text-[12px] leading-relaxed text-ink-400">{t(language, 'lnChatScope')}</p>
+
+        {chat.length > 0 && (
+          <div className="mt-4 max-h-80 space-y-2.5 overflow-y-auto" aria-live="polite">
+            {chat.map((turn, i) => (
+              <div
+                key={i}
+                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed ${
+                  turn.role === 'user'
+                    ? 'ml-auto bg-brand-500 text-white'
+                    : 'bg-ink-25 text-ink-700'
+                }`}
+              >
+                {turn.text}
+              </div>
+            ))}
+            {asking && (
+              <div className="flex items-center gap-2 px-2 text-[13px] text-ink-400" role="status">
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" aria-hidden />
+                …
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-4 flex gap-2">
+          <input
+            type="text"
+            value={question}
+            maxLength={500}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && ask()}
+            placeholder={t(language, 'lnChatPlaceholder')}
+            className="min-w-0 flex-1 rounded-xl border border-ink-100 bg-white px-3.5 py-2.5 text-[14px] text-ink-900 outline-none placeholder:text-ink-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-50"
+          />
+          <button
+            type="button"
+            onClick={ask}
+            disabled={asking || cooldown || !question.trim()}
+            className="shrink-0 rounded-xl bg-brand-500 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-40"
+          >
+            {t(language, 'lnChatSend')}
+          </button>
+        </div>
+      </Card>
 
       <div className="mt-8 flex justify-center">
         <Button size="lg" onClick={onStart}>
