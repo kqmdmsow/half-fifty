@@ -89,7 +89,7 @@ export function DoneScreen({
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16 print:hidden">
       <div className="text-center">
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-[28px]">
-          🎉
+          ✓
         </span>
         <h1 className="mt-5 text-[26px] font-bold tracking-[-0.02em] text-ink-900 md:text-[30px]">
           {t(language, 'doTitle')}
@@ -160,7 +160,6 @@ export function DoneScreen({
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         <ActionCard
-          emoji="💬"
           title={t(language, 'doCard1T')}
           body={t(language, 'doCard1B')}
         >
@@ -168,7 +167,7 @@ export function DoneScreen({
             {t(language, 'doCopyQ')}
           </CopyButton>
         </ActionCard>
-        <ActionCard emoji="🖨️" title={t(language, 'doCard2T')} body={t(language, 'doCard2B')}>
+        <ActionCard title={t(language, 'doCard2T')} body={t(language, 'doCard2B')}>
           <button
             type="button"
             onClick={() => window.print()}
@@ -178,7 +177,6 @@ export function DoneScreen({
           </button>
         </ActionCard>
         <ActionCard
-          emoji="👩‍⚖️"
           title={t(language, 'doCard3T')}
           body={t(language, 'doCard3B')}
         >
@@ -375,19 +373,16 @@ function ConsultCard({
 }
 
 function ActionCard({
-  emoji,
   title,
   body,
   children,
 }: {
-  emoji: string
   title: string
   body: string
   children: React.ReactNode
 }) {
   return (
     <Card className="flex flex-col items-start p-6">
-      <span className="text-[26px]">{emoji}</span>
       <p className="mt-3.5 text-[16px] font-bold text-ink-900">{title}</p>
       <p className="mb-4 mt-1.5 flex-1 text-[13px] leading-relaxed text-ink-400">{body}</p>
       {children}

@@ -76,7 +76,7 @@ export function DetailScreen({
 
   const questions = clause.check_questions.length
     ? clause.check_questions
-    : ['이 조항은 그대로 유지해야 하나요?']
+    : [t(language, 'fallbackQuestion')]
 
   return (
     <div className="mx-auto max-w-5xl animate-fade-up px-6 py-10 md:py-14">
@@ -184,7 +184,7 @@ export function DetailScreen({
                 listening ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
               }`}
             >
-              🔊 {t(language, listening ? 'readAllStop' : 'listenClause')}
+              {t(language, listening ? 'readAllStop' : 'listenClause')}
             </button>
             )}
           </div>
@@ -208,7 +208,7 @@ export function DetailScreen({
               문구로 못 박아 단정을 피한다(자문 §7). */}
           {!!clause.related_cases?.length && (
             <section className="mt-6">
-              <h2 className="text-[14px] font-bold text-ink-400">📎 {t(language, 'relatedCases')}</h2>
+              <h2 className="text-[14px] font-bold text-ink-400">{t(language, 'relatedCases')}</h2>
               <div className="mt-2 space-y-2.5">
                 {clause.related_cases.map((c) => (
                   <div
@@ -229,7 +229,7 @@ export function DetailScreen({
           <div className="mt-6 rounded-2xl border border-danger-500/20 bg-danger-50 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
-              <CopyButton text={clause.original_text} className="!bg-white" />
+              <CopyButton text={clause.original_text} copiedText={t(language, 'copied')} className="!bg-white">{t(language, 'copy')}</CopyButton>
             </div>
             <p className="mt-2.5 text-[15px] leading-loose text-ink-700">{clause.original_text}</p>
             {clause.original_text_translated && (
@@ -280,7 +280,7 @@ export function DetailScreen({
                         {question}
                       </p>
                     </div>
-                    <CopyButton text={question} />
+                    <CopyButton text={question} copiedText={t(language, 'copied')}>{t(language, 'copy')}</CopyButton>
                   </div>
                 )
               })}

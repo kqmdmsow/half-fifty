@@ -1414,97 +1414,97 @@ const UI_SAMPLES: Record<LangCode, Record<SampleKey, string>> = {
     spTitle: '샘플로 바로 체험하기', spDesc: '실제 분쟁 사례 기반 계약서예요. 누르면 자동으로 채워져요. 조항은 한국어(분석 대상), 결과는 선택한 언어로 나와요.',
     sp1: '대출 — 이자 1회 지체 시 전액 상환', sp2: '보험 — 모호해도 소비자에게 유리하면 안전',
     sp3: '카드 — 포괄 면책으로 보상 제외', sp4: '전자금융 — 표준 면책은 안전',
-    sp5: '전세 — 신탁 면책 특약 (전세사기 패턴)', sp6: '고령층 모드 — 같은 조항을 쉬운 말로', sp7: '📄 PDF 업로드 — 표준계약서 21개 조항', sp8: '📷 사진(OCR) — 신탁 특약이 숨은 계약서',
+    sp5: '전세 — 신탁 면책 특약 (전세사기 패턴)', sp6: '고령층 모드 — 같은 조항을 쉬운 말로', sp7: 'PDF 업로드 — 표준계약서 21개 조항', sp8: '사진(OCR) — 신탁 특약이 숨은 계약서',
   },
   en: {
     spTitle: 'Try it with a sample', spDesc: 'Sample contracts from real disputes. One click fills everything. Clauses are in Korean (what we analyze) — results come in your language.',
     sp1: 'Loan — one missed interest payment triggers full repayment', sp2: 'Insurance — ambiguous but consumer-favorable = safe',
     sp3: 'Card — blanket liability waiver', sp4: 'E-finance — standard waiver is safe',
-    sp5: 'Jeonse — trust immunity clause (fraud pattern)', sp6: 'Senior mode — same clause, plain words', sp7: '📄 PDF upload — standard lease, 21 clauses', sp8: '📷 Photo (OCR) — contract hiding a trust clause',
+    sp5: 'Jeonse — trust immunity clause (fraud pattern)', sp6: 'Senior mode — same clause, plain words', sp7: 'PDF upload — standard lease, 21 clauses', sp8: 'Photo (OCR) — contract hiding a trust clause',
   },
   zh: {
     spTitle: '用样例立即体验', spDesc: '来自真实纠纷的样例合同。点击自动填入。条款为韩语（分析对象），结果以所选语言显示。',
     sp1: '贷款 — 利息逾期一次即须全额偿还', sp2: '保险 — 虽有歧义但有利于消费者=安全',
     sp3: '信用卡 — 概括免责排除赔偿', sp4: '电子金融 — 标准免责属安全',
-    sp5: '全租 — 信托免责特约（诈骗模式）', sp6: '老年模式 — 同一条款，更易懂', sp7: '📄 PDF上传 — 标准合同21条', sp8: '📷 照片(OCR) — 藏有信托特约的合同',
+    sp5: '全租 — 信托免责特约（诈骗模式）', sp6: '老年模式 — 同一条款，更易懂', sp7: 'PDF上传 — 标准合同21条', sp8: '照片(OCR) — 藏有信托特约的合同',
   },
   vi: {
     spTitle: 'Trải nghiệm ngay với mẫu', spDesc: 'Hợp đồng mẫu từ tranh chấp thực tế. Bấm là tự điền. Điều khoản bằng tiếng Hàn (đối tượng phân tích) — kết quả bằng ngôn ngữ bạn chọn.',
     sp1: 'Vay — chậm trả lãi một lần là phải trả toàn bộ', sp2: 'Bảo hiểm — mơ hồ nhưng có lợi cho người dùng = an toàn',
     sp3: 'Thẻ — miễn trách bao quát', sp4: 'Tài chính điện tử — miễn trách tiêu chuẩn = an toàn',
-    sp5: 'Jeonse — điều khoản miễn trách tín thác (mẫu lừa đảo)', sp6: 'Chế độ cao tuổi — cùng điều khoản, lời dễ hiểu', sp7: '📄 Tải PDF — hợp đồng chuẩn 21 điều', sp8: '📷 Ảnh (OCR) — hợp đồng giấu điều khoản tín thác',
+    sp5: 'Jeonse — điều khoản miễn trách tín thác (mẫu lừa đảo)', sp6: 'Chế độ cao tuổi — cùng điều khoản, lời dễ hiểu', sp7: 'Tải PDF — hợp đồng chuẩn 21 điều', sp8: 'Ảnh (OCR) — hợp đồng giấu điều khoản tín thác',
   },
   th: {
     spTitle: 'ลองด้วยตัวอย่างทันที', spDesc: 'สัญญาตัวอย่างจากคดีจริง กดแล้วกรอกอัตโนมัติ ข้อสัญญาเป็นภาษาเกาหลี (สิ่งที่วิเคราะห์) ผลลัพธ์เป็นภาษาที่คุณเลือก',
     sp1: 'สินเชื่อ — ค้างดอกเบี้ยครั้งเดียวต้องชำระคืนทั้งหมด', sp2: 'ประกัน — กำกวมแต่เป็นคุณต่อผู้บริโภค = ปลอดภัย',
     sp3: 'บัตร — ยกเว้นความรับผิดแบบกว้าง', sp4: 'การเงินอิเล็กทรอนิกส์ — ยกเว้นมาตรฐาน = ปลอดภัย',
-    sp5: 'จอนเซ — ข้อยกเว้นทรัสต์ (รูปแบบฉ้อโกง)', sp6: 'โหมดผู้สูงอายุ — ข้อเดิม คำง่ายขึ้น', sp7: '📄 อัปโหลด PDF — สัญญามาตรฐาน 21 ข้อ', sp8: '📷 รูปถ่าย (OCR) — สัญญาที่ซ่อนข้อทรัสต์',
+    sp5: 'จอนเซ — ข้อยกเว้นทรัสต์ (รูปแบบฉ้อโกง)', sp6: 'โหมดผู้สูงอายุ — ข้อเดิม คำง่ายขึ้น', sp7: 'อัปโหลด PDF — สัญญามาตรฐาน 21 ข้อ', sp8: 'รูปถ่าย (OCR) — สัญญาที่ซ่อนข้อทรัสต์',
   },
   id: {
     spTitle: 'Coba langsung dengan sampel', spDesc: 'Kontrak sampel dari sengketa nyata. Sekali klik terisi. Pasal dalam bahasa Korea (objek analisis) — hasil dalam bahasa Anda.',
     sp1: 'Pinjaman — telat bunga sekali langsung lunas seluruhnya', sp2: 'Asuransi — ambigu tapi menguntungkan konsumen = aman',
     sp3: 'Kartu — pembebasan tanggung jawab menyeluruh', sp4: 'E-finance — pembebasan standar itu aman',
-    sp5: 'Jeonse — klausul imunitas trust (pola penipuan)', sp6: 'Mode lansia — pasal sama, bahasa sederhana', sp7: '📄 Unggah PDF — kontrak standar 21 pasal', sp8: '📷 Foto (OCR) — kontrak dengan klausul trust tersembunyi',
+    sp5: 'Jeonse — klausul imunitas trust (pola penipuan)', sp6: 'Mode lansia — pasal sama, bahasa sederhana', sp7: 'Unggah PDF — kontrak standar 21 pasal', sp8: 'Foto (OCR) — kontrak dengan klausul trust tersembunyi',
   },
   tl: {
     spTitle: 'Subukan gamit ang sample', spDesc: 'Sample na kontrata mula sa totoong kaso. Isang click, napupunan. Nasa Korean ang sugnay (ang sinusuri) — resulta sa wikang pinili mo.',
     sp1: 'Loan — isang beses na hindi nabayarang interes, buong bayad agad', sp2: 'Insurance — malabo pero pabor sa consumer = ligtas',
     sp3: 'Card — malawakang pag-iwas sa pananagutan', sp4: 'E-finance — karaniwang waiver ay ligtas',
-    sp5: 'Jeonse — trust immunity clause (scam pattern)', sp6: 'Senior mode — parehong sugnay, simpleng salita', sp7: '📄 PDF upload — standard na kontrata, 21 sugnay', sp8: '📷 Litrato (OCR) — kontratang may tagong trust clause',
+    sp5: 'Jeonse — trust immunity clause (scam pattern)', sp6: 'Senior mode — parehong sugnay, simpleng salita', sp7: 'PDF upload — standard na kontrata, 21 sugnay', sp8: 'Litrato (OCR) — kontratang may tagong trust clause',
   },
   ne: {
     spTitle: 'नमूनाबाट तुरुन्तै हेर्नुहोस्', spDesc: 'वास्तविक विवादका नमूना सम्झौता। क्लिकमा आफैं भरिन्छ। धारा कोरियालीमा (विश्लेषण वस्तु) — नतिजा रोजेको भाषामा।',
     sp1: 'ऋण — एकपटक ब्याज ढिलो हुँदा पूरै तिर्नुपर्ने', sp2: 'बीमा — अस्पष्ट तर उपभोक्ता पक्षमा = सुरक्षित',
     sp3: 'कार्ड — व्यापक जिम्मेवारी छुट', sp4: 'ई-वित्त — मानक छुट सुरक्षित',
-    sp5: 'जोन्से — ट्रस्ट छुट धारा (ठगी ढाँचा)', sp6: 'ज्येष्ठ मोड — उही धारा, सजिलो भाषा', sp7: '📄 PDF अपलोड — मानक सम्झौता २१ धारा', sp8: '📷 फोटो (OCR) — ट्रस्ट धारा लुकेको सम्झौता',
+    sp5: 'जोन्से — ट्रस्ट छुट धारा (ठगी ढाँचा)', sp6: 'ज्येष्ठ मोड — उही धारा, सजिलो भाषा', sp7: 'PDF अपलोड — मानक सम्झौता २१ धारा', sp8: 'फोटो (OCR) — ट्रस्ट धारा लुकेको सम्झौता',
   },
   km: {
     spTitle: 'សាកល្បងជាមួយគំរូភ្លាមៗ', spDesc: 'កិច្ចសន្យាគំរូពីវិវាទពិត។ ចុចម្តងបំពេញ។ ប្រការជាភាសាកូរ៉េ (វត្ថុវិភាគ) — លទ្ធផលជាភាសាដែលអ្នកជ្រើស។',
     sp1: 'កម្ចី — ខកខានការប្រាក់ម្ដងត្រូវសងទាំងអស់', sp2: 'ធានារ៉ាប់រង — មិនច្បាស់ប៉ុន្តែអំណោយផលអ្នកប្រើ = សុវត្ថិភាព',
     sp3: 'កាត — លើកលែងទំនួលខុសត្រូវទូលំទូលាយ', sp4: 'ហិរញ្ញវត្ថុអេឡិចត្រូនិក — លើកលែងស្តង់ដារ = សុវត្ថិភាព',
-    sp5: 'Jeonse — ប្រការលើកលែងទ្រាស្ត (គំរូបោកប្រាស់)', sp6: 'របៀបមនុស្សចាស់ — ប្រការដដែល ពាក្យងាយៗ', sp7: '📄 ផ្ទុក PDF — កិច្ចសន្យាស្តង់ដារ ២១ ប្រការ', sp8: '📷 រូបថត (OCR) — កិច្ចសន្យាលាក់ប្រការទ្រាស្ត',
+    sp5: 'Jeonse — ប្រការលើកលែងទ្រាស្ត (គំរូបោកប្រាស់)', sp6: 'របៀបមនុស្សចាស់ — ប្រការដដែល ពាក្យងាយៗ', sp7: 'ផ្ទុក PDF — កិច្ចសន្យាស្តង់ដារ ២១ ប្រការ', sp8: 'រូបថត (OCR) — កិច្ចសន្យាលាក់ប្រការទ្រាស្ត',
   },
   my: {
     spTitle: 'နမူနာဖြင့် ချက်ချင်းစမ်းကြည့်ပါ', spDesc: 'အမှန်တကယ်အငြင်းပွားမှုမှ နမူနာစာချုပ်။ နှိပ်လျှင်ဖြည့်သည်။ အပိုဒ်များ ကိုရီးယားဘာသာ (စိစစ်ခံ) — ရလဒ် သင်ရွေးသောဘာသာဖြင့်။',
     sp1: 'ချေးငွေ — အတိုးတစ်ကြိမ်နောက်ကျလျှင် အားလုံးပြန်ဆပ်ရမည်', sp2: 'အာမခံ — မရှင်းသော်လည်း သုံးစွဲသူအကျိုး = စိတ်ချရ',
     sp3: 'ကတ် — ကျယ်ပြန့်သော တာဝန်ကင်းလွတ်ခွင့်', sp4: 'အီလက်ထရွန်နစ်ငွေရေး — စံကင်းလွတ်ခွင့် = စိတ်ချရ',
-    sp5: 'Jeonse — ယုံကြည်အပ်နှံမှု ကင်းလွတ်အပိုဒ် (လိမ်လည်ပုံစံ)', sp6: 'သက်ကြီးမုဒ် — အပိုဒ်တူ စကားလွယ်', sp7: '📄 PDF တင်ခြင်း — စံစာချုပ် အပိုဒ် ၂၁', sp8: '📷 ဓာတ်ပုံ (OCR) — ယုံကြည်အပ်နှံအပိုဒ် ဝှက်ထားသောစာချုပ်',
+    sp5: 'Jeonse — ယုံကြည်အပ်နှံမှု ကင်းလွတ်အပိုဒ် (လိမ်လည်ပုံစံ)', sp6: 'သက်ကြီးမုဒ် — အပိုဒ်တူ စကားလွယ်', sp7: 'PDF တင်ခြင်း — စံစာချုပ် အပိုဒ် ၂၁', sp8: 'ဓာတ်ပုံ (OCR) — ယုံကြည်အပ်နှံအပိုဒ် ဝှက်ထားသောစာချုပ်',
   },
   mn: {
     spTitle: 'Жишээгээр шууд туршье', spDesc: 'Бодит маргаанаас авсан жишээ гэрээ. Дарахад бөглөнө. Заалт солонгосоор (шинжлэх зүйл) — үр дүн таны сонгосон хэлээр.',
     sp1: 'Зээл — хүү нэг удаа хоцроход бүгдийг төлүүлнэ', sp2: 'Даатгал — тодорхойгүй ч хэрэглэгчид ашигтай = аюулгүй',
     sp3: 'Карт — өргөн хүрээний хариуцлага чөлөөлөлт', sp4: 'Э-санхүү — стандарт чөлөөлөлт аюулгүй',
-    sp5: 'Жонсэ — итгэлцлийн чөлөөлөх заалт (залилангийн хэв)', sp6: 'Ахмад горим — ижил заалт, энгийн үгээр', sp7: '📄 PDF оруулах — стандарт гэрээ 21 заалт', sp8: '📷 Зураг (OCR) — итгэлцлийн заалт нуусан гэрээ',
+    sp5: 'Жонсэ — итгэлцлийн чөлөөлөх заалт (залилангийн хэв)', sp6: 'Ахмад горим — ижил заалт, энгийн үгээр', sp7: 'PDF оруулах — стандарт гэрээ 21 заалт', sp8: 'Зураг (OCR) — итгэлцлийн заалт нуусан гэрээ',
   },
   uz: {
     spTitle: 'Namuna bilan darhol sinang', spDesc: 'Haqiqiy nizolardan namuna shartnoma. Bir bosishda toʻladi. Bandlar koreyscha (tahlil obyekti) — natija siz tanlagan tilda.',
     sp1: 'Kredit — foiz bir marta kechiksa, hammasini toʻlash talab qilinadi', sp2: 'Sugʻurta — noaniq, lekin isteʼmolchi foydasiga = xavfsiz',
     sp3: 'Karta — keng qamrovli javobgarlikdan ozod', sp4: 'E-moliya — standart ozodlik xavfsiz',
-    sp5: 'Jeonse — trast ozodlik bandi (firibgarlik namunasi)', sp6: 'Keksalar rejimi — oʻsha band, sodda til', sp7: '📄 PDF yuklash — standart shartnoma 21 band', sp8: '📷 Surat (OCR) — trast bandi yashiringan shartnoma',
+    sp5: 'Jeonse — trast ozodlik bandi (firibgarlik namunasi)', sp6: 'Keksalar rejimi — oʻsha band, sodda til', sp7: 'PDF yuklash — standart shartnoma 21 band', sp8: 'Surat (OCR) — trast bandi yashiringan shartnoma',
   },
   si: {
     spTitle: 'නියැදියකින් දැන්ම අත්හදා බලන්න', spDesc: 'සැබෑ ආරවුල්වලින් නියැදි ගිවිසුම්. ක්ලික් කළ විට පිරෙයි. වගන්ති කොරියානු බසින් (විශ්ලේෂණ වස්තුව) — ප්‍රතිඵල ඔබ තෝරා ගත් භාෂාවෙන්.',
     sp1: 'ණය — පොලිය එක් වරක් පමා වුවහොත් සියල්ල ගෙවිය යුතුය', sp2: 'රක්ෂණ — අපැහැදිලි වුවත් පාරිභෝගිකයාට හිතකර = ආරක්ෂිත',
     sp3: 'කාඩ් — පුළුල් වගකීම් නිදහස', sp4: 'ඉ-මූල්‍ය — සම්මත නිදහස ආරක්ෂිතයි',
-    sp5: 'ජොන්සේ — භාර නිදහස් වගන්තිය (වංචා රටාව)', sp6: 'ජ්‍යෙෂ්ඨ ප්‍රකාරය — එම වගන්තිය සරල බසින්', sp7: '📄 PDF උඩුගත — සම්මත ගිවිසුම වගන්ති 21', sp8: '📷 ඡායාරූප (OCR) — භාර වගන්තිය සැඟවුණු ගිවිසුම',
+    sp5: 'ජොන්සේ — භාර නිදහස් වගන්තිය (වංචා රටාව)', sp6: 'ජ්‍යෙෂ්ඨ ප්‍රකාරය — එම වගන්තිය සරල බසින්', sp7: 'PDF උඩුගත — සම්මත ගිවිසුම වගන්ති 21', sp8: 'ඡායාරූප (OCR) — භාර වගන්තිය සැඟවුණු ගිවිසුම',
   },
   bn: {
     spTitle: 'নমুনা দিয়ে এখনই দেখুন', spDesc: 'বাস্তব বিরোধ থেকে নমুনা চুক্তি। ক্লিকেই পূরণ হয়। ধারা কোরীয় ভাষায় (বিশ্লেষণের বিষয়) — ফলাফল আপনার বাছাই করা ভাষায়।',
     sp1: 'ঋণ — একবার সুদ বাকি পড়লেই পুরোটা পরিশোধ করতে হবে', sp2: 'বিমা — অস্পষ্ট হলেও ভোক্তার অনুকূলে = নিরাপদ',
     sp3: 'কার্ড — ব্যাপক দায়মুক্তি', sp4: 'ই-ফাইন্যান্স — প্রমিত দায়মুক্তি নিরাপদ',
-    sp5: 'জনসে — ট্রাস্ট দায়মুক্তি ধারা (প্রতারণার ধরন)', sp6: 'প্রবীণ মোড — একই ধারা, সহজ ভাষায়', sp7: '📄 PDF আপলোড — প্রমিত চুক্তি ২১ ধারা', sp8: '📷 ছবি (OCR) — ট্রাস্ট ধারা লুকানো চুক্তি',
+    sp5: 'জনসে — ট্রাস্ট দায়মুক্তি ধারা (প্রতারণার ধরন)', sp6: 'প্রবীণ মোড — একই ধারা, সহজ ভাষায়', sp7: 'PDF আপলোড — প্রমিত চুক্তি ২১ ধারা', sp8: 'ছবি (OCR) — ট্রাস্ট ধারা লুকানো চুক্তি',
   },
   ru: {
     spTitle: 'Попробуйте на примере', spDesc: 'Образцы договоров из реальных споров. Один клик — всё заполнено. Пункты на корейском (объект анализа) — результат на выбранном языке.',
     sp1: 'Кредит — одна просрочка процентов ведёт к полному погашению', sp2: 'Страхование — неясно, но в пользу потребителя = безопасно',
     sp3: 'Карта — огульное освобождение от ответственности', sp4: 'Э-финансы — стандартное освобождение безопасно',
-    sp5: 'Чонсе — трастовая оговорка (схема мошенничества)', sp6: 'Режим для пожилых — тот же пункт, простыми словами', sp7: '📄 Загрузка PDF — стандартный договор, 21 пункт', sp8: '📷 Фото (OCR) — договор со скрытой трастовой оговоркой',
+    sp5: 'Чонсе — трастовая оговорка (схема мошенничества)', sp6: 'Режим для пожилых — тот же пункт, простыми словами', sp7: 'Загрузка PDF — стандартный договор, 21 пункт', sp8: 'Фото (OCR) — договор со скрытой трастовой оговоркой',
   },
   ja: {
     spTitle: 'サンプルですぐ体験', spDesc: '実際の紛争事例に基づくサンプル契約書。クリックで自動入力。条項は韓国語（分析対象）、結果は選択した言語で表示されます。',
     sp1: 'ローン — 利息を一度延滞すると全額返済', sp2: '保険 — 曖昧でも消費者有利なら安全',
     sp3: 'カード — 包括免責で補償除外', sp4: '電子金融 — 標準免責は安全',
-    sp5: 'チョンセ — 信託免責特約（詐欺パターン）', sp6: '高齢者モード — 同じ条項をやさしい言葉で', sp7: '📄 PDFアップロード — 標準契約書21条項', sp8: '📷 写真(OCR) — 信託特約が隠れた契約書',
+    sp5: 'チョンセ — 信託免責特約（詐欺パターン）', sp6: '高齢者モード — 同じ条項をやさしい言葉で', sp7: 'PDFアップロード — 標準契約書21条項', sp8: '写真(OCR) — 信託特約が隠れた契約書',
   },
 }
 
@@ -3058,6 +3058,7 @@ export const WARNING_CODE_KEYS: Record<string, WarnKey> = {
 
 type LearnKey =
   | 'lnNav' | 'lnTitle' | 'lnDesc' | 'lnSignal' | 'lnOutside' | 'lnCase' | 'lnKoNote'
+  | 'lnPageTitle' | 'lnPageDesc' | 'lnTypesTitle' | 'lnTypesDesc' | 'lnTip' | 'lnCases' | 'lnNoCases'
 
 // 교육 페이지 (#104) — 챗봇(#103)은 세션당 대화 상한·인젝션 방어 조건 충족 후 별도 PR
 const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
@@ -3069,6 +3070,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: '계약서 밖에서 확인할 것',
     lnCase: '근거·사례',
     lnKoNote: '학습 콘텐츠는 한국어로 제공돼요',
+    lnPageTitle: '위험 조항 배우기',
+    lnPageDesc: '계약서에서 자주 문제되는 위험 유형과 전세사기 수법을 미리 알아두세요.',
+    lnTypesTitle: '위험 유형 10가지',
+    lnTypesDesc: '이 서비스가 계약서에서 찾아내는 위험 유형 전부예요. 눌러서 신호·대처법·실제 사례를 확인하세요.',
+    lnTip: '이렇게 대처하세요',
+    lnCases: '검증된 실제 사례',
+    lnNoCases: '아직 검증 가능한 공개 사례가 확보되지 않아 설명만 제공해요.',
   },
   en: {
     lnNav: 'Learn risky clauses',
@@ -3078,6 +3086,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'What to check outside the contract',
     lnCase: 'Evidence & cases',
     lnKoNote: 'Learning content is provided in Korean',
+    lnPageTitle: 'Learn risky clauses',
+    lnPageDesc: 'Know the common risk patterns and jeonse scam tactics before you sign.',
+    lnTypesTitle: 'The 10 risk types',
+    lnTypesDesc: 'Every risk type this service detects. Tap one for signals, tips and real cases.',
+    lnTip: 'How to respond',
+    lnCases: 'Verified real cases',
+    lnNoCases: 'No verifiable public case yet — explanation only.',
   },
   zh: {
     lnNav: '学习危险条款',
@@ -3087,6 +3102,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: '合同之外要确认的事',
     lnCase: '依据·案例',
     lnKoNote: '学习内容以韩语提供',
+    lnPageTitle: '学习风险条款',
+    lnPageDesc: '签约前先了解常见的风险类型和传贳诈骗手法。',
+    lnTypesTitle: '10种风险类型',
+    lnTypesDesc: '本服务在合同中检测的全部风险类型。点击查看信号、应对方法和真实案例。',
+    lnTip: '应对方法',
+    lnCases: '经核实的真实案例',
+    lnNoCases: '尚无可核实的公开案例，仅提供说明。',
   },
   vi: {
     lnNav: 'Học điều khoản rủi ro',
@@ -3096,6 +3118,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'Kiểm tra ngoài hợp đồng',
     lnCase: 'Căn cứ·vụ việc',
     lnKoNote: 'Nội dung học được cung cấp bằng tiếng Hàn',
+    lnPageTitle: 'Tìm hiểu điều khoản rủi ro',
+    lnPageDesc: 'Nắm các dạng rủi ro thường gặp và thủ đoạn lừa đảo jeonse trước khi ký.',
+    lnTypesTitle: '10 loại rủi ro',
+    lnTypesDesc: 'Tất cả loại rủi ro dịch vụ này phát hiện. Chạm để xem dấu hiệu, cách xử lý và án lệ thực tế.',
+    lnTip: 'Cách xử lý',
+    lnCases: 'Án lệ thực tế đã xác minh',
+    lnNoCases: 'Chưa có án lệ công khai xác minh được — chỉ có phần giải thích.',
   },
   th: {
     lnNav: 'เรียนรู้ข้อสัญญาเสี่ยง',
@@ -3105,6 +3134,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'สิ่งที่ต้องเช็กนอกสัญญา',
     lnCase: 'หลักฐาน·คดี',
     lnKoNote: 'เนื้อหาการเรียนให้บริการเป็นภาษาเกาหลี',
+    lnPageTitle: 'เรียนรู้ข้อสัญญาเสี่ยง',
+    lnPageDesc: 'รู้จักรูปแบบความเสี่ยงและกลโกงจอนเซก่อนเซ็นสัญญา',
+    lnTypesTitle: 'ความเสี่ยง 10 ประเภท',
+    lnTypesDesc: 'ประเภทความเสี่ยงทั้งหมดที่บริการนี้ตรวจจับ แตะเพื่อดูสัญญาณ วิธีรับมือ และคดีจริง',
+    lnTip: 'วิธีรับมือ',
+    lnCases: 'คดีจริงที่ตรวจสอบแล้ว',
+    lnNoCases: 'ยังไม่มีคดีสาธารณะที่ตรวจสอบได้ — มีเฉพาะคำอธิบาย',
   },
   id: {
     lnNav: 'Pelajari pasal berisiko',
@@ -3114,6 +3150,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'Yang dicek di luar kontrak',
     lnCase: 'Bukti·kasus',
     lnKoNote: 'Konten pembelajaran tersedia dalam bahasa Korea',
+    lnPageTitle: 'Pelajari klausul berisiko',
+    lnPageDesc: 'Kenali pola risiko umum dan taktik penipuan jeonse sebelum tanda tangan.',
+    lnTypesTitle: '10 jenis risiko',
+    lnTypesDesc: 'Semua jenis risiko yang dideteksi layanan ini. Ketuk untuk melihat sinyal, tips, dan kasus nyata.',
+    lnTip: 'Cara menanggapi',
+    lnCases: 'Kasus nyata terverifikasi',
+    lnNoCases: 'Belum ada kasus publik terverifikasi — hanya penjelasan.',
   },
   tl: {
     lnNav: 'Matuto ng risky clauses',
@@ -3123,6 +3166,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'Iche-check sa labas ng kontrata',
     lnCase: 'Ebidensya·kaso',
     lnKoNote: 'Ang learning content ay nasa Korean',
+    lnPageTitle: 'Alamin ang mga mapanganib na sugnay',
+    lnPageDesc: 'Alamin ang mga karaniwang panganib at panloloko sa jeonse bago pumirma.',
+    lnTypesTitle: 'Ang 10 uri ng panganib',
+    lnTypesDesc: 'Lahat ng uri ng panganib na natutukoy ng serbisyong ito. I-tap para sa mga senyales, payo, at totoong kaso.',
+    lnTip: 'Paano tumugon',
+    lnCases: 'Na-verify na totoong kaso',
+    lnNoCases: 'Wala pang publikong kasong ma-verify — paliwanag lamang.',
   },
   ne: {
     lnNav: 'जोखिम दफा सिक्ने',
@@ -3132,6 +3182,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'करारबाहिर जाँच्ने कुरा',
     lnCase: 'आधार·मुद्दा',
     lnKoNote: 'शिक्षण सामग्री कोरियालीमा उपलब्ध छ',
+    lnPageTitle: 'जोखिमपूर्ण दफा सिक्नुहोस्',
+    lnPageDesc: 'हस्ताक्षर अघि सामान्य जोखिम ढाँचा र जोन्से ठगी चिन्नुहोस्।',
+    lnTypesTitle: '१० प्रकारका जोखिम',
+    lnTypesDesc: 'यो सेवाले पत्ता लगाउने सबै जोखिम प्रकार। संकेत, उपाय र वास्तविक मुद्दा हेर्न थिच्नुहोस्।',
+    lnTip: 'कसरी सामना गर्ने',
+    lnCases: 'प्रमाणित वास्तविक मुद्दा',
+    lnNoCases: 'अहिलेसम्म प्रमाणित सार्वजनिक मुद्दा छैन — व्याख्या मात्र।',
   },
   km: {
     lnNav: 'រៀនអំពីមាត្រាហានិភ័យ',
@@ -3141,6 +3198,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'អ្វីត្រូវពិនិត្យក្រៅកិច្ចសន្យា',
     lnCase: 'ភស្តុតាង·ករណី',
     lnKoNote: 'មាតិកាសិក្សាផ្ដល់ជាភាសាកូរ៉េ',
+    lnPageTitle: 'ស្វែងយល់ប្រការហានិភ័យ',
+    lnPageDesc: 'ស្គាល់ទម្រង់ហានិភ័យ និងល្បិចឆបោក jeonse មុនចុះហត្ថលេខា។',
+    lnTypesTitle: 'ហានិភ័យ ១០ ប្រភេទ',
+    lnTypesDesc: 'ប្រភេទហានិភ័យទាំងអស់ដែលសេវានេះរកឃើញ។ ចុចដើម្បីមើលសញ្ញា ដំណោះស្រាយ និងករណីពិត។',
+    lnTip: 'របៀបដោះស្រាយ',
+    lnCases: 'ករណីពិតដែលបានផ្ទៀងផ្ទាត់',
+    lnNoCases: 'មិនទាន់មានករណីសាធារណៈអាចផ្ទៀងផ្ទាត់ — មានតែការពន្យល់។',
   },
   my: {
     lnNav: 'အန္တရာယ်အပိုဒ်များလေ့လာရန်',
@@ -3150,6 +3214,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'စာချုပ်ပြင်ပ စစ်ဆေးရန်',
     lnCase: 'အထောက်အထား·အမှု',
     lnKoNote: 'သင်ခန်းစာကို ကိုရီးယားဘာသာဖြင့် ပေးသည်',
+    lnPageTitle: 'အန္တရာယ်ရှိအချက်များ လေ့လာရန်',
+    lnPageDesc: 'လက်မှတ်မထိုးမီ အန္တရာယ်ပုံစံနှင့် jeonse လိမ်လည်နည်းများကို သိထားပါ။',
+    lnTypesTitle: 'အန္တရာယ် ၁၀ မျိုး',
+    lnTypesDesc: 'ဤဝန်ဆောင်မှုက စာချုပ်တွင်ရှာဖွေသော အန္တရာယ်အမျိုးအစားအားလုံး။ လက္ခဏာ၊ ဖြေရှင်းနည်းနှင့် ဖြစ်ရပ်မှန်များကြည့်ရန် နှိပ်ပါ။',
+    lnTip: 'မည်သို့တုံ့ပြန်မည်',
+    lnCases: 'အတည်ပြုပြီး ဖြစ်ရပ်မှန်များ',
+    lnNoCases: 'အတည်ပြုနိုင်သော အများပြည်သူဖြစ်ရပ် မရှိသေး — ရှင်းလင်းချက်သာ။',
   },
   mn: {
     lnNav: 'Эрсдэлтэй заалт сурах',
@@ -3159,6 +3230,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'Гэрээнээс гадуур шалгах зүйл',
     lnCase: 'Үндэслэл·хэрэг',
     lnKoNote: 'Сургалтын агуулга солонгос хэлээр',
+    lnPageTitle: 'Эрсдэлтэй заалт сурах',
+    lnPageDesc: 'Гарын үсэг зурахаас өмнө нийтлэг эрсдэл ба жонсэ залилангийн арга барилыг мэдэж аваарай.',
+    lnTypesTitle: 'Эрсдэлийн 10 төрөл',
+    lnTypesDesc: 'Энэ үйлчилгээний илрүүлдэг бүх эрсдэлийн төрөл. Дохио, зөвлөгөө, бодит хэргийг харахын тулд дарна уу.',
+    lnTip: 'Хэрхэн хариу арга хэмжээ авах',
+    lnCases: 'Баталгаажсан бодит хэргүүд',
+    lnNoCases: 'Баталгаажуулах боломжтой нийтийн хэрэг хараахан алга — зөвхөн тайлбар.',
   },
   uz: {
     lnNav: 'Xavfli bandlarni oʻrganish',
@@ -3168,6 +3246,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'Shartnomadan tashqari tekshirish',
     lnCase: 'Asos·ishlar',
     lnKoNote: 'Oʻquv kontenti koreys tilida',
+    lnPageTitle: "Xavfli bandlarni o'rganish",
+    lnPageDesc: 'Imzolashdan oldin keng tarqalgan xavf turlari va jeonse firibgarligini bilib oling.',
+    lnTypesTitle: '10 ta xavf turi',
+    lnTypesDesc: "Ushbu xizmat aniqlaydigan barcha xavf turlari. Belgilar, maslahat va haqiqiy ishlarni ko'rish uchun bosing.",
+    lnTip: 'Qanday javob berish',
+    lnCases: 'Tasdiqlangan haqiqiy ishlar',
+    lnNoCases: "Hali tasdiqlanadigan ochiq ish yo'q — faqat tushuntirish.",
   },
   si: {
     lnNav: 'අවදානම් වගන්ති ඉගෙනීම',
@@ -3177,6 +3262,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'ගිවිසුමෙන් පිටත පරීක්ෂා කළ යුතු දේ',
     lnCase: 'සාක්ෂි·නඩු',
     lnKoNote: 'ඉගෙනුම් අන්තර්ගතය කොරියානු බසින්',
+    lnPageTitle: 'අවදානම් වගන්ති ඉගෙන ගන්න',
+    lnPageDesc: 'අත්සන් කිරීමට පෙර පොදු අවදානම් රටා සහ jeonse වංචා ක්\u200dරම දැනගන්න.',
+    lnTypesTitle: 'අවදානම් වර්ග 10',
+    lnTypesDesc: 'මෙම සේවාව හඳුනාගන්නා සියලු අවදානම් වර්ග. සංඥා, උපදෙස් සහ සැබෑ නඩු බැලීමට ඔබන්න.',
+    lnTip: 'ප්\u200dරතිචාර දක්වන ආකාරය',
+    lnCases: 'සත්\u200dයාපිත සැබෑ නඩු',
+    lnNoCases: 'තවම සත්\u200dයාපනය කළ හැකි ප්\u200dරසිද්ධ නඩුවක් නැත — පැහැදිලි කිරීම පමණි.',
   },
   bn: {
     lnNav: 'ঝুঁকির ধারা শিখুন',
@@ -3186,6 +3278,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'চুক্তির বাইরে যা যাচাই করবেন',
     lnCase: 'ভিত্তি·মামলা',
     lnKoNote: 'শেখার বিষয়বস্তু কোরিয়ান ভাষায়',
+    lnPageTitle: 'ঝুঁকিপূর্ণ ধারা শিখুন',
+    lnPageDesc: 'স্বাক্ষরের আগে সাধারণ ঝুঁকির ধরন ও জনসে প্রতারণার কৌশল জেনে নিন।',
+    lnTypesTitle: '১০ ধরনের ঝুঁকি',
+    lnTypesDesc: 'এই পরিষেবা যেসব ঝুঁকি শনাক্ত করে তার সবগুলো। সংকেত, করণীয় ও বাস্তব মামলা দেখতে চাপুন।',
+    lnTip: 'কীভাবে মোকাবিলা করবেন',
+    lnCases: 'যাচাইকৃত বাস্তব মামলা',
+    lnNoCases: 'এখনও যাচাইযোগ্য প্রকাশ্য মামলা নেই — শুধু ব্যাখ্যা।',
   },
   ru: {
     lnNav: 'Изучить опасные пункты',
@@ -3195,6 +3294,13 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: 'Что проверить вне договора',
     lnCase: 'Основания·дела',
     lnKoNote: 'Учебный контент на корейском языке',
+    lnPageTitle: 'Изучите рискованные пункты',
+    lnPageDesc: 'Узнайте типичные риски и схемы мошенничества с чонсе до подписания.',
+    lnTypesTitle: '10 типов рисков',
+    lnTypesDesc: 'Все типы рисков, которые находит сервис. Нажмите, чтобы увидеть признаки, советы и реальные дела.',
+    lnTip: 'Как реагировать',
+    lnCases: 'Проверенные реальные дела',
+    lnNoCases: 'Проверяемых публичных дел пока нет — только пояснение.',
   },
   ja: {
     lnNav: '危険条項を学ぶ',
@@ -3204,12 +3310,42 @@ const UI_LEARN: Record<LangCode, Record<LearnKey, string>> = {
     lnOutside: '契約書の外で確認すること',
     lnCase: '根拠・事例',
     lnKoNote: '学習コンテンツは韓国語で提供されます',
+    lnPageTitle: 'リスク条項を学ぶ',
+    lnPageDesc: '署名前に、よくあるリスク類型とチョンセ詐欺の手口を知っておきましょう。',
+    lnTypesTitle: '10のリスク類型',
+    lnTypesDesc: '本サービスが検出する全リスク類型。タップでシグナル・対処法・実例を確認できます。',
+    lnTip: '対処のしかた',
+    lnCases: '検証済みの実例',
+    lnNoCases: '検証可能な公開事例はまだありません — 説明のみ提供します。',
   },
+}
+
+/* --- 진행 화면 현지화 + 공통 보완 키 (#86 계열 잔여 소탕) --- */
+type ProgKey =
+  | 'prPhase1' | 'prPhase2' | 'prPhase3' | 'prPhase4' | 'prDoneTitle' | 'prErrTitle' | 'prLoadingDesc' | 'prStreamDesc' | 'prDoneDesc' | 'prErrDesc' | 'prActive' | 'copy' | 'copied' | 'fallbackQuestion' | 'requestFailed'
+
+const UI_PROG: Record<LangCode, Record<ProgKey, string>> = {
+  ko: { prPhase1: '계약서 텍스트 읽기', prPhase2: '조항 단위로 나누기', prPhase3: '불리할 수 있는 조항 찾기', prPhase4: '분석 결과 품질 확인하기', prDoneTitle: '분석이 끝났어요', prErrTitle: '분석 서버에 연결하지 못했어요', prLoadingDesc: '조항 단위로 나누고 위험 신호와 질문 목록을 정리해요.', prStreamDesc: '조항 {done}/{total}개 분석 완료 — 끝난 조항부터 아래에 보여드려요.', prDoneDesc: '잠시 후 결과 화면으로 이동해요.', prErrDesc: '{msg} 잠시 후 다시 시도해주세요.', prActive: '진행 중', copy: '복사', copied: '복사됨', fallbackQuestion: '이 조항은 그대로 유지해야 하나요?', requestFailed: '분석 요청에 실패했어요.', },
+  en: { prPhase1: 'Reading contract text', prPhase2: 'Splitting into clauses', prPhase3: 'Finding unfavorable clauses', prPhase4: 'Checking result quality', prDoneTitle: 'Analysis complete', prErrTitle: 'Could not reach the analysis server', prLoadingDesc: 'Splitting into clauses and preparing risk signals and questions.', prStreamDesc: '{done}/{total} clauses analyzed — finished clauses appear below.', prDoneDesc: 'Taking you to the results shortly.', prErrDesc: '{msg} Please try again in a moment.', prActive: 'In progress', copy: 'Copy', copied: 'Copied', fallbackQuestion: 'Should this clause stay as it is?', requestFailed: 'The analysis request failed.', },
+  zh: { prPhase1: '读取合同文本', prPhase2: '按条款拆分', prPhase3: '查找不利条款', prPhase4: '检查结果质量', prDoneTitle: '分析完成', prErrTitle: '无法连接分析服务器', prLoadingDesc: '正在按条款拆分并整理风险信号与问题清单。', prStreamDesc: '已分析 {done}/{total} 条 — 完成的条款显示在下方。', prDoneDesc: '稍后进入结果页面。', prErrDesc: '{msg} 请稍后重试。', prActive: '进行中', copy: '复制', copied: '已复制', fallbackQuestion: '这一条款应保持原样吗？', requestFailed: '分析请求失败。', },
+  vi: { prPhase1: 'Đọc văn bản hợp đồng', prPhase2: 'Tách theo điều khoản', prPhase3: 'Tìm điều khoản bất lợi', prPhase4: 'Kiểm tra chất lượng kết quả', prDoneTitle: 'Phân tích hoàn tất', prErrTitle: 'Không kết nối được máy chủ phân tích', prLoadingDesc: 'Đang tách điều khoản và chuẩn bị tín hiệu rủi ro, câu hỏi.', prStreamDesc: 'Đã phân tích {done}/{total} điều khoản — điều khoản xong hiện bên dưới.', prDoneDesc: 'Sắp chuyển đến màn hình kết quả.', prErrDesc: '{msg} Vui lòng thử lại sau.', prActive: 'Đang xử lý', copy: 'Sao chép', copied: 'Đã sao chép', fallbackQuestion: 'Điều khoản này có nên giữ nguyên không?', requestFailed: 'Yêu cầu phân tích thất bại.', },
+  th: { prPhase1: 'อ่านข้อความสัญญา', prPhase2: 'แยกเป็นรายข้อ', prPhase3: 'ค้นหาข้อที่เสียเปรียบ', prPhase4: 'ตรวจคุณภาพผลลัพธ์', prDoneTitle: 'วิเคราะห์เสร็จแล้ว', prErrTitle: 'เชื่อมต่อเซิร์ฟเวอร์วิเคราะห์ไม่ได้', prLoadingDesc: 'กำลังแยกรายข้อและเตรียมสัญญาณเสี่ยงกับรายการคำถาม', prStreamDesc: 'วิเคราะห์แล้ว {done}/{total} ข้อ — ข้อที่เสร็จแสดงด้านล่าง', prDoneDesc: 'กำลังไปหน้าผลลัพธ์', prErrDesc: '{msg} โปรดลองใหม่อีกครั้ง', prActive: 'กำลังดำเนินการ', copy: 'คัดลอก', copied: 'คัดลอกแล้ว', fallbackQuestion: 'ข้อนี้ควรคงไว้ตามเดิมหรือไม่?', requestFailed: 'คำขอวิเคราะห์ล้มเหลว', },
+  id: { prPhase1: 'Membaca teks kontrak', prPhase2: 'Memisah per pasal', prPhase3: 'Mencari pasal merugikan', prPhase4: 'Memeriksa kualitas hasil', prDoneTitle: 'Analisis selesai', prErrTitle: 'Tidak dapat terhubung ke server analisis', prLoadingDesc: 'Memisah pasal dan menyiapkan sinyal risiko serta daftar pertanyaan.', prStreamDesc: '{done}/{total} pasal dianalisis — pasal selesai tampil di bawah.', prDoneDesc: 'Segera menuju layar hasil.', prErrDesc: '{msg} Silakan coba lagi sebentar lagi.', prActive: 'Berlangsung', copy: 'Salin', copied: 'Tersalin', fallbackQuestion: 'Apakah pasal ini sebaiknya tetap seperti ini?', requestFailed: 'Permintaan analisis gagal.', },
+  tl: { prPhase1: 'Binabasa ang teksto ng kontrata', prPhase2: 'Hinahati sa mga sugnay', prPhase3: 'Hinahanap ang di-kanais-nais na sugnay', prPhase4: 'Sinusuri ang kalidad ng resulta', prDoneTitle: 'Tapos na ang pagsusuri', prErrTitle: 'Hindi maabot ang analysis server', prLoadingDesc: 'Hinahati sa mga sugnay at inihahanda ang mga senyales ng panganib at tanong.', prStreamDesc: '{done}/{total} sugnay na nasuri — lalabas sa ibaba ang mga tapos na.', prDoneDesc: 'Ililipat ka sa resulta sandali na lang.', prErrDesc: '{msg} Pakisubukan muli mamaya.', prActive: 'Isinasagawa', copy: 'Kopyahin', copied: 'Nakopya', fallbackQuestion: 'Dapat bang panatilihin ang sugnay na ito?', requestFailed: 'Nabigo ang kahilingan sa pagsusuri.', },
+  ne: { prPhase1: 'सम्झौताको पाठ पढ्दै', prPhase2: 'दफा अनुसार छुट्याउँदै', prPhase3: 'प्रतिकूल दफा खोज्दै', prPhase4: 'नतिजाको गुणस्तर जाँच्दै', prDoneTitle: 'विश्लेषण सकियो', prErrTitle: 'विश्लेषण सर्भरमा जडान भएन', prLoadingDesc: 'दफा छुट्याएर जोखिम संकेत र प्रश्न सूची तयार गर्दै।', prStreamDesc: '{done}/{total} दफा विश्लेषण भयो — सकिएका तल देखिन्छन्।', prDoneDesc: 'छिट्टै नतिजा स्क्रिनमा जान्छ।', prErrDesc: '{msg} कृपया केही बेरमा फेरि प्रयास गर्नुहोस्।', prActive: 'चलिरहेको', copy: 'प्रतिलिपि', copied: 'प्रतिलिपि भयो', fallbackQuestion: 'यो दफा यथावत् राख्नुपर्छ?', requestFailed: 'विश्लेषण अनुरोध असफल भयो।', },
+  km: { prPhase1: 'កំពុងអានអត្ថបទកិច្ចសន្យា', prPhase2: 'បំបែកតាមប្រការ', prPhase3: 'ស្វែងរកប្រការមិនអំណោយផល', prPhase4: 'ពិនិត្យគុណភាពលទ្ធផល', prDoneTitle: 'វិភាគរួចរាល់', prErrTitle: 'មិនអាចតភ្ជាប់ម៉ាស៊ីនមេវិភាគ', prLoadingDesc: 'កំពុងបំបែកប្រការ និងរៀបចំសញ្ញាហានិភ័យនិងសំណួរ។', prStreamDesc: 'វិភាគរួច {done}/{total} ប្រការ — ប្រការរួចរាល់បង្ហាញខាងក្រោម។', prDoneDesc: 'នឹងទៅអេក្រង់លទ្ធផលក្នុងពេលបន្តិច។', prErrDesc: '{msg} សូមព្យាយាមម្តងទៀត។', prActive: 'កំពុងដំណើរការ', copy: 'ចម្លង', copied: 'បានចម្លង', fallbackQuestion: 'តើប្រការនេះគួររក្សាទុកដដែលទេ?', requestFailed: 'សំណើវិភាគបរាជ័យ។', },
+  my: { prPhase1: 'စာချုပ်စာသားဖတ်နေသည်', prPhase2: 'အပိုဒ်အလိုက်ခွဲနေသည်', prPhase3: 'မလျော်ကန်သောအပိုဒ်ရှာနေသည်', prPhase4: 'ရလဒ်အရည်အသွေးစစ်နေသည်', prDoneTitle: 'ခွဲခြမ်းစိတ်ဖြာမှုပြီးပါပြီ', prErrTitle: 'ဆာဗာနှင့်ချိတ်ဆက်၍မရပါ', prLoadingDesc: 'အပိုဒ်ခွဲပြီး အန္တရာယ်လက္ခဏာနှင့်မေးခွန်းများပြင်နေသည်။', prStreamDesc: '{done}/{total} ပိုဒ်ပြီးပါပြီ — ပြီးသောအပိုဒ်များအောက်တွင်ပြသည်။', prDoneDesc: 'မကြာမီရလဒ်စာမျက်နှာသို့သွားပါမည်။', prErrDesc: '{msg} ခဏအကြာတွင်ထပ်စမ်းကြည့်ပါ။', prActive: 'ဆောင်ရွက်နေဆဲ', copy: 'ကူးယူရန်', copied: 'ကူးယူပြီး', fallbackQuestion: 'ဤအပိုဒ်ကိုအတိုင်းထားသင့်ပါသလား။', requestFailed: 'ခွဲခြမ်းစိတ်ဖြာတောင်းဆိုမှုမအောင်မြင်ပါ။', },
+  mn: { prPhase1: 'Гэрээний текст уншиж байна', prPhase2: 'Заалтаар хувааж байна', prPhase3: 'Тааламжгүй заалт хайж байна', prPhase4: 'Үр дүнгийн чанар шалгаж байна', prDoneTitle: 'Шинжилгээ дууслаа', prErrTitle: 'Шинжилгээний сервертэй холбогдож чадсангүй', prLoadingDesc: 'Заалтаар хувааж, эрсдэлийн дохио, асуултын жагсаалт бэлдэж байна.', prStreamDesc: '{done}/{total} заалт шинжлэгдлээ — дууссан нь доор гарна.', prDoneDesc: 'Удахгүй үр дүнгийн дэлгэц рүү шилжинэ.', prErrDesc: '{msg} Түр хүлээгээд дахин оролдоно уу.', prActive: 'Явагдаж байна', copy: 'Хуулах', copied: 'Хуулсан', fallbackQuestion: 'Энэ заалтыг хэвээр үлдээх ёстой юу?', requestFailed: 'Шинжилгээний хүсэлт амжилтгүй боллоо.', },
+  uz: { prPhase1: "Shartnoma matni o'qilmoqda", prPhase2: "Bandlarga bo'linmoqda", prPhase3: 'Noqulay bandlar qidirilmoqda', prPhase4: 'Natija sifati tekshirilmoqda', prDoneTitle: 'Tahlil tugadi', prErrTitle: 'Tahlil serveriga ulanib bo‘lmadi', prLoadingDesc: "Bandlarga bo'lib, xavf belgilari va savollar tayyorlanmoqda.", prStreamDesc: "{done}/{total} band tahlil qilindi — tugaganlari quyida ko'rinadi.", prDoneDesc: 'Tez orada natija ekraniga o‘tasiz.', prErrDesc: "{msg} Birozdan so'ng qayta urinib ko'ring.", prActive: 'Davom etmoqda', copy: 'Nusxalash', copied: 'Nusxalandi', fallbackQuestion: 'Bu band shundayligicha qolishi kerakmi?', requestFailed: "Tahlil so'rovi bajarilmadi.", },
+  si: { prPhase1: 'ගිවිසුම් පාඨය කියවමින්', prPhase2: 'වගන්ති අනුව බෙදමින්', prPhase3: 'අවාසිදායක වගන්ති සොයමින්', prPhase4: 'ප්\u200dරතිඵල ගුණාත්මකභාවය පරීක්ෂා කරමින්', prDoneTitle: 'විශ්ලේෂණය අවසන්', prErrTitle: 'විශ්ලේෂණ සේවාදායකයට සම්බන්ධ විය නොහැක', prLoadingDesc: 'වගන්ති බෙදා අවදානම් සංඥා සහ ප්\u200dරශ්න ලැයිස්තුව සූදානම් කරමින්.', prStreamDesc: '{done}/{total} වගන්ති විශ්ලේෂණය විය — අවසන් ඒවා පහත පෙන්වයි.', prDoneDesc: 'ඉක්මනින් ප්\u200dරතිඵල තිරයට යයි.', prErrDesc: '{msg} මොහොතකින් නැවත උත්සාහ කරන්න.', prActive: 'ක්\u200dරියාත්මකයි', copy: 'පිටපත්', copied: 'පිටපත් විය', fallbackQuestion: 'මෙම වගන්තිය එලෙසම තැබිය යුතුද?', requestFailed: 'විශ්ලේෂණ ඉල්ලීම අසාර්ථකයි.', },
+  bn: { prPhase1: 'চুক্তির লেখা পড়া হচ্ছে', prPhase2: 'ধারা অনুযায়ী ভাগ করা হচ্ছে', prPhase3: 'অসুবিধাজনক ধারা খোঁজা হচ্ছে', prPhase4: 'ফলাফলের মান যাচাই হচ্ছে', prDoneTitle: 'বিশ্লেষণ শেষ', prErrTitle: 'বিশ্লেষণ সার্ভারে সংযোগ হয়নি', prLoadingDesc: 'ধারা ভাগ করে ঝুঁকির সংকেত ও প্রশ্ন তালিকা তৈরি হচ্ছে।', prStreamDesc: '{done}/{total} ধারা বিশ্লেষিত — শেষ হওয়াগুলো নিচে দেখা যাবে।', prDoneDesc: 'শীঘ্রই ফলাফল স্ক্রিনে যাবেন।', prErrDesc: '{msg} একটু পরে আবার চেষ্টা করুন।', prActive: 'চলছে', copy: 'কপি', copied: 'কপি হয়েছে', fallbackQuestion: 'এই ধারা কি এভাবেই থাকা উচিত?', requestFailed: 'বিশ্লেষণ অনুরোধ ব্যর্থ হয়েছে।', },
+  ru: { prPhase1: 'Чтение текста договора', prPhase2: 'Разбиение на пункты', prPhase3: 'Поиск невыгодных пунктов', prPhase4: 'Проверка качества результата', prDoneTitle: 'Анализ завершён', prErrTitle: 'Не удалось подключиться к серверу анализа', prLoadingDesc: 'Разбиваем на пункты и готовим сигналы риска и список вопросов.', prStreamDesc: 'Проанализировано {done}/{total} пунктов — готовые появляются ниже.', prDoneDesc: 'Скоро откроется экран результатов.', prErrDesc: '{msg} Повторите попытку чуть позже.', prActive: 'Выполняется', copy: 'Копировать', copied: 'Скопировано', fallbackQuestion: 'Стоит ли оставить этот пункт как есть?', requestFailed: 'Запрос анализа не выполнен.', },
+  ja: { prPhase1: '契約書テキストの読み取り', prPhase2: '条項ごとに分割', prPhase3: '不利になり得る条項の検出', prPhase4: '結果品質の確認', prDoneTitle: '分析が完了しました', prErrTitle: '分析サーバーに接続できませんでした', prLoadingDesc: '条項に分割し、リスクシグナルと質問リストを整理しています。', prStreamDesc: '{done}/{total}条項の分析完了 — 済んだ条項から下に表示します。', prDoneDesc: 'まもなく結果画面へ移動します。', prErrDesc: '{msg} しばらくしてから再度お試しください。', prActive: '進行中', copy: 'コピー', copied: 'コピー済み', fallbackQuestion: 'この条項はこのままで良いですか？', requestFailed: '分析リクエストに失敗しました。', },
 }
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | QuizKey | ZoomKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | QuizKey | ZoomKey | VoiceKey | RecordKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3219,7 +3355,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

@@ -59,8 +59,11 @@ export function ExtractScreen({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-              <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-[28px]">
-                {isImage ? '📷' : '📄'}
+              <span
+                aria-hidden
+                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-[15px] font-extrabold tracking-wide text-brand-600"
+              >
+                {isImage ? 'IMG' : 'PDF'}
               </span>
               <p className="mt-5 text-[16px] font-bold text-ink-900">{docName}</p>
               <p className="mt-2 max-w-sm text-[14px] leading-relaxed text-ink-400">
@@ -99,7 +102,7 @@ export function ExtractScreen({
 
           {isTextMode && !enoughText ? (
             <div className="rounded-2xl bg-caution-50 px-4 py-3.5 text-[14px] font-semibold leading-relaxed text-caution-700">
-              ⚠️ {t(language, 'exShort')}
+              {t(language, 'exShort')}
             </div>
           ) : (
             <div className="rounded-2xl bg-safe-50 px-4 py-3.5 text-[14px] font-semibold leading-relaxed text-safe-700">

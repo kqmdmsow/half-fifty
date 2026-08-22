@@ -202,7 +202,7 @@ export default function App() {
         )
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '분석 요청에 실패했어요.')
+      setError(err instanceof Error ? err.message : t(language, 'requestFailed'))
       setStreamProgress(null)
       go('progress') // 오류 안내와 재시도 버튼은 Progress 화면이 담당
     } finally {
@@ -278,10 +278,9 @@ export default function App() {
                 screen === 'learn' ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
               }`}
             >
-              📖 {t(language, 'lnNav')}
+              {t(language, 'lnNav')}
             </button>
             <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
-              <span aria-hidden>🌐</span>
               <select
                 aria-label="언어 선택 / Language"
                 value={language}
@@ -357,7 +356,7 @@ export default function App() {
           <div className="mx-auto max-w-3xl px-6 pt-6">
             <div className="flex flex-col gap-3 rounded-2xl border border-brand-500/20 bg-brand-50 px-5 py-4 md:flex-row md:items-center md:justify-between">
               <p className="text-[14px] font-semibold leading-relaxed text-ink-700">
-                🌐 {t(language, 'langMismatch')}
+                {t(language, 'langMismatch')}
               </p>
               <button
                 type="button"
@@ -422,6 +421,7 @@ export default function App() {
         )}
         {screen === 'progress' && (
           <ProgressScreen
+            language={language}
             loading={loading}
             error={error}
             streamProgress={streamProgress}

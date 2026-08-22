@@ -1,0 +1,2567 @@
+{
+ "en": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Excessive Penalty Clauses",
+    "what": "A clause that sets the amount of money to be paid when a contract is terminated or breached much higher than the actual damage. Even without the word 'penalty,' it applies if the substance is a predetermined damage compensation.",
+    "signals": [
+     "Penalty, penalty fee, or multiple damages",
+     "Full charge of remaining period fees upon termination",
+     "Exclusion of pro-rata calculation",
+     "Asymmetric design with unusually high late payment interest only for customers"
+    ],
+    "tip": "Ask whether it is proportional to actual damage. Courts have consistently reduced excessive penalties (Civil Act Article 398)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Unilateral Contract Termination",
+    "what": "A clause that allows the other party to end the contract immediately without prior notice or legitimate reason.",
+    "signals": [
+     "Immediate termination without demand procedure",
+     "Termination of housing with just one late payment (law uses two periods as standard)",
+     "Special agreement to waive renewal request rights"
+    ],
+    "tip": "Two periods of late payment for housing and three periods for commercial property are the legal termination standards. If written to allow easier termination, it requires verification."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Deposit Refund Delay",
+    "what": "A clause that causes security deposits, refunds, or settlement amounts to be returned late, reduced, or replaced with something else.",
+    "signals": [
+     "Extended refund period such as 'within O months after contract termination'",
+     "Uniform deduction of reserve funds or fees",
+     "Interest-free return or replacement payment with coupons or points"
+    ],
+    "tip": "Verify that the refund deadline and interest upon delay are clearly specified. Jeongsae registration order and deposit insurance serve as safety measures."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Liability Waiver",
+    "what": "A clause that shifts or waives responsibilities imposed by law on the other party (repair obligations, warranty of habitability, etc.) entirely to consumers or tenants.",
+    "signals": [
+     "'No liability whatsoever'",
+     "'All repair costs borne by tenant'",
+     "Prohibition of civil or criminal objections"
+    ],
+    "tip": "Blanket phrases like 'all' or 'any' are key signals. Adjustment committees have repeatedly ruled blanket liability-shifting clauses invalid."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Unclear Fee and Interest Conditions",
+    "what": "A clause written so that you cannot determine how much to pay just by reading the contract. Ambiguous language is easily interpreted in favor of the other party later.",
+    "signals": [
+     "Blank interest rate or fee rate fields",
+     "Vague standards such as 'statutory interest determined at judgment'",
+     "'To be determined by separate agreement'"
+    ],
+    "tip": "Request that numbers and calculation methods be written in the contract. There are cases where adjustment committees limited ambiguous interest language to 5% per annum (Civil Act statutory rate)."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Trust Relationship and Ownership Instability Notice",
+    "what": "A clause where the property is owned by a trust company making ownership structure unstable, and special agreements reduce tenant protection. This is one of the core patterns of jeonse fraud.",
+    "signals": [
+     "'Trustee (trust company) has no responsibility for deposit refund'",
+     "'Lease without prior trustee consent is invalid'",
+     "Pressure to contract without verifying trust documents"
+    ],
+    "tip": "Check if the owner in the property register (Section A) is a trust company, and verify in the trust document who has the right to lease."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Unfair Cost and Tax Shifting",
+    "what": "A clause that shifts expenses that the other party (owner or business operator) should legally bear to consumers or tenants.",
+    "signals": [
+     "Owner-borne taxes (property tax, acquisition tax) shifted to tenant",
+     "Landlord's repair and maintenance costs shifted to tenant",
+     "Request to bear mortgage registration costs"
+    ],
+    "tip": "Ask who should legally bear that cost. Distinguish from actual utility costs (electricity, water) that you use."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Unilateral Change of Terms and Conditions",
+    "what": "A clause allowing the other party to change contract contents (terms, interest rates, payment conditions) without consent.",
+    "signals": [
+     "'Company may change at its discretion'",
+     "Deemed consent if no response after change notice",
+     "Payment conditions adjusted at company's discretion"
+    ],
+    "tip": "Verify that prior notice and right to object (terminate) are guaranteed upon change. Deemed consent clauses are a repeatedly restricted type in dispute adjustment."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Choice Restriction and Forced Purchase",
+    "what": "A clause that forces use of specific products or vendors or blocks consumer choice (including bundled sales).",
+    "signals": [
+     "'Only through designated vendors'",
+     "Mandatory subscription to ancillary products",
+     "Language excluding other options"
+    ],
+    "tip": "Ask whether the forced use or purchase is absolutely necessary for the contract purpose and why other options are blocked."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Rights Exercise Restriction",
+    "what": "A clause that blocks the exercise of rights guaranteed by law (termination rights, objection rights, litigation rights, etc.).",
+    "signals": [
+     "Commitment not to raise objections",
+     "Excessively restrictive termination right exercise period or method",
+     "Prohibition of lawsuits or non-suit agreement"
+    ],
+    "tip": "Statutory rights cannot be easily taken away by special agreement. There are cases where such clauses were rejected as violations of the Unfair Terms and Conditions Act and Installment Sales Act."
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Trust Company Liability Waiver Clause",
+    "what": "A scheme where the property is owned by a trust company and a special clause states 'the trust company has no responsibility for deposit refund.' The tenant loses the legal party to claim the deposit back.",
+    "signal": "Special clause contains language like 'trustee,' 'trust,' 'no responsibility for refund,' 'no objection will be raised.'",
+    "outside": "Check if the owner in the property register (Section A) is a trust company. Obtain the trust document to verify who has the right to lease.",
+    "case": "Multiple financial dispute adjustment cases — type where deposit recovery is structurally blocked by trustee liability waiver clause (Golden Set Grade A)."
+   },
+   {
+    "id": "gap",
+    "title": "Empty Jeonse (Debt Ratio Exceeds Property Value)",
+    "what": "A situation where the security deposit plus senior loans approach or exceed the property value. If the property goes to auction, the tenant cannot recover the full deposit.",
+    "signal": "Not visible from the contract alone — that's why it's dangerous. If the deposit is large relative to market price and the landlord rushes, be suspicious.",
+    "outside": "Debt ratio = (senior claims + deposit) ÷ market price. Above 90%, empirical research shows 17.6% of contracts experience deposit loss (baseline 0.2%). Verify using the empty jeonse calculator on the results screen.",
+    "case": "Ahn Sun-young and Lee Sang-yeop (2025) empirical study of 450,000 Seoul metropolitan jeonse contracts — accident rate 17.6% in debt ratio above 90% range."
+   },
+   {
+    "id": "double",
+    "title": "Double Contracts",
+    "what": "A scheme where the same property is contracted with multiple tenants or a manager forges contracts without the owner's knowledge. Tenants lose deposits if they rank lower in priority.",
+    "signal": "Contract counterparty differs from registered owner but power of attorney is vague. Pressure to contract quickly at below-market price.",
+    "outside": "Contract directly with the registered owner (verify ID). If delegated, verify power of attorney with certified seal. Pay final installment only to owner's account.",
+    "case": "Repeated type in Housing Lease Dispute Adjustment Committee — disputes over validity of unauthorized lease contracts."
+   },
+   {
+    "id": "appraisal",
+    "title": "Inflated Appraisal (Appraisal Abuse)",
+    "what": "A scheme where appraisals inflate market value for new villas without actual transaction records, allowing deposits at or above appraised value. Starts as empty jeonse from the beginning.",
+    "signal": "Emphasis on 'appraised value O billion' while refusing to show actual transaction data. Frequent in new multi-unit housing.",
+    "outside": "Directly verify actual transaction prices of similar properties in the same area using the Ministry of Land, Infrastructure and Transport's actual transaction price disclosure system. Empirical research shows appraisal-based pricing has 4.8 times higher deposit loss odds.",
+    "case": "Ahn Sun-young and Lee Sang-yeop (2025) — expert (appraisal) pricing Exp(B) 4.8, multi-unit housing 5.8 times."
+   },
+   {
+    "id": "proxy",
+    "title": "Dummy Landlord and Corporate Landlord",
+    "what": "A scheme where a property-less person or shell corporation buys property to lease it. Even if problems occur, there are no assets to recover.",
+    "signal": "Landlord is a corporation with unclear substance. Owner changes right before contract (recent transfer records in property register Section A).",
+    "outside": "Check recent ownership transfer history in property register Section A. Corporate landlords have 3.6 times higher deposit loss odds in empirical research — verify substance through corporate register.",
+    "case": "Ahn Sun-young and Lee Sang-yeop (2025) — corporate landlord Exp(B) 3.6 (accident rate 20.4% vs individual 4.8%)."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "After service performance, a clause returning only 20% of fees (80% penalty) was deemed unfair excessive damage compensation, resulting in full refund without penalty",
+   "신발도매_2013": "Franchise termination clause with 50% franchise fee penalty — adjustment settlement with partial penalty refund based on Fair Trade Commission precedent (2004약제2214) and common issues",
+   "2019-18b": "Objection waiver commitment in insurance guarantee supplementary agreement — 'lapse' language unclear, requiring terms revision",
+   "2005-41": "Consumer termination right restriction clause in investment advisory contract — rejected for violation of Unfair Terms and Conditions Act disclosure requirements and conflict with Doorstep Sales Act voluntary termination rights",
+   "즉시연금_2017-17": "Annuity payment below minimum guaranteed rate determined as terms violation",
+   "바로연금보험_2018-8": "Maturity insurance payment deduction clause with unclear basis — interpreted favorably to consumer under principle of contra proferentem",
+   "2019-18a": "Unilateral termination clause in credit transaction basic terms — termination grounds negated by citing Fair Trade Commission invalidity ruling",
+   "990": "Tenant's waiver of contract renewal request right — invalid without special circumstances under Housing Lease Protection Act Article 6-3(1)",
+   "2008_약관변경동의간주": "Clause deeming consent to terms change if no objection within certain period — deemed consent negated for violation of Unfair Terms and Conditions Act Article 12",
+   "2010_ELS조건조정": "Clause allowing issuer discretion to adjust payment conditions — restricted by narrow interpretation and payment order issued",
+   "20": "Special clause making tenant fully responsible for housing repair costs — invalid for shifting landlord's statutory maintenance obligation",
+   "2008_직불카드양도": "Clause imposing full liability upon card transfer — member liability limited to 40% based on contribution allocation precedent"
+  }
+ },
+ "ja": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "過度な違約金",
+    "what": "契約を解除したり破ったりするときに支払うべき金額を、実際の損害よりもはるかに大きく定める条項。「違約金」という言葉がなくても、実質が損害賠償予定であれば該当する。",
+    "signals": [
+     "違約金・違約罰・倍額賠償",
+     "解除時に残余期間の料金全額請求",
+     "日割り計算の除外",
+     "顧客の延滞利率だけが異常に高い非対称設計"
+    ],
+    "tip": "実際の損害と比例しているか確認してください。裁判所は過度な違約金を減額してきました(民法第398条)。"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "一方的な契約解除",
+    "what": "相手方が事前通知や正当な理由なく契約をすぐに終わらせることができるようにする条項。",
+    "signals": [
+     "催告手続なく「即座に解除できる」",
+     "住宅なのに1回の延滞だけで解除(法は2期延滞が基準)",
+     "更新請求権を放棄させる特約"
+    ],
+    "tip": "住宅は2期、店舗は3期延滞が法定解除基準です。それより簡単に解除されるように書かれていれば確認対象です。"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "保証金返還の遅延",
+    "what": "保証金・返金・精算金を遅く、減額して、または別のもので返すようにする条項。",
+    "signals": [
+     "「契約終了後O ヶ月以内に返還できる」のように期限を長く",
+     "保留金・手数料の一律控除",
+     "無利息返還、クーポン・ポイント代替支給"
+    ],
+    "tip": "返還期限と遅延時の利息が明記されているか確認してください。テナント権登記命令・保証保険が安全装置になります。"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "責任免除",
+    "what": "法が相手方に課した責任(修繕義務、瑕疵担保責任など)を丸ごと消費者・借家人に転嫁したり免除を受ける条項。",
+    "signals": [
+     "「一切(いかなる)責任を負わない」",
+     "「すべての修理費用は借家人負担」",
+     "民・刑事上の異議提起禁止"
+    ],
+    "tip": "「すべて・一切」のような包括文句が重要な信号です。調整委員会は包括的責任転嫁特約を無効と判断してきました。"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "不明確な手数料・利息条件",
+    "what": "いくら支払うべきか契約書だけでは分からないように書かれた条項。曖昧な文句は後で相手方に有利に解釈されやすい。",
+    "signals": [
+     "利率・手数料率欄が空白",
+     "「一般的に判決時に定める法定利息」のような曖昧な基準",
+     "「別途協議による」"
+    ],
+    "tip": "数字と計算方法を契約書に記載するよう要求してください。曖昧な利息文句を調整委員会が年5%(民法法定利率)に制限した事例があります。"
+   },
+   {
+    "id": "trust_notice",
+    "title": "信託関係・所有権不安定の告知",
+    "what": "建物が信託会社所有で所有権構造が不安定なのに、特約で借家人保護を縮小する条項。全セ詐欺の重要パターンの一つ。",
+    "signals": [
+     "「受託者(信託会社)は保証金返還責任がない」",
+     "「受託者事前承認なき賃貸借は効力がない」",
+     "信託原簿確認なく契約を急かす"
+    ],
+    "tip": "登記簿甲区で所有者が信託会社か、信託原簿で賃貸権限が誰にあるか確認してください。"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "不当な費用・税金転嫁",
+    "what": "法律上相手方(所有者・事業者)が負担すべき支出を消費者・借家人に転嫁する条項。",
+    "signals": [
+     "所有者負担税(固定資産税・取得税)を借家人に",
+     "賃貸人の修繕・維持保全費用転嫁",
+     "根抵当権設定費用負担要求"
+    ],
+    "tip": "その費用が法律上誰の負担か確認してください。本人が実際に使用した公共料金(電気・水道)とは区別されます。"
+   },
+   {
+    "id": "benefit_change",
+    "title": "一方的な給付・条件変更",
+    "what": "相手方が契約内容(約款・金利・支払条件)を同意なく変更できるようにする条項。",
+    "signals": [
+     "「会社が任意に変更できる」",
+     "変更通知後に無応答なら「同意したものとみなす」",
+     "支払条件を会社裁量で調整"
+    ],
+    "tip": "変更時に事前通知と拒否(解除)権が保障されるか確認してください。同意間擬制条項は分争調整で繰り返し制動がかかった類型です。"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "選択権制限・購入強制",
+    "what": "特定商品・業者利用を強制したり消費者の選択権を奪う条項(抱き合わせ販売を含む)。",
+    "signals": [
+     "「指定業者を通じてのみ」",
+     "付帯商品の義務加入",
+     "他の選択肢を排除する文句"
+    ],
+    "tip": "強制される利用・購入が契約目的に必須か、他の選択肢がなぜ塞がれているか確認してください。"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "権利行使制限",
+    "what": "法が保障した権利(解除権・異議提起・訴訟など)を使えなくする条項。",
+    "signals": [
+     "「異議を提起しない」確約",
+     "解除権行使期間・方法を過度に制限",
+     "訴訟提起禁止・管轄合意"
+    ],
+    "tip": "法定権利は特約でも勝手に奪えません。約款規制法・割賦販売法違反で排斥された事例があります。"
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "信託免責特約",
+    "what": "建物が信託会社所有なのに、特約で「信託会社は保証金返還責任がない」と釘を刺す手口。借家人が保証金を取り戻す法的請求先が消える。",
+    "signal": "特約に「受託者」「信託」「返還責任がない」「異議を提起しない」のような文句。",
+    "outside": "登記簿等本甲区で所有者が信託会社か確認。信託原簿を発行してもらい賃貸権限が誰にあるか確認。",
+    "case": "金融分争調整事例多数 — 受託者免責特約で保証金回収が構造的に塞がれた類型(ゴールデンセット A等級)。"
+   },
+   {
+    "id": "gap",
+    "title": "空き家全セ(負債比率超過)",
+    "what": "保証金+先順位融資が建物価値に迫るか超える状態。建物が競売に移ると保証金を全額取り戻せない。",
+    "signal": "契約書だけでは見えない — だから危険。時価に比べ保証金が大きいのに賃貸人が急かせば疑い。",
+    "outside": "負債比率=(先順位債権+保証金)÷時価。90%以上なら実証研究で契約の17.6%が保証事故(基準区間0.2%)。結果画面の空き家全セ計算機で確認。",
+    "case": "安善英・李相燁(2025)首都圏全セ保証45万件実証 — 負債比率90%以上区間事故率17.6%。"
+   },
+   {
+    "id": "double",
+    "title": "二重契約",
+    "what": "同じ建物を複数の借家人と契約したり、建物所有者に無断で管理人が偽造契約を結ぶ手口。対抗力順位で負けると保証金を失う。",
+    "signal": "契約相手が登記簿上所有者と異なるのに委任状が曖昧。時価より安く、早く契約しようと急かす。",
+    "outside": "登記簿上所有者本人と直接契約(身分証対照)。委任契約なら印鑑証明書付き委任状確認。残金は所有者名義口座のみ。",
+    "case": "住宅賃貸借分争調整委員会反復類型 — 無権限賃貸契約の効力分争。"
+   },
+   {
+    "id": "appraisal",
+    "title": "時価水増し(鑑定評価悪用)",
+    "what": "実取引がない新築ビラなどで鑑定評価で時価を水増しし、保証金を時価並み(またはそれ以上)に受け取る手口。最初から空き家全セで始まる。",
+    "signal": "「鑑定価O億」を強調し実取引価資料は見せない。新築連立・多世帯で頻発。",
+    "outside": "国土部実取引価公開システムで同じ地域の類似物件実取引価を直接確認。実証研究で鑑定評価基盤価格算定は保証事故勝算4.8倍。",
+    "case": "安善英・李相燁(2025) — 専門家(鑑定)価格算定Exp(B)4.8、連立・多世帯5.8倍。"
+   },
+   {
+    "id": "proxy",
+    "title": "ダミー賃貸人・法人賃貸人",
+    "what": "財産のない人やペーパー法人名義で建物を買って賃貸する手口。事故が起きても返す財産がない。",
+    "signal": "賃貸人が法人なのに実体が不明。契約直前に所有者が変わる(登記簿甲区最近移転記録)。",
+    "outside": "登記簿甲区で最近の所有権移転履歴確認。法人賃貸人は実証研究で保証事故勝算3.6倍 — 法人登記簿で実体確認。",
+    "case": "安善英・李相燁(2025) — 法人賃貸人Exp(B)3.6(事故率20.4% vs 個人4.8%)。"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "業務履行後手数料20%のみ返還(違約金80%)する条項を不当に過重な損害賠償予定と見なし違約金なし全額返金成立",
+   "신발도매_2013": "加盟解除時加盟費50%違約罰条項 — 公正委先例(2004약제2214)と争点共通で違約金一部返還調整成立",
+   "2019-18b": "保険担保提供追加約定書の異議提起放棄確約 — 「失効」文言が不明確で約款改正必要指摘",
+   "2005-41": "投資顧問契約の消費者解除権制限条項 — 約款規制法明示・説明義務違反及び訪問販売法任意解除権抵触で適用排斥",
+   "즉시연금_2017-17": "最低保証利率未満で年金を支給したことは約款違反と判定",
+   "바로연금보험_2018-8": "満期保険金差減根拠が不明確な条項 — 作成者不利益原則に従い消費者に有利に解釈",
+   "2019-18a": "与信取引基本約款の一方的解除条項 — 公正取引委員会無効判断を引用し解除根拠性否定",
+   "990": "借家人の契約更新請求権放棄特約 — 住宅賃貸借保護法第6条の3第1項違反で特別な事情なく無効",
+   "2008_약관변경동의간주": "一定期間異議がなければ約款変更に同意したものと見なす条項 — 約款規制法第12条違反で拘束力否定",
+   "2010_ELS조건조정": "発行社裁量で支給条件を調整できるという条項 — 拡張適用を限定解釈で統制し支給命令",
+   "20": "住宅修理費用全額を借家人責任とする特約 — 賃貸人の法定維持修繕義務を包括転嫁し無効確認",
+   "2008_직불카드양도": "カード譲渡時全額責任を負わせる条項 — 寄与度配分判例に従い会員責任を40%に制限"
+  }
+ },
+ "zh": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "过高的违约金",
+    "what": "在解除或违反合同时，规定应支付的金额远超实际损失的条款。即使没有'违约金'这个词，如果实质上是损害赔偿预定，也属于此类。",
+    "signals": [
+     "违约金·违约罚·倍数赔偿",
+     "解除时收取剩余期间全额费用",
+     "排除按日计算",
+     "仅客户逾期利率异常高的不对称设计"
+    ],
+    "tip": "请确认实际损失是否成比例。法院一直在减少过高的违约金(民法第398条)。"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "单方面解除合同",
+    "what": "允许对方在没有事先通知或正当理由的情况下立即终止合同的条款。",
+    "signals": [
+     "没有催告程序，直接'可以立即解除'",
+     "住宅仅一次逾期就可解除(法律以两期逾期为标准)",
+     "放弃续约请求权的特约"
+    ],
+    "tip": "住宅为两期、商业为三期逾期是法定解除标准。如果条款规定更容易解除，需要确认。"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "保证金返还延迟",
+    "what": "延迟返还、扣除或以其他方式返还保证金、退款或结算金的条款。",
+    "signals": [
+     "'合同终止后O个月内可返还'这样的长期限",
+     "保留金·手续费一律扣除",
+     "无息返还、优惠券·积分替代支付"
+    ],
+    "tip": "确认返还期限和逾期利息是否明确。임차권등기명령·保证保险是安全保障。"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "责任豁免",
+    "what": "法律规定的责任(修缮义务、瑕疵担保责任等)被完全转移给消费者·承租人或被豁免的条款。",
+    "signals": [
+     "'不承担任何责任'",
+     "'所有维修费用由承租人承担'",
+     "禁止民事·刑事异议"
+    ],
+    "tip": "'所有·任何'这样的包括性文字是关键信号。调整委员会一直认定包括性责任转移特约无效。"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "不明确的手续费·利息条件",
+    "what": "仅从合同书上无法了解应支付多少的条款。模糊的文字容易被对方有利地解释。",
+    "signals": [
+     "利率·手续费率栏为空白",
+     "'通常判决时确定的法定利息'这样的模糊标准",
+     "'根据另行协议'"
+    ],
+    "tip": "要求在合同书中写明数字和计算方法。调整委员会有案例将模糊的利息文字限制为年5%(民法法定利率)。"
+   },
+   {
+    "id": "trust_notice",
+    "title": "信托关系·所有权不稳定告知",
+    "what": "房屋由信托公司所有，所有权结构不稳定，但通过特约缩小承租人保护的条款。这是全租诈骗的核心模式之一。",
+    "signals": [
+     "'受托人(信托公司)不承担保证金返还责任'",
+     "'未经受托人事先同意的租赁无效'",
+     "未确认信托原簿就催促签约"
+    ],
+    "tip": "在登记簿甲区确认所有者是否为信托公司，在信托原簿中确认谁有租赁权。"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "不当费用·税款转嫁",
+    "what": "法律上应由对方(所有者·经营者)承担的支出被转嫁给消费者·承租人的条款。",
+    "signals": [
+     "所有者承担的税款(财产税·取得税)转嫁给承租人",
+     "转嫁房东的修缮·维护费用",
+     "要求承担抵押权设定费用"
+    ],
+    "tip": "请确认该费用在法律上由谁承担。这与承租人实际使用的公用事业费(电·水)不同。"
+   },
+   {
+    "id": "benefit_change",
+    "title": "单方面变更给付·条件",
+    "what": "允许对方在未经同意的情况下改变合同内容(条款·利率·支付条件)的条款。",
+    "signals": [
+     "'公司可以任意变更'",
+     "变更通知后无回应则'视为同意'",
+     "由公司自由裁量调整支付条件"
+    ],
+    "tip": "确认变更时是否保证事先通知和拒绝(解除)权。同意间断条款在分纠调整中反复被制止。"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "限制选择权·强制购买",
+    "what": "强制使用特定产品·企业或阻止消费者选择的条款(包括捆绑销售)。",
+    "signals": [
+     "'仅通过指定企业'",
+     "附带产品强制加入",
+     "排除其他选择的文字"
+    ],
+    "tip": "询问强制使用·购买是否对合同目的绝对必要，为什么要排除其他选择。"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "限制权利行使",
+    "what": "阻止行使法律保障的权利(解除权·异议权·诉讼权等)的条款。",
+    "signals": [
+     "'不提出异议'的承诺",
+     "过度限制解除权行使期间·方法",
+     "禁止提起诉讼·不诉讼合意"
+    ],
+    "tip": "法定权利不能通过特约随意剥夺。有被约款规制法·分期付款交易法驳回的案例。"
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "信托豁免特约",
+    "what": "房屋由信托公司所有，通过特约规定'信托公司不承担保证金返还责任'的手法。承租人失去了追回保证金的法律请求对象。",
+    "signal": "特约中出现'受托人'、'信托'、'不承担返还责任'、'不提出异议'等文字。",
+    "outside": "在登记簿甲区确认所有者是否为信托公司。申请信托原簿确认谁有租赁权。",
+    "case": "金融分纠调整案例众多——受托人豁免特约导致保证金回收结构性受阻(黄金套装A等级)。"
+   },
+   {
+    "id": "gap",
+    "title": "空壳全租(债务比率超标)",
+    "what": "保证金+优先顺位贷款接近或超过房价的状态。房屋进入竞拍时，无法全额返还保证金。",
+    "signal": "仅从合同书看不出来——这就是危险所在。房价相比保证金较大，房东催促时要警惕。",
+    "outside": "债务比率=(优先顺位债权+保证金)÷房价。90%以上时，实证研究显示17.6%的合同发生保证事故(基准区间0.2%)。在结果画面的空壳全租计算器中确认。",
+    "case": "安善英·李相燮(2025)首都圈全租保证45万件实证——债务比率90%以上区间事故率17.6%。"
+   },
+   {
+    "id": "double",
+    "title": "重复合同",
+    "what": "与多个承租人签订同一房屋合同，或管理人在房东不知情的情况下签订伪造合同的手法。在对抗力顺位上落后会失去保证金。",
+    "signal": "合同相对人与登记簿上所有者不同，委托书模糊。房价低于市价，催促快速签约。",
+    "outside": "与登记簿上的所有者本人直接签约(核对身份证)。如是委托合同，确认附有印鉴证明的委托书。尾款仅转入所有者名义账户。",
+    "case": "住宅租赁分纠调整委员会反复出现的类型——无权限租赁合同效力纠纷。"
+   },
+   {
+    "id": "appraisal",
+    "title": "虚高市价(滥用感定评估)",
+    "what": "在没有实际交易的新建别墅等中，通过感定评估虚高市价，以市价(或更高)收取保证金的手法。从一开始就是空壳全租。",
+    "signal": "强调'感定价O亿'，不展示实际交易价资料。在新建连排·多户住宅中频繁出现。",
+    "outside": "在国土部实际交易价公开系统中直接确认同地区类似房产的实际交易价。实证研究显示基于感定评估的价格确定保证事故胜算4.8倍。",
+    "case": "安善英·李相燮(2025)——专家(感定)价格确定Exp(B) 4.8，连排·多户5.8倍。"
+   },
+   {
+    "id": "proxy",
+    "title": "皮包房东·法人房东",
+    "what": "无资产的人或纸质法人名义购买房屋出租的手法。出事时没有资产可返还。",
+    "signal": "房东是法人但实体不明。签约前不久所有者变更(登记簿甲区最近转移记录)。",
+    "outside": "在登记簿甲区确认最近所有权转移历史。法人房东在实证研究中保证事故胜算3.6倍——通过法人登记簿确认实体。",
+    "case": "安善英·李相燮(2025)——法人房东Exp(B) 3.6(事故率20.4% vs 个人4.8%)。"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "业务履行后仅返还20%手续费(80%违约金)的条款被认定为不当过重的损害赔偿预定，成立无违约金全额退款",
+   "신발도매_2013": "加盟解除时加盟费50%违约罚条款——与公正委选例(2004약제2214)争点相同，成立违约金部分返还调整",
+   "2019-18b": "保险担保提供追加约定书的异议放弃承诺——'失效'文言不明确，指出需要修改约款",
+   "2005-41": "投资咨询合同的消费者解除权限制条款——违反约款规制法明示·说明义务及触犯访问销售法任意解除权，适用被驳回",
+   "즉시연금_2017-17": "以低于最低保证利率的年金支付被判定为违反约款",
+   "바로연금보험_2018-8": "满期保险金扣除根据不明确的条款——按作成者不利原则，对消费者有利地解释",
+   "2019-18a": "信用交易基本约款的单方面解除条款——引用公正交易委员会无效判断，否定解除根据性",
+   "990": "承租人的合同续约请求权放弃特约——违反住宅租赁保护法第6条之3第1项，无特殊情事下无效",
+   "2008_약관변경동의간주": "一定期间内无异议则视为同意约款变更的条款——违反约款规制法第12条，否定约束力",
+   "2010_ELS조건조정": "发行人可自由裁量调整支付条件的条款——限制扩张适用，下达支付命令",
+   "20": "将住宅修缮费用全部作为承租人责任的特约——包括转移房东的法定维护修缮义务，确认无效",
+   "2008_직불카드양도": "卡转让时承担全部责任的条款——按贡献度分配判例，将会员责任限制为40%"
+  }
+ },
+ "vi": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Tiền phạt hợp đồng quá mức",
+    "what": "Điều khoản quy định số tiền phải trả khi hủy hoặc vi phạm hợp đồng cao hơn nhiều so với thiệt hại thực tế. Ngay cả khi không có từ 'tiền phạt', nếu bản chất là bồi thường dự kiến thì cũng được coi là loại này.",
+    "signals": [
+     "Tiền phạt, phí phạt, bồi thường gấp đôi",
+     "Tính toàn bộ phí cho kỳ còn lại khi hủy hợp đồng",
+     "Loại trừ tính toán theo ngày",
+     "Thiết kế không cân xứng — lãi suất chậm trả của khách hàng cao bất thường"
+    ],
+    "tip": "Hãy hỏi xem tiền phạt có tương xứng với thiệt hại thực tế không. Tòa án đã giảm tiền phạt quá mức nhiều lần (Bộ luật Dân sự Điều 398)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Hủy hợp đồng một phía",
+    "what": "Điều khoản cho phép bên kia kết thúc hợp đồng ngay lập tức mà không cần thông báo trước hoặc lý do chính đáng.",
+    "signals": [
+     "Có thể 'hủy ngay lập tức' mà không cần thủ tục nhắc nhở",
+     "Nhà ở — hủy chỉ vì chậm trả 1 kỳ (luật quy định tiêu chuẩn chậm trả 2 kỳ)",
+     "Điều khoản đặc biệt buộc từ bỏ quyền yêu cầu gia hạn"
+    ],
+    "tip": "Nhà ở chậm trả 2 kỳ, nhà thương mại chậm trả 3 kỳ là tiêu chuẩn hủy theo luật. Nếu quy định dễ hủy hơn thế, cần kiểm tra."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Trì hoãn hoàn trả tiền đặt cọc",
+    "what": "Điều khoản làm cho tiền đặt cọc, tiền hoàn lại, hoặc tiền thanh toán được trả lại muộn, bị cắt giảm, hoặc dưới hình thức khác.",
+    "signals": [
+     "Quy định 'có thể hoàn trả trong O tháng sau khi hợp đồng kết thúc' — thời hạn dài",
+     "Cắt giảm theo tỷ lệ cố định cho tiền dự trữ, phí dịch vụ",
+     "Hoàn trả không lãi, thay thế bằng phiếu giảm giá hoặc điểm thưởng"
+    ],
+    "tip": "Kiểm tra xem thời hạn hoàn trả và lãi suất chậm trả có được nêu rõ không. Lệnh đăng ký quyền thuê nhà, bảo hiểm đảm bảo là những biện pháp an toàn."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Miễn trừ trách nhiệm",
+    "what": "Điều khoản chuyển toàn bộ trách nhiệm mà luật giao cho bên kia (nghĩa vụ sửa chữa, trách nhiệm bảo hành khiếm khuyết) sang cho người tiêu dùng hoặc người thuê, hoặc được miễn trừ.",
+    "signals": [
+     "'Không chịu bất kỳ trách nhiệm nào'",
+     "'Tất cả chi phí sửa chữa do người thuê chịu'",
+     "Cấm đặt ra vấn đề dân sự hoặc hình sự"
+    ],
+    "tip": "Các từ như 'tất cả, toàn bộ' là tín hiệu chính. Ủy ban điều hòa đã xem các điều khoản chuyển trách nhiệm toàn diện là vô hiệu."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Điều kiện phí dịch vụ, lãi suất không rõ ràng",
+    "what": "Điều khoản viết sao cho chỉ nhìn hợp đồng không thể biết phải trả bao nhiêu. Các từ mơ hồ dễ bị bên kia giải thích có lợi cho họ sau này.",
+    "signals": [
+     "Ô lãi suất hoặc tỷ lệ phí để trống",
+     "Tiêu chuẩn mơ hồ như 'lãi suất pháp định mà tòa án thường phán quyết'",
+     "'Sẽ thương lượng riêng'"
+    ],
+    "tip": "Yêu cầu ghi rõ con số và cách tính vào hợp đồng. Ủy ban điều hòa đã giới hạn các điều khoản lãi suất mơ hồ ở mức 5% mỗi năm (lãi suất pháp định theo Bộ luật Dân sự)."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Thông báo về quan hệ tín thác, bất ổn định quyền sở hữu",
+    "what": "Nhà được công ty tín thác sở hữu nên cấu trúc quyền sở hữu không ổn định, nhưng điều khoản đặc biệt giảm bớt bảo vệ người thuê. Đây là một trong những mô hình cốt lõi của lừa đảo tiền đặt cọc nhà ở.",
+    "signals": [
+     "'Người được tín thác (công ty tín thác) không chịu trách nhiệm hoàn trả tiền đặt cọc'",
+     "'Hợp đồng thuê không có sự chấp thuận trước của người được tín thác là vô hiệu'",
+     "Thúc ép ký hợp đồng mà không xác minh tài liệu tín thác"
+    ],
+    "tip": "Kiểm tra xem chủ sở hữu trong sổ đăng ký (phần A) có phải công ty tín thác không, và xem tài liệu tín thác để biết ai có quyền cho thuê."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Chuyển gánh nặng chi phí, thuế không công bằng",
+    "what": "Điều khoản chuyển các khoản chi tiêu mà luật quy định bên kia (chủ sở hữu, doanh nhân) phải chịu sang cho người tiêu dùng hoặc người thuê.",
+    "signals": [
+     "Chuyển thuế của chủ sở hữu (thuế tài sản, thuế mua) cho người thuê",
+     "Chuyển chi phí sửa chữa, bảo trì của chủ nhà",
+     "Yêu cầu người thuê chịu chi phí đăng ký cầm cố"
+    ],
+    "tip": "Hãy hỏi xem theo luật thì ai phải chịu chi phí đó. Điều này khác với các khoản công cộng thực tế mà bạn sử dụng (điện, nước)."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Thay đổi một phía về nội dung, điều kiện",
+    "what": "Điều khoản cho phép bên kia thay đổi nội dung hợp đồng (điều khoản, lãi suất, điều kiện thanh toán) mà không cần sự đồng ý.",
+    "signals": [
+     "'Công ty có thể thay đổi tùy ý'",
+     "Nếu không phản đối sau khi thông báo thay đổi, coi như 'đã đồng ý'",
+     "Điều kiện thanh toán được điều chỉnh tùy theo quyết định của công ty"
+    ],
+    "tip": "Kiểm tra xem thay đổi có được thông báo trước và có quyền từ chối (hủy hợp đồng) không. Các điều khoản coi sự im lặng là đồng ý đã bị chặn lại nhiều lần trong tranh chấp."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Hạn chế lựa chọn, buộc mua sắm",
+    "what": "Điều khoản buộc sử dụng sản phẩm hoặc công ty cụ thể, hoặc cản trở lựa chọn của người tiêu dùng (bao gồm bán kèm bắt buộc).",
+    "signals": [
+     "'Chỉ được sử dụng thông qua công ty được chỉ định'",
+     "Bắt buộc mua sản phẩm phụ",
+     "Các từ loại trừ các lựa chọn khác"
+    ],
+    "tip": "Hãy hỏi xem việc sử dụng hoặc mua bắt buộc có thực sự cần thiết cho mục đích hợp đồng không, và tại sao các lựa chọn khác bị cấm."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Hạn chế quyền hành sử",
+    "what": "Điều khoản cản trở quyền mà luật bảo đảm (quyền hủy, quyền phản đối, quyền kiện tụng).",
+    "signals": [
+     "Cam kết 'sẽ không đặt ra vấn đề'",
+     "Hạn chế quá mức thời gian hoặc phương thức hành sử quyền hủy",
+     "Cấm kiện tụng, thỏa thuận không kiện"
+    ],
+    "tip": "Quyền theo luật không thể bị lấy đi bằng điều khoản đặc biệt. Có những trường hợp bị bác bỏ vì vi phạm Luật Quy định Điều khoản hoặc Luật Giao dịch Mua bán Trả góp."
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Điều khoản miễn trừ trách nhiệm của người được tín thác",
+    "what": "Nhà được công ty tín thác sở hữu, nhưng điều khoản đặc biệt quy định 'công ty tín thác không chịu trách nhiệm hoàn trả tiền đặt cọc'. Người thuê mất đối tượng để yêu cầu hoàn trả tiền đặt cọc theo pháp luật.",
+    "signal": "Các từ như 'người được tín thác', 'tín thác', 'không chịu trách nhiệm hoàn trả', 'sẽ không đặt ra vấn đề' trong điều khoản đặc biệt.",
+    "outside": "Kiểm tra xem chủ sở hữu trong sổ đăng ký (phần A) có phải công ty tín thác không. Xin cấp bản tài liệu tín thác để xác minh ai có quyền cho thuê.",
+    "case": "Nhiều trường hợp trong Ủy ban Điều hòa Tranh chấp Tài chính — loại hình mà tiền đặt cọc bị cấu trúc không thể lấy lại do điều khoản miễn trừ của người được tín thác (Hạng A Tập hợp Vàng)."
+   },
+   {
+    "id": "gap",
+    "title": "Nhà ở không có giá trị (tỷ lệ nợ vượt quá)",
+    "what": "Tiền đặt cọc + khoản vay ưu tiên cao gần bằng hoặc vượt quá giá nhà. Nếu nhà bị đấu giá, tiền đặt cọc không thể hoàn trả đầy đủ.",
+    "signal": "Không thể thấy từ hợp đồng một mình — đó là lý do tại sao nó nguy hiểm. Nếu tiền đặt cọc lớn so với giá thị trường và chủ nhà vội vàng, hãy cảnh báo.",
+    "outside": "Tỷ lệ nợ = (khoản vay ưu tiên cao + tiền đặt cọc) ÷ giá thị trường. Nếu ≥90%, nghiên cứu thực tế cho thấy 17,6% hợp đồng gặp sự cố bảo hiểm (so với 0,2% trong khoảng cơ sở). Xác minh bằng máy tính nhà ở không có giá trị trong màn hình kết quả.",
+    "case": "An Seon-yeong, Lee Sang-yeop (2025) — 450.000 hợp đồng bảo hiểm tiền đặt cọc nhà ở ở vùng thủ đô — tỷ lệ sự cố 17,6% trong khoảng tỷ lệ nợ ≥90%."
+   },
+   {
+    "id": "double",
+    "title": "Hợp đồng kép",
+    "what": "Ký hợp đồng cùng một nhà với nhiều người thuê, hoặc người quản lý giả mạo hợp đồng mà chủ nhà không biết. Nếu thua trong thứ tự ưu tiên quyền, người thuê mất tiền đặt cọc.",
+    "signal": "Bên ký hợp đồng khác với chủ sở hữu trong sổ đăng ký, nhưng giấy ủy quyền mơ hồ. Giá rẻ hơn thị trường, thúc ép ký nhanh.",
+    "outside": "Ký hợp đồng trực tiếp với chủ sở hữu theo sổ đăng ký (kiểm tra chứng minh thư). Nếu là hợp đồng ủy quyền, xác minh giấy ủy quyền có chứng thực và dấu vân tay. Chỉ chuyển tiền cuối cùng vào tài khoản tên chủ sở hữu.",
+    "case": "Ủy ban Điều hòa Tranh chấp Thuê nhà Ở — loại hình lặp lại — tranh chấp hiệu lực hợp đồng thuê không có quyền hạn."
+   },
+   {
+    "id": "appraisal",
+    "title": "Phóng đại giá thị trường (lạm dụng định giá)",
+    "what": "Với các tòa nhà mới không có giao dịch thực tế, sử dụng định giá để phóng đại giá thị trường, nhận tiền đặt cọc bằng giá định giá (hoặc cao hơn). Bắt đầu là nhà ở không có giá trị từ đầu.",
+    "signal": "Nhấn mạnh 'giá định giá O tỷ đồng' nhưng không hiển thị dữ liệu giao dịch thực tế. Phổ biến với các tòa nhà liên kế mới, nhà phố mới.",
+    "outside": "Kiểm tra trực tiếp giá giao dịch thực tế của các bất động sản tương tự trong khu vực trên hệ thống công khai giá giao dịch của Bộ Xây dựng. Nghiên cứu thực tế cho thấy định giá dựa trên giá chuyên gia tăng 4,8 lần khả năng sự cố bảo hiểm.",
+    "case": "An Seon-yeong, Lee Sang-yeop (2025) — định giá chuyên gia Exp(B) 4,8, liên kế/nhà phố 5,8 lần."
+   },
+   {
+    "id": "proxy",
+    "title": "Chủ nhà giả, chủ nhà là pháp nhân",
+    "what": "Người không có tài sản hoặc pháp nhân giấy mua nhà để cho thuê. Nếu có sự cố, không có tài sản để hoàn trả.",
+    "signal": "Chủ nhà là pháp nhân nhưng thực thể không rõ. Chủ sở hữu thay đổi ngay trước ký hợp đồng (bản ghi lịch sử chuyển nhượng quyền sở hữu gần đây trong sổ đăng ký).",
+    "outside": "Kiểm tra lịch sử chuyển nhượng quyền sở hữu gần đây trong sổ đăng ký (phần A). Chủ nhà là pháp nhân tăng 3,6 lần khả năng sự cố bảo hiểm theo nghiên cứu thực tế — xác minh thực thể qua sổ đăng ký pháp nhân.",
+    "case": "An Seon-yeong, Lee Sang-yeop (2025) — chủ nhà là pháp nhân Exp(B) 3,6 (tỷ lệ sự cố 20,4% so với cá nhân 4,8%)."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "Sau khi hoàn thành công việc, chỉ hoàn lại 20% phí dịch vụ (phạt 80%) — được coi là bồi thường dự kiến quá nặng, thành lập hoàn lại toàn bộ không có phạt",
+   "신발도매_2013": "Điều khoản phạt 50% phí nhượp quyền khi hủy nhượp quyền — có chung vấn đề với tiền lệ của Ủy ban Công bằng Thương mại (2004약제2214), thành lập hoàn lại một phần phạt",
+   "2019-18b": "Phụ lục thỏa thuận cung cấp bảo đảm bảo hiểm — cam kết từ bỏ quyền phản đối — từ 'thực hiện' không rõ ràng, chỉ ra cần sửa đổi điều khoản",
+   "2005-41": "Hợp đồng tư vấn đầu tư — điều khoản hạn chế quyền hủy của người tiêu dùng — vi phạm nghĩa vụ nêu rõ và giải thích theo Luật Quy định Điều khoản, và xung đột với quyền hủy tùy ý theo Luật Bán hàng Trực tiếp, bị bác bỏ",
+   "즉시연금_2017-17": "Trả lãi suất thấp hơn mức lãi suất bảo đảm tối thiểu được xác định là vi phạm điều khoản",
+   "바로연금보험_2018-8": "Điều khoản cơ sở cắt giảm bảo hiểm khi đáo hạn không rõ ràng — theo nguyên tắc bất lợi cho người soạn thảo, được giải thích có lợi cho người tiêu dùng",
+   "2019-18a": "Điều khoản hủy một phía trong điều khoản cơ bản giao dịch tín dụng — trích dẫn quyết định vô hiệu của Ủy ban Công bằng Thương mại, phủ nhận cơ sở hủy",
+   "990": "Điều khoản đặc biệt từ bỏ quyền yêu cầu gia hạn hợp đồng của người thuê — vi phạm Luật Bảo vệ Thuê nhà Ở Điều 6-3 Khoản 1, vô hiệu nếu không có hoàn cảnh đặc biệt",
+   "2008_약관변경동의간주": "Điều khoản coi sự không phản đối trong một khoảng thời gian nhất định là đồng ý với thay đổi điều khoản — vi phạm Luật Quy định Điều khoản Điều 12, phủ nhận tính ràng buộc",
+   "2010_ELS조건조정": "Điều khoản cho phép công ty phát hành điều chỉnh điều kiện thanh toán tùy ý — kiểm soát bằng giải thích hạn chế áp dụng mở rộng, ra lệnh thanh toán",
+   "20": "Điều khoản đặc biệt giao toàn bộ chi phí sửa chữa nhà cho người thuê — chuyển toàn bộ nghĩa vụ bảo trì pháp định của chủ nhà, xác nhận vô hiệu",
+   "2008_직불카드양도": "Điều khoản giao toàn bộ trách nhiệm khi chuyển thẻ — theo tiền lệ phân bổ đóng góp, hạn chế trách nhiệm thành viên ở 40%"
+  }
+ },
+ "th": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "ค่าปรับตามสัญญาที่มากเกินไป",
+    "what": "ข้อกำหนดที่กำหนดจำนวนเงินที่ต้องจ่ายเมื่อยกเลิกหรือละเมิดสัญญาให้มากกว่าความเสียหายจริงมาก แม้ว่าจะไม่มีคำว่า 'ค่าปรับตามสัญญา' แต่ถ้าเป็นการชดเชยความเสียหายที่คาดหมายไว้ล่วงหน้าก็ถือว่าเป็นกรณีนี้",
+    "signals": [
+     "ค่าปรับตามสัญญา ค่าปรับ การชดเชยเป็นสองเท่า",
+     "การเรียกเก็บค่าใช้งานตลอดระยะเวลาที่เหลือเมื่อยกเลิก",
+     "ไม่อนุญาตให้คำนวณตามสัดส่วนวัน",
+     "อัตราดอกเบี้ยค้างชำระของลูกค้าสูงผิดปกติในการออกแบบที่ไม่สมดุล"
+    ],
+    "tip": "ถามว่าค่าปรับตามสัญญาเป็นสัดส่วนกับความเสียหายจริงหรือไม่ ศาลได้ลดค่าปรับตามสัญญาที่มากเกินไปมาแล้ว (พระราชกฤษฎีกาแพ่งมาตรา 398)"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "การยกเลิกสัญญาแบบเอกฝ่าย",
+    "what": "ข้อกำหนดที่อนุญาตให้อีกฝ่ายหนึ่งสิ้นสุดสัญญาได้ทันทีโดยไม่มีการแจ้งล่วงหน้าหรือเหตุผลที่ชอบธรรม",
+    "signals": [
+     "สามารถ 'ยกเลิกได้ทันที' โดยไม่มีขั้นตอนการเตือน",
+     "บ้านที่ค้างชำระเพียงครั้งเดียวก็ยกเลิกได้ (กฎหมายกำหนดเกณฑ์ 2 ครั้ง)",
+     "ข้อตกลงพิเศษที่ยกเลิกสิทธิในการขอต่ออายุสัญญา"
+    ],
+    "tip": "บ้านต้องค้างชำระ 2 ครั้ง ห้องเช่าเชิงพาณิชย์ต้องค้างชำระ 3 ครั้งจึงจะยกเลิกได้ตามกฎหมาย หากเขียนให้ยกเลิกได้ง่ายกว่านั้นต้องตรวจสอบ"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "การล่าช้าในการคืนเงินประกัน",
+    "what": "ข้อกำหนดที่ทำให้เงินประกัน เงินคืน หรือเงินชำระบัญชีถูกคืนช้า หรือหักลดลง หรือคืนในรูปแบบอื่น",
+    "signals": [
+     "ระบุว่า 'จะคืนได้ภายใน O เดือนหลังสิ้นสุดสัญญา' โดยกำหนดระยะเวลายาว",
+     "หักเงินสำรองและค่าธรรมเนียมแบบเดียวกัน",
+     "คืนโดยไม่มีดอกเบี้ย แทนด้วยคูปองหรือแต้ม"
+    ],
+    "tip": "ตรวจสอบว่ามีการระบุระยะเวลาคืนและดอกเบี้ยเมื่อล่าช้าหรือไม่ การลงทะเบียนสิทธิในการเช่า การสั่งการลงทะเบียน และประกันเงินประกัยเป็นมาตรการป้องกัน"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "การยกเว้นความรับผิดชอบ",
+    "what": "ข้อกำหนดที่ถ่ายโอนความรับผิดชอบตามกฎหมายให้กับผู้บริโภค ผู้เช่า หรือยกเว้นความรับผิดชอบ เช่น หน้าที่ซ่อมแซม หน้าที่รับประกันความชำนาญ",
+    "signals": [
+     "'ไม่รับผิดชอบในเรื่องใดๆ เลย'",
+     "'ค่าซ่อมแซมทั้งหมดเป็นหน้าที่ของผู้เช่า'",
+     "ห้ามยกข้อโต้แย้งทางแพ่ง และอาญา"
+    ],
+    "tip": "คำว่า 'ทั้งหมด' และ 'เรื่องใดๆ' เป็นสัญญาณหลัก คณะอนุกรรมการปรับปรุงข้อพิพาทได้ตัดสินว่าข้อตกลงพิเศษที่ถ่ายโอนความรับผิดชอบแบบกว้างๆ เป็นโมฆะ"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "เงื่อนไขค่าธรรมเนียมและดอกเบี้ยที่ไม่ชัดเจน",
+    "what": "ข้อกำหนดที่เขียนในลักษณะที่ไม่สามารถทราบจำนวนเงินที่ต้องจ่ายได้จากสัญญาเพียงอย่างเดียว ข้อความที่คลุมเครือมักถูกตีความให้เป็นประโยชน์ของอีกฝ่ายในภายหลัง",
+    "signals": [
+     "ช่องอัตราดอกเบี้ยหรือค่าธรรมเนียมว่างเปล่า",
+     "ข้อความคลุมเครือเช่น 'ดอกเบี้ยตามกฎหมายที่ศาลตัดสินโดยทั่วไป'",
+     "'ตามข้อตกลงเพิ่มเติม'"
+    ],
+    "tip": "ขอให้เขียนตัวเลขและวิธีการคำนวณในสัญญา มีตัวอย่างที่คณะอนุกรรมการปรับปรุงข้อพิพาทจำกัดข้อความดอกเบี้ยที่คลุมเครือให้เป็นดอกเบี้ยตามกฎหมาย 5% ต่อปี"
+   },
+   {
+    "id": "trust_notice",
+    "title": "การแจ้งเกี่ยวกับความสัมพันธ์ในการไว้วางใจและความไม่มั่นคงของสิทธิในการเป็นเจ้าของ",
+    "what": "บ้านเป็นของบริษัทไว้วางใจ ทำให้โครงสร้างสิทธิในการเป็นเจ้าของไม่มั่นคง และข้อตกลงพิเศษลดการป้องกันผู้เช่า นี่คือรูปแบบหลักของการหลอกลวงเรื่องเงินประกัยเต็มจำนวน",
+    "signals": [
+     "'ผู้รับไว้วางใจ (บริษัทไว้วางใจ) ไม่รับผิดชอบในการคืนเงินประกัน'",
+     "'สัญญาเช่าที่ไม่ได้รับอนุมัติจากผู้รับไว้วางใจล่วงหน้าจะไม่มีผลบังคับ'",
+     "เร่งให้ทำสัญญาโดยไม่ตรวจสอบเอกสารไว้วางใจ"
+    ],
+    "tip": "ตรวจสอบในเอกสารลงทะเบียนส่วน ก ว่าเจ้าของเป็นบริษัทไว้วางใจหรือไม่ ขอเอกสารไว้วางใจเพื่อตรวจสอบว่าใครมีสิทธิในการให้เช่า"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "การถ่ายโอนค่าใช้จ่ายและภาษีที่ไม่เป็นธรรม",
+    "what": "ข้อกำหนดที่ถ่ายโอนค่าใช้จ่ายที่ตามกฎหมายเจ้าของ ผู้ประกอบการต้องรับผิดชอบให้กับผู้บริโภค ผู้เช่า",
+    "signals": [
+     "ภาษีของเจ้าของ (ภาษีทรัพย์สิน ภาษีการได้มา) เรียกเก็บจากผู้เช่า",
+     "ถ่ายโอนค่าซ่อมแซมและค่าบำรุงรักษาของเจ้าของให้ผู้เช่า",
+     "ขอให้ผู้เช่าจ่ายค่าลงทะเบียนสิทธิจำนอง"
+    ],
+    "tip": "ถามว่าตามกฎหมายใครต้องรับผิดชอบค่าใช้จ่ายนั้น สิ่งนี้แตกต่างจากค่าสาธารณูปโภคที่ผู้เช่าใช้จริง (ไฟฟ้า น้ำ)"
+   },
+   {
+    "id": "benefit_change",
+    "title": "การเปลี่ยนแปลงสิ่งที่ให้และเงื่อนไขแบบเอกฝ่าย",
+    "what": "ข้อกำหนดที่อนุญาตให้อีกฝ่ายเปลี่ยนแปลงเนื้อหาสัญญา (ข้อกำหนด อัตราดอกเบี้ย เงื่อนไขการชำระเงิน) โดยไม่ได้รับความยินยอม",
+    "signals": [
+     "'บริษัทสามารถเปลี่ยนแปลงได้ตามต้องการ'",
+     "หลังจากแจ้งการเปลี่ยนแปลง หากไม่มีการตอบสนอง 'ถือว่าได้รับความยินยอม'",
+     "ปรับเงื่อนไขการชำระเงินตามดุลยพินิจของบริษัท"
+    ],
+    "tip": "ตรวจสอบว่ามีการแจ้งล่วงหน้าและสิทธิในการปฏิเสธ (ยกเลิก) เมื่อมีการเปลี่ยนแปลงหรือไม่ ข้อตกลงว่าการไม่ตอบสนองถือว่าเป็นการยินยอมเป็นประเภทที่คณะอนุกรรมการปรับปรุงข้อพิพาทหยุดชะงักซ้ำแล้วซ้ำเล่า"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "การจำกัดสิทธิในการเลือก การบังคับให้ซื้อ",
+    "what": "ข้อกำหนดที่บังคับให้ใช้สินค้า บริษัท เฉพาะเจาะจง หรือปิดกั้นสิทธิในการเลือกของผู้บริโภค (รวมถึงการขายสินค้าเพิ่มเติมแบบบังคับ)",
+    "signals": [
+     "'ต้องใช้เฉพาะบริษัทที่ระบุ'",
+     "บังคับให้ลงทะเบียนสินค้าเสริม",
+     "ข้อความที่ปิดกั้นตัวเลือกอื่น"
+    ],
+    "tip": "ถามว่าการใช้หรือซื้อที่บังคับนั้นจำเป็นต่อวัตถุประสงค์ของสัญญาหรือไม่ และเหตุใดจึงปิดกั้นตัวเลือกอื่น"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "การจำกัดการใช้สิทธิ",
+    "what": "ข้อกำหนดที่ปิดกั้นการใช้สิทธิที่กฎหมายรับประกัน เช่น สิทธิในการยกเลิก สิทธิในการโต้แย้ง สิทธิในการฟ้องร้อง",
+    "signals": [
+     "ยืนยันว่า 'จะไม่ยกข้อโต้แย้ง'",
+     "จำกัดระยะเวลาและวิธีการใช้สิทธิในการยกเลิกอย่างมากเกินไป",
+     "ห้ามฟ้องร้อง ข้อตกลงไม่ฟ้องร้อง"
+    ],
+    "tip": "สิทธิตามกฎหมายไม่สามารถเอาออกได้ด้วยข้อตกลงพิเศษ มีตัวอย่างที่ถูกปฏิเสธเนื่องจากละเมิดพระราชกฤษฎีกาว่าด้วยการควบคุมข้อกำหนดและพระราชกฤษฎีกาว่าด้วยการขายแบบผ่อนชำระ"
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "ข้อตกลงพิเศษยกเว้นความรับผิดชอบของผู้รับไว้วางใจ",
+    "what": "บ้านเป็นของบริษัทไว้วางใจ แต่ข้อตกลงพิเศษระบุว่า 'ผู้รับไว้วางใจไม่รับผิดชอบในการคืนเงินประกัน' วิธีนี้ทำให้ผู้เช่าไม่มีเป้าหมายทางกฎหมายในการเรียกร้องเงินประกัยคืน",
+    "signal": "ข้อตกลงพิเศษมีคำว่า 'ผู้รับไว้วางใจ' 'ไว้วางใจ' 'ไม่รับผิดชอบในการคืน' 'จะไม่ยกข้อโต้แย้ง'",
+    "outside": "ตรวจสอบในเอกสารลงทะเบียนส่วน ก ว่าเจ้าของเป็นบริษัทไว้วางใจหรือไม่ ขอเอกสารไว้วางใจเพื่อตรวจสอบว่าใครมีสิทธิในการให้เช่า",
+    "case": "มีตัวอย่างจากการปรับปรุงข้อพิพาททางการเงินมากมาย — ประเภทที่ข้อตกลงพิเศษยกเว้นความรับผิดชอบของผู้รับไว้วางใจทำให้การคืนเงินประกัยถูกปิดกั้นอย่างมีโครงสร้าง (Golden Set ระดับ A)"
+   },
+   {
+    "id": "gap",
+    "title": "เงินประกัยเต็มจำนวน (อัตราส่วนหนี้สูงเกินไป)",
+    "what": "เงินประกัย + เงินกู้ลำดับแรกเข้าใกล้หรือเกินราคาบ้าน หากบ้านถูกประมูล ผู้เช่าจะไม่ได้รับเงินประกัยคืนเต็มจำนวน",
+    "signal": "ไม่สามารถเห็นได้จากสัญญาเพียงอย่างเดียว — นั่นคือเหตุผลที่เป็นอันตราย เงินประกัยมากเมื่อเทียบกับราคาตลาด แต่เจ้าของรีบเร่ง ให้สงสัย",
+    "outside": "อัตราส่วนหนี้ = (เงินกู้ลำดับแรก + เงินประกัย) ÷ ราคาตลาด หากมากกว่า 90% การศึกษาเชิงประจักษ์พบว่า 17.6% ของสัญญาประสบปัญหาเงินประกัย (เกณฑ์ 0.2%) ตรวจสอบด้วยเครื่องคำนวณเงินประกัยเต็มจำนวนในหน้าผลลัพธ์",
+    "case": "An Sun-young, Lee Sang-yeop (2025) การศึกษาเชิงประจักษ์เกี่ยวกับเงินประกัยเต็มจำนวนในเขตกรุงโซล 450,000 สัญญา — อัตราส่วนหนี้ 90% ขึ้นไปมีอัตราเหตุการณ์ 17.6%"
+   },
+   {
+    "id": "double",
+    "title": "สัญญาซ้ำ",
+    "what": "ทำสัญญาเช่าบ้านหลังเดียวกับผู้เช่าหลายคน หรือผู้จัดการทำสัญญาปลอมโดยไม่ได้รับอนุญาตจากเจ้าของ หากแพ้ในลำดับสิทธิ ผู้เช่าจะสูญเสียเงินประกัย",
+    "signal": "คู่สัญญาต่างจากเจ้าของในเอกสารลงทะเบียน แต่หนังสือมอบอำนาจไม่ชัดเจน ราคาถูกกว่าตลาด เร่งให้ทำสัญญาอย่างรวดเร็ว",
+    "outside": "ทำสัญญากับเจ้าของตามเอกสารลงทะเบียนโดยตรง (ตรวจสอบบัตรประชาชน) หากเป็นสัญญามอบอำนาจ ตรวจสอบหนังสือมอบอำนาจที่มีประกาศรับรองตราประทับ จ่ายเงินคงเหลือเฉพาะบัญชีชื่อเจ้าของเท่านั้น",
+    "case": "ประเภทที่ซ้ำกันในคณะอนุกรรมการปรับปรุงข้อพิพาทเรื่องการเช่าบ้าน — ข้อพิพาทเกี่ยวกับผลบังคับของสัญญาเช่าที่ไม่มีอำนาจ"
+   },
+   {
+    "id": "appraisal",
+    "title": "การบวมราคาตลาด (การใช้ประเมินราคาอย่างไม่เหมาะสม)",
+    "what": "ในบ้านใหม่และวิลล่าที่ไม่มีการซื้อขายจริง ใช้การประเมินราคาเพื่อบวมราคาตลาด และเรียกเก็บเงินประกัยตามราคาตลาด (หรือมากกว่า) วิธีนี้เริ่มต้นด้วยเงินประกัยเต็มจำนวนตั้งแต่แรก",
+    "signal": "เน้นว่า 'ราคาประเมิน O หมื่นล้าน' แต่ไม่แสดงข้อมูลราคาซื้อขายจริง บ่อยในอาคารใหม่ ทาวน์โฮม และบ้านแถว",
+    "outside": "ตรวจสอบราคาซื้อขายจริงของสินค้าที่คล้ายกันในพื้นที่เดียวกันโดยตรงในระบบเปิดเผยราคาซื้อขายจริงของกระทรวงที่ดิน การกำหนดราคาตามการประเมินราคาเพิ่มความเสี่ยงในการเงินประกัยเต็มจำนวน 4.8 เท่าในการศึกษาเชิงประจักษ์",
+    "case": "An Sun-young, Lee Sang-yeop (2025) — การกำหนดราคาโดยผู้เชี่ยวชาญ (การประเมิน) Exp(B) 4.8, ทาวน์โฮม และบ้านแถว 5.8 เท่า"
+   },
+   {
+    "id": "proxy",
+    "title": "เจ้าของเช่าปลอม บริษัทเช่า",
+    "what": "บุคคลที่ไม่มีทรัพย์สินหรือบริษัทกระดาษซื้อบ้านและให้เช่า หากเกิดปัญหา ไม่มีทรัพย์สินที่จะคืน",
+    "signal": "เจ้าของเป็นบริษัท แต่ไม่มีตัวตน เจ้าของเปลี่ยนแปลงก่อนทำสัญญา (บันทึกการโอนสิทธิล่าสุดในส่วน ก ของเอกสารลงทะเบียน)",
+    "outside": "ตรวจสอบประวัติการโอนสิทธิล่าสุดในส่วน ก ของเอกสารลงทะเบียน เจ้าของบริษัทมีความเสี่ยงในการเงินประกัยเต็มจำนวน 3.6 เท่าในการศึกษาเชิงประจักษ์ — ตรวจสอบตัวตนด้วยเอกสารลงทะเบียนบริษัท",
+    "case": "An Sun-young, Lee Sang-yeop (2025) — เจ้าของบริษัท Exp(B) 3.6 (อัตราเหตุการณ์ 20.4% เทียบกับบุคคล 4.8%)"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "หลังจากปฏิบัติงาน คืนค่าธรรมเนียมเพียง 20% (ค่าปรับตามสัญญา 80%) ข้อกำหนดนี้ถูกมองว่าเป็นการชดเชยความเสียหายที่คาดหมายไว้ล่วงหน้าอย่างไม่เป็นธรรม ส่งผลให้คืนเต็มจำนวนโดยไม่มีค่าปรับตามสัญญา",
+   "신발도매_2013": "เมื่อยกเลิกการเป็นตัวแทนจำหน่าย ค่าปรับตามสัญญา 50% — ตัวอย่างของสำนักงานคณะกรรมการการค้าเสรี (2004약제2214) และประเด็นร่วมกัน ส่งผลให้ปรับปรุงค่าปรับตามสัญญาบางส่วน",
+   "2019-18b": "เอกสารข้อตกลงเพิ่มเติมเกี่ยวกับการให้ประกันประกันภัย — ข้อตกลงพิเศษที่ยกเว้นการโต้แย้ง ข้อความ 'สิ้นสุด' ไม่ชัดเจน ชี้ให้เห็นว่าต้องแก้ไขข้อกำหนด",
+   "2005-41": "สัญญาให้คำปรึกษาด้านการลงทุน — ข้อกำหนดที่จำกัดสิทธิในการยกเลิกของผู้บริโภค ละเมิดหน้าที่ในการแจ้งและอธิบายตามพระราชกฤษฎีกาควบคุมข้อกำหนด และขัดต่อสิทธิในการยกเลิกตามพระราชกฤษฎีกาว่าด้วยการขายแบบเยี่ยมบ้าน ส่งผลให้ปฏิเสธการใช้บังคับ",
+   "즉시연금_2017-17": "การจ่ายเงินบำนาญต่ำกว่าอัตราดอกเบี้ยขั้นต่ำที่รับประกัน ตัดสินว่าเป็นการละเมิดข้อกำหนด",
+   "바로연금보험_2018-8": "เงื่อนไขการหักเงินประกันภัยครบกำหนดไม่ชัดเจน — ตามหลักการตีความที่ไม่เอื้อต่อผู้เขียน ตีความให้เป็นประโยชน์ของผู้บริโภค",
+   "2019-18a": "ข้อกำหนดการยกเลิกแบบเอกฝ่ายในข้อกำหนดพื้นฐานเกี่ยวกับการให้เครดิต — อ้างอิงการตัดสินใจของสำนักงานคณะกรรมการการค้าเสรี ปฏิเสธความเป็นเหตุเป็นผล",
+   "990": "ข้อตกลงพิเศษที่ผู้เช่าสละสิทธิในการขอต่ออายุสัญญา — ละเมิดมาตรา 6 ส่วนที่ 3 ของพระราชกฤษฎีกาว่าด้วยการป้องกันการเช่าบ้าน ไม่มีเหตุผลพิเศษจึงเป็นโมฆะ",
+   "2008_약관변경동의간주": "ข้อกำหนดที่ถ้าไม่มีการโต้แย้งในระยะเวลาหนึ่ง ถือว่าเห็นชอบในการเปลี่ยนแปลงข้อกำหนด — ละเมิดมาตรา 12 ของพระราชกฤษฎีกาควบคุมข้อกำหนด ปฏิเสธความผูกพัน",
+   "2010_ELS조건조정": "ข้อกำหนดที่ผู้ออกสามารถปรับเงื่อนไขการชำระเงินตามดุลยพินิจ — ควบคุมการใช้ขยายด้วยการตีความแบบจำกัด และออกคำสั่งชำระเงิน",
+   "20": "ข้อตกลงพิเศษที่ให้ผู้เช่ารับผิดชอบค่าซ่อมแซมบ้านทั้งหมด — ถ่ายโอนหน้าที่บำรุงรักษาตามกฎหมายของเจ้าของแบบกว้างๆ ยืนยันว่าเป็นโมฆะ",
+   "2008_직불카드양도": "ข้อกำหนดที่ให้ผู้ถือบัตรรับผิดชอบเต็มจำนวนเมื่อโอนบัตร — ตามหลักการแบ่งส่วนการมีส่วนร่วม จำกัดความรับผิดชอบของสมาชิกที่ 40%"
+  }
+ },
+ "id": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Denda Kontrak yang Berlebihan",
+    "what": "Klausul yang menetapkan uang yang harus dibayar saat membatalkan atau melanggar kontrak jauh lebih besar dari kerugian sebenarnya. Meskipun tidak ada kata 'denda', jika substansinya adalah ganti rugi yang dijanjikan, termasuk dalam kategori ini.",
+    "signals": [
+     "Denda, penalti, atau ganti rugi berlipat ganda",
+     "Pengenaan biaya sisa periode penuh saat pembatalan",
+     "Pengecualian perhitungan harian",
+     "Desain asimetris dengan tingkat keterlambatan pelanggan yang tidak biasa tinggi"
+    ],
+    "tip": "Tanyakan apakah denda sebanding dengan kerugian sebenarnya. Pengadilan telah mengurangi denda yang berlebihan (Pasal 398 Hukum Perdata)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Pembatalan Kontrak Sepihak",
+    "what": "Klausul yang memungkinkan pihak lain mengakhiri kontrak segera tanpa pemberitahuan sebelumnya atau alasan yang sah.",
+    "signals": [
+     "Dapat 'dibatalkan segera' tanpa prosedur peringatan",
+     "Untuk perumahan, pembatalan hanya dengan 1 kali keterlambatan (hukum menetapkan standar 2 periode keterlambatan)",
+     "Perjanjian khusus yang melepaskan hak permintaan pembaruan"
+    ],
+    "tip": "Standar pembatalan hukum adalah 2 periode keterlambatan untuk perumahan dan 3 periode untuk properti komersial. Jika ditulis lebih mudah dibatalkan, perlu dikonfirmasi."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Penundaan Pengembalian Jaminan",
+    "what": "Klausul yang membuat jaminan, dana pengembalian, atau dana penyelesaian dikembalikan terlambat, dipotong, atau diganti dengan sesuatu yang lain.",
+    "signals": [
+     "Batas waktu pengembalian yang panjang seperti 'dapat dikembalikan dalam O bulan setelah akhir kontrak'",
+     "Pemotongan dana cadangan atau biaya administrasi secara seragam",
+     "Pengembalian tanpa bunga, pembayaran pengganti dengan kupon atau poin"
+    ],
+    "tip": "Periksa apakah batas waktu pengembalian dan bunga keterlambatan ditentukan dengan jelas. Perintah pendaftaran hak sewa dan asuransi jaminan menjadi mekanisme keamanan."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Pengecualian Tanggung Jawab",
+    "what": "Klausul yang sepenuhnya mengalihkan tanggung jawab yang diberikan hukum kepada pihak lain (kewajiban perbaikan, tanggung jawab cacat, dll.) kepada konsumen atau penyewa, atau membebaskan tanggung jawab.",
+    "signals": [
+     "'Tidak bertanggung jawab atas apapun'",
+     "'Semua biaya perbaikan adalah tanggung jawab penyewa'",
+     "Larangan keberatan sipil dan pidana"
+    ],
+    "tip": "Frasa komprehensif seperti 'semua' atau 'setiap' adalah sinyal utama. Komisi penyelesaian telah menganggap pengalihan tanggung jawab komprehensif tidak sah."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Kondisi Biaya Administrasi dan Bunga yang Tidak Jelas",
+    "what": "Klausul yang ditulis sedemikian rupa sehingga tidak dapat diketahui berapa banyak yang harus dibayar hanya dengan membaca kontrak. Frasa yang samar-samar mudah ditafsirkan menguntungkan pihak lain di kemudian hari.",
+    "signals": [
+     "Kolom tingkat bunga atau biaya kosong",
+     "Standar yang samar-samar seperti 'bunga hukum yang biasanya ditetapkan dalam putusan'",
+     "'Akan ditentukan melalui negosiasi terpisah'"
+    ],
+    "tip": "Minta agar angka dan metode perhitungan ditulis dalam kontrak. Ada kasus di mana komisi penyelesaian membatasi frasa bunga yang samar-samar menjadi 5% per tahun (tingkat bunga hukum perdata)."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Pemberitahuan Hubungan Kepercayaan dan Ketidakstabilan Kepemilikan",
+    "what": "Klausul di mana properti dimiliki oleh perusahaan kepercayaan sehingga struktur kepemilikan tidak stabil, dan perjanjian khusus mengurangi perlindungan penyewa. Ini adalah salah satu pola inti penipuan sewa.",
+    "signals": [
+     "'Penerima amanah (perusahaan kepercayaan) tidak bertanggung jawab atas pengembalian jaminan'",
+     "'Sewa tanpa persetujuan penerima amanah sebelumnya tidak berlaku'",
+     "Tekanan untuk kontrak tanpa konfirmasi dokumen kepercayaan"
+    ],
+    "tip": "Periksa di bagian kepemilikan buku tanah apakah pemilik adalah perusahaan kepercayaan, dan di dokumen kepercayaan siapa yang memiliki wewenang untuk menyewa."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Pengalihan Biaya dan Pajak yang Tidak Adil",
+    "what": "Klausul yang mengalihkan pengeluaran yang seharusnya ditanggung oleh pihak lain menurut hukum (pemilik, pengusaha) kepada konsumen atau penyewa.",
+    "signals": [
+     "Pajak pemilik (pajak properti, pajak akuisisi) dialihkan ke penyewa",
+     "Biaya perbaikan dan pemeliharaan pemilik dialihkan",
+     "Permintaan untuk menanggung biaya pendaftaran hipotek"
+    ],
+    "tip": "Tanyakan siapa yang seharusnya menanggung biaya tersebut menurut hukum. Ini berbeda dari biaya utilitas aktual yang Anda gunakan (listrik, air)."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Perubahan Prestasi dan Kondisi Sepihak",
+    "what": "Klausul yang memungkinkan pihak lain mengubah isi kontrak (syarat, suku bunga, kondisi pembayaran) tanpa persetujuan.",
+    "signals": [
+     "'Perusahaan dapat mengubah sesuai keinginan'",
+     "Jika tidak ada respons setelah pemberitahuan perubahan, 'dianggap telah menyetujui'",
+     "Kondisi pembayaran disesuaikan atas kebijakan perusahaan"
+    ],
+    "tip": "Periksa apakah pemberitahuan sebelumnya dan hak untuk menolak (membatalkan) dijamin saat ada perubahan. Klausul persetujuan dianggap adalah jenis yang berulang kali dikendalikan dalam penyelesaian sengketa."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Pembatasan Pilihan dan Pembelian Paksa",
+    "what": "Klausul yang memaksa penggunaan produk atau penyedia tertentu atau menghalangi pilihan konsumen (termasuk bundling paksa).",
+    "signals": [
+     "'Hanya melalui penyedia yang ditunjuk'",
+     "Pendaftaran produk tambahan wajib",
+     "Frasa yang mengecualikan pilihan lain"
+    ],
+    "tip": "Tanyakan apakah penggunaan atau pembelian yang dipaksa benar-benar diperlukan untuk tujuan kontrak, dan mengapa pilihan lain diblokir."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Pembatasan Pelaksanaan Hak",
+    "what": "Klausul yang menghalangi penggunaan hak yang dijamin oleh hukum (hak pembatalan, hak keberatan, hak menggugat, dll.).",
+    "signals": [
+     "Jaminan 'tidak akan mengajukan keberatan'",
+     "Periode dan metode pelaksanaan hak pembatalan dibatasi secara berlebihan",
+     "Larangan pengajuan gugatan atau perjanjian tidak menggugat"
+    ],
+    "tip": "Hak hukum tidak dapat dengan mudah diambil bahkan dengan perjanjian khusus. Ada kasus di mana ini ditolak sebagai pelanggaran Undang-Undang Regulasi Syarat dan Ketentuan dan Undang-Undang Transaksi Cicilan."
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Perjanjian Pengecualian Kepercayaan",
+    "what": "Metode di mana properti dimiliki oleh perusahaan kepercayaan, dan perjanjian khusus menetapkan 'penerima amanah tidak bertanggung jawab atas pengembalian jaminan'. Penyewa kehilangan target hukum untuk menuntut pengembalian jaminan.",
+    "signal": "Frasa dalam perjanjian khusus seperti 'penerima amanah', 'kepercayaan', 'tidak bertanggung jawab atas pengembalian', 'tidak akan mengajukan keberatan'.",
+    "outside": "Periksa di bagian kepemilikan buku tanah apakah pemilik adalah perusahaan kepercayaan. Dapatkan dokumen kepercayaan untuk mengonfirmasi siapa yang memiliki wewenang untuk menyewa.",
+    "case": "Banyak kasus penyelesaian sengketa keuangan — jenis di mana pemulihan jaminan secara struktural diblokir oleh perjanjian pengecualian penerima amanah (Goldenset Grade A)."
+   },
+   {
+    "id": "gap",
+    "title": "Sewa Kosong (Rasio Utang Melebihi Batas)",
+    "what": "Kondisi di mana jaminan + pinjaman prioritas pertama mendekati atau melebihi nilai properti. Jika properti dilelang, penyewa tidak dapat sepenuhnya mendapatkan kembali jaminan.",
+    "signal": "Tidak terlihat hanya dari kontrak — itulah mengapa berbahaya. Jika jaminan besar dibandingkan dengan harga pasar dan pemilik terburu-buru, curigai.",
+    "outside": "Rasio utang = (klaim prioritas + jaminan) ÷ harga pasar. Jika 90% atau lebih, penelitian empiris menunjukkan 17,6% kontrak mengalami klaim jaminan (standar 0,2%). Gunakan kalkulator sewa kosong di layar hasil.",
+    "case": "An Seon-young, Lee Sang-yeop (2025) — 450.000 klaim sewa jaminan di wilayah metropolitan — tingkat insiden 17,6% pada interval rasio utang 90% atau lebih."
+   },
+   {
+    "id": "double",
+    "title": "Kontrak Ganda",
+    "what": "Metode menyewakan properti yang sama kepada beberapa penyewa, atau agen membuat kontrak palsu tanpa sepengetahuan pemilik. Jika kalah dalam urutan prioritas hak, penyewa kehilangan jaminan.",
+    "signal": "Pihak kontrak berbeda dari pemilik di buku tanah dengan surat kuasa yang samar-samar. Tekanan untuk kontrak dengan harga lebih murah dan cepat.",
+    "outside": "Kontrak langsung dengan pemilik yang terdaftar di buku tanah (konfirmasi identitas). Jika kontrak dengan kuasa, konfirmasi surat kuasa dengan sertifikat cap pribadi. Bayar sisa hanya ke rekening atas nama pemilik.",
+    "case": "Jenis berulang dari Komisi Penyelesaian Sengketa Sewa Perumahan — sengketa keabsahan kontrak sewa tanpa wewenang."
+   },
+   {
+    "id": "appraisal",
+    "title": "Inflasi Harga Pasar (Penyalahgunaan Penilaian)",
+    "what": "Metode di mana properti baru tanpa transaksi aktual menggunakan penilaian untuk menaikkan harga pasar dan menerima jaminan sebesar harga pasar (atau lebih). Dimulai sebagai sewa kosong sejak awal.",
+    "signal": "Menekankan 'harga penilaian O miliar' sambil tidak menunjukkan data transaksi aktual. Sering terjadi pada villa baru, perumahan baris, dan properti multi-unit.",
+    "outside": "Periksa sistem pengungkapan transaksi aktual Kementerian Tanah, Infrastruktur, dan Transportasi untuk transaksi aktual properti serupa di lingkungan yang sama. Penelitian empiris menunjukkan penetapan harga berbasis penilaian meningkatkan peluang klaim jaminan 4,8 kali.",
+    "case": "An Seon-young, Lee Sang-yeop (2025) — penetapan harga berbasis ahli (penilaian) Exp(B) 4,8, perumahan baris dan multi-unit 5,8 kali."
+   },
+   {
+    "id": "proxy",
+    "title": "Pemilik Boneka dan Pemilik Korporat",
+    "what": "Metode membeli properti atas nama orang tanpa aset atau perusahaan kertas dan menyewakannya. Bahkan jika ada masalah, tidak ada aset untuk dikembalikan.",
+    "signal": "Pemilik adalah korporasi dengan entitas yang tidak jelas. Pemilik berubah tepat sebelum kontrak (catatan transfer kepemilikan terbaru di buku tanah).",
+    "outside": "Periksa catatan transfer kepemilikan terbaru di bagian kepemilikan buku tanah. Pemilik korporat menunjukkan peluang klaim jaminan 3,6 kali lebih tinggi dalam penelitian empiris — konfirmasi entitas dengan buku tanah korporat.",
+    "case": "An Seon-young, Lee Sang-yeop (2025) — pemilik korporat Exp(B) 3,6 (tingkat insiden 20,4% vs individu 4,8%)."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "Setelah melaksanakan pekerjaan, klausul pengembalian hanya 20% dari biaya administrasi (denda 80%) dianggap sebagai ganti rugi yang dijanjikan secara tidak adil yang berlebihan, penyelesaian pengembalian penuh tanpa denda tercapai",
+   "신발도매_2013": "Klausul penalti denda 50% dari biaya waralaba saat pembatalan waralaba — penyelesaian pengembalian sebagian denda tercapai dengan preseden Komisi Persaingan Adil (2004약제2214) dan isu bersama",
+   "2019-18b": "Surat perjanjian tambahan penyediaan jaminan asuransi dengan jaminan melepaskan keberatan — frasa 'tidak berlaku' tidak jelas, perbaikan syarat dan ketentuan diperlukan",
+   "2005-41": "Klausul pembatasan hak pembatalan penyewa dalam kontrak konsultasi investasi — pelanggaran kewajiban penjelasan dan pernyataan Undang-Undang Regulasi Syarat dan Ketentuan dan pelanggaran hak pembatalan sukarela Undang-Undang Penjualan Langsung menyebabkan penolakan penerapan",
+   "즉시연금_2017-17": "Pembayaran anuitas di bawah tingkat bunga jaminan minimum dianggap sebagai pelanggaran syarat dan ketentuan",
+   "바로연금보험_2018-8": "Klausul dengan dasar pengurangan manfaat asuransi jatuh tempo yang tidak jelas — ditafsirkan menguntungkan konsumen sesuai prinsip ketidakuntungan penulis",
+   "2019-18a": "Klausul pembatalan sepihak dalam syarat dan ketentuan dasar transaksi kredit — penolakan dasar pembatalan dengan mengutip keputusan Komisi Persaingan Adil tidak sah",
+   "990": "Perjanjian khusus melepaskan hak permintaan pembaruan kontrak penyewa — tidak sah karena melanggar Pasal 6-3 Ayat 1 Undang-Undang Perlindungan Sewa Perumahan tanpa keadaan khusus",
+   "2008_약관변경동의간주": "Klausul yang menganggap perubahan syarat dan ketentuan telah disetujui jika tidak ada keberatan dalam periode tertentu — penolakan kekuatan mengikat karena pelanggaran Pasal 12 Undang-Undang Regulasi Syarat dan Ketentuan",
+   "2010_ELS조건조정": "Klausul yang memungkinkan penerbit menyesuaikan kondisi pembayaran atas kebijakan — penerapan diperluas dibatasi dengan interpretasi ketat dan perintah pembayaran dikeluarkan",
+   "20": "Perjanjian khusus membuat penyewa bertanggung jawab penuh atas biaya perbaikan perumahan — tidak sah karena mengalihkan kewajiban pemeliharaan hukum pemilik secara komprehensif",
+   "2008_직불카드양도": "Klausul yang membuat anggota bertanggung jawab penuh saat kartu ditransfer — tanggung jawab anggota dibatasi menjadi 40% sesuai preseden distribusi kontribusi"
+  }
+ },
+ "tl": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Labis na multa",
+    "what": "Isang klausul na nagtakda ng pera na dapat bayaran kapag kinansela o nilabag ang kontrata na mas malaki kaysa sa tunay na pinsala. Kahit walang salitang 'multa', kung ito ay tunay na pag-aayos ng damages, ito ay kasama.",
+    "signals": [
+     "Multa·dagdag na bayad·doble na kompensasyon",
+     "Buong bayad para sa natitirang panahon kapag kinansela",
+     "Walang proporsyonal na pagkalkula",
+     "Asymmetric na disenyo kung saan ang interes ng customer ay hindi karapat-dapat na mataas"
+    ],
+    "tip": "Tanungin kung proporsyonal ba sa tunay na pinsala. Ang mga korte ay patuloy na binabawasan ang labis na multa (Batas Sibil Artikulo 398)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Unilateral na pagkansela ng kontrata",
+    "what": "Isang klausul na nagbibigay-daan sa isa pang partido na tapusin ang kontrata kaagad nang walang paunang abiso o wastong dahilan.",
+    "signals": [
+     "Maaaring 'agad na kanselahin' nang walang proseso ng pagbabanta",
+     "Bahay na maaaring kanselahin sa isang pagkaantala lamang (ang batas ay nagsasaad ng dalawang panahon)",
+     "Espesyal na kasunduan na nagpapahintulot sa pagwala ng karapatan sa pagpapabago"
+    ],
+    "tip": "Para sa bahay, dalawang panahon; para sa komersyal, tatlong panahon ang legal na batayan para sa pagkansela. Kung mas madali kaysa dito, dapat suriin."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Pagkaantala sa pagbabalik ng deposito",
+    "what": "Isang klausul na nagpapahintulot sa pagbabalik ng deposito, refund, o settlement na huli, nabawasan, o sa ibang paraan.",
+    "signals": [
+     "Mahabang panahon tulad ng 'O buwan pagkatapos ng pagtatapos ng kontrata'",
+     "Automatic na pagbabawas ng bayad o commission",
+     "Walang interes na pagbabalik, o pagbibigay ng coupon at points sa halip"
+    ],
+    "tip": "Suriin kung malinaw ang panahon ng pagbabalik at ang interes sa pagkaantala. Ang pagpaparehistro ng karapatan ng tenant at insurance ay mga ligtas na hakbang."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Pagwala ng responsibilidad",
+    "what": "Isang klausul na naglilipat o nagwawala ng responsibilidad na itinakda ng batas (tulad ng pag-aayos, warranty ng defects) mula sa isa pang partido tungo sa consumer o tenant.",
+    "signals": [
+     "'Walang anumang responsibilidad'",
+     "'Lahat ng gastos sa pagsasaayos ay responsibilidad ng tenant'",
+     "Pagbabawal sa paghahabol ng civil o criminal na kaso"
+    ],
+    "tip": "Ang mga salitang tulad ng 'lahat' at 'anumang' ay mga pangunahing signal. Ang mga komite ay patuloy na nagsasaad na ang pangkalahatang paglilipat ng responsibilidad ay batalin."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Hindi malinaw na bayad at interes",
+    "what": "Isang klausul na hindi malinaw kung magkano ang dapat bayaran batay sa kontrata lamang. Ang mga ambiguous na salita ay madaling maisalin sa pabor ng iba pang partido sa hinaharap.",
+    "signals": [
+     "Walang laman na puwesto para sa rate o commission",
+     "Ambiguous na pamantayan tulad ng 'legal na interes na karaniwang itinakda ng korte'",
+     "'Ayon sa hiwalay na kasunduan'"
+    ],
+    "tip": "Hilingin na isulat ang mga numero at paraan ng pagkalkula sa kontrata. May kaso kung saan ang ambiguous na interes ay limitado sa 5% bawat taon (legal na interes)."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Pag-abiso ng trust relationship at hindi siguradong pagmamay-ari",
+    "what": "Isang klausul na nagpapakita na ang bahay ay pag-aari ng trust company, kaya ang pagmamay-ari ay hindi sigurado, at ang proteksyon ng tenant ay nabawasan. Ito ay isa sa mga pangunahing pattern ng scam sa bahay.",
+    "signals": [
+     "'Ang trustee ay walang responsibilidad sa pagbabalik ng deposito'",
+     "'Ang kontrata ay walang bisa nang walang pahintulot ng trustee'",
+     "Mabilis na pag-uudyok na magkontrata nang walang pagsusuri ng trust documents"
+    ],
+    "tip": "Suriin sa registration kung ang may-ari ay trust company. Tingnan ang trust documents upang malaman kung sino ang may karapatan na mag-alok ng bahay."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Hindi makatarungang paglilipat ng gastos at buwis",
+    "what": "Isang klausul na naglilipat ng gastos na dapat bayaran ng may-ari o negosyante (ayon sa batas) tungo sa consumer o tenant.",
+    "signals": [
+     "Buwis ng may-ari (property tax, acquisition tax) na ipinapasa sa tenant",
+     "Gastos sa pagsasaayos at pagpapanatili ng may-ari na ipinapasa",
+     "Paghingi ng bayad para sa pagpaparehistro ng mortgage"
+    ],
+    "tip": "Tanungin kung sino ang dapat magbayad ng buwis ayon sa batas. Iba ito sa mga utility na aktwal na ginagamit (kuryente, tubig)."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Unilateral na pagbabago ng benepisyo at kondisyon",
+    "what": "Isang klausul na nagbibigay-daan sa iba pang partido na baguhin ang nilalaman ng kontrata (terms, interes, kondisyon ng pagbabayad) nang walang pahintulot.",
+    "signals": [
+     "'Maaaring baguhin ng kumpanya nang walang pahintulot'",
+     "Kung walang pagtugon pagkatapos ng abiso, ito ay itinuturing na 'napayagan'",
+     "Kondisyon ng pagbabayad na maaaring ayusin ng kumpanya"
+    ],
+    "tip": "Suriin kung may paunang abiso at karapatan na tumanggi o kanselahin. Ang 'deemed consent' ay patuloy na pinipigilan sa mga komite."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Pagpapahigpit ng pagpipilian at puwersang pagbili",
+    "what": "Isang klausul na puwersang gamitin ang partikular na produkto o kumpanya, o na-block ang pagpipilian ng consumer (kasama ang bundling).",
+    "signals": [
+     "'Lamang sa pamamagitan ng itinalagang kumpanya'",
+     "Mandatory na pagpaparehistro sa karagdagang produkto",
+     "Mga salitang nag-block sa ibang pagpipilian"
+    ],
+    "tip": "Tanungin kung kailangan talaga ang puwersang produkto para sa kontrata, at bakit walang ibang pagpipilian."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Pagpapahigpit ng karapatan",
+    "what": "Isang klausul na pumipigil sa paggamit ng mga karapatan na itinakda ng batas (tulad ng karapatan na kanselahin, magprotesta, o magsumpa).",
+    "signals": [
+     "Pangako na 'hindi magprotesta'",
+     "Labis na pagpapahigpit sa panahon at paraan ng paggamit ng karapatan na kanselahin",
+     "Pagbabawal sa pagsusumpa o kasunduan na hindi magsusumpa"
+    ],
+    "tip": "Ang mga karapatan na itinakda ng batas ay hindi maaaring alisin ng espesyal na kasunduan. May mga kaso kung saan ito ay bataling dahil sa batas sa kontrol ng terms at installment sales."
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Espesyal na kasunduan na nagwawala ng responsibilidad ng trustee",
+    "what": "Ang bahay ay pag-aari ng trust company, at ang espesyal na kasunduan ay nagsasaad na 'ang trustee ay walang responsibilidad sa pagbabalik ng deposito'. Ang tenant ay mawawalan ng legal na paraan upang makuha ang deposito.",
+    "signal": "Mga salitang tulad ng 'trustee', 'trust', 'walang responsibilidad sa pagbabalik', 'hindi magprotesta' sa espesyal na kasunduan.",
+    "outside": "Suriin sa registration kung ang may-ari ay trust company. Kumuha ng trust documents upang malaman kung sino ang may karapatan na mag-alok.",
+    "case": "Maraming kaso sa financial dispute mediation — ang espesyal na kasunduan na nagwawala ng responsibilidad ay nakablock sa pagkuha ng deposito (Grade A risk)."
+   },
+   {
+    "id": "gap",
+    "title": "Walang halaga na kontrata (sobrang utang)",
+    "what": "Ang deposito + pangunahing utang ay malapit o lumampas sa halaga ng bahay. Kung ang bahay ay mapupunta sa auction, ang tenant ay hindi makakakuha ng buong deposito.",
+    "signal": "Hindi makikita sa kontrata lamang — kaya ito ay mapanganib. Kung ang deposito ay malaki kumpara sa presyo, at ang may-ari ay nagmamadali, dapat mag-alala.",
+    "outside": "Ratio ng utang = (pangunahing utang + deposito) ÷ presyo. Kung 90% o higit pa, ang pag-aaral ay nagpapakita na 17.6% ng mga kontrata ay may problema (normal ay 0.2%). Gamitin ang calculator sa resulta.",
+    "case": "An Seon-young at Lee Sang-yeop (2025) — 450,000 kontrata sa Seoul area; ratio na 90% o higit pa ay may 17.6% na problema."
+   },
+   {
+    "id": "double",
+    "title": "Doble na kontrata",
+    "what": "Ang parehong bahay ay kinontrata sa maraming tenant, o ang manager ay gumagawa ng fake na kontrata nang walang alam ng may-ari. Kung ang priority ay mababa, ang tenant ay mawawalan ng deposito.",
+    "signal": "Ang kontrata ay hindi sa tunay na may-ari ayon sa registration, at ang power of attorney ay hindi malinaw. Mabilis na pag-uudyok na magkontrata sa mas murang presyo.",
+    "outside": "Direktang kontrata sa tunay na may-ari (tingnan ang ID). Kung may power of attorney, kailangan ng certified power of attorney. Ang final payment ay dapat sa account ng may-ari.",
+    "case": "Paulit-ulit na uri sa Housing Lease Dispute Mediation Committee — mga kontrata na walang karapatan na mag-alok."
+   },
+   {
+    "id": "appraisal",
+    "title": "Pag-inflate ng presyo (gamit ang appraisal)",
+    "what": "Sa mga bagong villa kung saan walang actual na presyo, ang appraisal ay ginagamit upang pataas ang presyo at kunin ang deposito na katulad ng presyo o higit pa. Nagsisimula na ito bilang walang halaga na kontrata.",
+    "signal": "Binibigyang-diin ang 'appraisal price' pero hindi ipinakikita ang actual na presyo. Madalas sa mga bagong townhouse at multi-unit.",
+    "outside": "Direktang tingnan ang actual na presyo sa government database. Ang pag-aaral ay nagpapakita na ang appraisal-based na presyo ay may 4.8 beses na mas mataas na panganib.",
+    "case": "An Seon-young at Lee Sang-yeop (2025) — appraisal-based na presyo ay may 4.8 beses na mas mataas na panganib; townhouse at multi-unit ay 5.8 beses."
+   },
+   {
+    "id": "proxy",
+    "title": "Fake landlord at corporate landlord",
+    "what": "Isang taong walang pera o isang paper corporation ang bumili ng bahay upang mag-alok. Kung may problema, walang pera upang ibalik.",
+    "signal": "Ang landlord ay corporation pero walang tunay na katawan. Ang may-ari ay nagbago bago ang kontrata (recent transfer sa registration).",
+    "outside": "Tingnan ang recent ownership transfer sa registration. Ang corporate landlord ay may 3.6 beses na mas mataas na panganib ayon sa pag-aaral — suriin ang corporate registration.",
+    "case": "An Seon-young at Lee Sang-yeop (2025) — corporate landlord ay may 3.6 beses na mas mataas na panganib (20.4% vs 4.8% para sa individual)."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "Pagkatapos ng trabaho, 20% lamang ng commission ang ibabalik (80% multa) — ito ay itinuturing na labis na pag-aayos ng damages, kaya buong refund ang naging resulta",
+   "신발도매_2013": "50% multa sa pagkansela ng franchise — ayon sa dating desisyon (2004약제2214), bahagi ng multa ay ibabalik",
+   "2019-18b": "Ang 'waiver of objection' sa insurance agreement — ang salitang 'ineffective' ay hindi malinaw, kaya kailangan ng pagbabago ng terms",
+   "2005-41": "Ang karapatan ng consumer na kanselahin sa investment advisory contract ay napigilan — ito ay labag sa batas at door-to-door sales law, kaya hindi ito ginagamit",
+   "즉시연금_2017-17": "Ang annuity na mas mababa sa minimum guaranteed rate ay labag sa terms",
+   "바로연금보험_2018-8": "Ang batayan para sa pagbabawas ng maturity benefit ay hindi malinaw — ayon sa prinsipyo na ang ambiguity ay para sa consumer, ito ay sa pabor ng consumer",
+   "2019-18a": "Ang unilateral termination clause sa credit agreement — ang desisyon ng Fair Trade Commission ay ginagamit upang tanggihan ang batayan para sa pagkansela",
+   "990": "Ang espesyal na kasunduan na nagwawala ng karapatan ng tenant na magpabago ng kontrata — ito ay labag sa Housing Lease Protection Law Artikulo 6-3 Seksyon 1, kaya batalin",
+   "2008_약관변경동의간주": "Ang klausul na kung walang protesta sa loob ng panahon, ito ay itinuturing na 'napayagan' ang pagbabago ng terms — ito ay labag sa batas sa kontrol ng terms, kaya walang bisa",
+   "2010_ELS조건조정": "Ang klausul na ang issuer ay maaaring baguhin ang kondisyon ng pagbabayad — ito ay limitado at dapat magbayad ayon sa order",
+   "20": "Ang espesyal na kasunduan na ang lahat ng gastos sa pagsasaayos ay responsibilidad ng tenant — ito ay labag sa legal na obligasyon ng landlord na magpanatili, kaya batalin",
+   "2008_직불카드양도": "Ang klausul na ang buong responsibilidad ay sa member kapag naglipat ng card — ayon sa prinsipyo ng contribution, ang responsibilidad ay limitado sa 40%"
+  }
+ },
+ "ne": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "अत्यधिक दंड राशि",
+    "what": "अनुबंध रद्द करते समय या उल्लंघन करते समय देय राशि को वास्तविक नुकसान से कहीं अधिक निर्धारित करने वाली शर्त। 'दंड राशि' शब्द न होने पर भी यदि वास्तविकता में नुकसान की भरपाई हो तो यह लागू होता है।",
+    "signals": [
+     "दंड राशि·दंड·गुणा क्षतिपूर्ति",
+     "रद्दीकरण पर शेष अवधि की पूरी फीस लागू करना",
+     "आनुपातिक गणना को छोड़ना",
+     "केवल ग्राहक विलंब दर असामान्य रूप से अधिक होना"
+    ],
+    "tip": "वास्तविक नुकसान के अनुपात में है या नहीं यह पूछें। अदालतें अत्यधिक दंड राशि को कम करती आई हैं (नागरिक कानून धारा 398)।"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "एकतरफा अनुबंध रद्दीकरण",
+    "what": "दूसरे पक्ष को पूर्व सूचना या वैध कारण के बिना अनुबंध तुरंत समाप्त करने की अनुमति देने वाली शर्त।",
+    "signals": [
+     "चेतावनी प्रक्रिया के बिना 'तुरंत रद्द कर सकते हैं'",
+     "आवास में केवल 1 बार विलंब पर रद्दीकरण (कानून 2 बार विलंब का आधार है)",
+     "नवीनीकरण अधिकार को त्यागने के लिए विशेष समझौता"
+    ],
+    "tip": "आवास के लिए 2 बार, व्यावसायिक संपत्ति के लिए 3 बार विलंब कानूनी रद्दीकरण का आधार है। इससे आसान रद्दीकरण लिखा हो तो जांचने योग्य है।"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "जमा राशि वापसी में देरी",
+    "what": "जमा राशि·वापसी राशि·निपटान राशि को देरी से, कम करके, या अन्य रूप में वापस करने वाली शर्त।",
+    "signals": [
+     "'अनुबंध समाप्ति के बाद O महीने के भीतर वापस कर सकते हैं' जैसी लंबी अवधि",
+     "आरक्षित राशि·शुल्क की एकमुश्त कटौती",
+     "बिना ब्याज वापसी, कूपन·पॉइंट से विकल्प भुगतान"
+    ],
+    "tip": "वापसी की अवधि और विलंब पर ब्याज स्पष्ट है या नहीं जांचें। किरायेदारी अधिकार पंजीकरण आदेश·जमा बीमा सुरक्षा प्रदान करते हैं।"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "दायित्व मुक्ति",
+    "what": "कानून द्वारा दूसरे पक्ष पर लगाया गया दायित्व (मरम्मत कर्तव्य, दोष गारंटी आदि) को पूरी तरह उपभोक्ता·किरायेदार पर डालने या मुक्त करने वाली शर्त।",
+    "signals": [
+     "'किसी भी दायित्व को नहीं निभाएंगे'",
+     "'सभी मरम्मत खर्च किरायेदार का'",
+     "नागरिक·आपराधिक आपत्ति पर प्रतिबंध"
+    ],
+    "tip": "'सभी·किसी भी' जैसे व्यापक शब्द मुख्य संकेत हैं। समायोजन समिति ने व्यापक दायित्व हस्तांतरण को अमान्य माना है।"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "अस्पष्ट शुल्क·ब्याज शर्तें",
+    "what": "अनुबंध पत्र से ही कितना देना है यह स्पष्ट न हो ऐसी शर्त। अस्पष्ट शब्द बाद में दूसरे पक्ष के पक्ष में व्याख्या किए जाते हैं।",
+    "signals": [
+     "ब्याज दर·शुल्क दर खाली है",
+     "'आमतौर पर निर्णय में निर्धारित कानूनी ब्याज' जैसी अस्पष्ट कसौटी",
+     "'अलग समझौते के अनुसार'"
+    ],
+    "tip": "संख्या और गणना विधि अनुबंध में लिखवाएं। समायोजन समिति ने अस्पष्ट ब्याज को 5% वार्षिक (नागरिक कानून कानूनी दर) तक सीमित किया है।"
+   },
+   {
+    "id": "trust_notice",
+    "title": "न्यास संबंध·स्वामित्व अस्थिरता सूचना",
+    "what": "घर न्यास कंपनी के नाम पर है इसलिए स्वामित्व संरचना अस्थिर है, पर विशेष समझौते से किरायेदार सुरक्षा घटाई जाती है। पूरे सेट किराया धोखाधड़ी का मुख्य पैटर्न है।",
+    "signals": [
+     "'न्यास धारक (न्यास कंपनी) जमा वापसी के लिए जिम्मेदार नहीं'",
+     "'न्यास धारक की पूर्व अनुमति के बिना किराया अमान्य'",
+     "न्यास दस्तावेज़ की पुष्टि के बिना अनुबंध जल्दबाजी"
+    ],
+    "tip": "पंजीकरण पत्र के प्रथम भाग में स्वामी न्यास कंपनी है या नहीं जांचें। न्यास दस्तावेज़ से किराया अधिकार किसके पास है यह देखें।"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "अनुचित लागत·कर हस्तांतरण",
+    "what": "कानूनी रूप से दूसरे पक्ष (स्वामी·व्यवसायी) को वहन करना चाहिए ऐसा खर्च उपभोक्ता·किरायेदार पर डालने वाली शर्त।",
+    "signals": [
+     "स्वामी का कर (संपत्ति कर·अधिग्रहण कर) किरायेदार को",
+     "मकान मालिक की मरम्मत·रखरखाव लागत हस्तांतरण",
+     "बंधक पंजीकरण शुल्क वहन की मांग"
+    ],
+    "tip": "वह लागत कानूनी रूप से किसकी है यह पूछें। वास्तविक उपयोग की सार्वजनिक सेवाएं (बिजली·पानी) से अलग है।"
+   },
+   {
+    "id": "benefit_change",
+    "title": "एकतरफा सेवा·शर्त परिवर्तन",
+    "what": "दूसरा पक्ष अनुबंध सामग्री (नियम·दर·भुगतान शर्त) को सहमति के बिना बदल सकता है ऐसी शर्त।",
+    "signals": [
+     "'कंपनी इच्छानुसार बदल सकती है'",
+     "परिवर्तन सूचना के बाद चुप रहना 'सहमति मानी जाएगी'",
+     "भुगतान शर्त कंपनी के विवेक से समायोजन"
+    ],
+    "tip": "परिवर्तन पर पूर्व सूचना और अस्वीकार (रद्दीकरण) अधिकार है या नहीं जांचें। सहमति मान लेने की शर्त विवाद समायोजन में बार-बार रोकी गई है।"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "विकल्प प्रतिबंध·खरीद बाध्यता",
+    "what": "विशेष उत्पाद·कंपनी उपयोग को बाध्य करना या उपभोक्ता विकल्प को रोकना (बंडल बिक्री सहित)।",
+    "signals": [
+     "'केवल नियुक्त कंपनी के माध्यम से'",
+     "सहायक उत्पाद अनिवार्य पंजीकरण",
+     "अन्य विकल्प को रोकने वाली भाषा"
+    ],
+    "tip": "बाध्य उपयोग·खरीद अनुबंध उद्देश्य के लिए आवश्यक है या नहीं, अन्य विकल्प क्यों रोके हैं यह पूछें।"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "अधिकार प्रयोग प्रतिबंध",
+    "what": "कानून द्वारा दिया गया अधिकार (रद्दीकरण·आपत्ति·मुकदमा) को प्रयोग न करने के लिए रोकने वाली शर्त।",
+    "signals": [
+     "'आपत्ति नहीं करूंगा' की पुष्टि",
+     "रद्दीकरण अधिकार प्रयोग की अवधि·विधि अत्यधिक सीमित",
+     "मुकदमा दायर प्रतिबंध·विवाद समझौता"
+    ],
+    "tip": "कानूनी अधिकार विशेष समझौते से भी नहीं छीने जा सकते। नियम नियंत्रण कानून·किस्त व्यापार कानून उल्लंघन से खारिज किए गए हैं।"
+   }
+  ],
+  "scams": [
+   {
+    "id": "trust",
+    "title": "न्यास मुक्ति विशेष समझौता",
+    "what": "घर न्यास कंपनी के नाम पर है, पर विशेष समझौते से 'न्यास धारक जमा वापसी के लिए जिम्मेदार नहीं' यह तय करना। किरायेदार को जमा वापसी का कानूनी दावा का लक्ष्य गायब हो जाता है।",
+    "signal": "विशेष समझौते में 'न्यास धारक', 'न्यास', 'वापसी दायित्व नहीं', 'आपत्ति नहीं करूंगा' जैसे शब्द।",
+    "outside": "पंजीकरण पत्र के प्रथम भाग में स्वामी न्यास कंपनी है या नहीं जांचें। न्यास दस्तावेज़ प्राप्त कर किराया अधिकार किसके पास है यह जांचें।",
+    "case": "वित्तीय विवाद समायोजन कई उदाहरण — न्यास धारक मुक्ति विशेष समझौते से जमा वसूली संरचनात्मक रूप से रुकी (गोल्डन सेट A ग्रेड)।"
+   },
+   {
+    "id": "gap",
+    "title": "खाली सेट किराया (ऋण अनुपात अधिक)",
+    "what": "जमा + प्रथम क्रम ऋण घर की कीमत के करीब या अधिक हो। घर नीलामी में जाए तो जमा पूरी तरह वापस नहीं मिलता।",
+    "signal": "अनुबंध से अकेले नहीं दिखता — इसलिए खतरनाक है। बाजार दर से जमा बड़ा हो और मकान मालिक जल्दबाजी करे तो संदेह करें।",
+    "outside": "ऋण अनुपात = (प्रथम क्रम ऋण+जमा) ÷ बाजार दर। 90% से अधिक हो तो वास्तविक अनुसंधान में 17.6% अनुबंध जमा दुर्घटना (आधार अंतराल 0.2%)। परिणाम स्क्रीन के खाली सेट किराया कैलकुलेटर से जांचें।",
+    "case": "आन सुन-योंग·ली संग-योप (2025) राजधानी क्षेत्र सेट किराया 45 लाख — ऋण अनुपात 90% से अधिक अंतराल दुर्घटना दर 17.6%।"
+   },
+   {
+    "id": "double",
+    "title": "दोहरा अनुबंध",
+    "what": "एक ही घर को कई किरायेदारों के साथ अनुबंध करना, या घर मालिक के बिना प्रबंधक द्वारा नकली अनुबंध। प्रतिकार क्रम में पिछड़ जाएं तो जमा खो जाता है।",
+    "signal": "अनुबंध पक्ष पंजीकरण पत्र के स्वामी से अलग है पर वकालत पत्र अस्पष्ट। बाजार दर से सस्ता, जल्दी अनुबंध करने के लिए दबाव।",
+    "outside": "पंजीकरण पत्र के स्वामी के साथ सीधे अनुबंध (पहचान पत्र जांच)। वकालत अनुबंध हो तो मुहर प्रमाण पत्र वाला वकालत पत्र जांचें। अंतिम भुगतान केवल स्वामी के खाते में।",
+    "case": "आवास किराया विवाद समायोजन समिति दोहराया पैटर्न — अनधिकृत किराया अनुबंध प्रभाव विवाद।"
+   },
+   {
+    "id": "appraisal",
+    "title": "बाजार दर फुलाना (मूल्यांकन दुरुपयोग)",
+    "what": "वास्तविक लेनदेन के बिना नई विला आदि में मूल्यांकन से बाजार दर फुलाकर जमा बाजार दर के बराबर (या अधिक) लेना। शुरुआत से खाली सेट किराया।",
+    "signal": "'मूल्यांकन दर O अरब' पर जोर पर वास्तविक लेनदेन डेटा नहीं दिखाना। नई पंक्तिबद्ध·बहु-परिवार में आम।",
+    "outside": "राष्ट्रीय भूमि विभाग वास्तविक लेनदेन सार्वजनिक प्रणाली में एक ही इलाके के समान संपत्ति वास्तविक लेनदेन सीधे जांचें। वास्तविक अनुसंधान में मूल्यांकन आधार मूल्य निर्धारण जमा दुर्घटना जीत 4.8 गुना।",
+    "case": "आन सुन-योंग·ली संग-योप (2025) — विशेषज्ञ (मूल्यांकन) मूल्य निर्धारण Exp(B) 4.8, पंक्तिबद्ध·बहु-परिवार 5.8 गुना।"
+   },
+   {
+    "id": "proxy",
+    "title": "नकली किराया मालिक·कंपनी किराया मालिक",
+    "what": "संपत्ति रहित व्यक्ति या कागजी कंपनी के नाम पर घर खरीदकर किराया देना। दुर्घटना हो तो वापस करने की संपत्ति नहीं।",
+    "signal": "किराया मालिक कंपनी है पर वास्तविकता अस्पष्ट। अनुबंध से पहले स्वामी बदल जाता है (पंजीकरण पत्र प्रथम भाग हाल ही में हस्तांतरण)।",
+    "outside": "पंजीकरण पत्र प्रथम भाग में हाल ही में स्वामित्व हस्तांतरण इतिहास जांचें। कंपनी किराया मालिक वास्तविक अनुसंधान में जमा दुर्घटना जीत 3.6 गुना — कंपनी पंजीकरण पत्र से वास्तविकता जांचें।",
+    "case": "आन सुन-योंग·ली संग-योप (2025) — कंपनी किराया मालिक Exp(B) 3.6 (दुर्घटना दर 20.4% बनाम व्यक्तिगत 4.8%)।"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "कार्य निष्पादन के बाद 20% शुल्क ही वापस करने की शर्त को अनुचित रूप से भारी नुकसान भरपाई के रूप में देखा गया, दंड राशि के बिना पूरी वापसी स्थापित",
+   "신발도매_2013": "फ्रेंचाइजी रद्दीकरण पर 50% फ्रेंचाइजी शुल्क दंड शर्त — सार्वजनिक व्यापार आयोग पूर्व उदाहरण (2004약제2214) और विवाद बिंदु समान के रूप में दंड राशि आंशिक वापसी समायोजन स्थापित",
+   "2019-18b": "बीमा गारंटी अतिरिक्त समझौता पत्र की आपत्ति त्याग पुष्टि — 'प्रभाव' भाषा अस्पष्ट है इसलिए नियम संशोधन आवश्यक संकेत",
+   "2005-41": "निवेश सलाह अनुबंध का उपभोक्ता रद्दीकरण अधिकार प्रतिबंध शर्त — नियम नियंत्रण कानून स्पष्ट·व्याख्या कर्तव्य उल्लंघन और दूरदर्शन बिक्री कानून स्वेच्छा रद्दीकरण अधिकार संघर्ष से आवेदन खारिज",
+   "즉시연금_2017-17": "न्यूनतम गारंटी दर से कम वार्षिकी भुगतान नियम उल्लंघन के रूप में निर्णय",
+   "바로연금보험_2018-8": "परिपक्वता बीमा राशि कटौती आधार अस्पष्ट शर्त — लेखक प्रतिकूल सिद्धांत के अनुसार उपभोक्ता के पक्ष में व्याख्या",
+   "2019-18a": "ऋण लेनदेन मूल आधार नियम की एकतरफा रद्दीकरण शर्त — सार्वजनिक व्यापार आयोग अमान्य निर्णय उद्धृत कर रद्दीकरण आधार नकारा",
+   "990": "किरायेदार का अनुबंध नवीनीकरण अधिकार त्याग विशेष समझौता — आवास किराया सुरक्षा कानून धारा 6 का 3 प्रथम खंड उल्लंघन से विशेष परिस्थिति के बिना अमान्य",
+   "2008_약관변경동의간주": "निश्चित अवधि आपत्ति न हो तो नियम परिवर्तन सहमति मानी जाएगी शर्त — नियम नियंत्रण कानून धारा 12 उल्लंघन से बाध्यकारी शक्ति नकारी",
+   "2010_ELS조건조정": "जारीकर्ता विवेक से भुगतान शर्त समायोजन कर सकता है शर्त — विस्तार आवेदन को सीमित व्याख्या से नियंत्रित कर भुगतान आदेश",
+   "20": "आवास मरम्मत लागत पूरी किरायेदार दायित्व विशेष समझौता — किराया मालिक की कानूनी रखरखाव कर्तव्य व्यापक हस्तांतरण से अमान्य पुष्टि",
+   "2008_직불카드양도": "कार्ड हस्तांतरण पर पूरी दायित्व शर्त — योगदान वितरण निर्णय के अनुसार सदस्य दायित्व 40% तक सीमित"
+  }
+ },
+ "km": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "ការលើកលែងលើការបង្ហាញក្តីសង្ឃឹម",
+    "what": "ឯកសារដែលកំណត់ថាលុយដែលត្រូវបង់នៅពេលលុបចោលឬបំពានលើកិច្ចសន្យាគឺធំជាងការខាតបង់ពិតប្រាកដ។ ទោះបីជាគ្មានពាក្យថា 'ការលើកលែង' ក៏ដោយ ប្រសិនបើលក្ខណៈពិសេសគឺការលើកលែងលើការខាតបង់ក៏វាក៏ដូចគ្នាដែរ។",
+    "signals": [
+     "ការលើកលែង·ការលើកលែងលើការបង្ហាញក្តីសង្ឃឹម·ការផ្តល់សំណងច្រើនដង",
+     "ការគិតថ្លៃពេញលេញសម្រាប់រយៈពេលដែលនៅសល់នៅពេលលុបចោល",
+     "ការលុបចោលការគណនាប្រចាំថ្ងៃ",
+     "ការរចនាមិនស្មើគ្នាដែលមានអត្រាការពង្延សម្រាប់អតិថិជនប៉ុណ្ណាក្ដាប់"
+    ],
+    "tip": "សូមសួរថាតើវាសមស្របទៅនឹងការខាតបង់ពិតប្រាកដឬទេ។ ក្រុមតុលាការបានកាត់បន្ថយការលើកលែងលើការបង្ហាញក្តីសង្ឃឹមច្រើនដង(ច្បាប់ស៊ីវិល ឆ្នាយ 398)។"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "ការលុបចោលកិច្ចសន្យាដោយម្ខាង",
+    "what": "ឯកសារដែលអនុញ្ញាតឱ្យម្ខាងទៀតលុបចោលកិច្ចសន្យាភ្លាមៗដោយគ្មានការជូនដំណឹងជាមុនឬហេតុផលយុត្តិធម៌។",
+    "signals": [
+     "ដោយគ្មានលក្ខណៈវិធីរំលឹក 'អាចលុបចោលភ្លាមៗ'",
+     "ផ្ទះលំនៅដែលមានការពង្延តែម្តង (ច្បាប់គឺ 2 ដងនៃការពង្延)",
+     "ឯកសារពិសេសដែលបង្ខំឱ្យលុបចោលសិទ្ធិស្នើសុំការផ្ដល់ឱ្យឡើងវិញ"
+    ],
+    "tip": "ផ្ទះលំនៅគឺ 2 ដង ហើយហាងលក់ដូច្នេះគឺ 3 ដងនៃការពង្延ដែលជាលក្ខណៈវិធីលុបចោលដែលកំណត់ដោយច្បាប់។ ប្រសិនបើវាត្រូវបានសរសេរឱ្យលុបចោលកាន់តែងាយស្រួល សូមពិនិត្យមើល។"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "ការពន្យឺតក្នុងការត្រឡប់មូលនិធិធានា",
+    "what": "ឯកសារដែលធ្វើឱ្យយឺត ឬកាត់បន្ថយ ឬផ្តល់ឱ្យក្នុងលក្ខណៈផ្សេងទៀតនូវមូលនិធិធានា·ប្រាក់ត្រឡប់មក·ឬលុយដែលបានគណនា។",
+    "signals": [
+     "'បន្ទាប់ពីការបញ្ចប់កិច្ចសន្យា អាចត្រឡប់មក O ខែក្នុងរយៈពេល' ដែលមានរយៈពេលវែង",
+     "ការកាត់ប្រាក់ដែលបានរក្សាទុក·ថ្លៃដើម្បើលើកលែង",
+     "ការត្រឡប់មកដោយគ្មានការប្រាក់ ឬការផ្តល់ឱ្យក្នុងលក្ខណៈកូប៉ុង·ចំណុច"
+    ],
+    "tip": "សូមពិនិត្យមើលថាតើរយៈពេលត្រឡប់មក និងការប្រាក់នៅពេលពន្យឺតត្រូវបានបញ្ជាក់ឬទេ។ ការចុះឈ្មោះលើសិទ្ធិលើផ្ទះលំនៅ·ការធានាប្រឡោះគឺជាវិធានការសុវត្ថិភាព។"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "ការលុបចោលលើការទទួលខុសត្រូវ",
+    "what": "ឯកសារដែលលុបចោលលើការទទួលខុសត្រូវដែលច្បាប់បានផ្តល់ឱ្យម្ខាងទៀត(ការជួសជុល ការទទួលខុសត្រូវលើកង្វល់ ។ល។) ឬលុបចោលលើការទទួលខុសត្រូវដែលបានផ្តល់ឱ្យឱ្យអ្នកប្រើប្រាស់·អ្នកជួល។",
+    "signals": [
+     "'មិនទទួលខុសត្រូវលើរឿងណាក៏ដោយ'",
+     "'ការជួសជុលទាំងអស់គឺជាការទទួលខុសត្រូវរបស់អ្នកជួល'",
+     "ការហាមឃាត់ការលើកលែងលើលក្ខណៈស៊ីវិល·ឧក្រិដ្ឋ"
+    ],
+    "tip": "ពាក្យដូចជា 'ទាំងអស់·ណាក៏ដោយ' គឺជាសញ្ញាសំខាន់។ គណៈកម្មការលម្អិតបានវិនិច្ឆ័យថាឯកសារពិសេសដែលផ្តល់ឱ្យលើការទទួលខុសត្រូវលើការទទួលខុសត្រូវគឺមិនមាន។"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "លក្ខខណ្ឌលើថ្លៃដើម្បើលើកលែង·ការប្រាក់ដែលមិនច្បាស់លាស់",
+    "what": "ឯកសារដែលសរសេរដូច្នេះលុយដែលត្រូវបង់មិនច្បាស់លាស់ពីឯកសារលម្អិតប៉ុណ្ណាក្ដាប់។ ពាក្យដែលមិនច្បាស់លាស់ត្រូវបានបកស្រាយឱ្យប្រសើរឡើងដល់ម្ខាងទៀតក្រោយមក។",
+    "signals": [
+     "ប្រាក់ឈានដល់·ថ្លៃដើម្បើលើកលែងដែលទទេ",
+     "'ការប្រាក់ដែលកំណត់ដោយច្បាប់ដែលជាធម្មតាត្រូវបានកំណត់នៅពេលសម្រេច' ដូចជាលក្ខណៈវិធីមិនច្បាស់លាស់",
+     "'ដោយយោងទៅលើការព្រឹងព្រឹងលម្អិត'"
+    ],
+    "tip": "សូមស្នើឱ្យលេខ និងវិធីសាស្រ្តគណនាក្នុងឯកសារលម្អិត។ គណៈកម្មការលម្អិតបានកំណត់ឱ្យលើការប្រាក់ដែលមិនច្បាស់លាស់ក្នុងលក្ខណៈ 5% ក្នុងឆ្នាំ(ការប្រាក់ដែលកំណត់ដោយច្បាប់ស៊ីវិល)។"
+   },
+   {
+    "id": "trust_notice",
+    "title": "ការជូនដំណឹងលើទំនាស់ក្នុងការទុកប្រាក់·ភាពមិនស្ថិតស្ថេរនៃសិទ្ធិលើម្ចាស់",
+    "what": "ឯកសារដែលផ្ទះគឺជាម្ចាស់របស់ក្រុមហ៊ុនទុកប្រាក់ ដូច្នេះរចនាសម្ព័ន្ធម្ចាស់មិនស្ថិតស្ថេរ ហើយឯកសារពិសេសកាត់បន្ថយការការពារអ្នកជួល។ វាគឺជាលក្ខណៈលម្អិតនៃលក្ខណៈលម្អិតនៃការក្លែងក្លាយលើផ្ទះលំនៅ។",
+    "signals": [
+     "'អ្នកទុកប្រាក់មិនទទួលខុសត្រូវលើការត្រឡប់មូលនិធិធានា'",
+     "'ការលើកលែងដោយគ្មានការយល់ព្រមលម្អិតរបស់អ្នកទុកប្រាក់គឺមិនមាន'",
+     "ការជំរុញឱ្យលុបចោលឯកសារលម្អិតលើការទុកប្រាក់"
+    ],
+    "tip": "សូមពិនិត្យមើលថាតើម្ចាស់នៅក្នុងផ្នែក A នៃឯកសារលម្អិតលើការចុះឈ្មោះគឺក្រុមហ៊ុនទុកប្រាក់ ហើយថាតើលក្ខណៈលម្អិតលើការទុកប្រាក់បង្ហាញថាលក្ខណៈលម្អិតលើការលើកលែងគឺលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត។"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "ការផ្ទេរលើការចំណាយ·ពន្ធលើការផ្ទេរលើការចំណាយ",
+    "what": "ឯកសារដែលផ្ទេរលើការចំណាយដែលម្ចាស់·អ្នកលក់ត្រូវបង់ដោយច្បាប់ឱ្យអ្នកប្រើប្រាស់·អ្នកជួល។",
+    "signals": [
+     "ពន្ធលើម្ចាស់(ពន្ធលើទ្រព្យសម្បត្តិ·ពន្ធលើការទិញ)ឱ្យអ្នកជួល",
+     "ការផ្ទេរលើការជួសជុល·ការថែរក្សារបស់អ្នកលើកលែង",
+     "ការស្នើឱ្យទទួលខុសត្រូវលើការកំណត់ការផ្តាច់ក្រោយ"
+    ],
+    "tip": "សូមសួរថាតើលុយនោះគឺជាលក្ខណៈលម្អិតលើការទទួលខុសត្រូវដោយច្បាប់។ វាខុសគ្នាពីលុយលើការប្រើប្រាស់ពិតប្រាកដ(អគ្គិសនី·ទឹក)។"
+   },
+   {
+    "id": "benefit_change",
+    "title": "ការផ្លាស់ប្តូរលើការផ្តល់ឱ្យ·លក្ខខណ្ឌដោយម្ខាង",
+    "what": "ឯកសារដែលម្ខាងទៀតអាចផ្លាស់ប្តូរលើលក្ខខណ្ឌកិច្ចសន្យា(ឯកសារលម្អិត·ការប្រាក់·លក្ខខណ្ឌលើការផ្តល់ឱ្យ)ដោយគ្មានការយល់ព្រម។",
+    "signals": [
+     "'ក្រុមហ៊ុនអាចផ្លាស់ប្តូរដោយចិត្តឯង'",
+     "បន្ទាប់ពីការជូនដំណឹងលើការផ្លាស់ប្តូរ ប្រសិនបើគ្មានការឆ្លើយ 'វាត្រូវបានគេមើលថាយល់ព្រម'",
+     "ការផ្លាស់ប្តូរលើលក្ខខណ្ឌលើការផ្តល់ឱ្យដោយលក្ខណៈលម្អិតលើក្រុមហ៊ុន"
+    ],
+    "tip": "សូមពិនិត្យមើលថាតើការផ្លាស់ប្តូរមានការជូនដំណឹងលម្អិត និងសិទ្ធិលើការបដិសេធ(លុបចោល)។ ឯកសារលម្អិតលើការយល់ព្រមដោយលក្ខណៈលម្អិតគឺជាលក្ខណៈលម្អិតដែលបានលុបចោលម្តងហើយម្តងទៀត។"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "ការកំណត់លើសិទ្ធិលើការជ្រើសរើស·ការបង្ខំឱ្យទិញ",
+    "what": "ឯកសារដែលបង្ខំឱ្យប្រើប្រាស់ផលិតផល·ក្រុមហ៊ុនជាក់លាក់ ឬលុបចោលលើសិទ្ធិលើការជ្រើសរើសរបស់អ្នកប្រើប្រាស់(រួមទាំងការលក់ដែលបង្ខំ)។",
+    "signals": [
+     "'តែប៉ុណ្ណាក្ដាប់តាមរយៈក្រុមហ៊ុនដែលបានកំណត់'",
+     "ការចុះឈ្មោះលើផលិតផលដែលបង្ខំ",
+     "ពាក្យដែលលុបចោលលើលក្ខណៈលម្អិតលើការជ្រើសរើស"
+    ],
+    "tip": "សូមសួរថាតើលក្ខណៈលម្អិតលើការប្រើប្រាស់·ការទិញដែលបង្ខំគឺចាំបាច់សម្រាប់គោលបំណងលើកិច្ចសន្យា ហើយថាហេតុផលលុបចោលលើលក្ខណៈលម្អិតលើការជ្រើសរើស។"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "ការកំណត់លើការប្រើប្រាស់សិទ្ធិ",
+    "what": "ឯកសារដែលលុបចោលលើសិទ្ធិដែលច្បាប់បានផ្តល់ឱ្យ(សិទ្ធិលើលុបចោល·សិទ្ធិលើលើកលែង·សិទ្ធិលើការលើកឡើង訴訟)។",
+    "signals": [
+     "'ឯកសារលម្អិតលើការលើកលែងលើការលើកលែង'",
+     "ការកំណត់លើរយៈពេល·វិធីសាស្រ្តលើការប្រើប្រាស់សិទ្ធិលើលុបចោលដែលលើសលប់",
+     "ការលុបចោលលើការលើកឡើង訴訟·ឯកសារលម្អិតលើការលើកឡើង訴訟"
+    ],
+    "tip": "សិទ្ធិលើច្បាប់មិនអាចលុបចោលដោយឯកសារលម្អិត។ មានករណីលុបចោលដោយច្បាប់លើការគ្រប់គ្រងលើឯកសារលម្អិត·ច្បាប់លើការលក់ដោយលក្ខណៈលម្អិត។"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "បន្ទាប់ពីការប្រតិបត្តិលើការងារ ឯកសារលម្អិតលើការត្រឡប់មក 20% នៃថ្លៃដើម្បើលើកលែង(ការលើកលែង 80%)ត្រូវបានមើលថាជាការលើកលែងលើការខាតបង់ដែលលើសលប់ ដូច្នេះការលើកលែងលើការលើកលែងគឺគ្មាន ហើយការត្រឡប់មកពេញលេញត្រូវបានបង្កើត",
+   "신발도매_2013": "ឯកសារលម្អិតលើការលើកលែង 50% នៃលក្ខណៈលម្អិតលើលុបចោលលើលក្ខណៈលម្អិត — ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត(2004약제2214) ហើយលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតគឺលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ដូច្នេះការលើកលែងលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតត្រូវបានបង្កើត",
+   "2019-18b": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ពាក្យលម្អិត 'មិនមាន' គឺមិនច្បាស់លាស់ ដូច្នេះឯកសារលម្អិតលើលក្ខណៈលម្អិតត្រូវការលម្អិត",
+   "2005-41": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ហើយលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ដូច្នេះឯកសារលម្អិតលើលក្ខណៈលម្អិតត្រូវបានលុបចោល",
+   "즉시연금_2017-17": "ការផ្តល់ឱ្យលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ត្រូវបានវិនិច្ឆ័យថាលើកលែងលើឯកសារលម្អិត",
+   "바로연금보험_2018-8": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ដោយលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត",
+   "2019-18a": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ត្រូវបានលុបចោល ដូច្នេះលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលុបចោលត្រូវបានបដិសេធ",
+   "990": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ច្បាប់លើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ឆ្នាយ 6 នៃ 3 ឆ្នាយ 1 ត្រូវបានលើកលែង ដូច្នេះឯកសារលម្អិតលើលក្ខណៈលម្អិតគឺមិនមាន",
+   "2008_약관변경동의간주": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ច្បាប់លើលក្ខណៈលម្អិត ឆ្នាយ 12 ត្រូវបានលើកលែង ដូច្នេះលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតត្រូវបានបដិសេធ",
+   "2010_ELS조건조정": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ហើយលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត",
+   "20": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត ត្រូវបានលុបចោល",
+   "2008_직불카드양도": "ឯកសារលម្អិតលើលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត — ដោយលក្ខណៈលម្អិតលើលក្ខណៈលម្អិត លក្ខណៈលម្អិតលើលក្ខណៈលម្អិតត្រូវបានកំណត់ក្នុង 40%"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "ការលុបលែងលក្ខណ្ឌទុកចិត្ត",
+    "what": "ផ្ទះគឺជាម្ចាស់ដោយក្រុមហ៊ុនទុកចិត្ត ហើយលក្ខណ្ឌពិសេសបញ្ជាក់ថា 'ក្រុមហ៊ុនទុកចិត្តមិនទទួលខុសត្រូវក្នុងការត្រឡប់ប្រាក់ធានា' ។ អ្នកជួលបាត់បង់ឱកាសស្នើសុំច្បាប់របស់ពួកគេ។",
+    "signal": "លក្ខណ្ឌមាន 'អ្នកទុកចិត្ត' 'ទុកចិត្ត' 'មិនទទួលខុសត្រូវក្នុងការត្រឡប់' 'មិនលើកកម្ពស់ការជំទាស់' ។",
+    "outside": "ពិនិត្យក្នុងឯកសារចុះឈ្មោះថាតើម្ចាស់គឺក្រុមហ៊ុនទុកចិត្ត ។ ទទួលបានឯកសារទុកចិត្តដើម្បីផ្ទៀងផ្ទាត់ថាអ្នកណាមានសិទ្ធិជួល ។",
+    "case": "ករណីលម្អិតលម្អិតផ្នែកហិរញ្ញវត្ថុច្រើន — ប្រភេទដែលលក្ខណ្ឌលុបលែងអ្នកទុកចិត្តរារាំងការស្ដារប្រាក់ធានា (ស្តង់ដារ A)។"
+   },
+   {
+    "id": "gap",
+    "title": "ផ្ទះទេពូជ (សមាមាត្របំណុលលើសពីលេខ)",
+    "what": "ប្រាក់ធានា + ឥណទាននឹងលើសលើតម្លៃផ្ទះ ឬស្មើគ្នា ។ ប្រសិនបើផ្ទះត្រូវបានលក់ដោយសាលក្តីវិচារណ៍ អ្នកជួលមិនបានប្រាក់ធានាពេញលេញ ។",
+    "signal": "មិនឃើញក្នុងឯកសារលម្អិតលម្អិត — នោះហើយមូលហេតុដែលវាគ្រោះថ្នាក់ ។ ប្រាក់ធានាធំបើប្រៀបធៀបនឹងតម្លៃ ហើយម្ចាស់ប្រឹងប្រែង ។",
+    "outside": "សមាមាត្របំណុល = (ឥណទាននឹងលើស + ប្រាក់ធានា) ÷ តម្លៃ ។ ៩០% ឬលើស — ការស្រាវស្រាវបង្ហាញថា ១៧.៦% នៃកិច្ចសន្យាមានគ្រោះថ្នាក់ (ស្តង់ដារ ០.២%) ។ ប្រើម៉ាស៊ីនគណនាក្នុងលទ្ធផល ។",
+    "case": "An Seon-young · Lee Sang-yeop (2025) ស្រាវស្រាវលម្អិតលម្អិត ៤៥ម៉ាននៃតំបន់រាជធានី — អត្រាគ្រោះថ្នាក់ ១៧.៦% នៅក្នុងចន្លោះ ៩០% ឬលើស ។"
+   },
+   {
+    "id": "double",
+    "title": "កិច្ចសន្យាទ្វេ",
+    "what": "ផ្ទះដូចគ្នាត្រូវបានលក់ឱ្យអ្នកជួលច្រើននាក់ ឬអ្នកគ្រប់គ្រងលក់ឯកសារក្លែងក្លាយដោយមិនដឹងរបស់ម្ចាស់ ។ ប្រសិនបើលំដាប់ការពារខ្សោយ អ្នកជួលបាត់ប្រាក់ធានា ។",
+    "signal": "ភាគីលក់ខុសពីម្ចាស់ក្នុងឯកសារចុះឈ្មោះ ហើយលិខិតអនុញ្ញាតមិនច្បាស់លាស់ ។ តម្លៃថោកជាងតម្លៃ ហើយប្រឹងប្រែងលក់រហ័ស ។",
+    "outside": "លក់ដោយម្ចាស់ក្នុងឯកសារចុះឈ្មោះដោយផ្ទាល់ (ពិនិត្យលេខសម្គាល់) ។ ប្រសិនបើលិខិតអនុញ្ញាត ពិនិត្យលិខិតអនុញ្ញាតដែលមានលេខសម្គាល់ ។ ប្រាក់ចុងក្រោយត្រូវលក់ទៅគណនីម្ចាស់ប៉ុណ្ណោះ ។",
+    "case": "ប្រភេទដែលម្ដងហើយម្ដងទៀតក្នុងគណៈកម្មការលម្អិតលម្អិត — ការលក់ដោយគ្មានសិទ្ធិ ។"
+   },
+   {
+    "id": "appraisal",
+    "title": "ពង្រីកតម្លៃ (ការប្រើប្រាស់ការវាយតម្លៃ)",
+    "what": "វីឡាថ្មីដែលគ្មានការលក់ពិតប្រាកដ ដែលប្រើការវាយតម្លៃដើម្បីពង្រីកតម្លៃ ហើយទទួលប្រាក់ធានាស្មើតម្លៃ ឬលើស ។ វាចាប់ផ្តើមជាផ្ទះទេពូជ ។",
+    "signal": "ផ្តោតលើ 'តម្លៃវាយតម្លៃ O ពាន់លាន' ហើយមិនបង្ហាញទិន្នន័យការលក់ពិតប្រាកដ ។ ឈានឡើងក្នុងលំនៅឋានថ្មីដែលមានលម្អិត ។",
+    "outside": "ពិនិត្យក្នុងប្រព័ន្ធលម្អិតលម្អិតរបស់ក្រសួងដីធ្លីដោយផ្ទាល់ ។ ការស្រាវស្រាវបង្ហាញថាការវាយតម្លៃផ្អែកលើឯកទេស មានលទ្ធភាព ៤.៨ដង ។",
+    "case": "An Seon-young · Lee Sang-yeop (2025) — ឯកទេស (វាយតម្លៃ) Exp(B) 4.8, លម្អិតលម្អិត 5.8 ដង ។"
+   },
+   {
+    "id": "proxy",
+    "title": "ម្ចាស់ផ្ទះក្លែងក្លាយ · ម្ចាស់ផ្ទះក្រុមហ៊ុន",
+    "what": "មនុស្សគ្មានទ្រព្យសម្បត្តិ ឬក្រុមហ៊ុនក្រដាស់ ឈ្មោះលក់ផ្ទះ ។ ប្រសិនបើមានគ្រោះថ្នាក់ គ្មានទ្រព្យសម្បត្តិដែលត្រូវត្រឡប់ ។",
+    "signal": "ម្ចាស់ផ្ទះគឺក្រុមហ៊ុន ប៉ុន្តែមិនច្បាស់លាស់ ។ មាលីកម្មផ្លាស់ប្តូរមុនលក់ (ឯកសារចុះឈ្មោះថ្មីៗ) ។",
+    "outside": "ពិនិត្យក្នុងឯកសារចុះឈ្មោះថាតើម្ចាស់ផ្លាស់ប្តូរថ្មីៗ ។ ម្ចាស់ផ្ទះក្រុមហ៊ុនមានលទ្ធភាព ៣.៦ដង — ពិនិត្យក្នុងឯកសារចុះឈ្មោះក្រុមហ៊ុន ។",
+    "case": "An Seon-young · Lee Sang-yeop (2025) — ម្ចាស់ផ្ទះក្រុមហ៊ុន Exp(B) 3.6 (អត្រាគ្រោះថ្នាក់ ២០.៤% ធៀបនឹងបុគ្គល ៤.៨%) ។"
+   }
+  ]
+ },
+ "my": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "အလွန်အကျွံသော စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်း",
+    "what": "စာချုပ်ကို ဖျက်သိမ်းခြင်း သို့မဟုတ် ချိုးဖောက်သည့်အခါ ပေးချေရမည့် ငွေကို အမှန်တကယ် ဆုံးရှုံးမှုထ다် များစွာ ကြီးမားစွာ သတ်မှတ်ထားသည့် စာချုပ်ကြ款။ 'စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်း' ဟူသော စကားလုံးမရှိသည့်တောင် အရေးယူခြင်းအရ ဆုံးရှုံးမှု အစီအစဉ်ဖြစ်လျှင် ဆိုင်ရာဖြစ်သည်။",
+    "signals": [
+     "စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်း၊ အရေးယူခြင်း ဒဏ်ခတ်ခြင်း၊ နှစ်ဆ ဆုံးရှုံးမှု အစီအစဉ်",
+     "ဖျက်သိမ်းသည့်အခါ ကျန်ရှိသည့် ကာလ အခကြေးငွေ အားလုံး ကောက်ခံခြင်း",
+     "အချိန်အလိုက် တွက်ချက်မှု ဖယ်ရှားခြင်း",
+     "ဝယ်ယူသူ ကျေးဇူးမခံ အတိုးနှုန်း တစ်ဖက်သတ် မြင့်မားသည့် အမှီအခိုကင်း ဒီဇိုင်း"
+    ],
+    "tip": "အမှန်တကယ် ဆုံးရှုံးမှုနှင့် အချိုးအစားကျ ကြောင်း မေးမြန်းပါ။ တရားရုံးများသည် အလွန်အကျွံသော စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်းကို လျှော့ချခဲ့သည်(အုပ်စုံ ဥပဒေ အခန်း ၃၉၈)။"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "တစ်ဖက်သတ် စာချုပ်ဖျက်သိမ်းခြင်း",
+    "what": "ဆန့်ကျင်ဖက်သည် အစီအစဉ်အလိုက် သတိပေးခြင်း သို့မဟုတ် တရားဝင်သော အကြောင်းအရာ မရှိဘဲ စာချုပ်ကို ချက်ချင်း အဆုံးသတ်နိုင်သည့် စာချုပ်ကြ款။",
+    "signals": [
+     "သတိပေးခြင်း(အခိုင်းအခြင်း) လုပ်ငန်းစဉ် မရှိဘဲ 'ချက်ချင်း ဖျက်သိမ်းနိုင်သည်'",
+     "အိမ်ရာ ဖြစ်သည့်တွင် တစ်ကြိမ် ကျေးဇူးမခံ သာလျှင် ဖျက်သိမ်းခြင်း(ဥပဒေသည် နှစ်ကြိမ် ကျေးဇူးမခံ စံချက်)",
+     "ပြန်လည်ရွေးချယ်ခွင့် ကျေးဇူးကို စွန့်လွှတ်စေသည့် အထူးစာချုပ်"
+    ],
+    "tip": "အိမ်ရာသည် နှစ်ကြိမ်၊ စီးပွားရေး ဆိုင်ရာ ဆောင်းပါးသည် သုံးကြိမ် ကျေးဇူးမခံ ဖြစ်သည့် ဥပဒေအခြေခံ ဖျက်သိမ်းခြင်း စံချက်ဖြစ်သည်။ ထိုထက် လွယ်ကူစွာ ဖျက်သိမ်းရန် ရေးသားထားလျှင် အတည်ပြုခြင်း အရာဖြစ်သည်။"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "အာမခံငွေ ပြန်အမ်းခြင်း ကျေးဇူးမခံခြင်း",
+    "what": "အာမခံငွေ၊ ပြန်အမ်းခြင်း ငွေ၊ သို့မဟုတ် ကျေးဇူးမခံ ငွေကို နှေးကွေးစွာ၊ လျှော့ချစွာ၊ သို့မဟုတ် အခြား အရာဖြင့် ပြန်အမ်းစေသည့် စာချုပ်ကြ款။",
+    "signals": [
+     "'စာချုပ်အဆုံးသတ်ပြီးနောက် အချိန်ကာလ အတွင်း ပြန်အမ်းနိုင်သည်' ကဲ့သို့ အချိန်ကာလ ရှည်လျားစွာ",
+     "ကျေးဇူးမခံ ငွေ၊ အခကြေးငွေ တစ်ခြား ကျေးဇူးမခံခြင်း",
+     "အတိုးမဲ့ ပြန်အမ်းခြင်း၊ အစီအစဉ်ကဒ်၊ အမှတ်အသားအစား ပေးချေခြင်း"
+    ],
+    "tip": "ပြန်အမ်းခြင်း အချိန်ကာလ နှင့် ကျေးဇူးမခံခြင်း အတိုးနှုန်း ရှင်းလင်းစွာ သတ်မှတ်ထားသည်ကို အတည်ပြုပါ။ အာမခံငွေ ပြန်အမ်းခြင်း အခွင့်အရေး မှတ်ပုံတင်ခြင်း၊ အာမခံ အာမခံ ကြေးငွေ ကင်းလွတ်သည့် ကိရိယာ ဖြစ်သည်။"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "တာဝန်ခွင့်လွှတ်ခြင်း",
+    "what": "ဥပဒေသည် ဆန့်ကျင်ဖက်ကို အပ်နှင်းသည့် တာဝန်(ပြုပြင်ခြင်း တာဝန်၊ ချိုးမှားမှု အာမခံ တာဝန် စသည်)ကို အားလုံး စားသုံးသူ၊ အငှားခံသူထံ လွှဲပြောင်းခြင်း သို့မဟုတ် ခွင့်လွှတ်ခြင်း စာချုပ်ကြ款။",
+    "signals": [
+     "'အားလုံး(မည်သည့်) တာဝန်ကိုမျှ မယူခြင်း'",
+     "'အားလုံး ပြုပြင်ခြင်း အခကြေးငွေသည် အငှားခံ တာဝန်'",
+     "အုပ်စုံ၊ ရုံးတင် အခွင့်အရေး ကန့်သတ်ခြင်း"
+    ],
+    "tip": "'အားလုံး၊ အားလုံး' ကဲ့သို့သော အကျုံးဝင် စာသားများသည် အဓိက အချက်အလက်ဖြစ်သည်။ ညှိနှိုင်းရုံး သည် အကျုံးဝင် တာဝန် လွှဲပြောင်းခြင်း အထူးစာချုပ်ကို အကျုံးမဝင်ဟု ဆုံးဖြတ်ခဲ့သည်။"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "မရှင်းလင်းသော အခကြေးငွေ၊ အတိုးနှုန်း အခြေအနေ",
+    "what": "မည်မျှ ပေးချေရမည်ကို စာချုပ်ကိုသာ ကြည့်ရှုခြင်းအားဖြင့် မသိနိုင်သည့် စာချုပ်ကြ款။ မရှင်းလင်းသော စာသားများသည် နောက်ပိုင်းတွင် ဆန့်ကျင်ဖက်အတွက် အလျှင်းမဲ့ အကျုံးဝင်သည့် နည်းလမ်းဖြစ်သည်။",
+    "signals": [
+     "အတိုးနှုန်း၊ အခကြေးငွေ နှုန်း အကွက် ကွက်လပ်",
+     "'ယေဘုယျအားဖြင့် ဆုံးဖြတ်ချက်အခါ သတ်မှတ်သည့် ဥပဒေအခြေခံ အတိုးနှုန်း' ကဲ့သို့သော မရှင်းလင်းသော စံချက်",
+     "'အထူးစာချုပ်အလိုက်' ဟူသော စာသား"
+    ],
+    "tip": "ဂဏန်းများ နှင့် တွက်ချက်မှု နည်းလမ်းကို စာချုပ်တွင် ရေးသားရန် တောင်းဆိုပါ။ မရှင်းလင်းသော အတိုးနှုန်း စာသားကို ညှိနှိုင်းရုံးသည် နှစ်စဉ် ၅%(အုပ်စုံ ဥပဒေ ဥပဒေအခြေခံ အတိုးနှုန်း)သို့ ကန့်သတ်ခဲ့သည့် ကိစ္စရှိသည်။"
+   },
+   {
+    "id": "trust_notice",
+    "title": "အယုံအကြည် ဆက်ဆံရေး၊ ပိုင်ဆိုင်မှု အခွင့်အရေး မတည်ဆောက်သော အသိပေးခြင်း",
+    "what": "အိမ်သည် အယုံအကြည် ကုမ္ပဏီ ပိုင်ဆိုင်သည့်အတွက် ပိုင်ဆိုင်မှု အခွင့်အရေး ဖွဲ့စည်းမှု မတည်ဆောက်သည့်တွင် အထူးစာချုပ်အားဖြင့် အငှားခံ ကာကွယ်မှုကို လျှော့ချသည့် စာချုပ်ကြ款။ အိမ်အငှား လုယူမှု လှည့်ဖြားမှု၏ အဓိက ပုံစံ တစ်ခုဖြစ်သည်။",
+    "signals": [
+     "'အယုံအကြည်ခံ(အယုံအကြည် ကုမ္ပဏီ)သည် အာမခံငွေ ပြန်အမ်းခြင်း တာဝန် မရှိသည်'",
+     "'အယုံအကြည်ခံ အစီအစဉ်အလိုက် အငှားခြင်းသည် အကျုံးမဝင်သည်'",
+     "အယုံအကြည် မူလစာရွက် အတည်ပြုခြင်း မရှိဘဲ စာချုပ်ကို အလျင်အမြန်တောင်းဆိုခြင်း"
+    ],
+    "tip": "မှတ်ပုံတင်ခြင်း အခန်း(ကျ)တွင် ပိုင်ဆိုင်သူသည် အယုံအကြည် ကုမ္ပဏီ ဖြစ်သည်ကို၊ အယုံအကြည် မူလစာရွက်တွင် အငှားခြင်း အခွင့်အရေး မည်သည့်အရာ ရှိသည်ကို အတည်ပြုပါ။"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "အကျုံးမဝင်သော အခကြေးငွေ၊ အခွန် လွှဲပြောင်းခြင်း",
+    "what": "ဥပဒေအရ ဆန့်ကျင်ဖက်(ပိုင်ဆိုင်သူ၊ စီးပွားရေး လုပ်ငန်းလုပ်သူ)သည် ဆောင်ရွက်ရမည့် အသုံးအဆောင်ကို စားသုံးသူ၊ အငှားခံထံ လွှဲပြောင်းသည့် စာချုပ်ကြ款။",
+    "signals": [
+     "ပိုင်ဆိုင်သူ ဆောင်ရွက်သည့် အခွန်(ပိုင်ဆိုင်မှု အခွန်၊ ရယူမှု အခွန်)ကို အငှားခံထံ",
+     "အငှားခွင့်ပေးသူ၏ ပြုပြင်ခြင်း၊ ထိန်းသိမ်းခြင်း အခကြေးငွေ လွှဲပြောင်းခြင်း",
+     "အောက်ခံ အရံ သတ်မှတ်ခြင်း အခကြေးငွေ ဆောင်ရွက်ခြင်း တောင်းဆိုခြင်း"
+    ],
+    "tip": "ထိုအခကြေးငွေသည် ဥပဒေအရ မည်သည့်အရာ ဆောင်ရွက်သည်ကို မေးမြန်းပါ။ ကိုယ်တိုင် အမှန်တကယ် အသုံးပြုသည့် အများသုံး အခကြေးငွေ(လျှပ်စစ်၊ ရေ)နှင့် ခွဲခြားပါ။"
+   },
+   {
+    "id": "benefit_change",
+    "title": "တစ်ဖက်သတ် အကျိုးအခြင်း၊ အခြေအနေ ပြောင်းလဲခြင်း",
+    "what": "ဆန့်ကျင်ဖက်သည် စာချုပ်အကြောင်းအရာ(စည်းမျဉ်းစည်းကမ်း၊ အတိုးနှုန်း၊ ပေးချေမှု အခြေအနေ)ကို သဘောတူညီမှု မရှိဘဲ ပြောင်းလဲနိုင်သည့် စာချုပ်ကြ款။",
+    "signals": [
+     "'ကုမ္ပဏီသည် အလိုအလျောက် ပြောင်းလဲနိုင်သည်'",
+     "ပြောင်းလဲမှု သတိပေးပြီးနောက် အလုံးစုံ မုံးမိုးခြင်းသည် 'သဘောတူညီသည်ဟု ယူဆသည်'",
+     "ပေးချေမှု အခြေအနေကို ကုမ္ပဏီ အလိုအလျောက် ညှိနှိုင်းခြင်း"
+    ],
+    "tip": "ပြောင်းလဲမှုအခါ အစီအစဉ်အလိုက် သတိပေးခြင်း နှင့် ငြင်းဆန်ခွင့်(ဖျက်သိမ်းခွင့်) ကာကွယ်ထားသည်ကို အတည်ပြုပါ။ သဘောတူညီမှု ယူဆသည့် စာချုပ်ကြည့်ခြင်းသည် ညှိနှိုင်းရုံးတွင် ထပ်မံ ကန့်သတ်ခံခဲ့သည့် အမျိုးအစားဖြစ်သည်။"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "အခွင့်အရေး ကန့်သတ်ခြင်း၊ ဝယ်ယူမှု အတင်းအကျပ်",
+    "what": "အချို့သော ထုတ်ကုန်၊ လုပ်ငန်းလုပ်သူ အသုံးပြုမှုကို အတင်းအကျပ်ခိုင်းခြင်း သို့မဟုတ် စားသုံးသူ၏ အခွင့်အရေးကို ကန့်သတ်သည့် စာချုပ်ကြ款်(ထည့်သွင်းအရောင်းအဝယ် အပါအဝင်)။",
+    "signals": [
+     "'သတ်မှတ်ထားသည့် လုပ်ငန်းလုပ်သူမှ သာလျှင်'",
+     "ဆက်စပ်သည့် ထုတ်ကုန် အတင်းအကျပ် ဝင်ရောက်ခြင်း",
+     "အခြား အခွင့်အရေးကို ဖယ်ရှားသည့် စာသား"
+    ],
+    "tip": "အတင်းအကျပ်ခိုင်းသည့် အသုံးပြုမှု၊ ဝယ်ယူမှုသည် စာချုပ်ရည်ရွယ်ချက်အတွက် အလွန်လိုအပ်သည်ကို၊ အခြား အခွင့်အရေးများ အဘယ်ကြောင့် ကန့်သတ်ထားသည်ကို မေးမြန်းပါ။"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "အခွင့်အရေး ကျင့်သုံးခြင်း ကန့်သတ်ခြင်း",
+    "what": "ဥပဒေသည် ကာကွယ်သည့် အခွင့်အရေး(ဖျက်သိမ်းခွင့်၊ အခွင့်အရေး ကျင့်သုံးခြင်း၊ တရားဆိုင်ရာ အရေးယူခြင်း စသည်)ကို မကျင့်သုံးနိုင်သည့် စာချုပ်ကြ款။",
+    "signals": [
+     "'အခွင့်အရေး ကျင့်သုံးခြင်းကို မပြုလုပ်ရန် အတည်ပြုခြင်း'",
+     "ဖျက်သိမ်းခွင့် ကျင့်သုံးခြင်း အချိန်ကာလ၊ နည်းလမ်းကို အလွန်အကျွံ ကန့်သတ်ခြင်း",
+     "တရားဆိုင်ရာ အရေးယူခြင်း ကန့်သတ်ခြင်း၊ အခွင့်အရေး ကျင့်သုံးခြင်း မခွင့်ပြုခြင်း"
+    ],
+    "tip": "ဥပဒေအခြေခံ အခွင့်အရေးများသည် အထူးစာချုပ်အားဖြင့်လည်း အလွယ်တကူ ဆုံးရှုံးမည် မဟုတ်သည်။ စည်းမျဉ်းစည်းကမ်း ကန့်သတ်ခြင်း ဥပဒေ၊ အရံငွေ ကုန်သည်ခြင်း ဥပဒေ ချိုးဖောက်မှုအဖြစ် ဖယ်ရှားခဲ့သည့် ကိစ္စရှိသည်။"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "အလုပ်ကိုင်ဆောင်ရွက်ပြီးနောက် အခကြေးငွေ ၂၀% သာ ပြန်အမ်းခြင်း(စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်း ၈၀%)စာချုပ်ကြည့်ခြင်းကို အကျုံးမဝင်သော အလွန်အကျွံ ဆုံးရှုံးမှု အစီအစဉ်အဖြစ် ယူဆ စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်း မရှိဘဲ အားလုံး ပြန်အမ်းခြင်း ညှိနှိုင်းခြင်း အောင်မြင်",
+   "신발도매_2013": "ကုန်သည်ခြင်း ဖျက်သိမ်းခြင်း အခါ ကုန်သည်ခြင်း အခကြေးငွေ ၅၀% စာချုပ်ချိုးဖောက်မှု ဒဏ်ခတ်ခြင်း စာချုပ်ကြည့်ခြင်း — အများသုံးကုန်သည်ခြင်း အဖွဲ့ အစီအစဉ်(၂၀၀၄ အခွန်ကုန်သည်ခြင်း ၂၂၁၄)နှင့် အရေးအခင်းအချက် အတူတူ စာချုပ်ချိုးဖောက်မှု အရေးယူခြင်း အချို့ ပြန်အမ်းခြင်း ညှိနှိုင်းခြင်း အောင်မြင်",
+   "2019-18b": "အာမခံ အာမခံ ပေးချေမှု အထူးစာချုပ်စာရွက်၏ အခွင့်အရေး ကျင့်သုံးခြင်း စွန့်လွှတ်ခြင်း အတည်ပြုခြင်း — 'အကျုံးမဝင်' စာသားသည် မရှင်းလင်းသည့်အတွက် စည်းမျဉ်းစည်းကမ်း ပြင်ဆင်ခြင်း လိုအပ်သည်ဟု ညွှန်ပြခြင်း",
+   "2005-41": "ရင်းနှီးမြုပ်နှံမှု အကြံပြုခြင်း စာချုပ်၏ စားသုံးသူ ဖျက်သိမ်းခွင့် ကန့်သတ်ခြင်း စာချုပ်ကြည့်ခြင်း — စည်းမျဉ်းစည်းကမ်း ကန့်သတ်ခြင်း ဥပဒေ ရှင်းလင်းခြင်း၊ ရှင်းလင်းခြင်း တာဝန် ချိုးဖောက်မှု နှင့် လည်ပတ်ရောင်းချခြင်း ဥပဒေ အလိုအလျောက် ဖျက်သိမ်းခွင့် ကျိုးကျော်ခြင်းအဖြစ် အသုံးမပြုခြင်း",
+   "즉시연금_2017-17": "အနည်းဆုံး အာမခံ အတိုးနှုန်း အောက်တွင် ငွေစုကို ပေးချေခြင်းသည် စည်းမျဉ်းစည်းကမ်း ချိုးဖောက်မှုအဖြစ် ဆုံးဖြတ်ခြင်း",
+   "바로연금보험_2018-8": "အဆုံးသတ် အာမခံ ငွေ လျှော့ချခြင်း အခြေခံ မရှင်းလင်းသည့် စာချုပ်ကြည့်ခြင်း — ရေးသားသူ အကျုံးမဝင်သည့် အခြေခံ အုပ်စုံအလိုက် စားသုံးသူအတွက် အလျှင်းမဲ့ အကျုံးဝင်သည့် နည်းလမ်းဖြင့် အဓိပ္ပါယ်ဖွင့်ဆိုခြင်း",
+   "2019-18a": "ငွေချေးငွေ ကုန်သည်ခြင်း အခြေခံ စည်းမျဉ်းစည်းကမ်း၏ တစ်ဖက်သတ် ဖျက်သိမ်းခြင်း စာချုပ်ကြည့်ခြင်း — အများသုံးကုန်သည်ခြင်း အဖွဲ့ အကျုံးမဝင်သည့် ဆုံးဖြတ်ချက်ကို ကိုးကားခြင်း ဖျက်သိမ်းခြင်း အခြေခံ အကျုံးမဝင်သည့် အခွင့်အရေး",
+   "990": "အငှားခံ၏ စာချုပ် ပြန်လည်ရွေးချယ်ခွင့် စွန့်လွှတ်ခြင်း အထူးစာချုပ် — အိမ်ရာ အငှားခြင်း ကာကွယ်မှု ဥပဒေ အခန်း ၆ အခွဲ ၃ အခြမ်း ၁ ချိုးဖောက်မှုအဖြစ် အထူးသဖြင့် အခြေအနေ မရှိဘဲ အကျုံးမဝင်",
+   "2008_약관변경동의간주": "အချို့သော အချိန်ကာလ အခွင့်အရေး ကျင့်သုံးခြင်း မရှိလျှင် စည်းမျဉ်းစည်းကမ်း ပြောင်းလဲခြင်းကို သဘောတူညီသည်ဟု ယူဆသည့် စာချုပ်ကြည့်ခြင်း — စည်းမျဉ်းစည်းကမ်း ကန့်သတ်ခြင်း ဥပဒေ အခန်း ၁၂ ချိုးဖောက်မှုအဖြစ် ကျိုးကျော်သည့် အခွင့်အရေး",
+   "2010_ELS조건조정": "ထုတ်ပြန်သူ အလိုအလျောက် ပေးချေမှု အခြေအနေကို ညှိနှိုင်းနိုင်သည့် စာချုပ်ကြည့်ခြင်း — ချဲ့ထွင်သည့် အသုံးပြုမှုကို ကန့်သတ်သည့် အဓိပ္ပါယ်ဖွင့်ဆိုခြင်းအားဖြင့် ထိန်းချုပ်ခြင်း နှင့် ပေးချေမှု အမိန့်",
+   "20": "အိမ်ရာ ပြုပြင်ခြင်း အခကြေးငွေ အားလုံးကို အငှားခံ တာဝန်အဖြစ် သတ်မှတ်သည့် အထူးစာချုပ် — အငှားခွင့်ပေးသူ၏ ဥပဒေအခြေခံ ထိန်းသိမ်းခြင်း တာဝန်ကို အကျုံးဝင် လွှဲပြောင်းခြင်းအဖြစ် အကျုံးမဝင် အတည်ပြုခြင်း",
+   "2008_직불카드양도": "ကဒ်ကို လွှဲပြောင်းခြင်း အခါ အားလုံး တာဝန်ကို ယူသည့် စာချုပ်ကြည့်ခြင်း — အခြင်းအခြာ ဖြန့်ဝေမှု ဆုံးဖြတ်ချက်အလိုက် အဖွဲ့ဝင် တာဝန်ကို ၄၀% သို့ ကန့်သတ်ခြင်း"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "ယုံကြည်မှု လွှတ်ပြန်ခွင့် အထူးစာချုပ်",
+    "what": "အိမ်သည် ယုံကြည်မှု ကုမ္ပဏီ၏ ပိုင်ဆိုင်မှုဖြစ်ပြီး၊ အထူးစာချုပ်မှ 'ယုံကြည်မှု ကုမ္ပဏီသည် ငှားခခြင်း ပြန်အခြင်း တာဝန်မရှိ' ဟု သတ်မှတ်သည့် နည်းလမ်း။ ငှားစားသူသည် ငှားခ ပြန်အခြင်းအတွက် ဥပဒေအရ တောင်းခံရန် ရည်ရွယ်သည့် အရာ ပျောက်ဆုံးသွားသည်။",
+    "signal": "အထူးစာချုပ်တွင် 'ယုံကြည်မှု ကိုင်တွယ်သူ'၊ 'ယုံကြည်မှု'၊ 'ပြန်အခြင်း တာဝန်မရှိ'၊ 'ကန့်သတ်ချက်မထုတ်ဖော်ခြင်း' ကဲ့သို့သော စာသားများ။",
+    "outside": "မှတ်ပုံတင်စာရွက်၏ အပိုင်း (ក) တွင် ပိုင်ဆိုင်သူသည် ယုံကြည်မှု ကုမ္ပဏီ ဖြစ်သည်ကို အတည်ပြုခြင်း။ ယုံကြည်မှု မူလစာရွက်ကို ထုတ်ယူပြီး ငှားခခြင်း အခွင့်အရာ သည် အဘယ်သူထံ ရှိသည်ကို အတည်ပြုခြင်း။",
+    "case": "ငွေကြေးအပ္ပစ္စည်း ညှိနှိုင်းခြင်း ကိစ္စများ အများအပြား — ယုံကြည်မှု ကိုင်တွယ်သူ လွှတ်ပြန်ခွင့်မှ ငှားခ ပြန်အခြင်း ဆီလျှောက်မှု အဆင့်ဆင့် ကျေးဇူးပြု ခြင်း (Golden Set A အဆင့်)။"
+   },
+   {
+    "id": "gap",
+    "title": "အလွတ်ငှားခ (ကြွေးမြီ အချိုးအစား ကျော်လွန်ခြင်း)",
+    "what": "ငှားခ + အစီအစဉ်ကျ ချေးငွေ သည် အိမ်တန်ဖိုးနှင့် နီးစပ်သည် သို့မဟုတ် ကျော်လွန်သည့် အခြေအနေ။ အိမ်သည် အိမ်ခြင်းအရောင်းအဝယ်သို့ လွှမ်းမိုးခံရလျှင် ငှားခကို সম్পূর্ණအားဖြင့် ပြန်အခြင်းမခံရသည်။",
+    "signal": "စာချုပ်မှ တစ်ခုတည်းဖြင့် မမြင်နိုင်သည် — ထို့ကြောင့် အန္တရာယ်ရှိသည်။ စျေးကွက်တန်ဖိုးနှင့် နှိုင်းယှဉ်လျှင် ငှားခ ကြီးမားပြီး ငှားခခြင်းသူ အလျင်အမြန်ဆောင်ရွက်လျှင် သံသယဖြစ်စေသည်။",
+    "outside": "ကြွေးမြီ အချိုးအစား = (အစီအစဉ်ကျ ကြွေးမြီ + ငှားခ) ÷ စျေးကွက်တန်ဖိုး။ 90% အထက်ဖြစ်လျှင် လက်တွေ့ သုတေသန တွင် စာချုပ်၏ 17.6% သည် ငှားခ အဖြေအခြင်း (အခြေခံ အကွာအဝေး 0.2%)။ ရလဒ် မျက်နှာပြင်တွင် အလွတ်ငှားခ ကိုင်တွယ်သူ ဖြင့် အတည်ပြုခြင်း။",
+    "case": "အန်းဆန်းယုံ · အီသုံးလွန်း (2025) ပြည်တွင်းရိုးရှင်း ငှားခ 450,000 ကိစ္စ လက်တွေ့ သုတေသန — ကြွေးမြီ အချိုးအစား 90% အထက် အကွာအဝေး အဖြေအခြင်း နှုန်း 17.6%။"
+   },
+   {
+    "id": "double",
+    "title": "နှစ်ဆ စာချုပ်",
+    "what": "တူညီသည့် အိမ်ကို ငှားစားသူများစွာ နှင့် စာချုပ်ချုပ်ခြင်း သို့မဟုတ် အိမ်ပိုင်ခွင့်သူ မသိရှိစွာ စီမံခန့်ခွဲသူ သုံးမူလ စာချုပ်ချုပ်သည့် နည်းလမ်း။ ဆန့်ကျင်ဖက်အခွင့်အရာ အစီအစဉ်တွင် နောက်ကျလျှင် ငှားခ ဆုံးရှုံးသည်။",
+    "signal": "စာချုပ်ချုပ်သည့် အခါ ကိုယ်စားလှယ်သည် မှတ်ပုံတင်စာရွက်ရှိ ပိုင်ဆိုင်သူ မဟုတ်ပြီး အခွင့်အရာ အပ်နှင်းမှု စာရွက် မရှင်းလင်းသည်။ စျေးကွက်တန်ဖိုးထက် သက်သာသည့် စာချုပ်ချုပ်ခြင်း၊ လျင်မြန်စွာ စာချုပ်ချုပ်ရန် အကြိုးအစည်း။",
+    "outside": "မှတ်ပုံတင်စာရွက်ရှိ ပိုင်ဆိုင်သူ ကိုယ်တိုင်နှင့် တိုက်ရိုက် စာချုပ်ချုပ်ခြင်း (အထောက်အထားစာရွက် ကိုက်ညီမှု)။ အခွင့်အရာ အပ်နှင်းမှု စာချုပ်ဖြစ်လျှင် အင်္ဂတံဆိုင်း အသိအမှတ်ပြုစာ ပါသည့် အခွင့်အရာ အပ်နှင်းမှု စာရွက် အတည်ပြုခြင်း။ ကျန်ငွေ ငွေချေးမှုသည် ပိုင်ဆိုင်သူ အမည်ရှိ ငွေစာရင်းသို့ သာ ပေးချေခြင်း။",
+    "case": "အိမ်ငှားခခြင်း အပ္ပစ္စည်း ညှိနှိုင်းခြင်း ကော်မတီ ထပ်ခါထပ်မံ အမျိုးအစား — အခွင့်အရာ မရှိသည့် ငှားခခြင်း စာချုပ်၏ ထိရောက်မှု အပ္ပစ္စည်း။"
+   },
+   {
+    "id": "appraisal",
+    "title": "စျေးကွက်တန်ဖိုး ဖြန့်ဝေခြင်း (အကဲအဆတ် အလွဲသုံးခြင်း)",
+    "what": "လက်တွေ့ အရောင်းအဝယ် မရှိသည့် အသစ်ဆောက်လုပ်သည့် အိမ်ခွဲများတွင် အကဲအဆတ်မှ စျေးကွက်တန်ဖိုး ဖြန့်ဝေခြင်း ဖြင့် ငှားခကို စျေးကွက်တန်ဖိုးအတိုင်း (သို့မဟုတ် ထိုထက်ပိုသည်) ရယူသည့် နည်းလမ်း။ အစတည်းက အလွတ်ငှားခအဖြစ် စတင်သည်။",
+    "signal": "'အကဲအဆတ်တန်ဖိုး O ကုဋေ' ကို အလေးအနက်ထားပြီး လက်တွေ့ အရောင်းအဝယ် အချက်အလက် မပြသခြင်း။ အသစ်ဆောက်လုပ်သည့် အိမ်ခွဲများ၊ အများအပြားတွင် ကျေးဇူးပြုခြင်း။",
+    "outside": "နိုင်ငံတကာ မြေယာ အဆောက်အအုံ အဖွဲ့ လက်တွေ့ အရောင်းအဝယ် အများပြည်သူ စနစ်တွင် တူညီသည့် အိမ်ခွဲ ဒေသ ရောင်းဝယ်မှု အချက်အလက်များကို တိုက်ရိုက် အတည်ပြုခြင်း။ လက်တွေ့ သုတေသန တွင် အကဲအဆတ် အခြေခံ စျေးကွက်တန်ဖိုး ကိုင်တွယ်မှု သည် ငှားခ အဖြေအခြင်း အောင်မြင်မှု 4.8 ဆ။",
+    "case": "အန်းဆန်းယုံ · အီသုံးလွန်း (2025) — ကျွမ်းကျင်သူ (အကဲအဆတ်) စျေးကွက်တန်ဖိုး ကိုင်တွယ်မှု Exp(B) 4.8၊ အိမ်ခွဲ · အများအပြား 5.8 ဆ။"
+   },
+   {
+    "id": "proxy",
+    "title": "အင်္ဂါ ငှားခခြင်းသူ · ကုမ္ပဏီ ငှားခခြင်းသူ",
+    "what": "ဆည်းပူးမရှိသည့် လူ သို့မဟုတ် စာရွက်စာတမ်း ကုမ္ပဏီ အမည်ဖြင့် အိမ်ဝယ်ယူပြီး ငှားခခြင်းသည့် နည်းလမ်း။ အဖြေအခြင်း ဖြစ်လျှင်ပင် ပြန်အခြင်းရန် ဆည်းပူး မရှိသည်။",
+    "signal": "ငှားခခြင်းသူ သည် ကုမ္ပဏီဖြစ်ပြီး အဖြေအခြင်း မရှင်းလင်းသည်။ စာချုပ်ချုပ်မီ ပိုင်ဆိုင်သူ ပြောင်းလဲသည် (မှတ်ပုံတင်စာရွက် အပိုင်း (က) နောက်ဆုံး ပိုင်ဆိုင်ခွင့် လွှဲပြောင်းမှု မှတ်တမ်း)။",
+    "outside": "မှတ်ပုံတင်စာရွက် အပိုင်း (က) တွင် နောက်ဆုံး ပိုင်ဆိုင်ခွင့် လွှဲပြောင်းမှု မှတ်တမ်း အတည်ပြုခြင်း။ ကုမ္ပဏီ ငှားခခြင်းသူ သည် လက်တွေ့ သုတေသန တွင် ငှားခ အဖြေအခြင်း အောင်မြင်မှု 3.6 ဆ — ကုမ္ပဏီ မှတ်ပုံတင်စာရွက်မှ အဖြေအခြင်း အတည်ပြုခြင်း။",
+    "case": "အန်းဆန်းယုံ · အီသုံးလွန်း (2025) — ကုမ္ပဏီ ငှားခခြင်းသူ Exp(B) 3.6 (အဖြေအခြင်း နှုန်း 20.4% vs ကိုယ်ရေး 4.8%)။"
+   }
+  ]
+ },
+ "mn": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Хэтэрсэн гэрээлэх торгууль",
+    "what": "Гэрээ цуцлах эсвэл зөрчих үед төлөх мөнгийг бодит хохирлоос хамаагүй их хэмжээгээр тогтоох заалт. 'Торгууль' гэсэн үг байхгүй байсан ч хохирлын нөхөн төлбөлийн үндэслэл байвал энэ хэмжээнд хамаарна.",
+    "signals": [
+     "Торгууль·торгуулийн хүнтэй·олон дахин нөхөн төлөх",
+     "Цуцлах үед үлдэгдэл хугацааны төлбөл бүрэн авах",
+     "Хоног тооцох аргыг хэрэглэхгүй байх",
+     "Зөвхөн үйлчүүлэгчийн хоцрогдлын хүүг өндөр байлгах тэгш бус байдал"
+    ],
+    "tip": "Бодит хохирлын хэмжээтэй пропорциональ эсэхийг асуугаарай. Шүүх нь хэтэрсэн торгуулийг бууруулсан түүхтэй (Иргэний хууль 398-р зүйл)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Нэг талын гэрээ цуцлах",
+    "what": "Эсрэг талын урьдчилсан мэдэгдэл эсвэл хүчинтэй шалтгаан байхгүйгээр гэрээг шууд цуцлах боломжийг олгох заалт.",
+    "signals": [
+     "Сануулах үйл явцгүйгээр 'шууд цуцлах боломжтой' гэсэн үг",
+     "Орон сууцны хувьд нэг удаа хоцрогдол гарвал цуцлах (хууль нь 2 удаа хоцрогдол гэж тогтоосон)",
+     "Сунгалтын хүсэлтийн эрхийг орхуулах тусгай заалт"
+    ],
+    "tip": "Орон сууцны хувьд 2 удаа, худалдааны байрны хувьд 3 удаа хоцрогдол нь хуулийн цуцлалтын үндэслэл юм. Үүнээс илүү хялбар цуцлагдаж байвал анхаарах хэрэгтэй."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Ломбард буцаах сааталт",
+    "what": "Ломбард·буцаах мөнгө·тооцоог удаа, хасаж, эсвэл өөр хэлбэрээр буцаах заалт.",
+    "signals": [
+     "'Гэрээ дуусаад O сар дотор буцаах боломжтой' гэх мэт урт хугацаа",
+     "Нөөцийн мөнгө·ашиг хэмжээ нэг хэмжээгээр хасах",
+     "Хүүгүй буцаах, купон·оноо орлуулан өгөх"
+    ],
+    "tip": "Буцаах хугацаа ба сааталтын хүүг тодорхойлсон эсэхийг шалгаарай. Түрээсийн эрхийн бүртгэлийн үйл явц·ломбардын даатгал нь аюулгүй байдлын хэрэгсэл болно."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Үүрэг хариуцлага чөлөөлөх",
+    "what": "Хуулиар эсрэг талд өгсөн үүрэг (засварлах үүрэг, гажилтын баталгаа гэх мэт) бүрэн хэрэглэгч·түрээслэгчид шилжүүлэх эсвэл чөлөөлөх заалт.",
+    "signals": [
+     "'Ямар ч хариуцлага хүлээхгүй'",
+     "'Бүх засварын зардал түрээслэгч хүлээнэ'",
+     "Иргэний·эрүүгийн эсэргүүцэл хориглох"
+    ],
+    "tip": "'Бүх·ямар ч' гэх мэт өргөн үг нь гол сигнал юм. Зохицуулалтын хороо нь өргөн хүрээний үүрэг шилжүүлэх тусгай заалтыг хүчингүй гэж үзсэн түүхтэй."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Тодорхойгүй ашиг·хүүгийн нөхцөл",
+    "what": "Хэдэн төлөх ёстойг гэрээ бичгээс л харахад ойлгомжгүй байдлаар бичсэн заалт. Тодорхойгүй үг нь дараа нь эсрэг талд таатай байдлаар тайлбарлагдах магадлалтай.",
+    "signals": [
+     "Хүүний хувь·ашигийн хувь хоосон",
+     "'Ерөнхийдөө шүүхийн шийдвэрээр тогтоох хуулийн хүү' гэх мэт тодорхойгүй үндэслэл",
+     "'Тусдаа санал болгосны дагуу'"
+    ],
+    "tip": "Тоо ба тооцооны аргыг гэрээнд бичүүлэхийг хүсээрэй. Тодорхойгүй хүүгийн үгийг зохицуулалтын хороо жилийн 5% (Иргэний хуулийн хуулийн хүү) гэж хязгаарласан жишээ байдаг."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Итгэмжлэлийн харилцаа·өмчийн эрхийн тогтворгүй байдлын мэдэгдэл",
+    "what": "Байшин нь итгэмжлэлийн компанийн өмч учраас өмчийн эрхийн бүтэц тогтворгүй байгаа бөгөөд тусгай заалтаар түрээслэгчийн хамгаалалтыг багасгах заалт. Түрээсийн төлөвлөгөөний үндсэн хэв маяг юм.",
+    "signals": [
+     "'Итгэмжлэлийн компани ломбард буцаах үүрэг байхгүй'",
+     "'Итгэмжлэлийн компанийн урьдчилсан зөвшөөрөлгүй түрээс хүчингүй'",
+     "Итгэмжлэлийн баримт бичиг шалгалтгүйгээр гэрээ яаруулах"
+    ],
+    "tip": "Бүртгэлийн эхний хэсэгт өмчийн эрхийн эзэн нь итгэмжлэлийн компани эсэх, итгэмжлэлийн баримт бичигт түрээслэх эрхийн эзэн хэн болох эсэхийг шалгаарай."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Шударга бус зардал·татвар шилжүүлэх",
+    "what": "Хуулийн дагуу эсрэг талын (өмчийн эзэн·бизнесийн үйл ажиллагаа) зардлыг хэрэглэгч·түрээслэгчид шилжүүлэх заалт.",
+    "signals": [
+     "Өмчийн эзэний үүрэг татвар (үл хөдлөх хөрөнгийн татвар·авах татвар) түрээслэгчид",
+     "Түрээслэгчийн засварлах·үйлчилгээний зардал шилжүүлэх",
+     "Ипотекийн зээлийн бүртгэлийн зардал төлөхийг шаардах"
+    ],
+    "tip": "Тэр зардлыг хуулийн дагуу хэн хүлээх ёстойг асуугаарай. Өөрийн ашигласан нийтийн үйлчилгээ (цахилгаан·ус) -тай ялгаатай."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Нэг талын үйлчилгээ·нөхцөл өөрчлөх",
+    "what": "Эсрэг талын гэрээний агуулга (үйл явцын дүрэм·хүүний хувь·төлбөлийн нөхцөл) зөвшөөрөлгүйгээр өөрчлөх боломжийг олгох заалт.",
+    "signals": [
+     "'Компани дур мэдэн өөрчлөх боломжтой'",
+     "Өөрчлөлтийн мэдэгдэл дараа хариу байхгүй бол 'зөвшөөрсөн гэж үзнэ'",
+     "Төлбөлийн нөхцөлийг компанийн үзэмжээр тохируулах"
+    ],
+    "tip": "Өөрчлөлтийн үед урьдчилсан мэдэгдэл ба татгалзах (цуцлах) эрхийг баталгаажуулаарай. Зөвшөөрөл гэж үзэх заалт нь маргаан шийдвэрлэлтэд давтан хориглогдсон төрөл юм."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Сонголтын эрхийг хязгаарлах·худалдан авалт хүчлүүлэх",
+    "what": "Тодорхой бүтээгдэхүүн·компанийн ашиглалтыг хүчлүүлэх эсвэл хэрэглэгчийн сонголтын эрхийг хаах заалт (нэмэлт бүтээгдэхүүн зэрэгцүүлэн худалдах).",
+    "signals": [
+     "'Зөвхөн томилогдсон компанийн дамжуулан'",
+     "Нэмэлт бүтээгдэхүүний заавал бүртгүүлэх",
+     "Өөр сонголтыг хаах үг"
+    ],
+    "tip": "Хүчлүүлэх ашиглалт·худалдан авалт нь гэрээний зорилгод үнэхээр шаардлагатай эсэх, өөр сонголтыг яагаад хаасан болохыг асуугаарай."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Эрхийн үйл ажиллагаа хязгаарлах",
+    "what": "Хуулиар баталгаажуулсан эрхийг (цуцлах эрх·эсэргүүцэл·иск гаргах гэх мэт) ашиглахаас сэргийлэх заалт.",
+    "signals": [
+     "'Эсэргүүцэл гаргахгүй' гэж баталгаажуулах",
+     "Цуцлах эрхийн хугацаа·аргыг хэтэрхий хязгаарлах",
+     "Иск гаргахыг хориглох·иск гаргахгүй байх гэрээ"
+    ],
+    "tip": "Хуулийн эрхийг тусгай заалтаар сүүлтэй авч чадахгүй. Үйл явцын дүрэм хязгаарлалтын хууль·хөлсөлсөн худалдааны хууль зөрчсөнөөр үгүйсгэсэн жишээ байдаг."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "Ажлын үйл ажиллагаа дуусаад ашигийн 20% л буцаах (торгууль 80%) заалтыг шударга бус хэтэрсэн хохирлын нөхөн төлбөл гэж үзэж торгуулгүй бүрэн буцаах гэрээ байгуулсан",
+   "신발도매_2013": "Франчайзийн цуцлалтын үед франчайзийн төлбөлийн 50% торгуулийн заалт — Шударга худалдааны комиссын сонгодог жишээ (2004약제2214) ба маргаан нийтлэг байдлаар торгуулийн хэсэг буцаах зохицуулалт байгуулсан",
+   "2019-18b": "Даатгалын баталгаа өгөх нэмэлт гэрээний эсэргүүцэл орхуулах баталгаажуулалт — 'хүчингүй' үг тодорхойгүй учраас үйл явцын дүрэм засах шаардлагатай гэж зөвлөмж өгсөн",
+   "2005-41": "Хөрөнгө оруулалтын зөвлөгөөний гэрээний хэрэглэгчийн цуцлах эрхийг хязгаарлах заалт — үйл явцын дүрэм хязгаарлалтын хуулийн тодорхойлох·тайлбарлах үүргийн зөрчил ба зочлох худалдааны хуулийн сайн дурын цуцлах эрхийн эсэргүүцэл учраас хэрэглэхгүй болгосон",
+   "즉시연금_2017-17": "Хамгийн бага баталгаажуулсан хүүнээс доош жилийн мөнгө өгөх нь үйл явцын дүрэм зөрчсөн гэж шийдвэрлэсэн",
+   "바로연금보험_2018-8": "Хугацаа дуусах даатгалын мөнгө хасах үндэслэл тодорхойгүй заалт — үүсгэгчийн сул байдлын зарчмын дагуу хэрэглэгчид таатай байдлаар тайлбарласан",
+   "2019-18a": "Зээлийн үндсэн үйл явцын дүрэмийн нэг талын цуцлах заалт — Шударга худалдааны комиссын хүчингүй гэсэн үзэл баримтлалыг ашиглаж цуцлах үндэслэлийг үгүйсгэсэн",
+   "990": "Түрээслэгчийн гэрээ сунгалтын хүсэлтийн эрхийг орхуулах тусгай заалт — Орон сууцны түрээсийн хамгаалалтын хуулийн 6-р зүйлийн 3-р хэсгийн 1-р заалт зөрчсөнөөр онцгой нөхцөл байхгүйгээр хүчингүй",
+   "2008_약관변경동의간주": "Тодорхой хугацаа эсэргүүцэл байхгүй бол үйл явцын дүрэм өөрчлөлтийг зөвшөөрсөн гэж үзэх заалт — үйл явцын дүрэм хязгаарлалтын хуулийн 12-р зүйл зөрчсөнөөр үүрэг хүлээлцэхгүй",
+   "2010_ELS조건조정": "Үйлдвэрлэгчийн үзэмжээр төлбөлийн нөхцөлийг тохируулах боломжийн заалт — өргөтгөл хэрэглэлийг хязгаарлалтын тайлбарлалтаар хянаж төлбөлийн үйл явцыг өгсөн",
+   "20": "Орон сууцны засварын зардлыг бүрэн түрээслэгчийн үүрэг болгох тусгай заалт — Түрээслэгчийн хуулийн үйлчилгээ засварлах үүргийг өргөн шилжүүлэж хүчингүй гэж баталгаажуулсан",
+   "2008_직불카드양도": "Карт шилжүүлэх үед бүрэн үүрэг хүлээх заалт — оруулалтын хуваарилалтын шүүхийн шийдвэрийн дагуу гишүүний үүргийг 40% гэж хязгаарласан"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Итгэлцлийн чөлөөлөх нөхцөл",
+    "what": "Байшин нь итгэлцлийн компанийн өмчтэй байгаа бөгөөд нөхцөлөөр 'итгэлцлийн компани нь орлогын хөрөнгө буцаах үүрэгтэй биш' гэж тогтоох арга. Түрээслэгч орлогын хөрөнгөө буцаан авах хууль ёсны шаардлагын объект алга болдог.",
+    "signal": "Нөхцөлд 'итгэлцлийн эрхтэй этгээд', 'итгэлцэл', 'буцаах үүрэг байхгүй', 'эсэргүүцэл үзүүлэхгүй' гэх мэт үгс.",
+    "outside": "Бүртгэлийн дэвтрийн эхний хэсэгт өмчлөгч нь итгэлцлийн компани эсэхийг шалгах. Итгэлцлийн анхны баримтыг авч түрээслүүлэх эрхтэй хэн болохыг шалгах.",
+    "case": "Санхүүгийн маргаан зохицуулах олон жишээ — итгэлцлийн эрхтэй этгээдийн чөлөөлөх нөхцөлөөр орлогын хөрөнгө авах нь бүтцийн хувьд саад болсон төрөл (Golden Set A зэрэг)."
+   },
+   {
+    "id": "gap",
+    "title": "Хоосон түрээс (өрийн харьцаа хэтэрсэн)",
+    "what": "Орлогын хөрөнгө + эхний эрэмбийн зээл нь байшингийн үнэтэй ойрхон эсвэл давсан байдал. Байшин дуудлага худалдаанд орвол орлогын хөрөнгөө бүрэн буцаан авахгүй.",
+    "signal": "Гэрээнээс л харагдахгүй — тийм учраас аюултай. Зах зээлийн үнэтэй харьцуулахад орлогын хөрөнгө их байгаа бөгөөд түрээслүүлэгч яарч байвал сэжигтэй.",
+    "outside": "Өрийн харьцаа = (эхний эрэмбийн өрийн үүрэг + орлогын хөрөнгө) ÷ зах зээлийн үнэ. 90% ба түүнээс дээш байвал практик судалгаанд гэрээний 17.6% нь орлогын хөрөнгө гэмтэл (суурь интервал 0.2%). Үр дүнгийн дэлгэцийн хоосон түрээсийн тооцоолуураар шалгах.",
+    "case": "Ан Сон-ён·И Сан-ёп (2025) Сеул орчмын түрээс орлогын хөрөнгө 450,000 хэргийн практик судалгаа — өрийн харьцаа 90% ба түүнээс дээш интервалын гэмтлийн түвшин 17.6%."
+   },
+   {
+    "id": "double",
+    "title": "Давхар гэрээ",
+    "what": "Нэг байшинг олон түрээслэгчтэй гэрээ хийх эсвэл байшингийн эзэн мэдэхгүй байхад удирдагч поддельдэх гэрээ хийх арга. Эсрэг үйлчлэлийн эрэмбээр ухарвал орлогын хөрөнгөө алдана.",
+    "signal": "Гэрээний талууд нь бүртгэлийн дэвтрийн өмчлөгчтэй ялгаатай байгаа бөгөөд эрх олгох баримт нь тодорхойгүй. Зах зээлийн үнээс хямд байгаа бөгөөд хурдан гэрээ хийхийг дэмжүүлж байна.",
+    "outside": "Бүртгэлийн дэвтрийн өмчлөгчтэй шууд гэрээ хийх (таних баримт шалгах). Эрх олгох гэрээ бол инкан баталгаа бүхий эрх олгох баримтыг шалгах. Үлдэгдэл төлбөр нь өмчлөгчийн нэрийн дансанд л.",
+    "case": "Орон сууцны түрээс маргаан зохицуулах хороо давтагдсан төрөл — эрхгүй түрээслүүлэх гэрээний үйлчлэлийн маргаан."
+   },
+   {
+    "id": "appraisal",
+    "title": "Зах зээлийн үнэ부풀리기 (үнэлгээ сэтгэл ашиглах)",
+    "what": "Бодит худалдаа байхгүй шинэ вилла гэх мэтэд үнэлгээгээр зах зээлийн үнэ өндөрлүүлэн орлогын хөрөнгөө зах зээлийн үнэтэй (эсвэл түүнээс дээш) авах арга. Эхнээс л хоосон түрээсээр эхэлдэг.",
+    "signal": "'Үнэлгээний үнэ O억' гэж онцлон дурдаж бодит худалдааны мэдээлэл харуулахгүй. Шинэ байшин, нэгдэл, олон өрхийн байшинд элбэг.",
+    "outside": "Улсын газрын хэлтсийн бодит худалдааны үнэ нээлттэй системээс ижил орчмын ижил төстэй бүтээгдэхүүний бодит худалдааны үнэ шууд шалгах. Практик судалгаанд үнэлгээ суурьтай үнэ тогтоох нь орлогын хөрөнгө гэмтлийн ялалтын магадлал 4.8 дахин.",
+    "case": "Ан Сон-ён·И Сан-ёп (2025) — мэргэжилтэн (үнэлгээ) үнэ тогтоох Exp(B) 4.8, нэгдэл·олон өрхийн байшин 5.8 дахин."
+   },
+   {
+    "id": "proxy",
+    "title": "Поддельдэх түрээслүүлэгч·хуулийн этгээд түрээслүүлэгч",
+    "what": "Өмч байхгүй хүн эсвэл цаасан хуулийн этгээдийн нэрээр байшин худалдаж түрээслүүлэх арга. Гэмтэл гарсан ч буцаан өгөх өмч байхгүй.",
+    "signal": "Түрээслүүлэгч нь хуулийн этгээд байгаа бөгөөд бодит байдал тодорхойгүй. Гэрээ хийхээс өмнө өмчлөгч өөрчлөгдөнө (бүртгэлийн дэвтрийн эхний хэсгийн сүүлийн үеийн шилжүүлэх бүртгэл).",
+    "outside": "Бүртгэлийн дэвтрийн эхний хэсгээс сүүлийн үеийн өмчлөгчийн шилжүүлэх түүх шалгах. Хуулийн этгээд түрээслүүлэгч нь практик судалгаанд орлогын хөрөнгө гэмтлийн ялалтын магадлал 3.6 дахин — хуулийн этгээдийн бүртгэлээр бодит байдал шалгах.",
+    "case": "Ан Сон-ён·И Сан-ёп (2025) — хуулийн этгээд түрээслүүлэгч Exp(B) 3.6 (гэмтлийн түвшин 20.4% vs хувь хүн 4.8%)."
+   }
+  ]
+ },
+ "uz": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Haddan ortiqcha jarima puli",
+    "what": "Shartnomani bekor qilish yoki buzganda to'lash kerak bo'lgan pulni haqiqiy zarar-ziyondan ancha ko'p qilib belgilash. 'Jarima puli' so'zi bo'lmasa ham, aslida zararni oldindan belgilash bo'lsa, bu kategoriyaga kiradi.",
+    "signals": [
+     "Jarima puli, jarima, ikki baravar kompensatsiya",
+     "Bekor qilish vaqtida qolgan muddatning to'liq to'lovi",
+     "Kunlik hisob-kitobni istisno qilish",
+     "Faqat mijoz kechiktirilgan foizining notekis yuqori bo'lishi"
+    ],
+    "tip": "Haqiqiy zarar bilan mutanosib ekanligini so'rang. Sudlar haddan ortiqcha jarima pullarni kamaytirgan (Fuqarolik kodeksi 398-modda)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Bir tomonlama shartnoma bekor qilish",
+    "what": "Qarama-qarshi tomon oldindan ogohlantirish yoki haqiqiy sabab bo'lmay, shartnomani darhol tugatishi mumkin bo'lgan shart.",
+    "signals": [
+     "Ogohlantirish jarayoni bo'lmay 'darhol bekor qilish mumkin' degan so'z",
+     "Uy uchun faqat 1 marta kechiktirilsa bekor qilish (qonun 2 marta kechiktirilish asosida)",
+     "Yangilash talabini rad etish bo'yicha maxsus shartnoma"
+    ],
+    "tip": "Uy uchun 2 marta, savdo joyiga 3 marta kechiktirilish qonuniy bekor qilish asosi. Bundan osonroq bekor qilish yozilgan bo'lsa, tekshirish kerak."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Garovlik pul qaytarish kechiktirilishi",
+    "what": "Garovlik pul, qaytarish puli, hisob-kitob pulini kech, kamaytirib yoki boshqa narsa bilan qaytarish.",
+    "signals": [
+     "'Shartnoma tugagandan keyin O oy ichida qaytarish mumkin' kabi uzoq muddatli qaytarish",
+     "Saqlanib turgan pul, komissiya bir xil miqdorda chegirmasi",
+     "Foizsiz qaytarish, kupon, ballar bilan to'lash"
+    ],
+    "tip": "Qaytarish muddati va kechiktirilsa foiz belgilangan ekanligini tekshiring. Ijara huquqi ro'yxatga olish buyrug'i va garovlik sug'urtasi himoya vositasi bo'ladi."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Mas'uliyatdan ozod qilish",
+    "what": "Qonun qarama-qarshi tomoniga yuklatgan mas'uliyatni (ta'mirlash majburiyati, nuqsonni kafolatlash) butunlay iste'molchi yoki ijara oluvchiga o'tkazish yoki ozod qilish.",
+    "signals": [
+     "'Hech qanday mas'uliyat olmaydi' degan so'z",
+     "'Barcha ta'mirlash xaraji ijara oluvchi hisobiga'",
+     "Fuqarolik va jinoyat jihatidan e'tiroz qilish taqiqlangan"
+    ],
+    "tip": "'Barcha', 'hech qanday' kabi umumiy so'zlar asosiy belgi. Moslashtiruv komissiyasi umumiy mas'uliyat o'tkazish shartlarini bekor deb hukm qilgan."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Noaniq komissiya va foiz shartlari",
+    "what": "Qancha to'lash kerakligini shartnomadan ko'rish mumkin bo'lmaydigan shart. Noaniq so'zlar keyinchalik qarama-qarshi tomonning foydasiga talqin qilinadi.",
+    "signals": [
+     "Foiz stavkasi, komissiya stavkasi bo'sh",
+     "'Odatda sud qaror bilan belgilangan qonuniy foiz' kabi noaniq mezon",
+     "'Alohida kelishuvga asosan'"
+    ],
+    "tip": "Raqam va hisoblash usulini shartnomaga yozishni so'rang. Noaniq foiz so'zlarini moslashtiruv komissiyasi yillik 5% (Fuqarolik kodeksi qonuniy foizi) bilan cheklagan."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Ishonch munosabati, mulk huquqi noaniqlik xabardori",
+    "what": "Uy ishonch kompaniyasiga tegishli bo'lib, mulk huquqi tuzilishi noaniq, lekin maxsus shartnoma bilan ijara oluvchi himoyasi kamaytirilgan. Bu to'liq ijara firibgarligining asosiy namunasi.",
+    "signals": [
+     "'Ishonch beruvchi (ishonch kompaniyasi) garovlik pul qaytarish mas'uliyati yo'q'",
+     "'Ishonch beruvchi oldindan ruxsat bermasdan ijara shartnomasi amal qilmaydi'",
+     "Ishonch hujjati tekshirilmay shartnoma shoshiltirilgan"
+    ],
+    "tip": "Ro'yxatning birinchi bo'limida mulk egasi ishonch kompaniyasi ekanligini, ishonch hujjatida ijara huquqi kimga tegishli ekanligini tekshiring."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Nohaq xarajat, soliq o'tkazish",
+    "what": "Qonun bo'yicha qarama-qarshi tomon (mulk egasi, tadbirkor) to'lashi kerak bo'lgan xarajatni iste'molchi yoki ijara oluvchiga o'tkazish.",
+    "signals": [
+     "Mulk egasi soliqlarini (mulk soliqsi, sotib olish soliqsi) ijara oluvchiga",
+     "Ijara beruvchining ta'mirlash, saqlash xarajatini o'tkazish",
+     "Ipoteka o'rnatish xarajatini to'lash talabi"
+    ],
+    "tip": "Bu xarajat qonun bo'yicha kimning mas'uliyati ekanligini so'rang. O'z ishlatgan kommunal xizmatlar (elektr, suv) bilan farq qiling."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Bir tomonlama imtiyoz, shart o'zgarishi",
+    "what": "Qarama-qarshi tomon shartnoma mazmuni (shartlar, foiz stavkasi, to'lash shartlari) rozi bo'lmasdan o'zgartirishi mumkin bo'lgan shart.",
+    "signals": [
+     "'Kompaniya o'z xohishiga ko'ra o'zgartirishi mumkin'",
+     "O'zgarish xabardori keyin javob bo'lmasa 'rozi bo'lgan deb hisoblanadi'",
+     "To'lash shartlarini kompaniya ixtiyorida o'zgartirish"
+    ],
+    "tip": "O'zgarish vaqtida oldindan xabardori va rad etish (bekor qilish) huquqi kafolatlangan ekanligini tekshiring. Rozi bo'lgan deb hisoblanish sharti moslashtiruv jarayonida takror to'xtatilgan."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Tanlash huquqi cheklash, sotib olish majburiyati",
+    "what": "Muayyan mahsulot, kompaniya foydalanishini majbur qilish yoki iste'molchining tanlash huquqini cheklash (qo'shimcha mahsulot sotish).",
+    "signals": [
+     "'Faqat belgilangan kompaniya orqali'",
+     "Qo'shimcha mahsulot majburiy sug'urtasi",
+     "Boshqa variantlarni istisno qiluvchi so'zlar"
+    ],
+    "tip": "Majbur qilingan foydalanish yoki sotib olish shartnoma maqsadiga zarur ekanligini, boshqa variantlar nima uchun cheklangan ekanligini so'rang."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Huquq ishlatish cheklash",
+    "what": "Qonun kafolatlagan huquqlarni (bekor qilish huquqi, e'tiroz qilish, sud ishini ko'tarish) ishlatmaslik shartlari.",
+    "signals": [
+     "'E'tiroz qilmaydi' degan kafolat",
+     "Bekor qilish huquqi muddati, usuli haddan ortiqcha cheklangan",
+     "Sud ishini ko'tarish taqiqlangan, sud bo'lmasdan kelishuv"
+    ],
+    "tip": "Qonuniy huquqlar maxsus shartnoma bilan ham olib qo'yilmaydi. Shartlar qoidalari, to'liq sotib olish qonuniga zid bo'lgan holda rad etilgan."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "Ish bajarilgandan keyin komissiyaning 20% qaytarilishi (jarima puli 80%) nohaq haddan ortiqcha zararni oldindan belgilash deb ko'rildi, jarima pulisiz to'liq qaytarish moslashtirildi",
+   "신발도매_2013": "Franshiza bekor qilish vaqtida franshiza to'lovining 50% jarima puli sharti — Adolat komissiyasi oldingi qaroriga (2004약제2214) va masala umumiyligiga ko'ra jarima pulining bir qismi qaytarilishi moslashtirildi",
+   "2019-18b": "Sug'urtaning kafolat berish qo'shimcha shartnomasi e'tiroz qilish kafolati — 'Amal qilmaydi' so'zi noaniq bo'lib, shartlar o'zgartirilishi kerak deb ko'rsatildi",
+   "2005-41": "Investitsiya maslahat shartnomasi iste'molchining bekor qilish huquqi cheklash sharti — Shartlar qoidalari aniq ko'rsatish majburiyati buzilishi va yo'l bilan sotish qonuni ixtiyoriy bekor qilish huquqiga zid bo'lib, qo'llanilmadi",
+   "즉시연금_2017-17": "Eng past kafolat foizi kamida foiz bilan pensiya to'lovi shartlarga zid deb hukm qilindi",
+   "바로연금보험_2018-8": "Muddati tugaganda sug'urtaning puli chegirmasi asosi noaniq shart — Yozuvchi noqulaylik printsipiga ko'ra iste'molchiga foydaliroq talqin qilindi",
+   "2019-18a": "Kredit operatsiyasi asosiy shartlarining bir tomonlama bekor qilish sharti — Adolat komissiyasining bekor deb hukm qilishini qabul qilib, bekor qilish asosi rad etildi",
+   "990": "Ijara oluvchining shartnoma yangilash talabini rad etish maxsus sharti — Uy ijara qonuni 6-modda 3-qismi 1-bandiga zid bo'lib, alohida holat bo'lmasa bekor",
+   "2008_약관변경동의간주": "Muayyan vaqt davomida e'tiroz bo'lmasa shartlar o'zgarishiga rozi bo'lgan deb ko'rish sharti — Shartlar qoidalari 12-moddasiga zid bo'lib, majburiyati rad etildi",
+   "2010_ELS조건조정": "Chiqaruvchi ixtiyorida to'lash shartlarini o'zgartirish mumkin degan shart — Kengaytirilgan qo'llanilishini cheklash talqini bilan nazorat qilindi va to'lash buyrug'i berildi",
+   "20": "Uy ta'mirlash xarajatining to'ligini ijara oluvchi mas'uliyatiga qo'yish maxsus sharti — Ijara beruvchining qonuniy ta'mirlash majburiyatini butunlay o'tkazib, bekor deb tasdiqlandi",
+   "2008_직불카드양도": "Karta o'tkazish vaqtida to'liq mas'uliyat qo'yish sharti — Hissa taqsimoti pretsedentiga ko'ra a'zo mas'uliyati 40% bilan cheklandi"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Ishonch kompaniyasi javobgarlik chiqarish shartnomasi",
+    "what": "Uy ishonch kompaniyasiga tegishli bo'lgan holda, shartnomada 'ishonch kompaniyasi omonat qaytarish javobgarligiga ega emas' deb yozilgan usul. Ijarachi omonatni qaytarish uchun qonuniy talab qilish maqsadi yo'qoladi.",
+    "signal": "Shartnomada 'vosita', 'ishonch', 'qaytarish javobgarligiga emas', 'e'tiroz bildirmaydi' kabi so'zlar.",
+    "outside": "Registr daftarining birinchi bo'limida egasi ishonch kompaniyasi ekanligini tekshiring. Ishonch daftarini olib, ijara qilish huquqi kimga tegishli ekanligini aniqlang.",
+    "case": "Moliyaviy nizolarni hal qilish bo'yicha ko'p misollar — vosita javobgarlikdan chiqarish shartnomasi bilan omonat qaytarish strukturaviy ravishda to'siq qo'yilgan turi (Golden Set A darajasi)."
+   },
+   {
+    "id": "gap",
+    "title": "Bo'sh ijara (qarz nisbati ortiqcha)",
+    "what": "Omonat + birinchi o'rindagi qarz uy narxiga yaqin yoki undan ortiq bo'lgan holat. Uy savdo-sotuvga o'tsa, omonatni to'liq qaytarish mumkin bo'lmaydi.",
+    "signal": "Shartnomadan ko'rinmaydi — shuning uchun xavfli. Bozor narxiga nisbatan omonat katta bo'lsa va ijarachi shoshilsa, shubhali.",
+    "outside": "Qarz nisbati = (birinchi o'rindagi qarz + omonat) ÷ bozor narxi. 90% va undan ortiq bo'lsa, ilmiy tadqiqotda shartnomalarning 17,6% omonat hodisasi (asosiy oraliq 0,2%). Natija ekranidagi bo'sh ijara kalkulyatori bilan tekshiring.",
+    "case": "An Seon-yeong·Lee Sang-yeop (2025) Seoul mintaqasi ijara omonati 450,000 ta — qarz nisbati 90% va undan ortiq oraliq hodisa nisbati 17,6%."
+   },
+   {
+    "id": "double",
+    "title": "Ikki marta shartnoma",
+    "what": "Bir uyni bir nechta ijarachi bilan shartnomalashtirish yoki uy egasining bilmasidan menejer poddel shartnoma tuzish usuli. Qarshi kuch tartibida orqada qolsa, omonatni yo'qotasiz.",
+    "signal": "Shartnoma tomon registr daftarida egasi bilan farq qiladi, vakalat hujjati noaniq. Bozor narxidan arzonroq, tezroq shartnomalashtirish uchun shoshilish.",
+    "outside": "Registr daftarida egasi bilan bevosita shartnoma (shaxsiy hujjat tekshiruvi). Vakalat shartnomasi bo'lsa, muhr sertifikati bilan vakalat hujjatini tekshiring. Oxirgi to'lov faqat ega nomidagi hisobga.",
+    "case": "Uy ijara nizolari hal qilish komiteti takroriy turi — vakalatsiz ijara shartnomasi amal qilish nizosi."
+   },
+   {
+    "id": "appraisal",
+    "title": "Bozor narxini ko'paytirib ko'rsatish (baholash noto'g'ri foydalanish)",
+    "what": "Haqiqiy savdo-sotuvga ega bo'lmagan yangi qurilgan villalarda baholash orqali bozor narxini ko'paytirib, omonatni bozor narxi miqdorida (yoki undan ortiq) olish usuli. Boshidan bo'sh ijara bilan boshlanadi.",
+    "signal": "'Baholash narxi O milliard' deb ta'kidlanadi, haqiqiy savdo-sotuv ma'lumotlari ko'rsatilmaydi. Yangi qurilgan ko'p xonali uylar va ko'p xonali uylar uchun keng tarqalgan.",
+    "outside": "Davlat Turizm Vazirligi haqiqiy savdo-sotuv ochiq tizimida shunga o'xshash mahsulotlarning haqiqiy savdo-sotuv narxini bevosita tekshiring. Ilmiy tadqiqotda baholash asosidagi narx belgilash omonat hodisasi ehtimoli 4,8 marta.",
+    "case": "An Seon-yeong·Lee Sang-yeop (2025) — mutaxassis (baholash) narx belgilash Exp(B) 4,8, ko'p xonali uylar 5,8 marta."
+   },
+   {
+    "id": "proxy",
+    "title": "Poddel ijarachi·yuridik shaxs ijarachi",
+    "what": "Mulk bo'lmagan odam yoki qog'oz yuridik shaxs nomida uy sotib ijara berish usuli. Hodisa bo'lsa, qaytarish uchun mulk yo'q.",
+    "signal": "Ijarachi yuridik shaxs bo'lsa, haqiqati noaniq. Shartnomadan oldin ega o'zgaradi (registr daftarida so'nggi o'tkazish yozuvi).",
+    "outside": "Registr daftarida so'nggi egalik o'tkazish tarixini tekshiring. Yuridik shaxs ijarachi ilmiy tadqiqotda omonat hodisasi ehtimoli 3,6 marta — yuridik shaxs registri bilan haqiqatni tekshiring.",
+    "case": "An Seon-yeong·Lee Sang-yeop (2025) — yuridik shaxs ijarachi Exp(B) 3,6 (hodisa nisbati 20,4% vs shaxs 4,8%)."
+   }
+  ]
+ },
+ "si": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "අධික ගිණුම් දඩ",
+    "what": "ගිණුම අවලංඝන කිරීමේ හෝ කඩ කිරීමේ දී ගෙවිය යුතු මුදල සැබෑ හානිවලට වඩා බොහෝ ගුණයකින් වැඩි ලෙස නිර්ණය කරන ඡේදය. 'ගිණුම් දඩ' යන වචනය නොතිබුණද සැබෑ අර්ථය හානි පිළිබඳ පූර්ව නිර්ණයක් නම් එය අදාළ වේ.",
+    "signals": [
+     "ගිණුම් දඩ·ගිණුම් දඩ·ගුණිතක් ගෙවීම",
+     "අවලංඝනය කිරීමේ දී ඉතිරි කාල ගාස්තු සම්පූර්ණයෙන් අයකිරීම",
+     "අනුපාතිక ගණනය බැහැර කිරීම",
+     "ග්‍රාහක ප්‍රමාද පනත් සම්මතයි අසාමාන්‍ය ලෙස ඉහළ අසමිතිමත් සැලසුම"
+    ],
+    "tip": "සැබෑ හානිට සමාන්තර ද යන්න විමසන්න. අධිකරණ ක්‍රම අධික ගිණුම් දඩ අඩු කර ඇත(සිවිල් නීතිය 398 වගන්තිය)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "එකපාර්ශ්වික ගිණුම අවලංඝනය",
+    "what": "ප්‍රතිපක්ෂයට පූර්ව දැනුම් දීම හෝ සාධාරණ හේතුවක් නොමැතිව ගිණුම වහාම අවසන් කළ හැකි ඡේදය.",
+    "signals": [
+     "අවවාද ක්‍රියා පටිපාටිය නොමැතිව 'වහාම අවලංඝන කළ හැකි'",
+     "නිවාසයි එක්’ක් ප්‍රමාද කිරීමෙන් අවලංඝනය(නීතිය 2 කාල ප්‍රමාද ප්‍රමිතිය)",
+     "ගිණුම ප්‍රතිනවීකරණ ඉල්ලීම අත්හැර දැමීමට බල කරන විශේෂ ගිණුම"
+    ],
+    "tip": "නිවාසයි 2 කාල, වාණිජ ස්ථාන 3 කාල ප්‍රමාද නීතිමත් අවලංඝන ප්‍රමිතිය. එයට වඩා පහසුවෙන් අවලංඝනය වන ලෙස ලියා ඇත්නම් පරීක්ෂා කිරීමේ විෂයය."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "ඉතුරුම් මුදල ප්‍රතිලාභ ප්‍රමාදය",
+    "what": "ඉතුරුම් මුදල·ප්‍රතිසම්පූර්ණ මුදල·ගිණුම් මුදල ප්‍රමාද ලෙස, අඩු කර, හෝ වෙනත් ආකාරයෙන් ප්‍රතිලාභ දෙන ඡේදය.",
+    "signals": [
+     "'ගිණුම අවසන් කිරීමෙන් පසු O මාස තුළ ප්‍රතිලාභ දිය හැකි'ය වැනි දිගු කාල සීමාව",
+     "රක්ෂිත මුදල·ගාස්තු ඒකාකාර අඩු කිරීම",
+     "පොළ රහිත ප්‍රතිලාභ, කූපන්·ලකුණු ආදේශ ගෙවීම"
+    ],
+    "tip": "ප්‍රතිලාභ කාල සීමාව සහ ප්‍රමාද පනත් නිශ්චිතව ඇත්ද යන්න පරීක්ෂා කරන්න. ඉතුරුම් අයිතිය ලියාපදිංචි නිර්දේශ·ඉතුරුම් ආවරණ රක්ෂණ ආරක්ෂක ක්‍රම වේ."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "দায়িත්ව අවලංඝනය",
+    "what": "නීතිය ප්‍රතිපක්ෂයට පැනවූ දায়িත්ව(අවලංඝන කර්තව්‍ය, දෝෂ ඉතිරි දায়িත්ව ආදිය) සම්පූර්ණයෙන් පාරිභෝගිකයා·ඉතුරුම්කරුට පිටින් දැමීම හෝ අවලංඝනය ලබන ඡේදය.",
+    "signals": [
+     "'සම්පූර්ණ(ඕනෑම) දায়িත්ව නොගන්නා'",
+     "'සියලු අවලංඝන ගාස්තු ඉතුරුම්කරු වගකිව ගන්නා'",
+     "සිවිල්·刑事 විරෝධතා ඉදිරිපත් කිරීම තහනම්"
+    ],
+    "tip": "'සියලු·සම්පූර්ණ' වැනි ව්‍යාපක ප්‍රකාශ ප්‍රධාන සංකේතය. සම්පාදන කර්තව්‍ය ව්‍යාපක දැමීම විශේෂ ගිණුම සම්පාදන කර්තව්‍ය අවලංඝනය ලෙස තීරණ කර ඇත."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "අපැහැදිලි ගාස්තු·පනත් කොන්දේසි",
+    "what": "ගිණුම පත්‍රයෙන් පමණක් බැලූ විට කොපමණ ගෙවිය යුතු ද යන්න නොදැනුණු ඡේදය. අපැහැදිලි ප්‍රකාශ පසුව ප්‍රතිපක්ෂයට ඉතා සුවිධ ලෙස අර්ථ නිරූපණය වීමට පහසු.",
+    "signals": [
+     "පනත් අනුපාত·ගාස්තු අනුපාත කොටුව හිස්",
+     "'සාමාන්‍යයෙන් තීරණයේ දී නිර්ණය කරන නීතිමත් පනත්' වැනි අපැහැදිලි ප්‍රමිතිය",
+     "'වෙනම සම්මතයි අනුව'"
+    ],
+    "tip": "ගිණුම පත්‍රයට සංඛ්‍යා සහ ගණනය කිරීමේ ක්‍රමය ඉල්ලා සිටින්න. අපැහැදිලි පනත් ප්‍රකාශ සම්පාදන කර්තව්‍ය වාර්ෂික 5%(සිවිල් නීතිය නීතිමත් පනත්) සීමා කර ඇත."
+   },
+   {
+    "id": "trust_notice",
+    "title": "විශ්වාස සම්බන්ධතා·අයිතිය අස්ථිරතා දැනුම්දීම",
+    "what": "නිවාසය විශ්වාස සමාගමේ අයිතිය නිසා අයිතිය ව්‍යුහය අස්ථිර ද, විශේෂ ගිණුමෙන් ඉතුරුම්කරු ආරක්ෂණ අඩු කරන ඡේදය. සම්පූර්ණ ඉතුරුම් වංචාවේ ප්‍රධාන ප්‍රවර්ගයක්.",
+    "signals": [
+     "'විශ්වාස ගිණුම්කරු(විශ්වාස සමාගම) ඉතුරුම් මුදල ප්‍රතිලාභ දায়িත්ව නැත'",
+     "'විශ්වාස ගිණුම්කරු පූර්ව අනුමතිය නොමැතිව ඉතුරුම් ගිණුම ඵලදායි නොවේ'",
+     "විශ්වාස මූල ලේඛන පරීක්ෂා නොකර ගිණුම ඉක්මනින් කිරීම"
+    ],
+    "tip": "ලියාපදිංචි පත්‍ර අ කොටසින් අයිතිකරු විශ්වාස සමාගම ද, විශ්වාස මූල ලේඛනින් ඉතුරුම් අයිතිය කවුරුට ඇත්ද යන්න පරීක්ෂා කරන්න."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "අසාධාරණ ගාස්තු·බදු පිටින් දැමීම",
+    "what": "නීතිමත ප්‍රතිපක්ෂයා(අයිතිකරු·ව්‍යාපාරිකයා) වගකිව ගත යුතු වියදම පාරිභෝගිකයා·ඉතුරුම්කරුට පිටින් දැමීමේ ඡේදය.",
+    "signals": [
+     "අයිතිකරු වගකිව ගත යුතු බදු(දේපල බදු·අත්පත් කර ගැනීමේ බදු) ඉතුරුම්කරුට",
+     "ඉතුරුම් කරුවේ අවලංඝන·නඩත්තු වියදම පිටින් දැමීම",
+     "ගිණුම ස්ථාපිතකරණ ගාස්තු වගකිරීම ඉල්ලීම"
+    ],
+    "tip": "එම ගාස්තු නීතිමත ලෙස කවුරුගේ වගකිරීම ද යන්න විමසන්න. ස්වයං භාවිතා කරන ජනසම්පත්තිය(විදුලි·ජලය) වලින් වෙනස්."
+   },
+   {
+    "id": "benefit_change",
+    "title": "එකපාර්ශ්වික ගිණුම්·කොන්දේසි වෙනස්කිරීම",
+    "what": "ප්‍රතිපක්ෂයා ගිණුම අන්තර්ගතය(නියම·පනත්·ගෙවීමේ කොන්දේසි) සම්මතිය නොමැතිව වෙනස් කළ හැකි ඡේදය.",
+    "signals": [
+     "'සමාගම අත්‍යවශ්‍යයෙන් වෙනස් කළ හැකි'",
+     "වෙනස්කිරීමේ දැනුම් දීමෙන් පසු ප්‍රතිචාරයක් නොමැත්නම් 'සම්මතිය ලබා ඇතැයි සලකනු ලබන්න'",
+     "ගෙවීමේ කොන්දේසි සමාගමේ අධිකාරයෙන් සම්පාදනය"
+    ],
+    "tip": "වෙනස්කිරීමේ දී පූර්ව දැනුම් දීම සහ ප්‍රතික්ෂේපනය(අවලංඝනය) අයිතිය සහතික ද යන්න පරීක්ෂා කරන්න. සම්මතිය සලකා ගැනීමේ ඡේදය විවාද සම්පාදනයේ නැවත නැවතත් නිරෝධක ඇතිවිය."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "තේරීම් අයිතිය සීමා කිරීම·ගිණුම බල කිරීම",
+    "what": "නිශ්චිත භාණ්ඩ·ව්‍යාපාරිකයා භාවිතා කිරීම බල කිරීම හෝ පාරිභෝගිකයාගේ තේරීම් අයිතිය අවහිර කරන ඡේදය(ඇතුළු විකිණීම ඇතුළුව).",
+    "signals": [
+     "'නිර්දේශිත ව්‍යාපාරිකයා හරහා පමණක්'",
+     "අතිරේක භාණ්ඩ අනිවාර්ය ලියාපදිංචිය",
+     "වෙනත් තේරීම් අයිතිය අවහිර කරන ප්‍රකාශ"
+    ],
+    "tip": "බල කරන ලද භාවිතා·ගිණුම ගිණුම අරමුණට අත්‍යවශ්‍ය ද, වෙනත් තේරීම් අයිතිය ඇයි අවහිර ද යන්න විමසන්න."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "අයිතිය ක්‍රියාකාරිතා සීමා කිරීම",
+    "what": "නීතිය සහතික කරන අයිතිය(අවලංඝනය අයිතිය·විරෝධතා ඉදිරිපත් කිරීම·නඩු ගිණුම ආදිය) භාවිතා කිරීම අවහිර කරන ඡේදය.",
+    "signals": [
+     "'විරෝධතා ඉදිරිපත් නොකරන බවට' සහතිකතා",
+     "අවලංඝනය අයිතිය ක්‍රියාකාරිතා කාල සීමාව·ක්‍රමය අධිකවෙන් සීමා කිරීම",
+     "නඩු ගිණුම තහනම්·නඩු ගිණුම නොකිරීමේ ගිණුම"
+    ],
+    "tip": "නීතිමත් අයිතිය විශේෂ ගිණුමෙන් පහසුවෙන් අඩු කළ නොහැක. නියම නිරෝධක නීතිය·ගිණුම ගිණුම නීතිය උල්ලංඝනයෙන් ප්‍රතික්ෂේපිත සිද්ධි ඇත."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "කර්තව්‍ය ඉටු කිරීමෙන් පසු ගාස්තු 20% පමණක් ප්‍රතිලාභ(ගිණුම් දඩ 80%) කරන ඡේදය අසාධාරණ ලෙස අධික හානි පිළිබඳ පූර්ව නිර්ණයක් ලෙස දෙස බලා ගිණුම් දඩ නොමැතිව සම්පූර්ණ ප්‍රතිසම්පූර්ණ ස්ථාපිතයි",
+   "신발도매_2013": "ගිණුම අවලංඝනය කිරීමේ දී ගිණුම් ගාස්තු 50% ගිණුම් දඩ ඡේදය — ජනතා සාධාරණ කර්තව්‍ය තේරීම(2004약제2214) සහ ප්‍රශ්ན පොදු ලෙස ගිණුම් දඩ අර්ධ ප්‍රතිලාභ සම්පාදනය ස්ථාපිතයි",
+   "2019-18b": "රක්ෂණ ඉතුරුම් සැපයීම අතිරේක ගිණුම පත්‍රයේ විරෝධතා ඉදිරිපත් කිරීම අත්හැර දැමීමේ සහතිකතා — 'අවසාන' ප්‍රකාශ අපැහැදිලි නිසා නියම සංස්කරණ අවශ්‍ය ලෙස ඉඟි කරයි",
+   "2005-41": "ආයෝජන උපදේශ ගිණුමේ පාරිභෝගිකයා අවලංඝනය අයිතිය සීමා කිරීමේ ඡේදය — නියම නිරෝධක නීතිය පැහැදිලි කිරීම·පැහැදිලි කිරීමේ කර්තව්‍ය උල්ලංඝනය සහ ගසහ විකිණීම නීතිය අත්‍යවශ්‍ය අවලංඝනය අයිතිය ස්පර්ශ කිරීමෙන් යෙදුම ප්‍රතික්ෂේපිතයි",
+   "즉시연금_2017-17": "අවම සහතිකතා පනත් අඩුවෙන් වාර්ෂිකී ගෙවීම එය නියම උල්ලංඝනය ලෙස තීරණ කරයි",
+   "바로연금보험_2018-8": "පරිණත ගිණුම් මුදල අඩු කිරීමේ පදනම අපැහැදිලි ඡේදය — ලිපිකරු අපකාර මූලධර්ම අනුව පාරිභෝගිකයාට ඉතා සුවිධ ලෙස අර්ථ නිරූපණය කරයි",
+   "2019-18a": "ණය ගිණුම මූල නියමයේ එකපාර්ශ්වික අවලංඝනය ඡේදය — ජනතා සාධාරණ කර්තව්‍ය කර්තව්‍ය අවලංඝනය තීරණය උদ්ධෘත කර අවලංඝනය පදනම ප්‍රතික්ෂේපිතයි",
+   "990": "ඉතුරුම්කරුගේ ගිණුම ප්‍රතිනවීකරණ ඉල්ලීම අයිතිය අත්හැර දැමීමේ විශේෂ ගිණුම — නිවාස ඉතුරුම් ගිණුම ආරක්ෂණ නීතිය 6වන වගන්තිය 3 උප-වගන්තිය 1 උල්ලංඝනයෙන් විශේෂ තත්ත්ව නොමැතිව අවලංඝනයි",
+   "2008_약관변경동의간주": "නිශ්චිත කාල සීමාවක් විරෝධතා නොමැත්නම් නියම වෙනස්කිරීමට සම්මතිය ලබා ඇතැයි සලකා ගැනීමේ ඡේදය — නියම නිරෝධක නීතිය 12 වගන්තිය උල්ලංඝනයෙන් බන්ධනකාරී බලය ප්‍රතික්ෂේපිතයි",
+   "2010_ELS조건조정": "නිකුතු කරුවේ අධිකාරයෙන් ගෙවීමේ කොන්දේසි සම්පාදනය කළ හැකි ඡේදය — ව්‍යාප්ත යෙදුම සීමිත අර්ථ නිරූපණයෙන් පාලනය කර ගෙවීම නිර්දේශ කරයි",
+   "20": "නිවාස අවලංඝනය ගාස්තු සම්පූර්ණයෙන් ඉතුරුම්කරු වගකිරීම ලෙස කරන විශේෂ ගිණුම — ඉතුරුම් කරුවේ නීතිමත් නඩත්තු කර්තව්‍ය ව්‍යාපක දැමීම අවලංඝනයි",
+   "2008_직불카드양도": "කාඩ්පත් පිටින් දැමීමේ දී සම්පූර්ණ වගකිරීම ගැනීමේ ඡේදය — දායකත්ව බෙදා හැරීමේ තීරණ අනුව සාමාජිකයා වගකිරීම 40% සීමා කරයි"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "විශ්වාස කිරීම් නිදහස් විශේෂ කොන්දේසි",
+    "what": "නිවස විශ්වාස කිරීම් සමාගමේ සිටින්නේ, විශේෂ කොන්දේසි මගින් 'විශ්වාස කිරීම් සමාගම ඉතුරු මුදල් ආපසු දීමේ দায়িත්වය නැත' යි කිරීමේ ක්‍රමය. කුලී ගෙවන්නා ඉතුරු මුදල් ආපසු ලබා ගැනීමේ නීතිමය ඉල්ලීමේ ඉලක්කය අතුරුදහන් වේ.",
+    "signal": "විශේෂ කොන්දේසිවල 'විශ්වාස කිරීම් ගිණුම්කරු', 'විශ්වාස කිරීම්', 'ආපසු දීමේ දায়িත්වය නැත', 'විරෝධතා ඉදිරිපත් නොකරනු ඇත' වැනි ප්‍රකාශන.",
+    "outside": "ලියාපදිංචි ප්‍රතිවාදයේ පළමු කොටසින් හිමිකරු විශ්වාස කිරීම් සමාගම ද යන්න තහවුරු කරන්න. විශ්වාස කිරීම් ලේඛනය ලබා ගෙන කුලී දීමේ බලය කිසට ඇත්ද යන්න තහවුරු කරන්න.",
+    "case": "මූල්‍ය ගැටුම් සකස් කිරීමේ උදාහරණ බහුතරයි — විශ්වාස කිරීම් ගිණුම්කරු නිදහස් කිරීමේ විශේෂ කොන්දේසි මගින් ඉතුරු මුදල් ප්‍රතිසම්පාදනය ව්‍යුහගතව වැළැක්වෙන ප්‍රකාරය (ගෝල්ඩන් සෙට් A ශ්‍රේණිය)."
+   },
+   {
+    "id": "gap",
+    "title": "හිස් සම්පූර්ණ කුලී (ණය අනුපාතය ඉක්මවා ගිය)",
+    "what": "ඉතුරු මුදල් + ඉහළ අනුපිළිවෙල ණය නිවසේ මිතිය ළඟා වීම හෝ ඉක්මවා යාම. නිවස බලහත්කාරී විකිණීමට යතුරු දුන්නොත් ඉතුරු මුදල් සම්පූර්ණයෙන් ආපසු ලබා ගත නොහැක.",
+    "signal": "ගිණුම්පතෙන් පමණක් නොපෙනේ — එබැවින් අනතුරුදායක. වෙළඳ මිතිය සාපේක්ෂව ඉතුරු මුදල් විශාල නම් කුලී දෙන්නා ඉක්මවා ගිය නම් සැක කරන්න.",
+    "outside": "ණය අනුපාතය = (ඉහළ අනුපිළිවෙල ණය + ඉතුරු මුදල්) ÷ වෙළඳ මිතිය. 90% ට වැඩි නම් සත්‍යතා පර්යේෂණයෙන් ගිණුම්පතෙහි 17.6% ඉතුරු මුදල් අනතුරු (මූලික පරතරය 0.2%). ප්‍රතිඵල තිරයේ හිස් සම්පූර්ණ කුලී ගණකය සමඟ තහවුරු කරන්න.",
+    "case": "An Seon-yeong·Lee Sang-yeop(2025) ප්‍රධාන නගරයේ කුලී ඉතුරු 450,000 ගිණුම්පත් සත්‍යතා — ණය අනුපාතය 90% ට වැඩි පරතරයේ අනතුරු අනුපාතය 17.6%."
+   },
+   {
+    "id": "double",
+    "title": "ද්විත්ව ගිණුම්පත",
+    "what": "එකම නිවස විවිධ කුලී ගෙවන්නා සමඟ ගිණුම්පත් කිරීම හෝ නිවස හිමිකරු නොදැන ප්‍රබන්ධකරු ව්‍යාජ ගිණුම්පත් සම්පාදනය කිරීමේ ක්‍රමය. විරුද්ධ බලය අනුපිළිවෙලින් පසුවෙතින් ඉතුරු මුදල් අහිමි වේ.",
+    "signal": "ගිණුම්පතේ පක්ෂ ලියාපදිංචි ප්‍රතිවාදයේ හිමිකරු වලට වෙනස් නම් බලතල පත්‍රය අපැහැදිලි. වෙළඳ මිතිය ට වඩා ඉතා සුලභ ගිණුම්පතක් ඉක්මවා ගිය බවට කිරීම.",
+    "outside": "ලියාපදිංචි ප්‍රතිවාදයේ හිමිකරු සමඟ සরලව ගිණුම්පත (අනන්‍යතා ප්‍රমාණ පත්‍ර සමඟ). බලතල ගිණුම්පත නම් සිද්ධ සාක්ෂ්‍ය සහිත බලතල පත්‍රය තහවුරු කරන්න. ඉතිරි මුදල් හිමිකරු නම් ගිණුම් වලට පමණක්.",
+    "case": "නිවස කුලී ගිණුම්පත ගැටුම් සකස් කිරීමේ කමිටුවේ පුනරාවර්තන ප්‍රකාරය — බලතල නොමැති කුලී ගිණුම්පතේ බලපත්‍ර ගැටුම්."
+   },
+   {
+    "id": "appraisal",
+    "title": "වෙළඳ මිතිය ඉහළ දැමීම (තක්සේරු අපයෝජනය)",
+    "what": "සත්‍ය ගිණුම්පත් නොමැති නව නිර්මිත විල්ල ආදිවලින් තක්සේරුවෙන් වෙළඳ මිතිය ඉහළ දැමීමෙන් ඉතුරු මුදල් වෙළඳ මිතිය තරම් (හෝ ඉක්මවා) ලබා ගැනීමේ ක්‍රමය. පටන්ගැනීමේ සිට හිස් සම්පූර්ණ කුලී ලෙස ආරම්භ වේ.",
+    "signal": "'තක්සේරු මිතිය O බිලියන' අවධාරණය කරන අතර සත්‍ය ගිණුම්පත් දත්ත නොපෙන්වනු ඇත. නව නිර්මිත සම්බන්ධිත නිවස·බහු පවුල් නිවසවල බහුතරයි.",
+    "outside": "ජාතික භූමි අමාත්‍යාංශ සත්‍ය ගිණුම්පත් ප්‍රකාශන පද්ධතියෙන් එකම ප්‍රදේශයේ සමාන ගිණුම්පත් සත්‍ය ගිණුම්පත් සরලව තහවුරු කරන්න. සත්‍යතා පර්යේෂණයෙන් තක්සේරුවෙන් ගිණුම්පත් මිතිය සකස් කිරීම ඉතුරු මුදල් අනතුරු ජයග්‍රහණ 4.8 ගුණයි.",
+    "case": "An Seon-yeong·Lee Sang-yeop(2025) — විශේෂඥ(තක්සේරු) මිතිය සකස් කිරීම Exp(B) 4.8, සම්බන්ධිත·බහු පවුල් නිවස 5.8 ගුණයි."
+   },
+   {
+    "id": "proxy",
+    "title": "බෙල්ට කුලී දෙන්නා·ආයතන කුලී දෙන්නා",
+    "what": "දේපල නොමැති පුද්ගලයා හෝ කඩදාසි ආයතන නම්වලින් නිවස ගෙන කුලී දීමේ ක්‍රමය. අනතුරු සිදුවුවත් ආපසු දීමට දේපල නැත.",
+    "signal": "කුලී දෙන්නා ආයතනයි නම් සත්‍යතා අපැහැදිලි. ගිණුම්පතට පෙර හිමිකරු වෙනස්වේ(ලියාපදිංචි ප්‍රතිවාදයේ පළමු කොටස අවසාන හිමිකරු ස්ථාන පිටපත).",
+    "outside": "ලියාපදිංචි ප්‍රතිවාදයේ පළමු කොටසින් අවසාන හිමිකරු ස්ථාන ඉතිහාසය තහවුරු කරන්න. ආයතන කුලී දෙන්නා සත්‍යතා පර්යේෂණයෙන් ඉතුරු මුදල් අනතුරු ජයග්‍රහණ 3.6 ගුණයි — ආයතන ලියාපදිංචි ප්‍රතිවාදයෙන් සත්‍යතා තහවුරු කරන්න.",
+    "case": "An Seon-yeong·Lee Sang-yeop(2025) — ආයතන කුලී දෙන්නා Exp(B) 3.6 (අනතුරු අනුපාතය 20.4% vs පුද්ගල 4.8%)."
+   }
+  ]
+ },
+ "bn": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "অত্যধিক চুক্তি ভঙ্গ জরিমানা",
+    "what": "চুক্তি বাতিল বা লঙ্ঘন করার সময় প্রকৃত ক্ষতির চেয়ে অনেক বেশি অর্থ প্রদানের শর্ত। 'জরিমানা' শব্দ না থাকলেও বাস্তবে ক্ষতিপূরণ পূর্বনির্ধারণ হলে এটি প্রযোজ্য।",
+    "signals": [
+     "জরিমানা·চুক্তি ভঙ্গ শাস্তি·দ্বিগুণ ক্ষতিপূরণ",
+     "বাতিলের সময় অবশিষ্ট সময়ের সম্পূর্ণ ফি প্রদান",
+     "আনুপাতিক গণনা বাদ দেওয়া",
+     "গ্রাহক বিলম্ব সুদের হার অস্বাভাবিকভাবে বেশি এবং অসমান ডিজাইন"
+    ],
+    "tip": "প্রকৃত ক্ষতির সাথে সামঞ্জস্যপূর্ণ কিনা জিজ্ঞাসা করুন। আদালত অত্যধিক জরিমানা হ্রাস করে আসছে (দেওয়ানি আইন ৩৯৮ ধারা)।"
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "একপক্ষীয় চুক্তি বাতিল",
+    "what": "অন্যপক্ষ পূর্ব বিজ্ঞপ্তি বা যথাযথ কারণ ছাড়াই চুক্তি অবিলম্বে শেষ করতে পারে এমন শর্ত।",
+    "signals": [
+     "চেতাবনি প্রক্রিয়া ছাড়াই 'অবিলম্বে বাতিল করা যায়'",
+     "আবাসন চুক্তিতে মাত্র ১ বার বিলম্ব হলে বাতিল (আইন ২ বার বিলম্ব নির্ধারণ করে)",
+     "নবায়ন দাবির অধিকার পরিত্যাগের বিশেষ চুক্তি"
+    ],
+    "tip": "আবাসন ২ বার, বাণিজ্যিক স্থান ৩ বার বিলম্ব আইনি বাতিল মানদণ্ড। এর চেয়ে সহজে বাতিল হলে যাচাই করুন।"
+   },
+   {
+    "id": "deposit_delay",
+    "title": "নিরাপত্তা জমা ফেরত বিলম্ব",
+    "what": "নিরাপত্তা জমা·ফেরত অর্থ·নিষ্পত্তি অর্থ দেরিতে, কম করে বা অন্য কিছু দিয়ে ফেরত দেওয়ার শর্ত।",
+    "signals": [
+     "'চুক্তি শেষের পর ও মাসের মধ্যে ফেরত দিতে পারে' এমন দীর্ঘ সময়সীমা",
+     "সংরক্ষিত অর্থ·হার সুদ সমান কাটা",
+     "সুদ ছাড়া ফেরত, কুপন·পয়েন্ট দিয়ে বিকল্প প্রদান"
+    ],
+    "tip": "ফেরত সময়সীমা এবং বিলম্বের সুদ স্পষ্ট কিনা যাচাই করুন। ভাড়াটে অধিকার নিবন্ধন আদেশ·নিরাপত্তা বীমা সুরক্ষা ব্যবস্থা।"
+   },
+   {
+    "id": "liability_waiver",
+    "title": "দায়িত্ব অব্যাহতি",
+    "what": "আইন যে দায়িত্ব অন্যপক্ষের উপর রোপণ করে (মেরামত দায়িত্ব, ত্রুটি গ্যারান্টি ইত্যাদি) তা সম্পূর্ণভাবে ভোক্তা·ভাড়াটেকে দেওয়া বা অব্যাহতি পাওয়ার শর্ত।",
+    "signals": [
+     "'সম্পূর্ণ (যেকোনো) দায়িত্ব নেই'",
+     "'সমস্ত মেরামত খরচ ভাড়াটে বহন করে'",
+     "দেওয়ানি·ফৌজদারি আপত্তি নিষেধ"
+    ],
+    "tip": "'সমস্ত·সম্পূর্ণ' এমন ব্যাপক শব্দ মূল সংকেত। সমন্বয় কমিশন ব্যাপক দায়িত্ব স্থানান্তর চুক্তি অকার্যকর বলে রায় দিয়েছে।"
+   },
+   {
+    "id": "unclear_fees",
+    "title": "অস্পষ্ট হার·সুদ শর্ত",
+    "what": "চুক্তিপত্র পড়ে কত অর্থ দিতে হবে তা বোঝা না যায় এমন শর্ত। অস্পষ্ট শব্দ পরে অন্যপক্ষের পক্ষে ব্যাখ্যা হওয়ার সম্ভাবনা বেশি।",
+    "signals": [
+     "সুদের হার·হার খালি ঘর",
+     "'সাধারণত রায়ে নির্ধারিত আইনি সুদ' এমন অস্পষ্ট মানদণ্ড",
+     "'পৃথক আলোচনা অনুযায়ী'"
+    ],
+    "tip": "সংখ্যা এবং গণনা পদ্ধতি চুক্তিপত্রে লিখতে বলুন। সমন্বয় কমিশন অস্পষ্ট সুদ শব্দ বার্ষিক ৫% (দেওয়ানি আইন আইনি সুদ) সীমিত করেছে।"
+   },
+   {
+    "id": "trust_notice",
+    "title": "বিশ্বাস সম্পর্ক·মালিকানা অস্থিরতা বিজ্ঞপ্তি",
+    "what": "বাড়ি বিশ্বাস কোম্পানির মালিকানায় থাকায় মালিকানা কাঠামো অস্থির, কিন্তু বিশেষ চুক্তিতে ভাড়াটে সুরক্ষা কমানো হয়। সম্পূর্ণ ভাড়া জালিয়াতির মূল প্যাটার্ন।",
+    "signals": [
+     "'বিশ্বাসী (বিশ্বাস কোম্পানি) নিরাপত্তা জমা ফেরত দায়িত্ব নেই'",
+     "'বিশ্বাসী পূর্ব অনুমতি ছাড়া ভাড়া চুক্তি কার্যকর নয়'",
+     "বিশ্বাস মূল নথি যাচাই ছাড়াই চুক্তি তাড়াহুড়ো"
+    ],
+    "tip": "নিবন্ধন খাতা প্রথম অংশে মালিক বিশ্বাস কোম্পানি কিনা, বিশ্বাস মূল নথিতে ভাড়া ক্ষমতা কার কাছে আছে তা যাচাই করুন।"
+   },
+   {
+    "id": "cost_shifting",
+    "title": "অন্যায্য খরচ·কর স্থানান্তর",
+    "what": "আইনত অন্যপক্ষ (মালিক·ব্যবসায়ী) বহন করবে এমন খরচ ভোক্তা·ভাড়াটেকে দেওয়ার শর্ত।",
+    "signals": [
+     "মালিক বহন কর (সম্পত্তি কর·অধিগ্রহণ কর) ভাড়াটেকে দেওয়া",
+     "ভাড়াটে মালিকের মেরামত·রক্ষণাবেক্ষণ খরচ",
+     "বন্ধকী নিবন্ধন খরচ বহন দাবি"
+    ],
+    "tip": "সেই খরচ আইনত কার বহন করবে তা জিজ্ঞাসা করুন। নিজে ব্যবহৃত সেবা খরচ (বিদ্যুৎ·জল) থেকে আলাদা।"
+   },
+   {
+    "id": "benefit_change",
+    "title": "একপক্ষীয় সুবিধা·শর্ত পরিবর্তন",
+    "what": "অন্যপক্ষ চুক্তি বিষয়বস্তু (শর্তাবলী·সুদের হার·প্রদান শর্ত) সম্মতি ছাড়াই পরিবর্তন করতে পারে এমন শর্ত।",
+    "signals": [
+     "'কোম্পানি ইচ্ছামত পরিবর্তন করতে পারে'",
+     "পরিবর্তন বিজ্ঞপ্তির পর নীরবতা হলে 'সম্মত হয়েছে বলে গণ্য'",
+     "প্রদান শর্ত কোম্পানির বিবেচনায় সমন্বয়"
+    ],
+    "tip": "পরিবর্তনে পূর্ব বিজ্ঞপ্তি এবং অস্বীকার (বাতিল) অধিকার নিশ্চিত কিনা যাচাই করুন। সম্মতি গণ্য শর্ত সমন্বয়ে বারবার বাধা পেয়েছে।"
+   },
+   {
+    "id": "forced_purchase",
+    "title": "পছন্দ সীমাবদ্ধতা·ক্রয় বাধ্যতা",
+    "what": "নির্দিষ্ট পণ্য·ব্যবসা ব্যবহার বাধ্য করা বা ভোক্তার পছন্দ বাধা দেওয়ার শর্ত (বান্ডেল বিক্রয় অন্তর্ভুক্ত)।",
+    "signals": [
+     "'নির্দিষ্ট ব্যবসার মাধ্যমে শুধুমাত্র'",
+     "সহায়ক পণ্য বাধ্যতামূলক নিবন্ধন",
+     "অন্য পছন্দ বাদ দেওয়ার শব্দ"
+    ],
+    "tip": "বাধ্যতামূলক ব্যবহার·ক্রয় চুক্তি উদ্দেশ্যের জন্য অপরিহার্য কিনা, অন্য পছন্দ কেন বাধা দেওয়া হয়েছে তা জিজ্ঞাসা করুন।"
+   },
+   {
+    "id": "rights_restriction",
+    "title": "অধিকার প্রয়োগ সীমাবদ্ধতা",
+    "what": "আইন নিশ্চিত অধিকার (বাতিল অধিকার·আপত্তি·মামলা) ব্যবহার করতে বাধা দেওয়ার শর্ত।",
+    "signals": [
+     "'আপত্তি করব না' এমন প্রতিশ্রুতি",
+     "বাতিল অধিকার প্রয়োগ সময়·পদ্ধতি অত্যধিক সীমিত",
+     "মামলা দায়ের নিষেধ·বিকল্প সমাধান চুক্তি"
+    ],
+    "tip": "আইনি অধিকার বিশেষ চুক্তিতেও সহজে নেওয়া যায় না। শর্তাবলী নিয়ন্ত্রণ আইন·কিস্তি বাণিজ্য আইন লঙ্ঘনে বাতিল হয়েছে।"
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "কাজ সম্পন্নের পর ২০% হার সুদ শুধু ফেরত দেওয়ার শর্ত অন্যায্য অত্যধিক ক্ষতিপূরণ পূর্বনির্ধারণ হিসেবে বিবেচিত, জরিমানা ছাড়াই সম্পূর্ণ অর্থ ফেরত চূড়ান্ত",
+   "신발도매_2013": "ফ্র্যাঞ্চাইজি বাতিলে ৫০% ফ্র্যাঞ্চাইজি ফি জরিমানা শর্ত — প্রতিযোগিতা কমিশন নজির (২০০৪ ক্ষমতা ২২১৪) এবং বিষয় সাধারণ হিসেবে জরিমানা আংশিক ফেরত সমন্বয় চূড়ান্ত",
+   "2019-18b": "বীমা নিরাপত্তা প্রদান অতিরিক্ত চুক্তিপত্রের আপত্তি পরিত্যাগ প্রতিশ্রুতি — 'অকার্যকর' শব্দ অস্পষ্ট হওয়ায় শর্তাবলী সংশোধন প্রয়োজন নির্দেশ",
+   "2005-41": "বিনিয়োগ পরামর্শ চুক্তির ভোক্তা বাতিল অধিকার সীমাবদ্ধতা শর্ত — শর্তাবলী নিয়ন্ত্রণ আইন স্পষ্টতা·ব্যাখ্যা দায়িত্ব লঙ্ঘন এবং দোরগোড়ায় বিক্রয় আইন ইচ্ছামত বাতিল অধিকার সংঘর্ষে প্রয়োগ বাতিল",
+   "즉시연금_2017-17": "সর্বনিম্ন গ্যারান্টি সুদের হার কম বার্ষিকী প্রদান শর্তাবলী লঙ্ঘন হিসেবে রায়",
+   "바로연금보험_2018-8": "পরিপক্কতা বীমা অর্থ কাটার ভিত্তি অস্পষ্ট শর্ত — লেখক অসুবিধা নীতি অনুযায়ী ভোক্তার পক্ষে অনুকূল ব্যাখ্যা",
+   "2019-18a": "ঋণ লেনদেন মূল শর্তাবলীর একপক্ষীয় বাতিল শর্ত — প্রতিযোগিতা কমিশন অকার্যকর রায় উদ্ধৃত করে বাতিল ভিত্তি অস্বীকার",
+   "990": "ভাড়াটের চুক্তি নবায়ন দাবি অধিকার পরিত্যাগ বিশেষ চুক্তি — আবাসন ভাড়া সুরক্ষা আইন ৬ ধারার ৩ অংশ ১ লঙ্ঘনে বিশেষ পরিস্থিতি ছাড়াই অকার্যকর",
+   "2008_약관변경동의간주": "নির্দিষ্ট সময় আপত্তি না থাকলে শর্তাবলী পরিবর্তনে সম্মত হয়েছে বলে গণ্য শর্ত — শর্তাবলী নিয়ন্ত্রণ আইন ১২ ধারা লঙ্ঘনে বাধ্যতামূলকতা অস্বীকার",
+   "2010_ELS조건조정": "প্রকাশক বিবেচনায় প্রদান শর্ত সমন্বয় করতে পারে এমন শর্ত — সম্প্রসারণ প্রয়োগ সীমিত ব্যাখ্যায় নিয়ন্ত্রণ এবং প্রদান আদেশ",
+   "20": "আবাসন মেরামত খরচ সম্পূর্ণ ভাড়াটে দায়িত্ব বিশেষ চুক্তি — ভাড়াটের আইনি রক্ষণাবেক্ষণ দায়িত্ব ব্যাপক স্থানান্তর অকার্যকর নিশ্চিত",
+   "2008_직불카드양도": "কার্ড স্থানান্তরে সম্পূর্ণ দায়িত্ব শর্ত — অবদান বন্টন রায় অনুযায়ী সদস্য দায়িত্ব ৪০% সীমিত"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "বিশ্বাস ব্যবস্থাপনা দায়মুক্তি বিশেষ শর্ত",
+    "what": "বাড়িটি বিশ্বাস ব্যবস্থাপনা কোম্পানির মালিকানায় থাকে, কিন্তু বিশেষ শর্তে 'বিশ্বাস ব্যবস্থাপনা কোম্পানি জমানত ফেরত দেওয়ার দায়িত্ব নেই' বলে নির্ধারণ করা হয়। ভাড়াটেরা জমানত ফেরত পাওয়ার জন্য আইনি দাবি করার কোনো লক্ষ্য থাকে না।",
+    "signal": "বিশেষ শর্তে 'সম্পত্তি ব্যবস্থাপক', 'বিশ্বাস ব্যবস্থাপনা', 'ফেরত দেওয়ার দায়িত্ব নেই', 'আপত্তি জানাবেন না' এর মতো শব্দ।",
+    "outside": "নিবন্ধন খাতা প্রথম অংশে মালিক বিশ্বাস ব্যবস্থাপনা কোম্পানি কিনা তা যাচাই করুন। বিশ্বাস ব্যবস্থাপনা মূল নথি সংগ্রহ করে ভাড়া দেওয়ার ক্ষমতা কার আছে তা নিশ্চিত করুন।",
+    "case": "আর্থিক বিরোধ সমন্বয় সংস্থার অনেক উদাহরণ — সম্পত্তি ব্যবস্থাপক দায়মুক্তি শর্তে জমানত পুনরুদ্ধার কাঠামোগতভাবে বাধাগ্রস্ত হয় (গোল্ডেন সেট এ গ্রেড)।"
+   },
+   {
+    "id": "gap",
+    "title": "খালি সম্পত্তি ভাড়া (ঋণ অনুপাত অতিক্রম)",
+    "what": "জমানত + প্রথম অগ্রাধিকার ঋণ বাড়ির মূল্যের কাছাকাছি বা তার বেশি। বাড়ি নিলামে চলে গেলে জমানত সম্পূর্ণভাবে ফেরত পাওয়া যায় না।",
+    "signal": "চুক্তিপত্র থেকে একা দেখা যায় না — তাই এটি ঝুঁকিপূর্ণ। বাজার মূল্যের তুলনায় জমানত বড়, এবং ভাড়াটিয়া তাড়াহুড়ো করলে সন্দেহজনক।",
+    "outside": "ঋণ অনুপাত = (প্রথম অগ্রাধিকার ঋণ + জমানত) ÷ বাজার মূল্য। ৯০% এর বেশি হলে বাস্তব গবেষণায় চুক্তির ১৭.৬% জমানত দুর্ঘটনা ঘটে (মানদণ্ড ব্যবধান ০.২%)। ফলাফল পর্দায় খালি সম্পত্তি ভাড়া ক্যালকুলেটর দিয়ে যাচাই করুন।",
+    "case": "আন সিওন-ইয়ং·ইয়ি সাং-ইয়াপ (২০২৫) রাজধানী অঞ্চল জমানত ৪৫ লক্ষ চুক্তি বাস্তব গবেষণা — ঋণ অনুপাত ৯০% এর বেশি ব্যবধানে দুর্ঘটনা হার ১৭.৬%।"
+   },
+   {
+    "id": "double",
+    "title": "দ্বিগুণ চুক্তি",
+    "what": "একই বাড়ি একাধিক ভাড়াটের সাথে চুক্তি করা, বা বাড়ির মালিক না জেনে ব্যবস্থাপক জাল চুক্তি করা। প্রতিরোধ ক্ষমতা ক্রমে পিছিয়ে গেলে জমানত হারিয়ে যায়।",
+    "signal": "চুক্তির পক্ষ নিবন্ধন খাতার মালিকের থেকে আলাদা, কিন্তু ক্ষমতায়ন চিঠি অস্পষ্ট। বাজার মূল্যের চেয়ে সস্তা, দ্রুত চুক্তি করতে তাড়াহুড়ো।",
+    "outside": "নিবন্ধন খাতার মালিক নিজের সাথে সরাসরি চুক্তি করুন (পরিচয়পত্র যাচাই করুন)। ক্ষমতায়ন চুক্তি হলে সীল শংসাপত্র সহ ক্ষমতায়ন চিঠি যাচাই করুন। চূড়ান্ত অর্থ শুধুমাত্র মালিকের নামের অ্যাকাউন্টে পাঠান।",
+    "case": "আবাসন ভাড়া বিরোধ সমন্বয় কমিশন পুনরাবৃত্ত ধরন — অনুমতিহীন ভাড়া চুক্তির কার্যকারিতা বিরোধ।"
+   },
+   {
+    "id": "appraisal",
+    "title": "বাজার মূল্য ফুলিয়ে দেওয়া (মূল্যায়ন অপব্যবহার)",
+    "what": "প্রকৃত লেনদেন নেই এমন নতুন ভিলায় মূল্যায়ন দিয়ে বাজার মূল্য ফুলিয়ে জমানত বাজার মূল্য অনুযায়ী (বা তার বেশি) নেওয়া। শুরু থেকেই খালি সম্পত্তি ভাড়া হয়ে যায়।",
+    "signal": "'মূল্যায়ন মূল্য O বিলিয়ন' জোর দেওয়া হয়, কিন্তু প্রকৃত লেনদেন তথ্য দেখানো হয় না। নতুন সংযুক্ত বাড়ি, বহু-পরিবার বাড়িতে সাধারণ।",
+    "outside": "জাতীয় ভূমি মন্ত্রণালয় প্রকৃত লেনদেন প্রকাশ ব্যবস্থায় একই এলাকার অনুরূপ সম্পত্তির প্রকৃত লেনদেন মূল্য সরাসরি যাচাই করুন। বাস্তব গবেষণায় মূল্যায়ন ভিত্তিক মূল্য নির্ধারণ জমানত দুর্ঘটনা সম্ভাবনা ৪.৮ গুণ।",
+    "case": "আন সিওন-ইয়ং·ইয়ি সাং-ইয়াপ (২০২৫) — বিশেষজ্ঞ (মূল্যায়ন) মূল্য নির্ধারণ Exp(B) ৪.৮, সংযুক্ত বাড়ি·বহু-পরিবার ৫.৮ গুণ।"
+   },
+   {
+    "id": "proxy",
+    "title": "নকল ভাড়াটিয়া·কর্পোরেট ভাড়াটিয়া",
+    "what": "সম্পদহীন ব্যক্তি বা কাগজের কর্পোরেশন নামে বাড়ি কিনে ভাড়া দেওয়া। দুর্ঘটনা হলেও ফেরত দেওয়ার সম্পদ নেই।",
+    "signal": "ভাড়াটিয়া কর্পোরেশন কিন্তু বাস্তবতা অস্পষ্ট। চুক্তির আগে মালিক পরিবর্তন হয় (নিবন্ধন খাতা প্রথম অংশ সাম্প্রতিক স্থানান্তর রেকর্ড)।",
+    "outside": "নিবন্ধন খাতা প্রথম অংশে সাম্প্রতিক মালিকানা স্থানান্তর ইতিহাস যাচাই করুন। কর্পোরেট ভাড়াটিয়া বাস্তব গবেষণায় জমানত দুর্ঘটনা সম্ভাবনা ৩.৬ গুণ — কর্পোরেট নিবন্ধন খাতা দিয়ে বাস্তবতা যাচাই করুন।",
+    "case": "আন সিওন-ইয়ং·ইয়ি সাং-ইয়াপ (২০२५) — কর্পোরেট ভাড়াটিয়া Exp(B) ৩.৬ (দুর্ঘটনা হার ২০.৪% বনাম ব্যক্তিগত ৪.৮%)।"
+   }
+  ]
+ },
+ "ru": {
+  "risk_types": [
+   {
+    "id": "penalty",
+    "title": "Чрезмерный штраф за расторжение",
+    "what": "Пункт, устанавливающий сумму денег, которую нужно выплатить при расторжении или нарушении контракта, намного превышающую фактический ущерб. Это применяется даже если слово «штраф» не используется, но суть — это предварительная оценка убытков.",
+    "signals": [
+     "Штраф, штрафная санкция, многократное возмещение",
+     "При расторжении взимается полная плата за оставшийся период",
+     "Исключение пропорционального расчета",
+     "Асимметричный дизайн с необычно высокой ставкой просрочки только для клиента"
+    ],
+    "tip": "Спросите, соответствует ли штраф фактическому ущербу. Суды неоднократно снижали чрезмерные штрафы (Гражданский кодекс, статья 398)."
+   },
+   {
+    "id": "unilateral_termination",
+    "title": "Одностороннее расторжение контракта",
+    "what": "Пункт, позволяющий другой стороне немедленно расторгнуть контракт без предварительного уведомления или законного основания.",
+    "signals": [
+     "Немедленное расторжение без процедуры требования платежа",
+     "Жилое помещение: расторжение при одной просрочке (закон требует двух)",
+     "Специальное соглашение об отказе от права требования продления"
+    ],
+    "tip": "Для жилья — две просрочки, для коммерческих помещений — три просрочки — это законный стандарт расторжения. Если условия мягче, это требует проверки."
+   },
+   {
+    "id": "deposit_delay",
+    "title": "Задержка возврата залога",
+    "what": "Пункт, позволяющий возвращать залог, возмещение или расчетные суммы с задержкой, в уменьшенном размере или в другой форме.",
+    "signals": [
+     "Формулировка «может быть возвращено в течение O месяцев после окончания контракта» с длительным сроком",
+     "Единовременное вычитание резервных сумм и комиссий",
+     "Возврат без процентов, замена купонами или баллами"
+    ],
+    "tip": "Проверьте, указаны ли срок возврата и проценты при задержке. Регистрация прав арендатора и страховка залога служат защитой."
+   },
+   {
+    "id": "liability_waiver",
+    "title": "Освобождение от ответственности",
+    "what": "Пункт, полностью перекладывающий на потребителя или арендатора ответственность, которую закон возлагает на другую сторону (обязанность по ремонту, ответственность за дефекты и т.д.), или освобождающий от нее.",
+    "signals": [
+     "«Не несет никакой ответственности»",
+     "«Все расходы на ремонт несет арендатор»",
+     "Запрет на возражения и претензии по гражданскому и уголовному праву"
+    ],
+    "tip": "Ключевой сигнал — слова «все» и «любой». Комиссии по разрешению споров неоднократно признавали такие пункты недействительными."
+   },
+   {
+    "id": "unclear_fees",
+    "title": "Неясные условия комиссий и процентов",
+    "what": "Пункт, написанный так, что из самого контракта невозможно понять, сколько нужно платить. Неясные формулировки позже легко интерпретируются в пользу другой стороны.",
+    "signals": [
+     "Пустые поля для процентной ставки или комиссии",
+     "Неясные критерии вроде «законный процент, обычно устанавливаемый судом»",
+     "«Определяется отдельным соглашением»"
+    ],
+    "tip": "Требуйте указать цифры и формулу расчета в контракте. Комиссии ограничивали неясные процентные пункты 5% годовых (законный процент по Гражданскому кодексу)."
+   },
+   {
+    "id": "trust_notice",
+    "title": "Уведомление о доверительном управлении и нестабильности прав собственности",
+    "what": "Пункт, в котором дом принадлежит трастовой компании, что делает структуру собственности нестабильной, и специальное соглашение сокращает защиту арендатора. Это один из ключевых паттернов мошенничества с залогом.",
+    "signals": [
+     "«Доверительный управляющий (трастовая компания) не несет ответственности за возврат залога»",
+     "«Договор аренды без предварительного согласия доверительного управляющего недействителен»",
+     "Спешка с подписанием без проверки документов доверительного управления"
+    ],
+    "tip": "Проверьте в реестре недвижимости, является ли собственник трастовой компанией, и в документах доверительного управления — кто имеет право сдавать в аренду."
+   },
+   {
+    "id": "cost_shifting",
+    "title": "Неправомерное перекладывание расходов и налогов",
+    "what": "Пункт, перекладывающий на потребителя или арендатора расходы, которые по закону должна нести другая сторона (собственник, бизнес).",
+    "signals": [
+     "Налоги собственника (налог на имущество, налог на приобретение) взимаются с арендатора",
+     "Расходы на ремонт и содержание, которые должен нести собственник",
+     "Требование оплатить регистрацию залога"
+    ],
+    "tip": "Спросите, кто по закону должен нести этот расход. Это отличается от коммунальных платежей (электричество, вода), которые платит пользователь."
+   },
+   {
+    "id": "benefit_change",
+    "title": "Одностороннее изменение условий и обязательств",
+    "what": "Пункт, позволяющий другой стороне менять условия контракта (правила, процентные ставки, условия платежа) без согласия.",
+    "signals": [
+     "«Компания может менять по своему усмотрению»",
+     "«Молчание после уведомления об изменении считается согласием»",
+     "Условия платежа могут быть изменены по усмотрению компании"
+    ],
+    "tip": "Проверьте, гарантированы ли предварительное уведомление и право отказа (расторжения). Пункты о молчаливом согласии неоднократно блокировались в разрешении споров."
+   },
+   {
+    "id": "forced_purchase",
+    "title": "Ограничение выбора и принудительная покупка",
+    "what": "Пункт, обязывающий использовать определенный товар или услугу либо блокирующий выбор потребителя (включая связанные продажи).",
+    "signals": [
+     "«Только через назначенную компанию»",
+     "Обязательная регистрация дополнительных услуг",
+     "Формулировки, исключающие альтернативы"
+    ],
+    "tip": "Спросите, действительно ли эта услуга необходима для цели контракта и почему другие варианты исключены."
+   },
+   {
+    "id": "rights_restriction",
+    "title": "Ограничение прав",
+    "what": "Пункт, блокирующий права, гарантированные законом (право расторжения, право возражения, право на судебное разбирательство и т.д.).",
+    "signals": [
+     "Обязательство «не возражать»",
+     "Чрезмерное ограничение периода или способа расторжения",
+     "Запрет на судебное разбирательство или соглашение о неподсудности"
+    ],
+    "tip": "Законные права нельзя отнять специальным соглашением. Есть прецеденты отклонения таких пунктов по Закону о регулировании условий договора и Закону о рассрочке."
+   }
+  ],
+  "cases": {
+   "광고대행_2025-03": "После выполнения работ возвращается только 20% комиссии (80% штраф) — признано чрезмерной предварительной оценкой убытков, достигнуто полное возмещение без штрафа",
+   "신발도매_2013": "При расторжении франшизы — штраф 50% от франшизного взноса; по прецеденту Комиссии по справедливой торговле (2004약제2214) достигнуто частичное возмещение штрафа",
+   "2019-18b": "В дополнительном соглашении о страховом обеспечении — обязательство отказаться от возражений; формулировка «прекращение» неясна, указана необходимость пересмотра условий",
+   "2005-41": "В контракте инвестиционного консультирования — ограничение права расторжения потребителем; нарушение требований раскрытия информации по Закону о регулировании условий договора и нарушение права на расторжение по Закону о дистанционной торговле — пункт отклонен",
+   "즉시연금_2017-17": "Выплата аннуитета ниже гарантированной минимальной ставки признана нарушением условий договора",
+   "바로연금보험_2018-8": "Основание для вычета страховой суммы при наступлении срока неясно; по принципу толкования против составителя интерпретировано в пользу потребителя",
+   "2019-18a": "Пункт об одностороннем расторжении в базовых условиях кредитования; ссылка на решение Комиссии по справедливой торговле об отсутствии оснований для расторжения",
+   "990": "Специальное соглашение об отказе арендатором права требования продления контракта — нарушение Закона о защите прав арендаторов жилья, статья 6-3, пункт 1; признано недействительным без особых обстоятельств",
+   "2008_약관변경동의간주": "Пункт о молчаливом согласии на изменение условий при отсутствии возражений в течение периода — нарушение Закона о регулировании условий договора, статья 12; юридическая сила отрицается",
+   "2010_ELS조건조정": "Пункт о праве эмитента менять условия выплаты по своему усмотрению — ограничено расширительное толкование, издан приказ о выплате",
+   "20": "Специальное соглашение о полной ответственности арендатора за ремонт жилья — нарушает законную обязанность собственника по содержанию и ремонту, признано недействительным",
+   "2008_직불카드양도": "Пункт о полной ответственности при передаче карты — по прецеденту о распределении вины ответственность члена ограничена 40%"
+  },
+  "scams": [
+   {
+    "id": "trust",
+    "title": "Освобождение от ответственности по доверительному управлению",
+    "what": "Дом принадлежит компании доверительного управления, а в договоре указано: 'Компания доверительного управления не несет ответственности за возврат залога'. Арендатор теряет возможность требовать возврат залога по закону.",
+    "signal": "В договоре есть фразы: 'доверительный управляющий', 'доверительное управление', 'не несет ответственности за возврат', 'не возражает против условий'.",
+    "outside": "В реестре недвижимости (раздел собственников) проверить, является ли владельцем компания доверительного управления. Получить документ о доверительном управлении и уточнить, кто имеет право сдавать в аренду.",
+    "case": "Множество случаев в Комиссии по разрешению финансовых споров — тип, при котором возврат залога структурно невозможен из-за освобождения доверительного управляющего (категория A высокого риска)."
+   },
+   {
+    "id": "gap",
+    "title": "Пустая аренда (превышение коэффициента задолженности)",
+    "what": "Залог + приоритетные кредиты приближаются к стоимости дома или превышают её. Если дом уходит на торги, залог не будет полностью возвращен.",
+    "signal": "Это не видно в самом договоре — поэтому это опасно. Залог большой по сравнению с рыночной ценой, и хозяин спешит — это подозрительно.",
+    "outside": "Коэффициент задолженности = (приоритетные кредиты + залог) ÷ рыночная цена. При 90% и выше в исследованиях 17,6% контрактов имели убытки (базовый уровень 0,2%). Проверить на калькуляторе пустой аренды в результатах.",
+    "case": "Ан Сон Ён, Ли Сан Ёп (2025) — эмпирическое исследование 450 тыс. контрактов аренды в столичном регионе: при коэффициенте 90% и выше уровень убытков 17,6%."
+   },
+   {
+    "id": "double",
+    "title": "Двойной контракт",
+    "what": "Один дом сдается в аренду нескольким арендаторам одновременно, или управляющий заключает поддельный контракт без ведома хозяина. Если вы отстанете в очередности прав, потеряете залог.",
+    "signal": "Контрагент не совпадает с владельцем в реестре, доверенность неясная. Предлагают договор дешевле рынка и торопят с подписанием.",
+    "outside": "Заключить контракт напрямую с владельцем по реестру (проверить паспорт). Если доверенность — проверить её с печатью и подписью. Финальный платёж только на счёт владельца.",
+    "case": "Повторяющийся тип в Комитете по разрешению жилищных споров — споры об эффективности контрактов при аренде без полномочий."
+   },
+   {
+    "id": "appraisal",
+    "title": "Завышение рыночной цены (злоупотребление оценкой)",
+    "what": "На новых виллах без реальных сделок оценщик завышает цену, и хозяин берет залог по этой оценке или выше. Контракт начинается как пустая аренда.",
+    "signal": "Подчеркивают 'оценочную стоимость O млн вон', но не показывают данные реальных сделок. Часто встречается на новых многоквартирных домах.",
+    "outside": "На портале реальных сделок Минземресурсов проверить реальные цены похожих объектов в районе. По исследованиям оценка как основа цены увеличивает риск убытков в 4,8 раза.",
+    "case": "Ан Сон Ён, Ли Сан Ёп (2025) — оценка как метод ценообразования: Exp(B) 4,8, для многоквартирных домов 5,8 раз."
+   },
+   {
+    "id": "proxy",
+    "title": "Фиктивный хозяин / корпоративный хозяин",
+    "what": "Человек без имущества или фиктивная компания покупает дом и сдает его в аренду. При проблемах нечего взыскивать.",
+    "signal": "Хозяин — компания с неясной структурой. Владелец меняется прямо перед контрактом (недавние записи о переходе в реестре).",
+    "outside": "В реестре проверить историю переходов собственности. Корпоративный хозяин по исследованиям имеет риск убытков в 3,6 раза выше — проверить реестр компании на реальность.",
+    "case": "Ан Сон Ён, Ли Сан Ёп (2025) — корпоративный хозяин: Exp(B) 3,6 (уровень убытков 20,4% против 4,8% у физических лиц)."
+   }
+  ]
+ }
+}
