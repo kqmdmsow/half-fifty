@@ -162,8 +162,11 @@ export function UploadScreen({
             />
             {file ? (
               <>
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-safe-50 text-[26px]">
-                  {isImage(file) ? '📷' : '📄'}
+                <span
+                  aria-hidden
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl bg-safe-50 text-[14px] font-extrabold tracking-wide text-safe-700"
+                >
+                  {isImage(file) ? 'IMG' : 'PDF'}
                 </span>
                 <p className="mt-4 max-w-full truncate text-[16px] font-bold text-ink-900">
                   {file.name}
@@ -174,8 +177,11 @@ export function UploadScreen({
               </>
             ) : (
               <>
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-[26px]">
-                  📎
+                <span
+                  aria-hidden
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-[26px] font-bold text-brand-500"
+                >
+                  +
                 </span>
                 <p className="mt-4 text-[16px] font-bold text-ink-900">
                   {t(language, 'upDropTitle')}

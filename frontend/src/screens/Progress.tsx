@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, RiskBadge } from '../components/ui'
+import { t, type LangCode } from '../i18n'
 
-const PHASES = [
-  '계약서 텍스트 읽기',
-  '조항 단위로 나누기',
-  '불리할 수 있는 조항 찾기',
-  '분석 결과 품질 확인하기',
-]
+const PHASE_KEYS = ['prPhase1', 'prPhase2', 'prPhase3', 'prPhase4'] as const
 
 export function ProgressScreen({
+  language = 'ko',
   loading,
   error,
   streamProgress,
@@ -18,6 +15,7 @@ export function ProgressScreen({
   onRetry,
   onShowResult,
 }: {
+  language?: LangCode
   loading: boolean
   error: string | null
   streamProgress?: { done: number; total: number } | null
@@ -83,24 +81,29 @@ export function ProgressScreen({
             className="transition-all duration-500"
           />
         </svg>
-        <span className="absolute text-[22px]">{error ? '⚠️' : loading ? '📄' : '✅'}</span>
+        <span
+          aria-hidden
+          className={`absolute text-[22px] font-extrabold ${error ? 'text-caution-500' : loading ? 'text-brand-500' : 'text-safe-500'}`}
+        >
+          {error ? '!' : loading ? '' : '✓'}
+        </span>
       </div>
 
       <h1 className="mt-8 text-[24px] font-bold tracking-[-0.02em] text-ink-900 md:text-[28px]">
         {error
-          ? '분석 서버에 연결하지 못했어요'
+          ? t(language, 'prErrTitle')
           : loading
-            ? '계약서를 꼼꼼히 살펴보고 있어요'
-            : '분석이 끝났어요'}
+            ? t(language, 'progressTitle')
+            : t(language, 'prDoneTitle')}
       </h1>
       <p className="mt-2.5 text-[15px] leading-relaxed text-ink-400">
         {error
-          ? `${error} 잠시 후 다시 시도해주세요.`
+          ? t(language, 'prErrDesc', { msg: error })
           : loading
             ? streaming && streamProgress?.total
-              ? `조항 ${streamProgress.done}/${streamProgress.total}개 분석 완료 — 끝난 조항부터 아래에 보여드려요.`
-              : '조항 단위로 나누고 위험 신호와 질문 목록을 정리해요.'
-            : '잠시 후 결과 화면으로 이동해요.'}
+              ? t(language, 'prStreamDesc', { done: streamProgress.done, total: streamProgress.total })
+              : t(language, 'prLoadingDesc')
+            : t(language, 'prDoneDesc')}
       </p>
 
       {/* 진행 바 */}
@@ -130,12 +133,12 @@ export function ProgressScreen({
 
       {/* 단계 목록 */}
       <ul className="mt-7 w-full space-y-1 text-left">
-        {PHASES.map((phase, index) => {
+        {PHASE_KEYS.map((phaseKey, index) => {
           const done = index < phaseIndex
           const active = index === phaseIndex
           return (
             <li
-              key={phase}
+              key={phaseKey}
               className="flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[14px]"
             >
               <span
@@ -147,10 +150,10 @@ export function ProgressScreen({
                       : 'text-ink-300'
                 }
               >
-                {phase}
+                {t(language, phaseKey)}
               </span>
               <span className={done ? 'text-safe-500' : active ? 'text-brand-500' : 'text-ink-200'}>
-                {done ? '✓' : active ? '진행 중' : ''}
+                {done ? '✓' : active ? t(language, 'prActive') : ''}
               </span>
             </li>
           )

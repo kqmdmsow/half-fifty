@@ -52,12 +52,148 @@ SCAMS = [
 ]
 
 
+# 위험 유형 10종 가이드 (#104 확장) — 카테고리 페이지의 단일 원천.
+# title은 schemas.RISK_TYPES 문자열과 정확히 일치해야 한다 (사례 각주를
+# case_footnotes.get_related_cases(title)로 서버에서 재활용하기 때문 —
+# 사례 데이터 중복 없이 각주 큐레이션(A등급 검수) 하나만 관리).
+# 설명·신호 문구는 분석 프롬프트(src/prompts/analysis.txt)의 유형 정의와
+# 골든셋 실측 사례에서 큐레이션.
+RISK_TYPE_GUIDE = [
+    {
+        "id": "penalty",
+        "title": "과도한 위약금",
+        "what": "계약을 해지하거나 어겼을 때 내야 할 돈을 실제 손해보다 훨씬 크게 정해두는 조항. '위약금'이라는 단어가 없어도 실질이 손해배상 예정이면 해당된다.",
+        "signals": ["위약금·위약벌·배액 배상", "해지 시 잔여기간 요금 전액 부과", "일할 계산 배제", "고객 연체이율만 유난히 높은 비대칭 설계"],
+        "tip": "실제 손해와 비례하는지 물어보세요. 법원은 과도한 위약금을 감액해 왔습니다(민법 제398조).",
+    },
+    {
+        "id": "unilateral_termination",
+        "title": "일방적 계약 해지",
+        "what": "상대방이 사전 통지나 정당한 사유 없이 계약을 곧바로 끝낼 수 있게 하는 조항.",
+        "signals": ["최고(독촉) 절차 없이 '즉시 해지할 수 있다'", "주택인데 1회 연체만으로 해지(법은 2기 연체 기준)", "갱신요구권을 포기시키는 특약"],
+        "tip": "주택은 2기, 상가는 3기 연체가 법정 해지 기준입니다. 그보다 쉽게 해지되게 쓰여 있으면 확인 대상입니다.",
+    },
+    {
+        "id": "deposit_delay",
+        "title": "보증금 반환 지연",
+        "what": "보증금·환급금·정산금을 늦게, 깎아서, 또는 다른 것으로 돌려주게 만드는 조항.",
+        "signals": ["'계약 종료 후 O개월 이내 반환할 수 있다'처럼 기한을 길게", "유보금·수수료 일률 공제", "무이자 반환, 쿠폰·포인트 대체 지급"],
+        "tip": "반환 기한과 지연 시 이자가 명시돼 있는지 확인하세요. 임차권등기명령·보증보험이 안전장치가 됩니다.",
+    },
+    {
+        "id": "liability_waiver",
+        "title": "책임 면제",
+        "what": "법이 상대방에게 지운 책임(수선 의무, 하자담보책임 등)을 통째로 소비자·임차인에게 떠넘기거나 면제받는 조항.",
+        "signals": ["'일체(어떠한) 책임을 지지 않는다'", "'모든 수리비용은 임차인 부담'", "민·형사상 이의제기 금지"],
+        "tip": "'모든·일체' 같은 포괄 문구가 핵심 신호입니다. 조정위는 포괄적 책임 전가 특약을 무효로 판단해 왔습니다.",
+    },
+    {
+        "id": "unclear_fees",
+        "title": "불명확한 수수료·이자 조건",
+        "what": "얼마를 내야 하는지 계약서만 봐서는 알 수 없게 쓰인 조항. 모호한 문구는 나중에 상대방에게 유리하게 해석되기 쉽다.",
+        "signals": ["이율·수수료율 칸이 공란", "'일반적으로 판결 시 정하는 법정이자' 같은 모호한 기준", "'별도 협의에 따른다'"],
+        "tip": "숫자와 계산 방법을 계약서에 적어달라고 요구하세요. 모호한 이자 문구를 조정위가 연 5%(민법 법정이율)로 제한한 사례가 있습니다.",
+    },
+    {
+        "id": "trust_notice",
+        "title": "신탁관계·소유권 불안정 고지",
+        "what": "집이 신탁회사 소유라 소유권 구조가 불안정한데, 특약으로 임차인 보호를 축소하는 조항. 전세사기의 핵심 패턴 중 하나다.",
+        "signals": ["'수탁자(신탁회사)는 보증금 반환 책임이 없다'", "'수탁자 사전승낙 없는 임대차는 효력이 없다'", "신탁원부 확인 없이 계약 재촉"],
+        "tip": "등기부 갑구에서 소유자가 신탁회사인지, 신탁원부에서 임대 권한이 누구에게 있는지 확인하세요.",
+    },
+    {
+        "id": "cost_shifting",
+        "title": "부당한 비용·세금 전가",
+        "what": "법률상 상대방(소유자·사업자)이 부담해야 할 지출을 소비자·임차인에게 떠넘기는 조항.",
+        "signals": ["소유자 부담 세금(재산세·취득세)을 임차인에게", "임대인의 수선·유지보수 비용 전가", "근저당 설정비용 부담 요구"],
+        "tip": "그 비용이 법률상 누구 부담인지 물어보세요. 본인이 실제 사용한 공과금(전기·수도)과는 구별됩니다.",
+    },
+    {
+        "id": "benefit_change",
+        "title": "일방적 급부·조건 변경",
+        "what": "상대방이 계약 내용(약관·금리·지급 조건)을 동의 없이 바꿀 수 있게 하는 조항.",
+        "signals": ["'회사가 임의로 변경할 수 있다'", "변경 통지 후 무응답이면 '동의한 것으로 본다'", "지급 조건을 회사 재량으로 조정"],
+        "tip": "변경 시 사전 통지와 거부(해지)권이 보장되는지 확인하세요. 동의 간주 조항은 분쟁조정에서 반복적으로 제동이 걸린 유형입니다.",
+    },
+    {
+        "id": "forced_purchase",
+        "title": "선택권 제한·구입 강제",
+        "what": "특정 상품·업체 이용을 강제하거나 소비자의 선택권을 막는 조항(끼워팔기 포함).",
+        "signals": ["'지정 업체를 통해서만'", "부대 상품 의무 가입", "다른 선택지를 배제하는 문구"],
+        "tip": "강제되는 이용·구입이 계약 목적에 꼭 필요한지, 다른 선택지가 왜 막혀 있는지 물어보세요.",
+    },
+    {
+        "id": "rights_restriction",
+        "title": "권리행사 제한",
+        "what": "법이 보장한 권리(해지권·이의제기·소송 등)를 못 쓰게 막는 조항.",
+        "signals": ["'이의를 제기하지 아니한다' 확약", "해지권 행사 기간·방법을 지나치게 제한", "소 제기 금지·부제소 합의"],
+        "tip": "법정 권리는 특약으로도 함부로 뺏을 수 없습니다. 약관규제법·할부거래법 위반으로 배척된 사례가 있습니다.",
+    },
+]
+
+
+def risk_types_with_cases() -> list:
+    """유형 가이드 + 검증된 실제 사례(각주 큐레이션 재활용).
+
+    사례가 없는 유형은 빈 리스트 그대로 노출 — 틀린 사건번호보다 없는 게
+    낫다는 각주 원칙(#91)을 교육 페이지에도 동일 적용.
+    """
+    from src.case_footnotes import get_related_cases
+
+    return [{**g, "cases": get_related_cases(g["title"])} for g in RISK_TYPE_GUIDE]
+
+
+# --- 정적 번역본 서빙 (#104 콘텐츠 다국어화) ---
+# generate_learn_translations.py가 워커 LLM으로 한 번 생성해 커밋한 파일.
+# 없는 언어·필드는 한국어 원문 폴백 — 번역 실패가 페이지를 깨지 않는다.
+import json as _json
+from pathlib import Path as _Path
+
+_TRANSLATIONS_PATH = _Path(__file__).parent / "learn_translations.json"
+try:
+    _TRANSLATIONS: dict = _json.loads(_TRANSLATIONS_PATH.read_text(encoding="utf-8"))
+except FileNotFoundError:
+    _TRANSLATIONS = {}
+
+
+def localized_learn(language: str = "ko") -> dict:
+    """/learn 응답 — 요청 언어의 정적 번역본을 병합해 반환.
+
+    content_language로 실제 서빙 언어를 알려 프론트가 '한국어 제공' 안내를
+    번역이 있는 언어에서는 숨길 수 있게 한다. 사례의 기관명·사건번호는
+    원문 유지(표기 관례), 결과 요약(result)만 번역본으로 교체.
+    """
+    base = {"scams": SCAMS, "risk_types": risk_types_with_cases()}
+    tr = _TRANSLATIONS.get(language or "ko")
+    if not tr:
+        return {**base, "content_language": "ko"}
+    tr_types = {t["id"]: t for t in tr.get("risk_types", [])}
+    tr_scams = {t["id"]: t for t in tr.get("scams", [])}
+    tr_cases = tr.get("cases", {})
+    risk_types = []
+    for g in base["risk_types"]:
+        t = tr_types.get(g["id"], {})
+        cases = [{**c, "result": tr_cases.get(c["case_id"], c["result"])} for c in g["cases"]]
+        risk_types.append({**g, "what": t.get("what", g["what"]),
+                           "signals": t.get("signals", g["signals"]),
+                           "tip": t.get("tip", g["tip"]), "cases": cases})
+    scams = [{**s, **{k: tr_scams.get(s["id"], {}).get(k, s[k])
+                      for k in ("title", "what", "signal", "outside", "case")}}
+             for s in SCAMS]
+    return {"scams": scams, "risk_types": risk_types, "content_language": language}
+
+
 def content_as_context() -> str:
-    """챗봇 프롬프트 주입용 직렬화."""
+    """챗봇 프롬프트 주입용 직렬화 — 전세사기 수법 + 위험 유형 가이드 전체."""
     parts = []
     for s in SCAMS:
         parts.append(
             f"[{s['title']}]\n수법: {s['what']}\n계약서 신호: {s['signal']}\n"
             f"계약서 밖 확인: {s['outside']}\n근거 사례: {s['case']}"
+        )
+    for g in RISK_TYPE_GUIDE:
+        parts.append(
+            f"[위험 유형: {g['title']}]\n설명: {g['what']}\n"
+            f"계약서 신호: {', '.join(g['signals'])}\n대처: {g['tip']}"
         )
     return "\n\n".join(parts)

@@ -175,12 +175,14 @@ public class ContractController {
     }
 
     /**
-     * 교육 콘텐츠 프록시 (#104). 내장 챗봇(#103)은 세션당 대화 상한·인젝션
-     * 방어 조건을 걸고 나서 별도 PR로 합류한다.
+     * 교육 콘텐츠 프록시 (#104) — 정적 번역본이 있는 언어는 번역해서 반환.
+     * 내장 챗봇(#103)은 세션당 대화 상한·인젝션 방어 조건을 걸고 나서
+     * 별도 PR로 합류한다.
      */
     @org.springframework.web.bind.annotation.GetMapping("/learn")
-    public String learn() {
-        return agentClient.learn();
+    public String learn(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "ko") String language) {
+        return agentClient.learn(language);
     }
 
     /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */

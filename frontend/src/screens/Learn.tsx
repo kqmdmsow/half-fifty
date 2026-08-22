@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Card, PageTitle } from '../components/ui'
-import { t, type LangCode } from '../i18n'
+import { riskTypeLabel, t, type LangCode } from '../i18n'
 
 /** 교육 페이지 (#104) — 분석 도구를 넘어선 상설 학습 탭.
  *
@@ -21,6 +21,22 @@ interface Scam {
   case: string
 }
 
+interface RiskCase {
+  case_id: string
+  agency: string
+  citation: string
+  result: string
+}
+
+interface RiskTypeGuide {
+  id: string
+  title: string
+  what: string
+  signals: string[]
+  tip: string
+  cases: RiskCase[]
+}
+
 export function LearnScreen({
   language = 'ko',
   onStart,
@@ -29,22 +45,102 @@ export function LearnScreen({
   onStart: () => void
 }) {
   const [scams, setScams] = useState<Scam[]>([])
+  const [riskTypes, setRiskTypes] = useState<RiskTypeGuide[]>([])
+  const [openType, setOpenType] = useState<string | null>(null)
 
+  // 콘텐츠는 언어별 정적 번역본 — 언어를 바꾸면 다시 받아온다.
+  // content_language가 ko로 돌아오면(번역 미보유 언어) 한국어 안내문을 띄운다.
+  const [contentLanguage, setContentLanguage] = useState('ko')
   useEffect(() => {
-    fetch(`${BASE_URL}/api/contracts/learn`)
+    fetch(`${BASE_URL}/api/contracts/learn?language=${language}`)
       .then((r) => r.json())
-      .then((d) => setScams(d.scams ?? []))
+      .then((d) => {
+        setScams(d.scams ?? [])
+        setRiskTypes(d.risk_types ?? [])
+        setContentLanguage(d.content_language ?? 'ko')
+      })
       .catch(() => setScams([]))
-  }, [])
+  }, [language])
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
-      <PageTitle title={t(language, 'lnTitle')} desc={t(language, 'lnDesc')} />
-      {language !== 'ko' && (
+      <PageTitle title={t(language, 'lnPageTitle')} desc={t(language, 'lnPageDesc')} />
+      {language !== 'ko' && contentLanguage === 'ko' && (
         <p className="mt-2 text-[13px] font-semibold text-ink-400">{t(language, 'lnKoNote')}</p>
       )}
 
-      <div className="mt-8 space-y-4">
+      {/* 위험 유형 카테고리 (#104 확장) — 그리드에서 고르면 상세가 열린다 */}
+      <h2 className="mt-10 text-[19px] font-bold text-ink-900">{t(language, 'lnTypesTitle')}</h2>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-ink-400">{t(language, 'lnTypesDesc')}</p>
+      <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+        {riskTypes.map((rt) => {
+          const open = openType === rt.id
+          return (
+            <div key={rt.id} className={open ? 'sm:col-span-2' : ''}>
+              <button
+                type="button"
+                aria-expanded={open}
+                onClick={() => setOpenType(open ? null : rt.id)}
+                className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-5 py-4 text-left text-[15px] font-bold transition-colors ${
+                  open
+                    ? 'border-brand-500 bg-brand-50 text-brand-600'
+                    : 'border-ink-100 bg-white text-ink-900 hover:border-brand-500/40 hover:bg-brand-50/50'
+                }`}
+              >
+                {riskTypeLabel(language, rt.title)}
+                <span aria-hidden className="text-[13px] text-ink-300">
+                  {open ? '−' : '+'}
+                </span>
+              </button>
+              {open && (
+                <Card className="mt-2 p-6">
+                  <p className="text-[14px] leading-relaxed text-ink-700">{rt.what}</p>
+                  <div className="mt-3.5 rounded-2xl bg-danger-50 px-4 py-3">
+                    <p className="text-[12px] font-bold text-danger-600">{t(language, 'lnSignal')}</p>
+                    <ul className="mt-1.5 space-y-1">
+                      {rt.signals.map((sig) => (
+                        <li key={sig} className="flex items-start gap-2 text-[13px] leading-relaxed text-ink-700">
+                          <span aria-hidden className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-danger-500" />
+                          {sig}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="mt-2.5 rounded-2xl bg-brand-50 px-4 py-3">
+                    <p className="text-[12px] font-bold text-brand-600">{t(language, 'lnTip')}</p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-ink-700">{rt.tip}</p>
+                  </div>
+                  {rt.cases.length > 0 ? (
+                    <div className="mt-3">
+                      <p className="text-[12px] font-bold text-ink-600">{t(language, 'lnCases')}</p>
+                      <ul className="mt-1.5 space-y-1.5">
+                        {rt.cases.map((c) => (
+                          <li key={c.case_id} className="text-[12.5px] leading-relaxed text-ink-400">
+                            <span className="font-semibold text-ink-600">
+                              {c.agency} {c.citation}
+                            </span>{' '}
+                            — {c.result}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-[12px] leading-relaxed text-ink-400">
+                      {t(language, 'lnNoCases')}
+                    </p>
+                  )}
+                </Card>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* 전세사기 5대 수법 — 임대차 특화 심화 섹션 */}
+      <h2 className="mt-12 text-[19px] font-bold text-ink-900">{t(language, 'lnTitle')}</h2>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-ink-400">{t(language, 'lnDesc')}</p>
+
+      <div className="mt-5 space-y-4">
         {scams.map((scam, i) => (
           <Card key={scam.id} className="p-6">
             <h2 className="text-[17px] font-bold text-ink-900">
