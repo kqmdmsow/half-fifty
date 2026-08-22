@@ -26,11 +26,12 @@ export function Button({
   size?: 'sm' | 'md' | 'lg'
   full?: boolean
 }) {
+  // KRDS 터치 타깃: 모든 크기가 최소 48px(--krds-size-height-7) — sm도 h-12
   const sizeStyle =
     size === 'lg'
       ? 'h-14 px-7 text-[17px]'
       : size === 'sm'
-        ? 'h-10 px-4 text-sm'
+        ? 'h-12 px-4 text-sm'
         : 'h-12 px-5 text-[15px]'
 
   return (
@@ -43,6 +44,34 @@ export function Button({
 }
 
 /* ---------- Risk badge ---------- */
+
+// 위험도 3중 인코딩(KRDS 접근성 원칙): 색 + 아이콘 + 텍스트 — 색만으로
+// 구분하지 않는다 (색각 이상·고대비 모드에서도 위험도가 즉시 구분되도록).
+const RISK_ICON: Record<RiskLevel, ReactNode> = {
+  위험: (
+    // 삼각형 느낌표
+    <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 fill-current">
+      <path d="M8 1.5 15.2 14a.9.9 0 0 1-.78 1.35H1.58A.9.9 0 0 1 .8 14L8 1.5Zm-.75 4.7v4.3h1.5V6.2h-1.5Zm0 5.5v1.6h1.5v-1.6h-1.5Z" />
+    </svg>
+  ),
+  주의: (
+    // 원형 느낌표
+    <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 fill-current">
+      <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm-.75 3.5v5h1.5v-5h-1.5Zm0 6.2v1.6h1.5v-1.6h-1.5Z" />
+    </svg>
+  ),
+  안전: (
+    // 원형 체크
+    <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 fill-current">
+      <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm3.1 4.6-4 4.2-1.9-1.9-1.1 1.1 3 3 5.1-5.3-1.1-1.1Z" />
+    </svg>
+  ),
+}
+
+// 배지 밖(내비 칩·계산기 등)에서도 같은 아이콘을 쓰도록 공개
+export function RiskIcon({ level, className = '' }: { level: RiskLevel; className?: string }) {
+  return <span className={`inline-flex ${className}`}>{RISK_ICON[level]}</span>
+}
 
 export function RiskBadge({
   level,
@@ -58,7 +87,7 @@ export function RiskBadge({
     <span
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[13px] font-bold ${meta.badge} ${className}`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+      {RISK_ICON[level]}
       {label ?? meta.label}
     </span>
   )

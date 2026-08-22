@@ -1,6 +1,6 @@
 import { LensMark } from '../components/Brand'
 import { useEffect, useMemo, useState } from 'react'
-import type { ClauseResult } from '../api'
+import type { ClauseResult, Persona } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, WARNING_CODE_KEYS, type LangCode } from '../i18n'
@@ -9,6 +9,7 @@ import { JeonseCalculator } from '../components/JeonseCalculator'
 import { JeonseTimeline } from '../components/JeonseTimeline'
 import { speak, stopSpeaking, useVoiceAvailable } from '../tts'
 import { FormattedText } from '../components/FormattedText'
+import { QuizCard } from '../components/QuizCard'
 import { JudgeReport } from '../components/JudgeReport'
 
 type Filter = '전체' | RiskLevel
@@ -22,6 +23,7 @@ export function SummaryScreen({
   recordSaved = false,
   onSaveRecord,
   domain = '',
+  persona = 'adult',
   judgeScores = {},
   retryCount = 0,
   needsReview = false,
@@ -39,6 +41,7 @@ export function SummaryScreen({
   recordSaved?: boolean
   onSaveRecord?: () => void
   domain?: string
+  persona?: Persona
   judgeScores?: Record<string, number>
   retryCount?: number
   needsReview?: boolean
@@ -87,7 +90,7 @@ export function SummaryScreen({
           key={warning}
           className="mb-5 rounded-2xl bg-caution-50 px-4 py-3 text-[14px] font-semibold text-caution-700"
         >
-          <span aria-hidden>⚠️</span> {text}
+          {text}
         </p>
         )
       })}
@@ -133,11 +136,11 @@ export function SummaryScreen({
           재시도 중에는 카드가 교체되는 이유를 명시한다 (#101) */}
       {live && retrying ? (
         <p className="mt-4 rounded-2xl bg-caution-50 px-4 py-3 text-[13px] font-semibold text-caution-700">
-          <span aria-hidden>🔄</span> {t(language, 'retryNote')}
+          {t(language, 'retryNote')}
         </p>
       ) : live && liveProgress && liveProgress.done >= liveProgress.total && liveProgress.total > 0 ? (
         <p className="mt-4 rounded-2xl bg-brand-50 px-4 py-3 text-[13px] font-semibold text-brand-600">
-          <span aria-hidden>🛡️</span> {t(language, 'verifyingNote')}
+          {t(language, 'verifyingNote')}
         </p>
       ) : null}
 
@@ -233,7 +236,7 @@ export function SummaryScreen({
               reading ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
             }`}
           >
-            <span aria-hidden>🔊</span> {t(language, reading ? 'readAllStop' : 'readAll')}
+            {t(language, reading ? 'readAllStop' : 'readAll')}
           </button>
           )}
           {allQuestions && <CopyButton text={allQuestions}>{t(language, 'copyAllQuestions')}</CopyButton>}
@@ -309,6 +312,18 @@ export function SummaryScreen({
           })
         )}
       </div>
+
+      {/* 3문답 이해 확인 (#92) — 분석 확정 후에만 (스트리밍 중 출제는 재료가 미완) */}
+      {!live && results.length > 0 && (
+        <div className="mt-6">
+          <QuizCard
+            results={results}
+            persona={persona}
+            language={language}
+            onSelectClause={onSelectClause}
+          />
+        </div>
+      )}
 
       {/* 깡통전세 위험 계산기 (#63) — 임대차 도메인일 때만. 조항 분석과 별개로
           계약서 밖 구조적 위험(전세가율)을 사용자 입력만으로 확인한다 */}

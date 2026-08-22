@@ -1,0 +1,6 @@
+doc_id,title,issuer,doc_no,revision_date,file,raw_source,expected,split,split_note
+housing_std,주택임대차표준계약서,법무부·국토교통부·서울시,,,../contract_05_molit_standard.txt,data/raw/sources_research/moj_주택임대차표준계약서_원본게시용.pdf,전 조항 안전,val,docs/clause_level_dataset_and_split.md 3.2절 배정
+sanga_std,상가건물임대차표준계약서,법무부,,,02_상가건물임대차표준계약서.txt,data/raw/normal_contract_sources/상가건물임대차표준계약서_2026게시.pdf,전 조항 안전,test,"신규 수집(2026-08-20), 배정 이력 없음"
+deposit_std,예금거래기본약관,공정거래위원회,표준약관 제10012호,2024-09-27,../contracts/normal_deposit_terms.txt,data/raw/10012_예금거래기본약관.txt,전 조항 안전,val,docs/clause_level_dataset_and_split.md 3.2절 배정
+gym_std,체력단련장(헬스장) 이용 표준약관,공정거래위원회,표준약관 제10048호,2025-05-23,04_체력단련장이용표준약관.txt,data/raw/normal_contract_sources/체력단련장이용표준약관_제10048호_2025-05-23.hwpx,전 조항 안전,test,"신규 수집(2026-08-20), 배정 이력 없음"
+ecom_std,전자상거래(인터넷사이버몰) 표준약관,공정거래위원회,표준약관 제10023호,2015-06-26,05_전자상거래표준약관.txt,data/raw/normal_contract_sources/전자상거래표준약관_제10023호_2015-06-26.hwp,전 조항 안전,test,"신규 수집(2026-08-20), 배정 이력 없음"

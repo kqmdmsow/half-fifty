@@ -1,8 +1,10 @@
 package com.halffifty.api.controller;
 
+import com.halffifty.api.config.LearnChatRateLimiter;
 import com.halffifty.api.dto.AnalyzeRequest;
 import com.halffifty.api.dto.AnalyzeResponse;
 import com.halffifty.api.service.AgentClient;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpStatus;
@@ -32,9 +34,11 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 public class ContractController {
 
     private final AgentClient agentClient;
+    private final LearnChatRateLimiter learnChatRateLimiter;
 
-    public ContractController(AgentClient agentClient) {
+    public ContractController(AgentClient agentClient, LearnChatRateLimiter learnChatRateLimiter) {
         this.agentClient = agentClient;
+        this.learnChatRateLimiter = learnChatRateLimiter;
     }
 
     @PostMapping("/analyze")
@@ -52,6 +56,18 @@ public class ContractController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/x-ndjson"))
                 .body(body);
+    }
+
+    /** 이해 확인 퀴즈 프록시 (#92) — 에이전트 /quiz 중계. */
+    @PostMapping("/quiz")
+    public String quiz(@RequestBody String request) {
+        return agentClient.quiz(request);
+    }
+
+    /** 재설명 프록시 (#76) — 에이전트 /reexplain 중계. */
+    @PostMapping("/reexplain")
+    public String reexplain(@RequestBody String request) {
+        return agentClient.reexplain(request);
     }
 
     /** 업로드 허용 최대 크기 (application.yml multipart 한도와 함께 이중 방어). */
@@ -160,13 +176,35 @@ public class ContractController {
                 .body(body);
     }
 
-    /**
-     * 교육 콘텐츠 프록시 (#104). 내장 챗봇(#103)은 세션당 대화 상한·인젝션
-     * 방어 조건을 걸고 나서 별도 PR로 합류한다.
-     */
+    /** 교육 콘텐츠 프록시 (#104) — 정적 번역본이 있는 언어는 번역해서 반환. */
     @org.springframework.web.bind.annotation.GetMapping("/learn")
-    public String learn() {
-        return agentClient.learn();
+    public String learn(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "ko") String language) {
+        return agentClient.learn(language);
+    }
+
+    /**
+     * 교육 챗봇 프록시 (#103). 비용 상한 — IP당 시간당 20회, 초과 시 429.
+     * 에이전트를 호출하기 전에 걸어 초과분은 LLM 비용이 아예 들지 않는다.
+     * 인젝션 방어는 에이전트(#131 detect_injection) 쪽에서 담당.
+     */
+    @PostMapping("/learn-chat")
+    public ResponseEntity<String> learnChat(
+            @RequestBody String request, HttpServletRequest httpRequest) {
+        if (!learnChatRateLimiter.allow(clientIp(httpRequest))) {
+            throw new ResponseStatusException(
+                    HttpStatus.TOO_MANY_REQUESTS, "질문이 너무 많아요. 잠시 후 다시 시도해주세요.");
+        }
+        return ResponseEntity.ok(agentClient.learnChat(request));
+    }
+
+    /** X-Forwarded-For(프록시·CDN 경유 시)를 우선하고, 없으면 원격 주소. */
+    private static String clientIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     /** 매직 바이트로 이미지 형식 판별. 미지원 형식은 null. */

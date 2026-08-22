@@ -22,11 +22,12 @@ import csv
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from src.nodes.analysis import _analyze_clause
+from src.nodes.analysis import _FALLBACK_EVIDENCE, _analyze_clause
 
 # EVAL_WORKER=solar — 크레딧 소진 시 무료 워커로 대체 실행 (평가 전용 주입).
-# 주의: _analyze_clause 폴백이 오류를 은폐하므로, 실행 후 출력에서
-# "분석 실패" 라인이 0건임을 반드시 확인할 것.
+# 주의: 개별 조항의 폴백은 정상 집계되지만(폴백 현황 표 참고), 여러 조항이
+# 연속으로 통째 폴백하면 SystemicFailureDetected로 중단된다 — 출력에서
+# "전체 폴백" 라인이 이어지면 원인(크레딧·인증·레이트리밋)을 확인할 것.
 import os
 if os.getenv("EVAL_WORKER") == "solar":
     from langchain_openai import ChatOpenAI
@@ -40,14 +41,30 @@ if os.getenv("EVAL_WORKER") == "solar":
 
 
 LABELS_PATH = Path(__file__).parent.parent / "data" / "real_clause_labels.csv"
+
 # 기본 출력은 베이스라인 문서 — 덮어쓰기 사고 방지를 위해 인자로 출력 파일명을 받는다.
-# 사용: python eval_real_labels.py [출력파일명.md]  (재실행 시 반드시 새 파일명 지정)
+# 위치 인자는 기존 호출 방식과의 호환을 위해 유지한다:
+#   python eval_real_labels.py [출력파일명.md] [split목록]
+import argparse
+import json
 import sys
-_out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_real_labels_claude.md"
-OUT_PATH = Path(__file__).parent.parent / "docs" / _out_name
-# 선택 인자 2: 실행할 split 목록(쉼표 구분, 예: "train,val").
-# 오염 방지 — 프롬프트 튜닝 중에는 test를 돌리지 않기 위한 필터. 기본은 전체.
-_splits = set(sys.argv[2].split(",")) if len(sys.argv) > 2 else None
+
+_ap = argparse.ArgumentParser(description="공식 조항 정답지 평가 (real_clause_labels.csv)")
+_ap.add_argument("out_name", nargs="?", default="eval_real_labels_claude.md",
+                 help="출력 마크다운 파일명 (재실행 시 새 이름을 줄 것)")
+_ap.add_argument("splits", nargs="?", default=None,
+                 help="실행할 split 목록(쉼표 구분). 오염 방지 — 튜닝 중에는 'train,val'만")
+_ap.add_argument("--repeats", type=int, default=1, metavar="N",
+                 help="조항별 반복 실행 횟수. 보고용 수치는 3 이상 권장 (#161) — "
+                      "temperature=0에서도 판정이 회차마다 뒤집히기 때문 "
+                      "(docs/reproducibility.md: 24조항 중 1건). 기본 1")
+_ap.add_argument("--out", default=None, metavar="results.json",
+                 help="회차별 원자료 JSON 저장 경로. 수치가 움직였을 때 "
+                      "재실행 없이 원인을 되짚으려면 반드시 남길 것 (#161)")
+_args = _ap.parse_args()
+
+OUT_PATH = Path(__file__).parent.parent / "docs" / _args.out_name
+_splits = set(_args.splits.split(",")) if _args.splits else None
 
 
 def _load_labels() -> list:
@@ -58,24 +75,93 @@ def _load_labels() -> list:
     return rows
 
 
-def run_eval() -> list:
+# 연속으로 이만큼 조항이 통째로(전 회차) 폴백하면 개별 조항 특성이 아니라
+# API 이상(크레딧 소진·인증·레이트리밋)으로 간주해 중단한다.
+_CONSECUTIVE_FULL_FALLBACK_LIMIT = 3
+
+
+class SystemicFailureDetected(RuntimeError):
+    """연속 다수 조항이 통째로 폴백했을 때 즉시 중단시키는 예외.
+
+    `_analyze_clause`는 실패를 '주의/해당 없음'으로 흡수한다. 2026-08-07 AI Hub
+    실행에서 크레딧이 소진된 뒤 이 폴백이 정상 결과처럼 기록돼 strong 82%라는
+    오염 수치가 나왔다 (docs/eval_aihub580_full_run.md) — 그때는 여러 조항이
+    연속으로 전부 폴백했다.
+
+    반면 2026-08-22 real_003_24 사례처럼 인용 검증(citation_check) 재시도
+    소진으로 조항 하나가 이따금 폴백하는 것은 정상적인 현상이라 그 자체로는
+    중단할 이유가 아니다 — 폴백 건수만 정직하게 기록하고 계속 진행한다.
+    "여러 조항이 연속으로 통째 폴백"만 API 이상 신호로 보고 중단한다.
+    """
+
+
+def _is_fallback(prediction: dict) -> bool:
+    return prediction.get("risk_evidence") == _FALLBACK_EVIDENCE
+
+
+def _majority(levels: list) -> tuple:
+    """회차별 risk_level 다수결. 반환: (확정 level, 과반 없음 여부)."""
+    counts = Counter(levels)
+    top, n = counts.most_common(1)[0]
+    return top, n * 2 <= len(levels)
+
+
+def run_eval(repeats: int = 1) -> list:
     rows = _load_labels()
     results = []
+    consecutive_full_fallback = 0
     for i, row in enumerate(rows):
         clause_id = f"real_{i:03d}_{row['case_id']}"
-        prediction = _analyze_clause(clause_id, row["clause_text"])
-        results.append({"row": row, "prediction": prediction})
+        attempts = []
+        for attempt in range(repeats):
+            prediction = _analyze_clause(clause_id, row["clause_text"])
+            attempts.append(prediction)
+
+        runs = [p for p in attempts if not _is_fallback(p)]
+        fallback_count = len(attempts) - len(runs)
+
+        if not runs:
+            # 이 조항은 전 회차가 폴백 — 확정 불가, 정확도 집계에서 제외.
+            consecutive_full_fallback += 1
+            results.append({
+                "row": row, "prediction": None, "runs": [], "attempts": attempts,
+                "tie": False, "fallback_count": fallback_count, "fully_fallback": True,
+            })
+            print(f"[!] {clause_id}: 전체 폴백 {fallback_count}/{repeats} — 정확도 집계 제외")
+            if consecutive_full_fallback >= _CONSECUTIVE_FULL_FALLBACK_LIMIT:
+                raise SystemicFailureDetected(
+                    f"최근 조항 {consecutive_full_fallback}개가 연속으로 전체 폴백 — "
+                    f"API 오류(크레딧 소진·인증·레이트리밋) 가능성이 높다. 원인을 확인한 "
+                    f"뒤 재실행할 것."
+                )
+            continue
+
+        consecutive_full_fallback = 0  # 유효 응답이 나왔으니 리셋
+
+        # 다수결은 risk_level 기준(폴백 회차는 제외). 확정 level을 낸 회차의
+        # 예측을 대표로 삼아야 risk_type·근거가 확정 level과 어긋나지 않는다.
+        level, tie = _majority([p["risk_level"] for p in runs])
+        prediction = next(p for p in runs if p["risk_level"] == level)
+
+        results.append({
+            "row": row, "prediction": prediction, "runs": runs, "attempts": attempts,
+            "tie": tie, "fallback_count": fallback_count, "fully_fallback": False,
+        })
         gold = row["gold_risk_level"]
-        pred = prediction["risk_level"]
-        match = "O" if (pred != "안전") == (gold != "안전") else "X"
+        match = "O" if (level != "안전") == (gold != "안전") else "X"
+        flag = " [과반없음]" if tie else ""
+        fb_flag = f" [폴백 {fallback_count}/{repeats}]" if fallback_count else ""
+        spread = "" if repeats == 1 else f" ({'/'.join(p['risk_level'] for p in runs)})"
         print(f"[{match}] {row['case_id']}: gold={gold}/{row['gold_risk_type']} -> "
-              f"pred={pred}/{prediction['risk_type']}")
+              f"pred={level}/{prediction['risk_type']}{spread}{flag}{fb_flag}")
     return results
 
 
 def _confusion(results: list) -> dict:
     tp = fp = fn = tn = 0
     for r in results:
+        if r["prediction"] is None:  # 전체 폴백 — 정답 없이 집계할 수 없어 제외
+            continue
         gold_risk = r["row"]["gold_risk_level"] != "안전"
         pred_risk = r["prediction"]["risk_level"] != "안전"
         if gold_risk and pred_risk:
@@ -88,7 +174,8 @@ def _confusion(results: list) -> dict:
             tn += 1
     precision = tp / (tp + fp) if (tp + fp) else None
     recall = tp / (tp + fn) if (tp + fn) else None
-    accuracy = (tp + tn) / len(results) if results else None
+    n_scored = tp + fp + fn + tn  # 전체 폴백 조항은 분모에서도 제외
+    accuracy = (tp + tn) / n_scored if n_scored else None
     return {"tp": tp, "fp": fp, "fn": fn, "tn": tn, "precision": precision, "recall": recall, "accuracy": accuracy}
 
 
@@ -114,6 +201,8 @@ def render_report(results: list) -> str:
     mismatches = []
 
     for r in results:
+        if r["prediction"] is None:  # 전체 폴백 — 정답 없어 혼동행렬·불일치 집계에서 제외
+            continue
         gold_level = r["row"]["gold_risk_level"]
         gold_type = r["row"]["gold_risk_type"]
         pred_level = r["prediction"]["risk_level"]
@@ -133,6 +222,13 @@ def render_report(results: list) -> str:
 
     test_c = _confusion(test_results)
     test_a_c = _confusion(test_a_results)
+
+    # 폴백 통계 — 개별 조항의 재시도 소진 성향 자체가 데이터라 별도로 남긴다.
+    total_attempts = sum(len(r["attempts"]) for r in results)
+    total_fallback_attempts = sum(r["fallback_count"] for r in results)
+    fully_fallback = [r for r in results if r["fully_fallback"]]
+    partial_fallback = [r for r in results if not r["fully_fallback"] and r["fallback_count"] > 0]
+    fallback_rate = (total_fallback_attempts / total_attempts * 100) if total_attempts else 0.0
 
     lines = [
         "# 실물 조항 정답지(real_clause_labels.csv) 평가 결과",
@@ -157,6 +253,23 @@ def render_report(results: list) -> str:
         "A등급은 hldcc·LBox(정부/법원 판정), C등급은 AI Hub(자체 판단) 출처다. "
         "\"정부 판정 기반이라 신뢰도 높다\"는 주장을 인용할 땐 A등급만 뗀 수치를 써야 한다.",
         "",
+        "## 폴백 현황",
+        "",
+        f"전체 {total_attempts}회 시도 중 폴백 {total_fallback_attempts}건 "
+        f"({fallback_rate:.1f}%). 전체 폴백(정확도 집계 제외) {len(fully_fallback)}개 조항, "
+        f"일부 폴백(잔여 회차로 확정) {len(partial_fallback)}개 조항.",
+        "",
+    ]
+    if fully_fallback or partial_fallback:
+        lines += ["| 조항 | split | 폴백/시도 | 상태 |", "|---|---|---|---|"]
+        for r in fully_fallback:
+            lines.append(f"| {r['row']['case_id']} | {r['row']['split']} | "
+                         f"{r['fallback_count']}/{len(r['attempts'])} | 전체 폴백(집계 제외) |")
+        for r in partial_fallback:
+            lines.append(f"| {r['row']['case_id']} | {r['row']['split']} | "
+                         f"{r['fallback_count']}/{len(r['attempts'])} | 일부 폴백(잔여로 확정) |")
+        lines.append("")
+    lines += [
         "## 참고: Train/Val 서브셋 (튜닝 이력 있음, 공식 수치 아님)",
         "",
         "| 구분 | TP | FP | FN | TN | Precision | Recall | Accuracy |",
@@ -192,9 +305,64 @@ def render_report(results: list) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _dump_raw(results: list, path: Path, repeats: int) -> None:
+    """회차별 원자료 저장 — 수치가 움직였을 때 재실행 없이 대조하기 위한 것 (#161)."""
+    payload = {
+        "repeats": repeats,
+        "n": len(results),
+        "items": [
+            {
+                "case_id": r["row"]["case_id"],
+                "split": r["row"]["split"],
+                "label_grade": r["row"].get("label_grade"),
+                "gold_risk_level": r["row"]["gold_risk_level"],
+                "gold_risk_type": r["row"]["gold_risk_type"],
+                "attempts": [
+                    {"risk_level": p["risk_level"], "risk_type": p["risk_type"],
+                     "risk_evidence": p.get("risk_evidence"),
+                     "is_fallback": p.get("risk_evidence") == _FALLBACK_EVIDENCE}
+                    for p in r["attempts"]
+                ],
+                "fallback_count": r["fallback_count"],
+                "fully_fallback": r["fully_fallback"],
+                "final_risk_level": r["prediction"]["risk_level"] if r["prediction"] else None,
+                "final_risk_type": r["prediction"]["risk_type"] if r["prediction"] else None,
+                "tie": r["tie"],
+            }
+            for r in results
+        ],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def main() -> None:
-    results = run_eval()
+    repeats = _args.repeats
+    if repeats < 1:
+        sys.exit("--repeats는 1 이상이어야 한다")
+    if repeats == 1:
+        print("주의: --repeats 1은 단발 측정이다. temperature=0에서도 판정이 회차마다 "
+              "뒤집히므로(±1~2건) 보고용 수치는 --repeats 3 이상으로 낼 것 (#161).")
+
+    try:
+        results = run_eval(repeats)
+    except SystemicFailureDetected as exc:
+        sys.exit(f"\n중단: {exc}")
+
+    if _args.out:
+        raw_path = Path(_args.out)
+        _dump_raw(results, raw_path, repeats)
+        print(f"원자료 저장: {raw_path}")
+
     report = render_report(results)
+    ties = sum(1 for r in results if r["tie"])
+    total_attempts = sum(len(r["attempts"]) for r in results)
+    total_fallback = sum(r["fallback_count"] for r in results)
+    fb_rate = (total_fallback / total_attempts * 100) if total_attempts else 0.0
+    header = (f"> 측정 조건: 조항별 {repeats}회 실행 후 risk_level 다수결"
+              f"{f' / 과반 없음 {ties}건' if repeats > 1 else ' (단발 — 보고용 아님)'}"
+              f" / 폴백 {total_fallback}/{total_attempts}건 ({fb_rate:.1f}%)\n\n")
+    report = header + report
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(report, encoding="utf-8")
     print(report)

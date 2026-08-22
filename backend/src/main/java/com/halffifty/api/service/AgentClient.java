@@ -66,6 +66,26 @@ public class AgentClient {
                 .body(AnalyzeResponse.class);
     }
 
+    /** 이해 확인 퀴즈 프록시 (#92) — JSON 그대로 중계. */
+    public String quiz(String requestJson) {
+        return restClient.post()
+                .uri("/quiz")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
+    /** 재설명 프록시 (#76) — JSON 그대로 중계. */
+    public String reexplain(String requestJson) {
+        return restClient.post()
+                .uri("/reexplain")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
     /**
      * PDF 업로드 프록시. 전문가 자문 §7 반영 — 모든 요청이 백엔드를 거치도록
      * 프론트→에이전트 직통 경로를 제거하고 이 메서드로 일원화한다.
@@ -161,9 +181,22 @@ public class AgentClient {
                 + value + "\r\n").getBytes(StandardCharsets.UTF_8));
     }
 
-    /** 교육 콘텐츠 프록시 (#104). */
-    public String learn() {
-        return restClient.get().uri("/learn").retrieve().body(String.class);
+    /** 교육 콘텐츠 프록시 (#104) — 정적 번역본이 있는 언어는 번역해서 반환. */
+    public String learn(String language) {
+        return restClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/learn")
+                        .queryParam("language", language == null ? "ko" : language).build())
+                .retrieve().body(String.class);
+    }
+
+    /** 교육 챗봇 프록시 (#103) — JSON 그대로 중계. 비용 상한은 컨트롤러가 처리. */
+    public String learnChat(String requestJson) {
+        return restClient.post()
+                .uri("/learn-chat")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
     }
 
     /** 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다. */

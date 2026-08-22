@@ -262,3 +262,64 @@ export async function analyzeImage(
   }
   return res.json()
 }
+
+// ---- 사용자 트리거 재설명 (#76) — judge 게이트 통과분만 반영 -------------
+
+export interface ReexplainResult {
+  ok: boolean
+  explanation?: string
+  judge_scores?: Record<string, number>
+  retry_count: number
+  reason?: string
+}
+
+export async function reexplainClause(
+  clause: Pick<ClauseResult, 'clause_id' | 'original_text' | 'explanation' | 'risk_level' | 'risk_type' | 'risk_evidence' | 'check_questions'>,
+  mode: 'easier' | 'detailed',
+  persona: Persona,
+  language: Language,
+): Promise<ReexplainResult> {
+  const res = await fetch(`${BASE_URL}/api/contracts/reexplain`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clause_id: clause.clause_id,
+      clause_text: clause.original_text,
+      analysis: {
+        explanation: clause.explanation,
+        risk_level: clause.risk_level,
+        risk_type: clause.risk_type,
+        risk_evidence: clause.risk_evidence,
+        check_questions: clause.check_questions,
+      },
+      mode, persona, language,
+    }),
+  })
+  if (!res.ok) throw new Error(`재설명 요청 실패 (${res.status})`)
+  return res.json()
+}
+
+// ---- 이해 확인 퀴즈 (#92, 시그니처 ②) ----------------------------------
+
+export interface QuizQuestion {
+  clause_id: string
+  question: string
+  choices: string[]
+  answer_index: number
+  answer_quote: string
+}
+
+export async function fetchQuiz(
+  items: Array<Pick<ClauseResult, 'clause_id' | 'explanation' | 'risk_level' | 'risk_type' | 'risk_evidence'>>,
+  persona: Persona,
+  language: Language,
+): Promise<QuizQuestion[]> {
+  const res = await fetch(`${BASE_URL}/api/contracts/quiz`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items, persona, language }),
+  })
+  if (!res.ok) throw new Error(`퀴즈 생성 실패 (${res.status})`)
+  const data = await res.json()
+  return data.questions ?? []
+}

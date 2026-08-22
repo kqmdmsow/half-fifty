@@ -1,5 +1,8 @@
 import { useState } from 'react'
-import { Card } from './ui'
+import { Card, RiskIcon } from './ui'
+
+// 계산기 등급 톤 → 위험도 아이콘 매핑 (3중 인코딩: 색+아이콘+텍스트)
+const TONE_LEVEL = { danger: '위험', caution: '주의', safe: '안전' } as const
 import { t, type LangCode } from '../i18n'
 
 /** 깡통전세 위험 계산기 (#63) — LLM 무관, 순수 프론트 계산.
@@ -89,7 +92,7 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
 
   return (
     <Card className="px-5 py-5">
-      <p className="text-[15px] font-bold text-ink-900"><span aria-hidden>🏠</span> {t(language, 'jcTitle')}</p>
+      <p className="text-[15px] font-bold text-ink-900">{t(language, 'jcTitle')}</p>
       <p className="mt-1 text-[13px] leading-relaxed text-ink-400">{t(language, 'jcDesc')}</p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -101,7 +104,8 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
       {grade && ratio !== null ? (
         <div className={`mt-4 rounded-2xl border p-4 ${TONE_STYLE[grade.tone].box}`}>
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className={`rounded-lg px-2.5 py-1 text-[13px] font-bold ${TONE_STYLE[grade.tone].badge}`}>
+            <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[13px] font-bold ${TONE_STYLE[grade.tone].badge}`}>
+              <RiskIcon level={TONE_LEVEL[grade.tone]} />
               {t(language, grade.labelKey)}
             </span>
             <span className="text-[22px] font-bold text-ink-900">{(ratio * 100).toFixed(1)}%</span>
@@ -143,7 +147,7 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
         </div>
         {factors.size > 0 && (
           <p className="mt-2.5 rounded-xl bg-danger-50 px-3 py-2 text-[13px] font-bold text-danger-600">
-            <span aria-hidden>⚠️</span> {t(language, 'jcFactorWarn', { n: factors.size })}
+            {t(language, 'jcFactorWarn', { n: factors.size })}
           </p>
         )}
       </div>
@@ -151,7 +155,7 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
       {/* HUG 보증 가입 유도 (④) — 부채비율 90% 이하일 때만 (초과 구간은 가입 불가) */}
       {ratio !== null && ratio <= 0.9 && (
         <div className="mt-3 flex flex-col gap-2.5 rounded-2xl bg-safe-50 px-4 py-3.5 md:flex-row md:items-center md:justify-between">
-          <p className="text-[13px] leading-relaxed text-safe-700"><span aria-hidden>🛡️</span> {t(language, 'jcHugOk')}</p>
+          <p className="text-[13px] leading-relaxed text-safe-700">{t(language, 'jcHugOk')}</p>
           <a
             href="https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp"
             target="_blank"

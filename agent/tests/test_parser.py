@@ -14,7 +14,9 @@ CONTRACT_CLAUSE_COUNTS = [
     ("contract_02_finance_loan.txt", 7),  # 제1~5조 + 특약 2건
     ("contract_03_lease_normal.txt", 7),  # 제1~7조, 특약 없음
     ("contract_04_gym_membership.txt", 7),  # 제1~5조 + 특약 2건
-    ("contract_05_molit_standard.txt", 16),  # 제1~13조 + 특약(Ÿ 불릿) 3건
+    # 제1~13조 + 특약(Ÿ 불릿) 1건. 나머지 Ÿ 항목 2건은 체크박스 빈칸만 있는
+    # 양식 안내라 제외된다 (docs/eval_normal_fp.md clause_016 오탐 대응)
+    ("contract_05_molit_standard.txt", 14),
 ]
 
 
@@ -113,3 +115,61 @@ def test_low_coverage_produces_warning():
     text = preamble + "\n제1조(목적) 짧은 조항."
     _, warnings = split_clauses_with_warnings(text)
     assert any("분리되지 않았습니다" in w for w in warnings)
+
+
+def test_page_number_line_removed():
+    # PDF 쪽번호가 조항 본문에 끼면 뒤따르는 표 조각까지 같은 조항으로 묶인다
+    from src.nodes.parser import split_clauses_with_warnings
+    text = "제5조(해제) 계약을 해제할 수 있다.\n- 1 / 4 -\n이어지는 본문이다."
+    clauses, _ = split_clauses_with_warnings(text)
+    assert len(clauses) == 1
+    assert "1 / 4" not in clauses[0]["text"]
+
+
+def test_bare_number_line_kept():
+    # 숫자만 있는 줄은 표에서 떨어져 나온 금액·면적일 수 있어 지우지 않는다
+    from src.nodes.parser import split_clauses_with_warnings
+    text = "제1조(보증금) 보증금은 아래와 같다.\n50000000\n원정으로 한다."
+    clauses, _ = split_clauses_with_warnings(text)
+    assert "50000000" in clauses[0]["text"]
+
+
+def test_form_blank_item_excluded_with_warning():
+    # 체크박스 선택지만 있고 완결 문장이 없는 항목은 계약 문언이 아니다
+    # (docs/eval_normal_fp.md housing_std clause_016 오탐의 직접 원인)
+    from src.nodes.parser import split_clauses_with_warnings
+    text = (
+        "제1조(목적) 계약의 목적을 정한다.\n"
+        "특약사항\n"
+        "Ÿ 주택의 철거 또는 재건축에 관한 구체적 계획 ( □ 없음 □ 있음 ※공사시기 :\n"
+    )
+    clauses, warnings = split_clauses_with_warnings(text)
+    assert len(clauses) == 1
+    assert any("빈칸·안내" in w for w in warnings)
+
+
+def test_handwritten_special_clause_kept():
+    # 특약사항은 위험 조항이 숨는 자리다 — 완결 문장이 있으면 반드시 남긴다
+    from src.nodes.parser import split_clauses_with_warnings
+    text = (
+        "제1조(목적) 계약의 목적을 정한다.\n"
+        "특약사항\n"
+        "1. 임대인은 보증금을 반환하지 않는다.\n"
+    )
+    clauses, warnings = split_clauses_with_warnings(text)
+    assert len(clauses) == 2
+    assert "보증금을 반환하지 않는다" in clauses[1]["text"]
+    assert warnings == []
+
+
+def test_form_item_with_checkbox_but_complete_sentence_kept():
+    # 체크박스가 있어도 완결 문장이면 당사자가 합의하는 계약 항목이다
+    # (housing_std clause_014 분쟁조정 동의 항목 — 제외하면 안 된다)
+    from src.nodes.parser import split_clauses_with_warnings
+    text = (
+        "제1조(목적) 계약의 목적을 정한다.\n"
+        "특약사항\n"
+        "Ÿ 분쟁이 있는 경우 조정위원회에 조정을 신청한다 ( □ 동의 □ 미동의)\n"
+    )
+    clauses, _ = split_clauses_with_warnings(text)
+    assert len(clauses) == 2

@@ -8,6 +8,7 @@ import {
   type Persona,
 } from './api'
 import { LANGUAGES, t } from './i18n'
+import { Logo } from './components/ui'
 import { saveRecord, type SavedRecord } from './records'
 import { currentSession, pushServerRecord, signOut, type Session } from './auth'
 import type { DemoSample } from './data/samples'
@@ -21,11 +22,13 @@ import { PersonaScreen } from './screens/Persona'
 import { ProgressScreen } from './screens/Progress'
 import { SummaryScreen } from './screens/Summary'
 import { UploadScreen } from './screens/Upload'
-import { DocMark, Wordmark } from './components/Brand'
 import { LoginScreen } from './screens/Login'
 import { RecordsScreen } from './screens/Records'
 
 import { LearnScreen } from './screens/Learn'
+
+// KRDS --krds-zoom-small/medium/large/xlarge/xxlarge (common.css)
+const ZOOM_LEVELS = [0.9, 1, 1.1, 1.3, 1.5]
 
 type Screen =
   | 'landing'
@@ -53,7 +56,12 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('ko')
 
   // 접근성 설정
-  const [largeText, setLargeText] = useState(false)
+  // 글자·화면 크기 5단계 (KRDS --krds-zoom-*: 0.9/1/1.1/1.3/1.5) —
+  // KRDS 사이트 우상단 '글자·화면 설정'과 같은 사고방식, 선택값은 저장.
+  const [zoom, setZoom] = useState<number>(() => {
+    const saved = Number(localStorage.getItem('jmjm_zoom'))
+    return ZOOM_LEVELS.includes(saved) ? saved : 1
+  })
   const [highContrast, setHighContrast] = useState(false)
   const [voiceGuide, setVoiceGuide] = useState(false)
 
@@ -78,10 +86,10 @@ export default function App() {
   const [retrying, setRetrying] = useState(false)
   // 옵트인 로컬 기록 (#102 v1) — 현재 결과의 저장 여부
   const [recordSaved, setRecordSaved] = useState(false)
+  const [savedRecordId, setSavedRecordId] = useState<string | null>(null)
   // 로그인 세션 (#102) — 로그인이 여는 기능은 '결과를 계정에 보관' 하나뿐이다.
   const [session, setSession] = useState<Session | null>(() => currentSession())
   const [savedToAccount, setSavedToAccount] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   // 로그인 후 자동으로 이어서 보관할지 (끝내기 화면에서 로그인으로 보낸 경우)
   const pendingKeepRef = useRef(false)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
@@ -101,6 +109,8 @@ export default function App() {
   const clauseCount = data?.clause_count ?? streamProgress?.total ?? 0
   hasResultsRef.current = results.length > 0
 
+  // 글자·화면 크기: KRDS zoom 토큰 값을 문서 루트에 적용 — 텍스트만이 아니라
+  // 레이아웃·아이콘·터치 타깃이 함께 커져 저시력 사용자에게 일관적이다.
   // 결과가 확정되면 읽기 시작 시각 기록 (사람 평가 소요시간 지표)
   useEffect(() => {
     if (data) setResultsShownAt(Date.now())
@@ -108,8 +118,9 @@ export default function App() {
 
   // 글자 크게: rem 기준(html font-size)을 키워 전체 화면에 적용
   useEffect(() => {
-    document.documentElement.style.fontSize = largeText ? '18px' : '16px'
-  }, [largeText])
+    document.documentElement.style.zoom = String(zoom)
+    localStorage.setItem('jmjm_zoom', String(zoom))
+  }, [zoom])
 
   // 접근성(#82): 화면 전환 시 스크린리더 포커스를 새 화면 제목으로 이동 —
   // SPA는 페이지 로드가 없어 전환을 알리지 않으면 리더가 침묵한다
@@ -129,7 +140,6 @@ export default function App() {
   // 화면 전환을 브라우저 히스토리에 쌓는다 — 뒤로가기가 홈으로 튕기며 분석
   // 결과까지 날리던 문제의 수정. popstate로 앱 내 화면 이동으로 처리한다.
   const go = (next: Screen) => {
-    setMenuOpen(false)
     window.history.pushState({ screen: next }, '')
     setScreen(next)
     window.scrollTo({ top: 0 })
@@ -158,6 +168,7 @@ export default function App() {
     setAnalyzedLanguage(language)
     setRetrying(false)
     setRecordSaved(false)
+    setSavedRecordId(null)
     setSavedToAccount(false)
     go('progress')
 
@@ -200,7 +211,7 @@ export default function App() {
         )
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '분석 요청에 실패했어요.')
+      setError(err instanceof Error ? err.message : t(language, 'requestFailed'))
       setStreamProgress(null)
       go('progress') // 오류 안내와 재시도 버튼은 Progress 화면이 담당
     } finally {
@@ -244,6 +255,7 @@ export default function App() {
     setData(record.data)
     setDomain(record.domain)
     setRecordSaved(true) // 이미 저장된 기록이므로 중복 저장 버튼 숨김
+    setSavedRecordId(record.id) // Done 화면 '삭제' 시 이 기록도 함께 지우기 위해
     go('summary')
   }
 
@@ -282,129 +294,103 @@ export default function App() {
         {t(language, 'skipToMain')}
       </a>
 
-      {/* 헤더 (#134) — 왼쪽 메뉴 버튼 + 가운데 로고. 언어·글자크기·또렷하게·
-          교육·기록·로그인은 메뉴 안으로 모아 첫 화면을 비운다. */}
+      {/* 헤더 (#134·#148 KRDS) — 로고 + 가로 버튼열. 로그인(#102)은 이
+          버튼열에 계정 상태를 보여주는 버튼으로 합류한다. */}
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
-        <div className="relative mx-auto flex h-16 max-w-6xl items-center px-4 md:px-6">
-          <button
-            type="button"
-            aria-expanded={menuOpen}
-            aria-controls="site-menu"
-            aria-label={t(language, 'navMenu')}
-            onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-12 w-12 shrink-0 flex-col items-center justify-center gap-[5px] rounded-xl hover:bg-ink-50"
-          >
-            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-transform ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`} />
-            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-opacity ${menuOpen ? 'opacity-0' : ''}`} />
-            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-transform ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`} />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setMenuOpen(false)
-              go('landing')
-            }}
-            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2"
-          >
-            <DocMark size={26} />
-            <Wordmark className="text-[19px]" />
-          </button>
-        </div>
-
-        {menuOpen && (
-          <div id="site-menu" className="border-t border-ink-50 bg-white">
-            <div className="mx-auto max-w-md px-4 py-2 md:max-w-lg md:px-6">
-              <div className="flex flex-col">
-                {/* 로그인 — 가장 위 */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    if (session) {
-                      signOut()
-                      setSession(null)
-                    } else {
-                      go('login')
-                    }
-                  }}
-                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
-                >
-                  {t(language, session ? 'lgOut' : 'lgNav')}
-                  {session && (
-                    <span className="text-[12px] font-semibold text-ink-400">{session.email}</span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    go('learn')
-                  }}
-                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
-                >
-                  {t(language, 'lnNav')}
-                  {screen === 'learn' && (
-                    <span aria-hidden className="text-[13px] font-bold text-brand-500">•</span>
-                  )}
-                </button>
-                {/* 언어 */}
-                <div className="flex w-full items-center justify-between gap-3 border-b border-ink-50 px-2 py-3">
-                  <span className="text-[15px] font-bold text-ink-900">
-                    {t(language, 'languageLabel')}
-                  </span>
-                  <select
-                    aria-label="언어 선택 / Language"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value as Language)}
-                    className="cursor-pointer rounded-xl bg-ink-50 px-3 py-2 text-[14px] font-bold text-ink-700 outline-none"
-                  >
-                    {LANGUAGES.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {/* 글자 크게 */}
-                <button
-                  type="button"
-                  aria-pressed={largeText}
-                  onClick={() => setLargeText((value) => !value)}
-                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
-                >
-                  {t(language, 'largeText')}
-                  <span className={`text-[13px] font-bold ${largeText ? 'text-brand-500' : 'text-ink-300'}`}>
-                    {largeText ? 'ON' : 'OFF'}
-                  </span>
-                </button>
-                {/* 또렷하게 (고대비) */}
-                <button
-                  type="button"
-                  aria-pressed={highContrast}
-                  onClick={() => setHighContrast((value) => !value)}
-                  className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
-                >
-                  {t(language, 'hcToggle')}
-                  <span className={`text-[13px] font-bold ${highContrast ? 'text-brand-500' : 'text-ink-300'}`}>
-                    {highContrast ? 'ON' : 'OFF'}
-                  </span>
-                </button>
-                {/* 내 기록 — 가장 아래 */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    go('records')
-                  }}
-                  className="flex w-full items-center px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
-                >
-                  {t(language, 'rcNav')}
-                </button>
-              </div>
+        {/* 좁은 폭(375px)에서는 컨트롤이 둘째 줄로 내려간다 — 고정 h-16이면
+            zoom 스테퍼가 추가된 뒤 오버플로로 '또렷하게'가 잘림 (실측) */}
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-y-1 px-4 py-1.5 md:px-6">
+          <Logo onClick={() => go('landing')} />
+          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (session) {
+                  signOut()
+                  setSession(null)
+                } else {
+                  go('login')
+                }
+              }}
+              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+            >
+              {t(language, session ? 'lgOut' : 'lgNav')}
+            </button>
+            <button
+              type="button"
+              aria-pressed={screen === 'learn'}
+              onClick={() => go('learn')}
+              className={`rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+                screen === 'learn' ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              {t(language, 'lnNav')}
+            </button>
+            <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
+              <select
+                aria-label="언어 선택 / Language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as Language)}
+                className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
+              >
+                {LANGUAGES.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {/* 글자·화면 크기 (KRDS zoom 5단계) — 값은 aria-live로 낭독 */}
+            <div
+              role="group"
+              aria-label={t(language, 'zoomLabel')}
+              className="flex items-center gap-0.5 rounded-full bg-ink-50 px-1.5 py-1 text-[13px] font-bold text-ink-600"
+            >
+              <button
+                type="button"
+                aria-label={t(language, 'zoomOut')}
+                disabled={zoom === ZOOM_LEVELS[0]}
+                onClick={() => setZoom(ZOOM_LEVELS[Math.max(0, ZOOM_LEVELS.indexOf(zoom) - 1)])}
+                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+              >
+                가−
+              </button>
+              <span aria-live="polite" className="min-w-[42px] text-center tabular-nums">
+                {Math.round(zoom * 100)}%
+              </span>
+              <button
+                type="button"
+                aria-label={t(language, 'zoomIn')}
+                disabled={zoom === ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
+                onClick={() =>
+                  setZoom(ZOOM_LEVELS[Math.min(ZOOM_LEVELS.length - 1, ZOOM_LEVELS.indexOf(zoom) + 1)])
+                }
+                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+              >
+                가+
+              </button>
             </div>
+            <button
+              type="button"
+              onClick={() => go('records')}
+              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
+            >
+              🗂 {t(language, 'rcNav')}
+            </button>
+            <button
+              type="button"
+              aria-pressed={highContrast}
+              onClick={() => setHighContrast((value) => !value)}
+              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
+                highContrast
+                  ? 'bg-ink-900 text-white'
+                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+              }`}
+            >
+              {t(language, 'hcToggle')}
+            </button>
           </div>
-        )}
+        </div>
       </header>
 
       <main id="main">
@@ -416,7 +402,7 @@ export default function App() {
           <div className="mx-auto max-w-3xl px-6 pt-6">
             <div className="flex flex-col gap-3 rounded-2xl border border-brand-500/20 bg-brand-50 px-5 py-4 md:flex-row md:items-center md:justify-between">
               <p className="text-[14px] font-semibold leading-relaxed text-ink-700">
-                🌐 {t(language, 'langMismatch')}
+                {t(language, 'langMismatch')}
               </p>
               <button
                 type="button"
@@ -428,7 +414,6 @@ export default function App() {
             </div>
           </div>
         )}
-        {screen === 'landing' && <LandingScreen language={language} onStart={() => go('upload')} />}
         {screen === 'records' && (
           <RecordsScreen language={language} session={session} onOpen={openRecord} />
         )}
@@ -448,7 +433,6 @@ export default function App() {
             }}
           />
         )}
-        {screen === 'records' && <RecordsScreen language={language} onOpen={openRecord} />}
         {screen === 'api' && <ApiInfoScreen language={language} onBack={() => go('landing')} />}
         {screen === 'landing' && (
           <LandingScreen
@@ -487,12 +471,12 @@ export default function App() {
           <PersonaScreen
             persona={persona}
             language={language}
-            largeText={largeText}
+            largeText={zoom > 1}
             highContrast={highContrast}
             voiceGuide={voiceGuide}
             onPersonaChange={setPersona}
             onLanguageChange={setLanguage}
-            onToggleLargeText={() => setLargeText((value) => !value)}
+            onToggleLargeText={() => setZoom((value) => (value > 1 ? 1 : 1.3))}
             onToggleHighContrast={() => setHighContrast((value) => !value)}
             onToggleVoiceGuide={() => setVoiceGuide((value) => !value)}
             onPrev={() => go('extract')}
@@ -501,6 +485,7 @@ export default function App() {
         )}
         {screen === 'progress' && (
           <ProgressScreen
+            language={language}
             loading={loading}
             error={error}
             streamProgress={streamProgress}
@@ -521,12 +506,14 @@ export default function App() {
             onSaveRecord={
               data
                 ? () => {
-                    saveRecord(data, { domain, language })
+                    const record = saveRecord(data, { domain, language })
                     setRecordSaved(true)
+                    setSavedRecordId(record.id)
                   }
                 : undefined
             }
             domain={domain}
+            persona={persona}
             judgeScores={data?.judge_scores ?? {}}
             retryCount={data?.retry_count ?? 0}
             needsReview={data?.needs_review ?? false}
@@ -542,6 +529,7 @@ export default function App() {
             results={results}
             voiceGuide={voiceGuide}
             language={language}
+            persona={persona}
             onSelectClause={setSelectedClauseId}
             onBack={() => go('summary')}
             onDone={() => go('done')}
@@ -551,11 +539,13 @@ export default function App() {
           <DoneScreen
             results={results}
             language={language}
+            resultsShownAt={resultsShownAt}
+            recordSaved={recordSaved}
+            savedRecordId={savedRecordId}
             onRestart={restart}
             signedIn={Boolean(session)}
             savedToAccount={savedToAccount}
             onKeepInAccount={data ? keepInAccount : undefined}
-            resultsShownAt={resultsShownAt}
           />
         )}
       </main>

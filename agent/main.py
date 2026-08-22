@@ -22,6 +22,7 @@ import logging
 import os
 import time
 
+from pathlib import Path
 from typing import List, Literal, Optional
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
@@ -32,9 +33,12 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
-from src.learn_content import SCAMS
+from src.injection_check import detect_injection
+from src.learn_content import content_as_context, localized_learn
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
+from src.quiz import generate_quiz
+from src.reexplain import reexplain
 from src.state import PipelineState
 from src.stream import stream_analysis
 
@@ -149,15 +153,76 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     )
 
 
-@app.get("/learn")
-def learn() -> dict:
-    """교육 콘텐츠 단일 원천 — 프론트가 표시용으로 가져간다 (#104).
+class QuizRequest(BaseModel):
+    """이해 확인 퀴즈 생성 요청 (#92) — 프론트가 분석 결과에서 발췌해 보낸다."""
 
-    내장 챗봇(/learn-chat, #103)은 세션당 대화 횟수 상한과 인젝션 방어
-    (#131 규칙 탐지기 재사용 또는 #149식 프롬프트 방어 블록) 조건을 걸고
-    나서 별도 PR로 합류한다 — 지금은 정적 콘텐츠만 노출.
+    items: List[dict] = Field(..., description="위험도순 조항 분석 발췌 (최대 3개 사용)")
+    persona: Literal["adult", "senior", "foreigner"] = "adult"
+    language: Optional[Language] = "ko"
+
+
+class ReexplainRequest(BaseModel):
+    """사용자 트리거 재설명 (#76) — explanation만 재생성, 판정 불변."""
+
+    clause_id: str
+    clause_text: str = Field(..., description="조항 원문 (judge faithfulness 채점 기준)")
+    analysis: dict = Field(..., description="기존 분석 결과 (risk_level 등 판정 필드 포함)")
+    mode: Literal["easier", "detailed"]
+    persona: Literal["adult", "senior", "foreigner"] = "adult"
+    language: Optional[Language] = "ko"
+
+
+@app.post("/quiz")
+def quiz(req: QuizRequest) -> dict:
+    """객관식 3문항 생성 — 코드 가드 통과분만, 미달 시 빈 목록 (src/quiz.py)."""
+    return {"questions": generate_quiz(req.items, req.persona, req.language or "ko")}  # type: ignore[arg-type]
+
+
+@app.post("/reexplain")
+def reexplain_endpoint(req: ReexplainRequest) -> dict:
+    """judge 게이트 통과분만 반환 — 실패 시 ok=False (프론트는 기존 설명 유지)."""
+    return reexplain(req.clause_id, req.clause_text, req.analysis,
+                     req.mode, req.persona, req.language or "ko")
+
+
+@app.get("/learn")
+def learn(language: str = "ko") -> dict:
+    """교육 콘텐츠 단일 원천 — 정적 번역본이 있는 언어는 번역해서 반환 (#104)."""
+    return localized_learn(language)
+
+
+_LEARN_CHAT_PROMPT = (
+    Path(__file__).parent / "src" / "prompts" / "learn_chat.txt"
+).read_text(encoding="utf-8")
+
+
+class LearnChatRequest(BaseModel):
+    """교육 페이지 챗봇 (#103) — 컨텍스트는 서버 사본만 사용 (클라이언트 미신뢰)."""
+
+    question: str = Field(..., min_length=2, max_length=500)
+    language: Optional[Language] = "ko"
+
+
+@app.post("/learn-chat")
+def learn_chat(req: LearnChatRequest) -> dict:
+    """학습 콘텐츠 범위 내 Q&A. 비용 상한은 백엔드(시간당 IP별 횟수)가 맡고,
+    여기서는 인젝션 방어만 담당한다 — 자유 입력 창구라 #67 규칙 탐지기를
+    통과한 질문에 대해서만 LLM을 호출한다(통과 못하면 거절, LLM 호출 없음).
     """
-    return {"scams": SCAMS}
+    from src.llm import get_worker_llm, invoke_json
+
+    if detect_injection(req.question):
+        return {"ok": False, "reason": "blocked"}
+
+    prompt = (_LEARN_CHAT_PROMPT
+              .replace("{language}", req.language or "ko")
+              .replace("{content}", content_as_context())
+              .replace("{question}", req.question))
+    try:
+        data = invoke_json(get_worker_llm(), prompt)
+        return {"ok": True, "answer": str(data["answer"])[:1000]}
+    except Exception:
+        return {"ok": False, "reason": "error"}
 
 
 @app.get("/health")

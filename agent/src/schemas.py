@@ -15,7 +15,7 @@
 import re
 from typing import List, Literal
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 # analysis.txt [위험 유형 기준]과 동일하게 유지할 것 (10종 + 해당 없음)
 RISK_TYPES = (
@@ -67,3 +67,23 @@ class AnalysisOutput(BaseModel):
         if not v.strip():
             raise ValueError("빈 문자열")
         return v
+
+
+class QuizQuestion(BaseModel):
+    """이해 확인 문항 (#92) — answer_quote는 코드 가드(quiz._grounded)로 검증."""
+
+    clause_id: str
+    question: str
+    choices: List[str] = Field(min_length=2, max_length=4)
+    answer_index: int = Field(ge=0)
+    answer_quote: str
+
+    @model_validator(mode="after")
+    def _answer_index_in_range(self):
+        if self.answer_index >= len(self.choices):
+            raise ValueError("answer_index가 choices 범위를 벗어남")
+        return self
+
+
+class QuizOutput(BaseModel):
+    questions: List[QuizQuestion] = Field(max_length=5)

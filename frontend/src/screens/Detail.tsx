@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
-import type { ClauseResult } from '../api'
-import { Button, CopyButton, RiskBadge } from '../components/ui'
+import { useEffect, useRef, useState } from 'react'
+import { reexplainClause } from '../api'
+import type { ClauseResult, Persona } from '../api'
+import { Button, CopyButton, RiskBadge, RiskIcon } from '../components/ui'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
 import { FormattedText } from '../components/FormattedText'
+import { isVoiceSupported, startVoiceSession, type VoiceSession } from '../voiceCommands'
 import { speak, stopSpeaking, useVoiceAvailable, voiceAvailable } from '../tts'
 
 export function DetailScreen({
@@ -12,6 +14,7 @@ export function DetailScreen({
   results,
   voiceGuide,
   language = 'ko',
+  persona = 'adult',
   onSelectClause,
   onBack,
   onDone,
@@ -20,11 +23,38 @@ export function DetailScreen({
   results: ClauseResult[]
   voiceGuide: boolean
   language?: LangCode
+  persona?: Persona
   onSelectClause: (clauseId: string) => void
   onBack: () => void
   onDone: () => void
 }) {
   const clause = results.find((result) => result.clause_id === clauseId) ?? results[0]
+
+  // 사용자 트리거 재설명 (#76) — judge 게이트 통과분만 반영, 조항당 2회 제한.
+  // 판정 불변: explanation 표시만 오버라이드, risk_* 필드는 원본 그대로.
+  const [reexplained, setReexplained] = useState<Record<string, { text: string; scores: Record<string, number> }>>({})
+  const [reCount, setReCount] = useState<Record<string, number>>({})
+  const [reState, setReState] = useState<'idle' | 'loading' | 'failed'>('idle')
+
+  const requestReexplain = async (mode: 'easier' | 'detailed') => {
+    if (!clause || reState === 'loading') return
+    setReState('loading')
+    try {
+      const out = await reexplainClause(clause, mode, persona, language)
+      setReCount((prev) => ({ ...prev, [clause.clause_id]: (prev[clause.clause_id] ?? 0) + 1 }))
+      if (out.ok && out.explanation) {
+        setReexplained((prev) => ({
+          ...prev,
+          [clause.clause_id]: { text: out.explanation!, scores: out.judge_scores ?? {} },
+        }))
+        setReState('idle')
+      } else {
+        setReState('failed')
+      }
+    } catch {
+      setReState('failed')
+    }
+  }
   const [listening, setListening] = useState(false)
   const voiceReady = useVoiceAvailable(language)
 
@@ -41,13 +71,41 @@ export function DetailScreen({
     setListening(false)
   }, [clause?.clause_id])
 
+  // 음성 명령 (#127) — Detail 문맥에서 6종: 다음/이전/읽어줘/멈춰/요약/더 쉽게.
+  // 인식 결과는 명령 해석 후 즉시 폐기 (전송·저장 없음).
+  const [micOn, setMicOn] = useState(false)
+  const voiceRef = useRef<VoiceSession | null>(null)
+  const stateRef = useRef({ clauseId: '', results: [] as ClauseResult[] })
+  stateRef.current = { clauseId: clause?.clause_id ?? '', results }
+
+  const toggleVoice = () => {
+    if (voiceRef.current) {
+      voiceRef.current.stop()
+      voiceRef.current = null
+      return
+    }
+    voiceRef.current = startVoiceSession((cmd) => {
+      const { clauseId: cur, results: rs } = stateRef.current
+      const idx = rs.findIndex((r) => r.clause_id === cur)
+      const current = rs[idx]
+      if (cmd === 'next' && idx < rs.length - 1) onSelectClause(rs[idx + 1].clause_id)
+      else if (cmd === 'prev' && idx > 0) onSelectClause(rs[idx - 1].clause_id)
+      else if (cmd === 'read' && current) speak(current.explanation, language)
+      else if (cmd === 'stop') stopSpeaking()
+      else if (cmd === 'summary') onBack()
+      // 'easier' 명령은 #133(다시 설명) 머지 후 requestReexplain('easier')로 연결
+    }, setMicOn)
+  }
+
+  useEffect(() => () => voiceRef.current?.stop(), [])
+
   // 결과가 아직 없으면 렌더링하지 않는다 (가짜 예시 폴백 제거 후의 방어선).
   // 훅 규칙 때문에 useEffect 뒤에 위치해야 한다.
   if (!clause) return null
 
   const questions = clause.check_questions.length
     ? clause.check_questions
-    : ['이 조항은 그대로 유지해야 하나요?']
+    : [t(language, 'fallbackQuestion')]
 
   return (
     <div className="mx-auto max-w-5xl animate-fade-up px-6 py-10 md:py-14">
@@ -58,6 +116,27 @@ export function DetailScreen({
       >
         ← {t(language, 'backToSummary')}
       </button>
+
+      {isVoiceSupported() && (
+        <span className="mb-6 ml-3 inline-flex items-center gap-2">
+          <button
+            type="button"
+            aria-pressed={micOn}
+            onClick={toggleVoice}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
+              micOn ? 'bg-danger-500 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
+            }`}
+          >
+            <span aria-hidden>🎤</span>
+            {micOn ? t(language, 'vcOff') : t(language, 'vcToggle')}
+          </button>
+          {micOn && (
+            <span className="text-[12px] font-semibold text-ink-400" role="status">
+              {t(language, 'vcListening')}
+            </span>
+          )}
+        </span>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
         {/* 조항 목록 */}
@@ -78,8 +157,11 @@ export function DetailScreen({
                       : 'bg-ink-25 text-ink-600 hover:bg-ink-50'
                   }`}
                 >
-                  <span
-                    className={`h-2 w-2 shrink-0 rounded-full ${RISK_META[result.risk_level].dot}`}
+                  {/* 3중 인코딩: 색 점만으로 위험도를 표시하지 않는다 —
+                      활성(어두운 배경) 칩에서는 현재색 상속으로 대비 유지 */}
+                  <RiskIcon
+                    level={result.risk_level}
+                    className={active ? '' : RISK_META[result.risk_level].text}
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
                     {clauseHeading(result.original_text, language, result.original_text_translated) ??
@@ -131,13 +213,66 @@ export function DetailScreen({
                 listening ? 'bg-ink-900 text-white' : 'bg-brand-50 text-brand-600 hover:bg-brand-100'
               }`}
             >
-              🔊 {t(language, listening ? 'readAllStop' : 'listenClause')}
+              {t(language, listening ? 'readAllStop' : 'listenClause')}
             </button>
             )}
           </div>
 
           <Section title={t(language, 'explainSimply')}>
-            <FormattedText text={clause.explanation} lead />
+            {(() => {
+              const re = reexplained[clause.clause_id]
+              const showRe = Boolean(re)
+              return (
+                <>
+                  {showRe && (
+                    <p className="mb-2 inline-flex items-center gap-1.5 rounded-lg bg-safe-50 px-2.5 py-1 text-[12px] font-bold text-safe-700">
+                      <span aria-hidden>🛡️</span> {t(language, 'reVerified')}
+                      {re.scores.faithfulness != null && (
+                        <span className="font-semibold text-safe-700/70">
+                          (faithfulness {re.scores.faithfulness.toFixed(1)})
+                        </span>
+                      )}
+                    </p>
+                  )}
+                  <FormattedText text={showRe ? re.text : clause.explanation} lead />
+
+                </>
+              )
+            })()}
+
+            {/* 재설명 트리거 (#76) — judge 게이트 통과분만 반영 */}
+            <div className="mt-3.5">
+              {reState === 'loading' ? (
+                <p className="flex items-center gap-2 text-[13px] font-semibold text-brand-600" role="status">
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" aria-hidden />
+                  {t(language, 'reLoading')}
+                </p>
+              ) : (reCount[clause.clause_id] ?? 0) >= 2 ? (
+                <p className="text-[13px] font-semibold text-ink-400">{t(language, 'reLimit')}</p>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => requestReexplain('easier')}
+                    className="rounded-full bg-brand-50 px-3.5 py-2 text-[13px] font-bold text-brand-600 transition-colors hover:bg-brand-100"
+                  >
+                    {t(language, 'reEasier')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => requestReexplain('detailed')}
+                    className="rounded-full bg-brand-50 px-3.5 py-2 text-[13px] font-bold text-brand-600 transition-colors hover:bg-brand-100"
+                  >
+                    {t(language, 'reDetailed')}
+                  </button>
+                  {reState === 'failed' && (
+                    <span className="text-[13px] font-semibold text-caution-700" role="status">
+                      {t(language, 'reFailed')}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </Section>
 
           {clause.risk_level !== '안전' && (
@@ -155,7 +290,7 @@ export function DetailScreen({
               문구로 못 박아 단정을 피한다(자문 §7). */}
           {!!clause.related_cases?.length && (
             <section className="mt-6">
-              <h2 className="text-[14px] font-bold text-ink-400">📎 {t(language, 'relatedCases')}</h2>
+              <h2 className="text-[14px] font-bold text-ink-400">{t(language, 'relatedCases')}</h2>
               <div className="mt-2 space-y-2.5">
                 {clause.related_cases.map((c) => (
                   <div
@@ -176,7 +311,7 @@ export function DetailScreen({
           <div className="mt-6 rounded-2xl border border-danger-500/20 bg-danger-50 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
-              <CopyButton text={clause.original_text} className="!bg-white" />
+              <CopyButton text={clause.original_text} copiedText={t(language, 'copied')} className="!bg-white">{t(language, 'copy')}</CopyButton>
             </div>
             <p className="mt-2.5 text-[15px] leading-loose text-ink-700">{clause.original_text}</p>
             {clause.original_text_translated && (
@@ -227,7 +362,7 @@ export function DetailScreen({
                         {question}
                       </p>
                     </div>
-                    <CopyButton text={question} />
+                    <CopyButton text={question} copiedText={t(language, 'copied')}>{t(language, 'copy')}</CopyButton>
                   </div>
                 )
               })}
