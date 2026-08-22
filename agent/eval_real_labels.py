@@ -22,7 +22,7 @@ import csv
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from src.nodes.analysis import _analyze_clause
+from src.nodes.analysis import _FALLBACK_EVIDENCE, _analyze_clause
 
 # EVAL_WORKER=solar — 크레딧 소진 시 무료 워커로 대체 실행 (평가 전용 주입).
 # 주의: _analyze_clause 폴백이 오류를 은폐하므로, 실행 후 출력에서
@@ -40,14 +40,30 @@ if os.getenv("EVAL_WORKER") == "solar":
 
 
 LABELS_PATH = Path(__file__).parent.parent / "data" / "real_clause_labels.csv"
+
 # 기본 출력은 베이스라인 문서 — 덮어쓰기 사고 방지를 위해 인자로 출력 파일명을 받는다.
-# 사용: python eval_real_labels.py [출력파일명.md]  (재실행 시 반드시 새 파일명 지정)
+# 위치 인자는 기존 호출 방식과의 호환을 위해 유지한다:
+#   python eval_real_labels.py [출력파일명.md] [split목록]
+import argparse
+import json
 import sys
-_out_name = sys.argv[1] if len(sys.argv) > 1 else "eval_real_labels_claude.md"
-OUT_PATH = Path(__file__).parent.parent / "docs" / _out_name
-# 선택 인자 2: 실행할 split 목록(쉼표 구분, 예: "train,val").
-# 오염 방지 — 프롬프트 튜닝 중에는 test를 돌리지 않기 위한 필터. 기본은 전체.
-_splits = set(sys.argv[2].split(",")) if len(sys.argv) > 2 else None
+
+_ap = argparse.ArgumentParser(description="공식 조항 정답지 평가 (real_clause_labels.csv)")
+_ap.add_argument("out_name", nargs="?", default="eval_real_labels_claude.md",
+                 help="출력 마크다운 파일명 (재실행 시 새 이름을 줄 것)")
+_ap.add_argument("splits", nargs="?", default=None,
+                 help="실행할 split 목록(쉼표 구분). 오염 방지 — 튜닝 중에는 'train,val'만")
+_ap.add_argument("--repeats", type=int, default=1, metavar="N",
+                 help="조항별 반복 실행 횟수. 보고용 수치는 3 이상 권장 (#161) — "
+                      "temperature=0에서도 판정이 회차마다 뒤집히기 때문 "
+                      "(docs/reproducibility.md: 24조항 중 1건). 기본 1")
+_ap.add_argument("--out", default=None, metavar="results.json",
+                 help="회차별 원자료 JSON 저장 경로. 수치가 움직였을 때 "
+                      "재실행 없이 원인을 되짚으려면 반드시 남길 것 (#161)")
+_args = _ap.parse_args()
+
+OUT_PATH = Path(__file__).parent.parent / "docs" / _args.out_name
+_splits = set(_args.splits.split(",")) if _args.splits else None
 
 
 def _load_labels() -> list:
@@ -58,18 +74,56 @@ def _load_labels() -> list:
     return rows
 
 
-def run_eval() -> list:
+class FallbackDetected(RuntimeError):
+    """폴백 응답을 감지했을 때 즉시 중단시키는 예외.
+
+    `_analyze_clause`는 실패를 '주의/해당 없음'으로 흡수한다. 2026-08-07 AI Hub
+    실행에서 크레딧이 소진된 뒤 이 폴백이 정상 결과처럼 기록돼 strong 82%라는
+    오염 수치가 나왔고, 2026-08-22 재측정에서도 같은 원인으로 중단됐다
+    (docs/eval_aihub580_full_run.md). 평가 하네스에서 폴백은 데이터가 아니라
+    사고이므로, 한 건이라도 나오면 부분 결과를 남기고 멈춘다.
+    """
+
+
+def _assert_not_fallback(clause_id: str, prediction: dict) -> None:
+    if prediction.get("risk_evidence") == _FALLBACK_EVIDENCE:
+        raise FallbackDetected(
+            f"{clause_id}에서 폴백 응답 감지 — API 오류(크레딧 소진·인증·레이트리밋)일 "
+            f"가능성이 높다. 원인을 확인한 뒤 재실행할 것. 폴백을 정상 결과로 집계하면 "
+            f"수치가 조용히 오염된다."
+        )
+
+
+def _majority(levels: list) -> tuple:
+    """회차별 risk_level 다수결. 반환: (확정 level, 과반 없음 여부)."""
+    counts = Counter(levels)
+    top, n = counts.most_common(1)[0]
+    return top, n * 2 <= len(levels)
+
+
+def run_eval(repeats: int = 1) -> list:
     rows = _load_labels()
     results = []
     for i, row in enumerate(rows):
         clause_id = f"real_{i:03d}_{row['case_id']}"
-        prediction = _analyze_clause(clause_id, row["clause_text"])
-        results.append({"row": row, "prediction": prediction})
+        runs = []
+        for attempt in range(repeats):
+            prediction = _analyze_clause(clause_id, row["clause_text"])
+            _assert_not_fallback(clause_id, prediction)
+            runs.append(prediction)
+
+        # 다수결은 risk_level 기준. 확정 level을 낸 회차의 예측을 대표로 삼아야
+        # risk_type·근거가 확정 level과 어긋나지 않는다.
+        level, tie = _majority([p["risk_level"] for p in runs])
+        prediction = next(p for p in runs if p["risk_level"] == level)
+
+        results.append({"row": row, "prediction": prediction, "runs": runs, "tie": tie})
         gold = row["gold_risk_level"]
-        pred = prediction["risk_level"]
-        match = "O" if (pred != "안전") == (gold != "안전") else "X"
+        match = "O" if (level != "안전") == (gold != "안전") else "X"
+        flag = " [과반없음]" if tie else ""
+        spread = "" if repeats == 1 else f" ({'/'.join(p['risk_level'] for p in runs)})"
         print(f"[{match}] {row['case_id']}: gold={gold}/{row['gold_risk_type']} -> "
-              f"pred={pred}/{prediction['risk_type']}")
+              f"pred={level}/{prediction['risk_type']}{spread}{flag}")
     return results
 
 
@@ -192,9 +246,57 @@ def render_report(results: list) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _dump_raw(results: list, path: Path, repeats: int) -> None:
+    """회차별 원자료 저장 — 수치가 움직였을 때 재실행 없이 대조하기 위한 것 (#161)."""
+    payload = {
+        "repeats": repeats,
+        "n": len(results),
+        "items": [
+            {
+                "case_id": r["row"]["case_id"],
+                "split": r["row"]["split"],
+                "label_grade": r["row"].get("label_grade"),
+                "gold_risk_level": r["row"]["gold_risk_level"],
+                "gold_risk_type": r["row"]["gold_risk_type"],
+                "runs": [
+                    {"risk_level": p["risk_level"], "risk_type": p["risk_type"],
+                     "risk_evidence": p.get("risk_evidence")}
+                    for p in r["runs"]
+                ],
+                "final_risk_level": r["prediction"]["risk_level"],
+                "final_risk_type": r["prediction"]["risk_type"],
+                "tie": r["tie"],
+            }
+            for r in results
+        ],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def main() -> None:
-    results = run_eval()
+    repeats = _args.repeats
+    if repeats < 1:
+        sys.exit("--repeats는 1 이상이어야 한다")
+    if repeats == 1:
+        print("주의: --repeats 1은 단발 측정이다. temperature=0에서도 판정이 회차마다 "
+              "뒤집히므로(±1~2건) 보고용 수치는 --repeats 3 이상으로 낼 것 (#161).")
+
+    try:
+        results = run_eval(repeats)
+    except FallbackDetected as exc:
+        sys.exit(f"\n중단: {exc}")
+
+    if _args.out:
+        raw_path = Path(_args.out)
+        _dump_raw(results, raw_path, repeats)
+        print(f"원자료 저장: {raw_path}")
+
     report = render_report(results)
+    ties = sum(1 for r in results if r["tie"])
+    header = (f"> 측정 조건: 조항별 {repeats}회 실행 후 risk_level 다수결"
+              f"{f' / 과반 없음 {ties}건' if repeats > 1 else ' (단발 — 보고용 아님)'}\n\n")
+    report = header + report
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(report, encoding="utf-8")
     print(report)
