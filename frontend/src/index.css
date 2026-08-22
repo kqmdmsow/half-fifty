@@ -225,3 +225,34 @@
   --c-shadow-2: rgba(0, 0, 0, 0.2);
   --c-shadow-3: rgba(0, 0, 0, 0.4);
 }
+.hc .border-ink-100,
+.hc .border-ink-200 {
+  border-color: #6b7684;
+}
+.hc .bg-ink-25 {
+  background-color: #eef1f4;
+}
+.hc .text-danger-600 { color: #b3261e; }
+.hc .text-safe-700 { color: #14532d; }
+.hc .text-caution-700 { color: #7c3d00; }
+.hc .text-brand-600 { color: #1246a3; }
+
+/* 분석 중 돋보기 마크가 조항을 훑는 미세 모션 (#134).
+   움직임 최소화 선호 시에는 아래 미디어쿼리에서 사실상 정지된다. */
+@keyframes lens-scan {
+  0%, 100% { transform: translateX(-3px) rotate(-4deg); }
+  50% { transform: translateX(3px) rotate(4deg); }
+}
+.animate-lens-scan {
+  animation: lens-scan 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

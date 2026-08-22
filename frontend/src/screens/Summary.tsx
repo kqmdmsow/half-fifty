@@ -1,3 +1,4 @@
+import { LensMark } from '../components/Brand'
 import { useEffect, useMemo, useState } from 'react'
 import type { ClauseResult, Persona } from '../api'
 import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
@@ -111,7 +112,9 @@ export function SummaryScreen({
 
       {live && liveProgress ? (
         <div className="flex items-center gap-2.5">
-          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+          {/* 분석 중에는 돋보기 마크가 조항을 훑는다 (#134) — 사용자가 실제로
+              기다리는 화면이 여기라서, 진행 표시 자리에 브랜드 마크를 쓴다 */}
+          <LensMark size={22} className="animate-lens-scan shrink-0" />
           <p className="text-[14px] font-bold text-brand-600">
             {t(language, 'analyzingLive', { done: liveProgress.done, total: liveProgress.total })}{' '}
             <span className="font-semibold text-ink-400">— {t(language, 'liveHint')}</span>

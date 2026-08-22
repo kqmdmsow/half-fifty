@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ClauseResult } from '../api'
 import { Button, RiskBadge } from '../components/ui'
+import { LensMark } from '../components/Brand'
 import { t, type LangCode } from '../i18n'
 
 const PHASE_KEYS = ['prPhase1', 'prPhase2', 'prPhase3', 'prPhase4'] as const
@@ -81,11 +82,18 @@ export function ProgressScreen({
             className="transition-all duration-500"
           />
         </svg>
-        <span
-          aria-hidden
-          className={`absolute text-[22px] font-extrabold ${error ? 'text-caution-500' : loading ? 'text-brand-500' : 'text-safe-500'}`}
-        >
-          {error ? '!' : loading ? '' : '✓'}
+        {/* 분석 중에는 돋보기 마크가 조항을 들여다본다 (#134 브랜드 마크) */}
+        <span className="absolute flex items-center justify-center">
+          {loading && !error ? (
+            <LensMark size={30} className="animate-lens-scan" />
+          ) : (
+            <span
+              aria-hidden
+              className={`text-[24px] font-extrabold ${error ? 'text-caution-500' : 'text-safe-500'}`}
+            >
+              {error ? '!' : '✓'}
+            </span>
+          )}
         </span>
       </div>
 
