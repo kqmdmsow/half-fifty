@@ -22,6 +22,7 @@ import logging
 import os
 import time
 
+from pathlib import Path
 from typing import List, Literal, Optional
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
@@ -32,7 +33,8 @@ from pydantic import BaseModel, Field
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
-from src.learn_content import localized_learn
+from src.injection_check import detect_injection
+from src.learn_content import content_as_context, localized_learn
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import extract_text_from_pdf
 from src.quiz import generate_quiz
@@ -185,13 +187,42 @@ def reexplain_endpoint(req: ReexplainRequest) -> dict:
 
 @app.get("/learn")
 def learn(language: str = "ko") -> dict:
-    """교육 콘텐츠 단일 원천 — 정적 번역본이 있는 언어는 번역해서 반환 (#104).
-
-    내장 챗봇(/learn-chat, #103)은 세션당 대화 횟수 상한과 인젝션 방어
-    (#131 규칙 탐지기 재사용 또는 #149식 프롬프트 방어 블록) 조건을 걸고
-    나서 별도 PR로 합류한다 — 지금은 정적 콘텐츠만 노출.
-    """
+    """교육 콘텐츠 단일 원천 — 정적 번역본이 있는 언어는 번역해서 반환 (#104)."""
     return localized_learn(language)
+
+
+_LEARN_CHAT_PROMPT = (
+    Path(__file__).parent / "src" / "prompts" / "learn_chat.txt"
+).read_text(encoding="utf-8")
+
+
+class LearnChatRequest(BaseModel):
+    """교육 페이지 챗봇 (#103) — 컨텍스트는 서버 사본만 사용 (클라이언트 미신뢰)."""
+
+    question: str = Field(..., min_length=2, max_length=500)
+    language: Optional[Language] = "ko"
+
+
+@app.post("/learn-chat")
+def learn_chat(req: LearnChatRequest) -> dict:
+    """학습 콘텐츠 범위 내 Q&A. 비용 상한은 백엔드(시간당 IP별 횟수)가 맡고,
+    여기서는 인젝션 방어만 담당한다 — 자유 입력 창구라 #67 규칙 탐지기를
+    통과한 질문에 대해서만 LLM을 호출한다(통과 못하면 거절, LLM 호출 없음).
+    """
+    from src.llm import get_worker_llm, invoke_json
+
+    if detect_injection(req.question):
+        return {"ok": False, "reason": "blocked"}
+
+    prompt = (_LEARN_CHAT_PROMPT
+              .replace("{language}", req.language or "ko")
+              .replace("{content}", content_as_context())
+              .replace("{question}", req.question))
+    try:
+        data = invoke_json(get_worker_llm(), prompt)
+        return {"ok": True, "answer": str(data["answer"])[:1000]}
+    except Exception:
+        return {"ok": False, "reason": "error"}
 
 
 @app.get("/health")

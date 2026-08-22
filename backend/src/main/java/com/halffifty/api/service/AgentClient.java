@@ -189,6 +189,16 @@ public class AgentClient {
                 .retrieve().body(String.class);
     }
 
+    /** 교육 챗봇 프록시 (#103) — JSON 그대로 중계. 비용 상한은 컨트롤러가 처리. */
+    public String learnChat(String requestJson) {
+        return restClient.post()
+                .uri("/learn-chat")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
     /** 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다. */
     private void pipeStream(HttpRequest httpRequest, OutputStream out) throws IOException {
         try {
