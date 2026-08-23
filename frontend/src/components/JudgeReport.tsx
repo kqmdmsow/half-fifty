@@ -1,5 +1,6 @@
 import { Card } from './ui'
 import { t, type LangCode } from '../i18n'
+import { VERIFICATION } from '../data/verification'
 
 /** AI 검증 리포트 (#53) — judge 점수 4종·재시도 횟수·needs_review 노출.
  *
@@ -81,6 +82,13 @@ export function JudgeReport({
           <span aria-hidden>⚠️</span> {t(language, 'jgNeedsReview')}
         </p>
       )}
+
+      {/* 판정 기준 자체의 근거 (#169) — 위 점수가 "이번 분석의 품질"이라면
+          이 줄은 "판정 기준을 무엇으로 검증했나"다. 둘은 다른 층위다. */}
+      <p className="mt-3.5 border-t border-ink-50 pt-3 text-[12px] leading-relaxed text-ink-400">
+        {t(language, 'trGolden', { n: VERIFICATION.goldenRows })} ·{' '}
+        {t(language, 'trNormalFp', { n: VERIFICATION.normalClauses })}
+      </p>
     </Card>
   )
 }
