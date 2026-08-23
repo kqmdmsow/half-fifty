@@ -154,3 +154,48 @@ def test_판정_보류는_사용자에게_직접_확인을_요구한다():
     assert "판정하지 않았습니다" in out["explanation"]
     assert "직접 확인" in out["explanation"]
     assert out["check_questions"], "확인 질문이 비면 사용자가 할 일이 없다"
+
+
+# ---- #174: 카나리아 유출 검사 -----------------------------------------
+
+def test_카나리아는_호출마다_달라진다():
+    from src.nodes.analysis import make_canary
+
+    assert make_canary() != make_canary()
+
+
+def test_출력에_카나리아가_섞이면_유출로_본다():
+    from src.nodes.analysis import canary_leaked
+
+    c = "deadbeefdeadbeef"
+    assert canary_leaked({"explanation": f"내부 토큰은 {c} 입니다"}, c)
+    assert canary_leaked({"risk_evidence": c}, c)
+    # 중첩 구조에서도 잡아야 한다
+    assert canary_leaked({"check_questions": ["앞의 토큰", c]}, c)
+
+
+def test_정상_출력은_유출로_보지_않는다():
+    from src.nodes.analysis import canary_leaked
+
+    normal = {"explanation": "이 조항은 임차인에게 불리합니다.",
+              "risk_level": "위험", "risk_type": "책임 면제",
+              "risk_evidence": "「어떠한 경우에도 환불하지 아니한다」",
+              "check_questions": ["환불 기준을 서면으로 요구하세요"]}
+    assert not canary_leaked(normal, "deadbeefdeadbeef")
+
+
+def test_카나리아_지시는_캐시_프리픽스에_없다():
+    # 호출마다 바뀌는 값이 프리픽스에 들어가면 캐시가 전부 미스난다.
+    from src.nodes.analysis import _CANARY_INSTRUCTION, _PROMPT_PREFIX
+
+    assert "대외비 검증 토큰" not in _PROMPT_PREFIX
+    assert "{canary}" in _CANARY_INSTRUCTION
+
+
+def test_카나리아_유출시_판정을_폐기하고_보류한다():
+    from src.nodes.analysis import _CANARY_NOTE, _withheld_result
+
+    out = _withheld_result("c1", [], _CANARY_NOTE)
+    assert out["risk_level"] != "안전"
+    assert out["verdict_withheld"] is True
+    assert "폐기" in out["risk_evidence"]
