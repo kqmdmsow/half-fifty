@@ -37,6 +37,12 @@ class AnalysisResult(TypedDict):
     #    뚫렸는가'를 분리해야 한다. 이 필드가 없으면 안전장치 때문에 관통이
     #    항상 0으로 나와 측정이 순환논리가 된다.
     original_risk_level: NotRequired[str]
+    # 이 조항에서 격리해 LLM에 넣지 않은 조작 문장 수 (#174).
+    quarantined: NotRequired[int]
+    # 격리 후 판정 근거가 남지 않아 판정을 보류한 경우 (#174, fail-closed).
+    # 프론트는 이 플래그를 '주의' 배지보다 강하게 표시해야 한다 — 조용히
+    # 넘어가면 공격자가 지시문 한 줄로 경고를 억제할 수 있게 된다.
+    verdict_withheld: NotRequired[bool]
 
 
 class JudgeScores(TypedDict):

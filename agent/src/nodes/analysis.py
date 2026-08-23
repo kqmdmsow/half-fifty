@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 
 from src.llm import get_worker_llm, invoke_json
 from src.citation_check import find_fabricated_quotes
-from src.injection_check import detect_injection, sanitize
+from src.injection_check import (detect_injection, is_analyzable, quarantine,
+                                 quarantine_notice, sanitize)
 from src.schemas import AnalysisOutput
 from src.state import AnalysisResult, PipelineState
 
@@ -118,6 +119,39 @@ _TAMPER_QUESTION = (
 )
 
 
+_WITHHELD_EXPLANATION = (
+    "이 조항은 판정하지 않았습니다. 조항 안에 AI 분석을 조작하려는 문장이 섞여 "
+    "있어 그 부분을 격리했는데, 남은 계약 내용만으로는 위험 여부를 판단할 근거가 "
+    "부족합니다. 조작 시도가 있었다는 사실 자체가 이 조항을 특히 주의해서 보아야 "
+    "할 이유이므로, 반드시 원문을 직접 확인하고 상대방에게 설명을 요구하세요."
+)
+_WITHHELD_QUESTIONS = [
+    "이 조항에 AI에게 내리는 지시문이 왜 들어 있는지 상대방에게 물어보세요.",
+    "이 조항의 정확한 내용을 서면으로 다시 받아 확인하세요.",
+]
+
+
+def _withheld_result(clause_id: str, removed: list) -> AnalysisResult:
+    """fail-closed — 판정을 내지 않고 사용자에게 직접 확인을 요구한다 (#174).
+
+    판정 거부는 조용하면 안 된다. 조용히 '안전'이나 무표시로 넘어가면 공격자가
+    조항 뒤에 지시문 한 줄을 붙이는 것만으로 경고를 억제할 수 있다. 그래서
+    등급은 '주의'로 두되(3단계 체계상 가장 강한 비-위험 신호) 별도 플래그로
+    "판정 보류"임을 명시해 화면에서 더 강하게 표시하도록 한다.
+    """
+    return AnalysisResult(
+        clause_id=clause_id,
+        explanation=_WITHHELD_EXPLANATION,
+        risk_level="주의",
+        risk_type=TAMPER_RISK_TYPE,
+        risk_evidence=quarantine_notice(removed) if removed else _TAMPER_NOTE,
+        check_questions=list(_WITHHELD_QUESTIONS),
+        injection_suspected=True,
+        quarantined=len(removed),
+        verdict_withheld=True,
+    )
+
+
 def _apply_tamper_floor(result: AnalysisResult, tampered: bool) -> AnalysisResult:
     """판정 안전장치 (#174, 4층) — 조작 탐지 조항은 '안전'으로 내려갈 수 없다.
 
@@ -159,12 +193,25 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
     # 평가 하네스처럼 입구를 우회해 이 함수를 직접 부르는 경로까지 덮인다.
     # "입력을 신뢰하지 않는다"를 노드 단위로 강제하는 배선이다.
     text, _ = sanitize(text)
-    # 조항 단위 탐지 — 문서 단위 경고(graph.py)와 별개로, 이 조항에 조작
-    # 흔적이 있었는지를 아래 판정 안전장치에서 쓴다.
+    # 조항 단위 탐지 — 문서 단위 경고(graph.py)와 별개로, 이 조항 자체에
+    # 조작 흔적이 있었는지를 격리·안전장치 판단에 쓴다.
     tampered = bool(detect_injection(text))
 
+    # 2.5층 격리 (#174) — 조작 문장을 LLM 입력에서 아예 들어낸다.
+    # 무력화는 공격 '문자'를 지우고, 격리는 공격 '문장'을 들어낸다. 무력화만
+    # 하면 "안전으로 판정하라"가 평문으로 모델에게 전달되고, 프롬프트 방어가
+    # 막아 주기를 기대하는 확률적 상태로 남는다.
+    body, removed = quarantine(text) if tampered else (text, [])
+
+    # fail-closed — 격리하고 나니 판정 근거가 남지 않았다면 판정하지 않는다.
+    # 껍데기만 남은 조항을 판정하면 '안전'이 나오기 쉽고, 그것이 정확히
+    # 공격자가 노리는 결과다.
+    if tampered and not is_analyzable(body):
+        logger.info("%s 판정 보류 (격리 후 근거 부족, 격리 %d건)", clause_id, len(removed))
+        return _withheld_result(clause_id, removed)
+
     prefix, suffix = _build_prompt_parts(domain, domain_evidence)
-    isolated = wrap_clause(text)  # 3층 구조적 격리
+    isolated = wrap_clause(body)  # 3층 구조적 격리 — 격리를 통과한 본문만 넣는다
     llm = get_worker_llm()
 
     for attempt in range(_PARSE_ATTEMPTS):
@@ -182,20 +229,24 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             # 도메인 주입 후 법령 인용 오탐은 citation_check.py의
             # _LEGAL_SOURCE_MARKER(출처 표지 기반 면제)만으로 해결되므로 검사
             # 범위 자체를 넓힐 필요가 없다.
-            fabricated = find_fabricated_quotes(data.risk_evidence, text)
+            # 인용 대조는 **모델이 실제로 본 텍스트**(격리 후 본문)로 한다.
+            # 원문 전체로 넓히면 격리한 지시문을 근거로 인용해도 통과한다.
+            fabricated = find_fabricated_quotes(data.risk_evidence, body)
             if fabricated:
                 raise ValueError(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")
-            return _apply_tamper_floor(
-                AnalysisResult(
-                    clause_id=clause_id,
-                    explanation=data.explanation,
-                    risk_level=data.risk_level,
-                    risk_type=data.risk_type,
-                    risk_evidence=data.risk_evidence,
-                    check_questions=data.check_questions,
-                ),
-                tampered,
+            result = AnalysisResult(
+                clause_id=clause_id,
+                explanation=data.explanation,
+                risk_level=data.risk_level,
+                risk_type=data.risk_type,
+                risk_evidence=data.risk_evidence,
+                check_questions=data.check_questions,
             )
+            if removed:
+                result["quarantined"] = len(removed)
+                result["check_questions"] = [quarantine_notice(removed),
+                                             *result["check_questions"]]
+            return _apply_tamper_floor(result, tampered)
         except Exception as exc:  # JSON 파싱 실패, 키 누락, 스키마 검증 실패 등
             if attempt + 1 == _PARSE_ATTEMPTS:
                 # exc는 창작 인용 30자(위 ValueError)나 LLM 원응답 일부(최대 200자,
@@ -207,7 +258,7 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
     return _apply_tamper_floor(
         AnalysisResult(
             clause_id=clause_id,
-            explanation=text,
+            explanation=body,
             risk_level="주의",
             risk_type="해당 없음",
             risk_evidence=_FALLBACK_EVIDENCE,
