@@ -8,7 +8,7 @@ import {
   type Persona,
 } from './api'
 import { LANGUAGES, t } from './i18n'
-import { Logo } from './components/ui'
+import { DocMark, Wordmark } from './components/Brand'
 import { saveRecord, type SavedRecord } from './records'
 import { currentSession, pushServerRecord, signOut, type Session } from './auth'
 import type { DemoSample } from './data/samples'
@@ -90,6 +90,9 @@ export default function App() {
   // 로그인 세션 (#102) — 로그인이 여는 기능은 '결과를 계정에 보관' 하나뿐이다.
   const [session, setSession] = useState<Session | null>(() => currentSession())
   const [savedToAccount, setSavedToAccount] = useState(false)
+  // 헤더 메뉴 열림 (#134) — 컨트롤 6종을 가로로 늘어놓으면 폭이 모자라
+  // '또렷하게'가 잘린다(실측). 메뉴로 접어 첫 화면을 비운다.
+  const [menuOpen, setMenuOpen] = useState(false)
   // 로그인 후 자동으로 이어서 보관할지 (끝내기 화면에서 로그인으로 보낸 경우)
   const pendingKeepRef = useRef(false)
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
@@ -140,10 +143,22 @@ export default function App() {
   // 화면 전환을 브라우저 히스토리에 쌓는다 — 뒤로가기가 홈으로 튕기며 분석
   // 결과까지 날리던 문제의 수정. popstate로 앱 내 화면 이동으로 처리한다.
   const go = (next: Screen) => {
+    setMenuOpen(false)
     window.history.pushState({ screen: next }, '')
     setScreen(next)
     window.scrollTo({ top: 0 })
   }
+
+  // 열린 메뉴는 Esc로 닫힌다 — 키보드·스크린리더 사용자가 메뉴에 갇히지
+  // 않게 하는 기본 동작이다 (#82 접근성).
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
 
   useEffect(() => {
     window.history.replaceState({ screen: 'landing' }, '')
@@ -294,103 +309,147 @@ export default function App() {
         {t(language, 'skipToMain')}
       </a>
 
-      {/* 헤더 (#134·#148 KRDS) — 로고 + 가로 버튼열. 로그인(#102)은 이
-          버튼열에 계정 상태를 보여주는 버튼으로 합류한다. */}
+      {/* 헤더 (#134·#148 KRDS) — 햄버거 + 가운데 브랜드 마크. 로그인·교육·
+          언어·화면 크기·또렷하게·기록은 메뉴로 접는다. 가로 버튼열은 컨트롤이
+          6종으로 늘어난 뒤 폭이 모자라 '또렷하게'가 잘렸다(실측). */}
       <header className="sticky top-0 z-20 border-b border-ink-50 bg-white/90 backdrop-blur-md print:hidden">
-        {/* 좁은 폭(375px)에서는 컨트롤이 둘째 줄로 내려간다 — 고정 h-16이면
-            zoom 스테퍼가 추가된 뒤 오버플로로 '또렷하게'가 잘림 (실측) */}
-        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-y-1 px-4 py-1.5 md:px-6">
-          <Logo onClick={() => go('landing')} />
-          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (session) {
-                  signOut()
-                  setSession(null)
-                } else {
-                  go('login')
-                }
-              }}
-              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
-            >
-              {t(language, session ? 'lgOut' : 'lgNav')}
-            </button>
-            <button
-              type="button"
-              aria-pressed={screen === 'learn'}
-              onClick={() => go('learn')}
-              className={`rounded-full px-3.5 py-2 text-[13px] font-bold transition-colors ${
-                screen === 'learn' ? 'bg-ink-900 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-              }`}
-            >
-              {t(language, 'lnNav')}
-            </button>
-            <label className="flex items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100">
-              <select
-                aria-label="언어 선택 / Language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as Language)}
-                className="cursor-pointer appearance-none bg-transparent pr-1 font-bold outline-none"
-              >
-                {LANGUAGES.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {/* 글자·화면 크기 (KRDS zoom 5단계) — 값은 aria-live로 낭독 */}
-            <div
-              role="group"
-              aria-label={t(language, 'zoomLabel')}
-              className="flex items-center gap-0.5 rounded-full bg-ink-50 px-1.5 py-1 text-[13px] font-bold text-ink-600"
-            >
+        <div className="relative mx-auto flex h-16 max-w-6xl items-center px-4 md:px-6">
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            aria-label={t(language, 'navMenu')}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="flex h-12 w-12 shrink-0 flex-col items-center justify-center gap-[5px] rounded-xl hover:bg-ink-50"
+          >
+            {/* 열리면 세 줄이 X로 접힌다 — 지금 상태가 어느 쪽인지 보이게 */}
+            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-transform ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`} />
+            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-opacity ${menuOpen ? 'opacity-0' : ''}`} />
+            <span aria-hidden className={`h-[2px] w-6 bg-ink-900 transition-transform ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => go('landing')}
+            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2"
+          >
+            <DocMark size={26} />
+            <Wordmark className="text-[19px]" />
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div id="site-menu" className="border-t border-ink-50 bg-white">
+            <div className="mx-auto flex max-w-md flex-col px-4 py-2 md:max-w-lg md:px-6">
+              {/* 로그인 — 가장 위 (#134 피드백) */}
               <button
                 type="button"
-                aria-label={t(language, 'zoomOut')}
-                disabled={zoom === ZOOM_LEVELS[0]}
-                onClick={() => setZoom(ZOOM_LEVELS[Math.max(0, ZOOM_LEVELS.indexOf(zoom) - 1)])}
-                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+                onClick={() => {
+                  if (session) {
+                    setMenuOpen(false)
+                    signOut()
+                    setSession(null)
+                  } else {
+                    go('login')
+                  }
+                }}
+                className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
               >
-                가−
+                {t(language, session ? 'lgOut' : 'lgNav')}
+                {session && (
+                  <span className="text-[12px] font-semibold text-ink-400">{session.email}</span>
+                )}
               </button>
-              <span aria-live="polite" className="min-w-[42px] text-center tabular-nums">
-                {Math.round(zoom * 100)}%
-              </span>
+
               <button
                 type="button"
-                aria-label={t(language, 'zoomIn')}
-                disabled={zoom === ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
-                onClick={() =>
-                  setZoom(ZOOM_LEVELS[Math.min(ZOOM_LEVELS.length - 1, ZOOM_LEVELS.indexOf(zoom) + 1)])
-                }
-                className="rounded-full px-2 py-1 hover:bg-ink-100 disabled:text-ink-300"
+                aria-pressed={screen === 'learn'}
+                onClick={() => go('learn')}
+                className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
               >
-                가+
+                {t(language, 'lnNav')}
+                {screen === 'learn' && (
+                  <span aria-hidden className="text-[13px] font-bold text-brand-500">•</span>
+                )}
+              </button>
+
+              <div className="flex w-full items-center justify-between gap-3 border-b border-ink-50 px-2 py-3">
+                <span className="text-[15px] font-bold text-ink-900">
+                  {t(language, 'languageLabel')}
+                </span>
+                <select
+                  aria-label="언어 선택 / Language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as Language)}
+                  className="cursor-pointer rounded-xl bg-ink-50 px-3 py-2 text-[14px] font-bold text-ink-700 outline-none"
+                >
+                  {LANGUAGES.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 글자·화면 크기 (KRDS zoom 5단계) — 값은 aria-live로 낭독 */}
+              <div
+                role="group"
+                aria-label={t(language, 'zoomLabel')}
+                className="flex w-full items-center justify-between gap-3 border-b border-ink-50 px-2 py-3"
+              >
+                <span className="text-[15px] font-bold text-ink-900">
+                  {t(language, 'zoomLabel')}
+                </span>
+                <div className="flex items-center gap-0.5 rounded-full bg-ink-50 px-1.5 py-1 text-[14px] font-bold text-ink-700">
+                  <button
+                    type="button"
+                    aria-label={t(language, 'zoomOut')}
+                    disabled={zoom === ZOOM_LEVELS[0]}
+                    onClick={() => setZoom(ZOOM_LEVELS[Math.max(0, ZOOM_LEVELS.indexOf(zoom) - 1)])}
+                    className="rounded-full px-2.5 py-1 hover:bg-ink-100 disabled:text-ink-300"
+                  >
+                    가−
+                  </button>
+                  <span aria-live="polite" className="min-w-[46px] text-center tabular-nums">
+                    {Math.round(zoom * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={t(language, 'zoomIn')}
+                    disabled={zoom === ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
+                    onClick={() =>
+                      setZoom(ZOOM_LEVELS[Math.min(ZOOM_LEVELS.length - 1, ZOOM_LEVELS.indexOf(zoom) + 1)])
+                    }
+                    className="rounded-full px-2.5 py-1 hover:bg-ink-100 disabled:text-ink-300"
+                  >
+                    가+
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                aria-pressed={highContrast}
+                onClick={() => setHighContrast((value) => !value)}
+                className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
+              >
+                {t(language, 'hcToggle')}
+                <span className={`text-[13px] font-bold ${highContrast ? 'text-brand-500' : 'text-ink-300'}`}>
+                  {highContrast ? 'ON' : 'OFF'}
+                </span>
+              </button>
+
+              {/* 내 기록 — 가장 아래 (#134 피드백) */}
+              <button
+                type="button"
+                onClick={() => go('records')}
+                className="flex w-full items-center px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
+              >
+                {t(language, 'rcNav')}
               </button>
             </div>
-            <button
-              type="button"
-              onClick={() => go('records')}
-              className="rounded-full bg-ink-50 px-3.5 py-2 text-[13px] font-bold text-ink-600 transition-colors hover:bg-ink-100"
-            >
-              🗂 {t(language, 'rcNav')}
-            </button>
-            <button
-              type="button"
-              aria-pressed={highContrast}
-              onClick={() => setHighContrast((value) => !value)}
-              className={`rounded-full px-4 py-2 text-[13px] font-bold transition-colors ${
-                highContrast
-                  ? 'bg-ink-900 text-white'
-                  : 'bg-ink-50 text-ink-600 hover:bg-ink-100'
-              }`}
-            >
-              {t(language, 'hcToggle')}
-            </button>
           </div>
-        </div>
+        )}
       </header>
 
       <main id="main">
