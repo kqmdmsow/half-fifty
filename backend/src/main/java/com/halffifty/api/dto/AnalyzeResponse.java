@@ -8,6 +8,7 @@ import java.util.Map;
 public record AnalyzeResponse(
         @JsonProperty("clause_count") int clauseCount,
         @JsonProperty("parse_warnings") List<String> parseWarnings,
+        @JsonProperty("parse_warning_codes") List<String> parseWarningCodes,
         @JsonProperty("retry_count") int retryCount,
         @JsonProperty("needs_review") boolean needsReview,
         @JsonProperty("judge_scores") Map<String, Double> judgeScores,
