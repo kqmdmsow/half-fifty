@@ -17,6 +17,9 @@ _PREFIXES = [
     ("low_coverage", "문서의 일부가 조항으로"),       # src/nodes/parser.py
     ("injection_detected", "⚠️ 이 문서에서"),        # src/injection_check.py
     ("injection_neutralized", "🛡️ 이 문서에"),        # src/injection_check.py (#174)
+    ("pdf_hidden_attack", "🚫 이 PDF에 "),            # src/pdf_extract.py (#174)
+    ("pdf_hidden_benign", "ℹ️ 이 PDF에서"),           # src/pdf_extract.py (#174)
+    ("clause_quarantined", "🚫 이 조항에서"),          # src/injection_check.py (#174)
 ]
 
 

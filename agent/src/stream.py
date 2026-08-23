@@ -130,7 +130,8 @@ def _emit_persona_only(
 
 
 def stream_analysis(
-    raw_text: str, persona: str, language: str = "ko", domain: str = ""
+    raw_text: str, persona: str, language: str = "ko", domain: str = "",
+    extra_warnings: Sequence[str] = (),
 ) -> Iterator[dict]:
     masked, pii_counts = mask_pii(raw_text)
     # 인젝션 1층 탐지 + 2층 무력화 (#67·#174). 순서가 중요하다:
@@ -142,6 +143,8 @@ def stream_analysis(
     clauses, warnings = split_clauses_with_warnings(masked)
     if pii_counts:
         warnings = [masking_notice(pii_counts)] + warnings
+    # PDF 은닉 텍스트 격리 등 파이프라인 진입 전 경고 (#174)
+    warnings = list(extra_warnings) + warnings
     if report.changed:
         warnings = [sanitize_notice(report)] + warnings
     # 조작 문구 탐지 시 경고를 최상단에 — 분석은 계속하되 사용자가 판정을

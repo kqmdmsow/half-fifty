@@ -139,7 +139,8 @@ pipeline = build_graph()
 
 
 def run_pipeline(
-    raw_text: str, persona: str = "adult", language: str = "ko", domain: str = ""
+    raw_text: str, persona: str = "adult", language: str = "ko", domain: str = "",
+    extra_warnings: Sequence[str] = (),
 ) -> PipelineState:
     """파이프라인 1회 실행 헬퍼.
 
@@ -150,6 +151,9 @@ def run_pipeline(
     """
     raw_text, pii_counts = mask_pii(raw_text)
     initial_warnings = [masking_notice(pii_counts)] if pii_counts else []
+    # 파이프라인 진입 전 단계(PDF 은닉 텍스트 격리 등)에서 생긴 경고 (#174).
+    # 맨 앞에 두어 사용자가 가장 먼저 보게 한다.
+    initial_warnings = list(extra_warnings) + initial_warnings
     # 인젝션 1층 탐지 + 2층 무력화 (#67·#174) — stream.py와 동일 배선.
     # 탐지는 무력화 **이전** 원문에 대해 수행한다(무력화 후에는 흔적이 사라져
     # 사용자에게 알릴 근거가 없어진다). 무력화된 텍스트를 이후 전 단계가
