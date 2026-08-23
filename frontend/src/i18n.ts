@@ -3565,9 +3565,30 @@ const UI_PROG: Record<LangCode, Record<ProgKey, string>> = {
   ja: { prPhase1: '契約書テキストの読み取り', prPhase2: '条項ごとに分割', prPhase3: '不利になり得る条項の検出', prPhase4: '結果品質の確認', prDoneTitle: '分析が完了しました', prErrTitle: '分析サーバーに接続できませんでした', prLoadingDesc: '条項に分割し、リスクシグナルと質問リストを整理しています。', prStreamDesc: '{done}/{total}条項の分析完了 — 済んだ条項から下に表示します。', prDoneDesc: 'まもなく結果画面へ移動します。', prErrDesc: '{msg} しばらくしてから再度お試しください。', prActive: '進行中', copy: 'コピー', copied: 'コピー済み', fallbackQuestion: 'この条項はこのままで良いですか？', requestFailed: '分析リクエストに失敗しました。', },
 }
 
+/** 랜딩 신뢰 지표 (#169) — 숫자는 data/verification.ts가 단일 출처이고
+ *  여기서는 문장 틀만 갖는다. Partial이라 ko/en만 채우면 나머지 언어는
+ *  t()의 en 폴백을 탄다 — 15개 언어 번역은 후속 작업. */
+type TrustKey = 'trGolden' | 'trNormalFp' | 'trJudge' | 'trAria'
+
+const UI_TRUST: Partial<Record<LangCode, Record<TrustKey, string>>> = {
+  ko: {
+    trGolden: '정부·법원 판정 {n}건으로 검증',
+    trNormalFp: '표준계약서 {n}개 조항에서 오탐 0건',
+    trJudge: 'AI 채점자를 {n}개 모델로 교차검증',
+    trAria: '이 서비스의 판정 기준이 어떻게 검증됐는지 보여주는 지표',
+  },
+  en: {
+    trGolden: 'Validated against {n} government and court rulings',
+    trNormalFp: 'Zero false alarms across {n} standard-contract clauses',
+    trJudge: 'AI grader cross-checked by {n} model families',
+    trAria: 'Indicators showing how this service\'s judgments were validated',
+  },
+}
+
+
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3577,7 +3598,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
