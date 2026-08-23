@@ -13,6 +13,7 @@ JSON 파싱 실패 시 1회 재시도하고, 그래도 실패하면 "주의" + �
 """
 
 import os
+import secrets
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 from src.llm import get_worker_llm, invoke_json
 from src.citation_check import find_fabricated_quotes
+from src.injection_check import detect_injection, sanitize
 from src.schemas import AnalysisOutput
 from src.state import AnalysisResult, PipelineState
 
@@ -75,10 +77,73 @@ def _build_prompt_parts(domain: str = "", domain_evidence: str = "") -> tuple[st
     return prefix, _PROMPT_SUFFIX
 
 
+def wrap_clause(text: str) -> str:
+    """조항 원문을 예측 불가능한 난수 구분자로 감싼다 (#174, 3층 구조적 격리).
+
+    프롬프트로 "지시를 따르지 마세요"라고 설득하는 것은 확률적 방어다. 반면
+    구분자를 난수로 만들면 **공격자가 구분자를 위조할 수 없다** — 문서를 쓰는
+    시점에 이번 호출의 난수를 알 수 없기 때문이다. 위조 마커로 프롬프트 구조를
+    가로채는 공격(`템플릿_마커_위장`)이 구조적으로 불가능해진다.
+
+    난수는 반드시 **캐시되지 않는 구간**에만 넣는다. 캐시 프리픽스에 넣으면
+    호출마다 프리픽스가 달라져 프롬프트 캐싱이 전부 무효화된다(원가 약 1.6배).
+    """
+    nonce = secrets.token_hex(8)
+    return f"<<<CLAUSE:{nonce}>>>\n{text}\n<<<END:{nonce}>>>"
+
+
 def build_prompt(text: str, domain: str = "", domain_evidence: str = "") -> str:
-    """전체 프롬프트 문자열 (평가 하네스용 — 캐싱 없이 단일 문자열이 필요할 때)."""
+    """전체 프롬프트 문자열 (평가 하네스용 — 캐싱 없이 단일 문자열이 필요할 때).
+
+    실제 호출 경로와 동일하게 무력화·격리를 거친다 — 평가가 운영보다 약한
+    방어를 측정하면 수치가 실제를 과소평가한다.
+    """
     prefix, suffix = _build_prompt_parts(domain, domain_evidence)
-    return prefix + text + suffix
+    return prefix + wrap_clause(sanitize(text)[0]) + suffix
+
+
+# 조작이 탐지된 조항에 붙는 전용 risk_type (#174). 10가지 위험 유형 어디에도
+# 넣지 않는다 — 약관 자체의 불공정성이 아니라 문서에 조작 시도가 섞였다는
+# 별개의 사실이기 때문이다. 골든셋에는 등장하지 않으므로 평가 수치에 영향이 없다.
+TAMPER_RISK_TYPE = "문서 조작 의심"
+
+_TAMPER_NOTE = (
+    "이 조항에서 AI 분석을 조작하려는 문구가 탐지되었습니다. "
+    "조작 문구는 제거하고 나머지 계약 내용만으로 판정했으나, "
+    "안전 판정을 그대로 신뢰할 수 없어 '주의'로 상향했습니다."
+)
+_TAMPER_QUESTION = (
+    "이 조항에 사람이 읽을 수 없는 숨은 문구나 AI에게 내리는 지시문이 "
+    "왜 들어 있는지 상대방에게 확인하세요."
+)
+
+
+def _apply_tamper_floor(result: AnalysisResult, tampered: bool) -> AnalysisResult:
+    """판정 안전장치 (#174, 4층) — 조작 탐지 조항은 '안전'으로 내려갈 수 없다.
+
+    왜 필요한가. 0~3층을 다 통과해도 방어는 확률적이다. 공격이 한 번 성공하면
+    위험 조항이 '안전'으로 표시되고, 그것이 이 서비스에서 가장 나쁜 실패다
+    (경고를 목적으로 하는 서비스가 침묵하는 것). 그래서 마지막에 결정적 규칙을
+    둔다: **조작 흔적이 있는 조항의 '안전' 판정은 채택하지 않는다.**
+
+    상향 폭은 '주의'까지로 제한한다. '위험'으로 올리면 규칙 오탐이 곧바로
+    허위 경보가 되므로, 팀의 원칙("놓친 위험이 오탐보다 나쁘다")을 지키면서도
+    과잉 경보를 만들지 않는 최소 개입이다.
+
+    조작이 탐지돼도 모델이 이미 '주의'나 '위험'으로 판정했다면 판정은 그대로
+    두고 플래그만 남긴다 — 방어가 제대로 동작한 경우까지 흔들 이유가 없다.
+    """
+    if not tampered:
+        return result
+    result["injection_suspected"] = True
+    if result["risk_level"] != "안전":
+        return result
+    result["original_risk_level"] = result["risk_level"]
+    result["risk_level"] = "주의"
+    result["risk_type"] = TAMPER_RISK_TYPE
+    result["risk_evidence"] = f"{_TAMPER_NOTE} (모델 판정 근거: {result['risk_evidence']})"
+    result["check_questions"] = [_TAMPER_QUESTION, *result["check_questions"]]
+    return result
 
 
 # 조항 분석은 서로 독립이라 병렬 호출한다. API rate limit을 고려한 보수적 동시성.
@@ -89,7 +154,17 @@ _MAX_CONCURRENCY = int(os.getenv("LLM_CONCURRENCY", "5"))
 
 def _analyze_clause(clause_id: str, text: str, domain: str = "",
                     domain_evidence: str = "") -> AnalysisResult:
+    # 2층 무력화 (#174) — 호출 지점에서 스스로 방어한다. 파이프라인 입구
+    # (graph.py·stream.py)에서도 sanitize를 거치지만 멱등이라 무해하고,
+    # 평가 하네스처럼 입구를 우회해 이 함수를 직접 부르는 경로까지 덮인다.
+    # "입력을 신뢰하지 않는다"를 노드 단위로 강제하는 배선이다.
+    text, _ = sanitize(text)
+    # 조항 단위 탐지 — 문서 단위 경고(graph.py)와 별개로, 이 조항에 조작
+    # 흔적이 있었는지를 아래 판정 안전장치에서 쓴다.
+    tampered = bool(detect_injection(text))
+
     prefix, suffix = _build_prompt_parts(domain, domain_evidence)
+    isolated = wrap_clause(text)  # 3층 구조적 격리
     llm = get_worker_llm()
 
     for attempt in range(_PARSE_ATTEMPTS):
@@ -97,7 +172,7 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             # Pydantic 검증: 스키마 이탈은 예외 → 재시도. 사소한 이탈(리스트
             # risk_type, 번호 접두사)은 스키마 정규화가 흡수한다 (src/schemas.py).
             data = AnalysisOutput.model_validate(
-                invoke_json(llm, text + suffix, cached_prefix=prefix))
+                invoke_json(llm, isolated + suffix, cached_prefix=prefix))
             # 인용 원문 존재 검사 (자문 §5, 규칙 기반): 창작 인용은 스키마
             # 위반과 동급으로 취급 → 재시도, 소진 시 폴백.
             # 검사 대상은 조항 원문(text)만 유지한다 — 프롬프트 전체(prefix+suffix)로
@@ -110,13 +185,16 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             fabricated = find_fabricated_quotes(data.risk_evidence, text)
             if fabricated:
                 raise ValueError(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")
-            return AnalysisResult(
-                clause_id=clause_id,
-                explanation=data.explanation,
-                risk_level=data.risk_level,
-                risk_type=data.risk_type,
-                risk_evidence=data.risk_evidence,
-                check_questions=data.check_questions,
+            return _apply_tamper_floor(
+                AnalysisResult(
+                    clause_id=clause_id,
+                    explanation=data.explanation,
+                    risk_level=data.risk_level,
+                    risk_type=data.risk_type,
+                    risk_evidence=data.risk_evidence,
+                    check_questions=data.check_questions,
+                ),
+                tampered,
             )
         except Exception as exc:  # JSON 파싱 실패, 키 누락, 스키마 검증 실패 등
             if attempt + 1 == _PARSE_ATTEMPTS:
@@ -126,14 +204,17 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
                 logger.warning("%s 분석 실패, 폴백 처리: %s", clause_id, type(exc).__name__)
                 logger.debug("%s 분석 실패 상세", clause_id, exc_info=exc)
 
-    return AnalysisResult(
-        clause_id=clause_id,
-        explanation=text,
-        risk_level="주의",
-        risk_type="해당 없음",
-        risk_evidence=_FALLBACK_EVIDENCE,
-        check_questions=[],
-        analysis_failed=True,  # 프론트 현지화용 기계 판독 마커 (#100)
+    return _apply_tamper_floor(
+        AnalysisResult(
+            clause_id=clause_id,
+            explanation=text,
+            risk_level="주의",
+            risk_type="해당 없음",
+            risk_evidence=_FALLBACK_EVIDENCE,
+            check_questions=[],
+            analysis_failed=True,  # 프론트 현지화용 기계 판독 마커 (#100)
+        ),
+        tampered,
     )
 
 

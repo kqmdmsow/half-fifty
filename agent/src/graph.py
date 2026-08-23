@@ -15,7 +15,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from src.injection_check import detect_injection, injection_warning
+from src.injection_check import detect_injection, injection_warning, sanitize, sanitize_notice
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import analysis_node
 from src.nodes.domain import domain_node
@@ -150,8 +150,14 @@ def run_pipeline(
     """
     raw_text, pii_counts = mask_pii(raw_text)
     initial_warnings = [masking_notice(pii_counts)] if pii_counts else []
-    # 인젝션 1층 방어 (#67) — stream.py와 동일 배선 (모듈 docstring 참조)
+    # 인젝션 1층 탐지 + 2층 무력화 (#67·#174) — stream.py와 동일 배선.
+    # 탐지는 무력화 **이전** 원문에 대해 수행한다(무력화 후에는 흔적이 사라져
+    # 사용자에게 알릴 근거가 없어진다). 무력화된 텍스트를 이후 전 단계가
+    # 공유하므로 화면 표시 원문·LLM 입력·인용 검사의 정합성이 유지된다.
     injections = detect_injection(raw_text)
+    raw_text, report = sanitize(raw_text)
+    if report.changed:
+        initial_warnings = [sanitize_notice(report)] + initial_warnings
     if injections:
         initial_warnings = [injection_warning(injections)] + initial_warnings
 
