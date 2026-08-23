@@ -68,7 +68,8 @@ half-fifty/
 ### 3. 성능 실측과 개선 사이클
 
 - **공식 확정 수치(2026-08-19, citation_check 개선 반영 후)**: 공식 Test 40
-  P0.69/R0.87/**Acc0.70** — `docs/eval_real_labels_claude_final.md`. 확장
+  **전체 입력 기준 Acc 67.5%(27/40)** / 평가 가능 38건 기준 71.1% ·
+  P0.68/R0.91/F1 0.78 — 수치의 단일 출처는 **`docs/공식수치.md`**. 확장
   세트(도메인 전이 실험): ext 18건 Acc0.67, finance 19건 Acc0.68 —
   `docs/eval_ext_sets_transfer.md` (이슈 #56)
 - 위험 유형 6→10종 확장(v2.1)·도메인 라우팅·citation_check 반복 수정을 거치며
