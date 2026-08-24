@@ -23,7 +23,7 @@ failing_aspects/shortcut_eligible로 공유해 드리프트를 막는다. Judge 
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, Iterator, List
+from typing import Dict, Iterator, List, Sequence
 
 from src.case_footnotes import get_related_cases
 from src.injection_check import detect_injection, injection_warning, sanitize, sanitize_notice
