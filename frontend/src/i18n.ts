@@ -3164,6 +3164,7 @@ const UI_WARNINGS: Record<LangCode, Record<WarnKey, string>> = {
 
 type FwWarnKey =
   | 'wnNeutralized' | 'wnPdfHiddenAttack' | 'wnPdfHiddenBenign' | 'wnQuarantined'
+  | 'wnOcrMismatch'
 
 // #174 방화벽 경고. UI_WARNINGS와 달리 Record<LangCode, ...>로 두지 않는다 —
 // 그러면 TypeScript가 16개 언어를 전부 요구하고, 원어민 검수 없이 기계 번역을
@@ -3175,12 +3176,14 @@ const UI_WARNINGS_FW: Record<string, Record<FwWarnKey, string>> = {
     wnPdfHiddenAttack: '이 PDF에 사람 눈에 보이지 않게 숨긴 AI 조작 지시문이 있어요. 분석에서 제외했어요. 정상적인 계약서에는 이런 게 들어갈 이유가 없으니 상대방에게 꼭 확인하세요.',
     wnPdfHiddenBenign: '이 PDF에서 화면에 보이지 않는 텍스트를 분석에서 제외했어요. 서식 안내 문구로 보이며 조작 지시문은 아니에요.',
     wnQuarantined: '이 문서에서 AI에게 내리는 지시로 보이는 문장을 격리했어요. 그 부분을 빼고 나머지 계약 내용만으로 판정했어요.',
+    wnOcrMismatch: '이 PDF는 화면에 보이는 이미지와 그 아래 숨은 텍스트가 서로 달라요. 사람이 보는 내용과 AI가 읽는 내용이 다르게 만들어진 문서일 수 있어요. 화면에 실제로 보이는 내용만으로 분석했지만, 이 문서는 신뢰하지 말고 발급처에 원본을 다시 요청하세요.',
   },
   en: {
     wnNeutralized: 'Hidden characters and disguised markers were neutralized before analysis. The contract text itself is unchanged.',
     wnPdfHiddenAttack: 'This PDF contains AI-manipulation instructions hidden from human eyes. They were excluded from analysis. A legitimate contract has no reason to contain these — ask the other party.',
     wnPdfHiddenBenign: 'Text invisible on screen was excluded from analysis. It appears to be form guidance, not manipulation.',
     wnQuarantined: 'Sentences that look like instructions to the AI were quarantined. The verdict used the remaining contract text only.',
+    wnOcrMismatch: 'The visible image in this PDF and the hidden text underneath do not match. The document may have been built so that what a person sees differs from what the AI reads. Analysis used only what is visibly rendered — do not trust this document; request the original from the issuer.',
   },
 }
 
@@ -3188,6 +3191,7 @@ export const WARNING_CODE_KEYS: Record<string, WarnKey | FwWarnKey> = {
   pii_masked: 'wnPii', byulji_excluded: 'wnByulji', low_coverage: 'wnLowCoverage', injection_detected: 'wnInjection',
   injection_neutralized: 'wnNeutralized', pdf_hidden_attack: 'wnPdfHiddenAttack',
   pdf_hidden_benign: 'wnPdfHiddenBenign', clause_quarantined: 'wnQuarantined',
+  ocr_layer_mismatch: 'wnOcrMismatch',
 }
 
 type FirewallKey =

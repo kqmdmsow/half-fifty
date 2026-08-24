@@ -20,6 +20,7 @@ _PREFIXES = [
     ("pdf_hidden_attack", "🚫 이 PDF에 "),            # src/pdf_extract.py (#174)
     ("pdf_hidden_benign", "ℹ️ 이 PDF에서"),           # src/pdf_extract.py (#174)
     ("clause_quarantined", "🚫 이 조항에서"),          # src/injection_check.py (#174)
+    ("ocr_layer_mismatch", "🚨 이 PDF는"),            # src/pdf_extract.py (#174)
 ]
 
 

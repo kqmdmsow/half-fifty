@@ -37,7 +37,8 @@ from src.injection_check import detect_injection
 from src.learn_content import content_as_context, localized_learn
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import (_EMPTY_PDF_ERROR, extract_with_hidden_report,
-                             hidden_text_notice)
+                             has_text_over_image, hidden_text_notice,
+                             ocr_layer_mismatch, ocr_mismatch_notice)
 from src.quiz import generate_quiz
 from src.reexplain import reexplain
 from src.state import PipelineState
@@ -56,6 +57,7 @@ logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
+logger = logging.getLogger(__name__)
 _access_logger = logging.getLogger("access")
 
 app = FastAPI(title="Jomokjomok (조목조목) Agent Service", version="0.1.0")
@@ -195,16 +197,39 @@ class ReexplainRequest(BaseModel):
     language: Optional[Language] = "ko"
 
 
-def _pdf_text_and_warnings(raw: bytes) -> tuple[str, list[str]]:
+def _pdf_text_and_warnings(raw: bytes, filename: str = "upload.pdf") -> tuple[str, list[str]]:
     """PDF에서 사람이 볼 수 있는 텍스트만 뽑고, 격리 고지를 함께 돌려준다 (#174).
 
-    은닉 텍스트(백색 글자·극소 활자·화면 밖 배치)는 추출 단계에서 이미
-    제외된다. 여기서는 그 사실을 사용자에게 전달할 경고 문구만 만든다.
+    두 가지를 본다.
+    ① 은닉 텍스트(백색 글자·극소 활자·화면 밖 배치)는 추출 단계에서 제외된다.
+    ② 페이지가 큰 이미지로 덮여 있는데 텍스트 레이어도 있으면 스캔본+OCR
+       오버레이 구조다. 이때만 실제 OCR을 돌려 두 텍스트를 대조한다 —
+       **사람이 보는 이미지와 AI가 읽는 텍스트가 다르게 만들어진 문서**를
+       잡기 위해서다. 모든 문서에 OCR을 돌리면 비용·지연이 감당되지 않으므로
+       위험 구조에만 건다.
+
+    불일치가 확인되면 **OCR 결과를 채택한다.** 사람이 화면에서 보는 것이 그것이고,
+    이 서비스는 사용자가 서명하려는 그 문서를 판정해야 하기 때문이다.
     """
     text, hidden = extract_with_hidden_report(raw)
     if not text.strip():
         raise ValueError(_EMPTY_PDF_ERROR)
-    return text, ([hidden_text_notice(hidden)] if hidden else [])
+    warnings = [hidden_text_notice(hidden)] if hidden else []
+
+    if has_text_over_image(raw):
+        try:
+            ocr_text = document_parse_text(raw, filename)
+        except OcrUnavailableError as exc:
+            # OCR을 못 돌리면 대조를 못 할 뿐, 분석은 텍스트 레이어로 계속한다.
+            logger.info("OCR 레이어 대조 생략 (%s)", exc)
+        else:
+            mismatch, ratio = ocr_layer_mismatch(text, ocr_text)
+            if mismatch:
+                logger.warning("OCR 레이어 불일치 (유사도 %.2f) — OCR 결과 채택", ratio)
+                warnings.insert(0, ocr_mismatch_notice(ratio))
+                text = ocr_text
+
+    return text, warnings
 
 
 @app.post("/quiz")
@@ -322,7 +347,7 @@ async def analyze_file_stream(
         try:
             if pdf:
                 try:
-                    text, hidden_warnings = _pdf_text_and_warnings(raw)
+                    text, hidden_warnings = _pdf_text_and_warnings(raw, filename)
                 except ValueError:
                     # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
                     text = document_parse_text(raw, filename)
@@ -359,7 +384,8 @@ async def analyze_pdf(
 
     hidden_warnings: list[str] = []
     try:
-        text, hidden_warnings = _pdf_text_and_warnings(pdf_bytes)
+        text, hidden_warnings = _pdf_text_and_warnings(
+            pdf_bytes, file.filename or "upload.pdf")
     except ValueError as exc:
         # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
         try:
