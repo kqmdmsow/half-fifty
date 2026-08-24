@@ -13,7 +13,7 @@
 """
 
 import re
-from typing import List, Literal
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -87,3 +87,51 @@ class QuizQuestion(BaseModel):
 
 class QuizOutput(BaseModel):
     questions: List[QuizQuestion] = Field(max_length=5)
+
+
+# ── 설명·서명 대조 검증 (#175) ────────────────────────────────────────
+
+_FINDING_TYPES = ("미고지_비용", "미고지_위험", "설명_불일치",
+                  "근거없는_확언", "이해확인_누락")
+_SEVERITIES = ("높음", "보통", "낮음")
+
+
+class DisclosureFinding(BaseModel):
+    """계약서와 상담 발화의 간극 1건.
+
+    인용 두 개(clause_quote·speech_quote)는 코드가 원문 존재를 검증한다
+    (nodes/disclosure.py). 지어낸 인용은 지적 전체를 폐기한다 — 허위 지적은
+    사용자가 상대방과 다투게 만들어 실제 피해를 준다.
+    """
+
+    finding_type: str
+    clause_id: Optional[str] = None
+    clause_quote: Optional[str] = None
+    speech_quote: Optional[str] = None
+    explanation: str
+    severity: str = "보통"
+
+    @field_validator("finding_type")
+    @classmethod
+    def _known_type(cls, v: str) -> str:
+        v = str(v).strip()
+        if v not in _FINDING_TYPES:
+            raise ValueError(f"알 수 없는 finding_type: {v}")
+        return v
+
+    @field_validator("severity", mode="before")
+    @classmethod
+    def _known_severity(cls, v):
+        v = str(v or "").strip()
+        return v if v in _SEVERITIES else "보통"
+
+    @field_validator("explanation")
+    @classmethod
+    def _non_empty_explanation(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("빈 설명")
+        return v
+
+
+class DisclosureOutput(BaseModel):
+    findings: List[DisclosureFinding] = Field(default_factory=list, max_length=30)

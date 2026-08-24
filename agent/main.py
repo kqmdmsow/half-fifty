@@ -37,6 +37,8 @@ from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
 from src.injection_check import detect_injection
 from src.learn_content import content_as_context, localized_learn
+from src.nodes.disclosure import TranscriptTooShortError, verify_disclosure
+from src.transcript import TranscriptUnavailableError, guess_audio_mime, transcribe
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import (_EMPTY_PDF_ERROR, extract_with_hidden_report,
                              has_text_over_image, hidden_text_notice,
@@ -324,6 +326,99 @@ def learn_chat(req: LearnChatRequest) -> dict:
         return {"ok": True, "answer": str(data["answer"])[:1000]}
     except Exception:
         return {"ok": False, "reason": "error"}
+
+
+class DisclosureRequest(BaseModel):
+    """설명·서명 대조 검증 요청 (#175)."""
+
+    text: str = Field(..., description="계약서 원문 텍스트")
+    transcript: str = Field(..., description="상담 녹취 전사 또는 상담 스크립트")
+    persona: Literal["adult", "senior", "foreigner"] = Field("adult")
+    language: Optional[Language] = Field("ko")
+    domain: str = Field("", description="문서 유형 (선택)")
+
+
+class DisclosureResponse(BaseModel):
+    clause_count: int
+    checked_clauses: int
+    findings: List[dict]
+    warnings: List[str] = []
+    transcript: str
+    results: List[ClauseResult]
+
+
+def _run_disclosure(text: str, transcript: str, persona: str, language: str,
+                    domain: str, extra_warnings: list) -> DisclosureResponse:
+    """계약서 분석 → 발화 대조. 두 단계를 한 응답으로 묶는다.
+
+    조항 판정 없이 발화만 봐서는 "무엇을 설명하지 않았는가"를 알 수 없다.
+    무엇이 위험한 조항인지부터 정해야 그것이 설명됐는지 물을 수 있다.
+    """
+    state = run_pipeline(text, persona=persona, language=language, domain=domain,
+                         extra_warnings=extra_warnings)
+    base = _state_to_response(state)
+    try:
+        out = verify_disclosure(state["clauses"], state["adapted_results"], transcript)
+    except TranscriptTooShortError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return DisclosureResponse(
+        clause_count=base.clause_count,
+        checked_clauses=out["checked_clauses"],
+        findings=out["findings"],
+        warnings=list(base.parse_warnings) + out["warnings"],
+        transcript=out["transcript"],
+        results=base.results,
+    )
+
+
+@app.post("/verify-disclosure", response_model=DisclosureResponse)
+def verify_disclosure_text(req: DisclosureRequest) -> DisclosureResponse:
+    """계약서 + 상담 스크립트(텍스트) 대조 검증 (#175)."""
+    return _run_disclosure(req.text, req.transcript, req.persona,
+                           req.language or "ko", req.domain, [])
+
+
+@app.post("/verify-disclosure-audio", response_model=DisclosureResponse)
+async def verify_disclosure_audio(
+    contract: UploadFile,
+    audio: UploadFile,
+    persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
+    language: Language = Form("ko"),
+    domain: str = Form(""),
+) -> DisclosureResponse:
+    """계약서 파일 + 상담 녹취(음성) 대조 검증 (#175).
+
+    녹취 전사에 실패하면 422로 끊는다. 전사를 못 했는데 "지적 없음"을 내면
+    사용자에게 "설명의무를 다했다"로 읽혀 정반대 결론을 준다.
+    """
+    contract_bytes = await contract.read()
+    if len(contract_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="계약서는 10MB 이하만 지원합니다.")
+
+    warnings: list = []
+    name = contract.filename or "contract.pdf"
+    if is_pdf_magic(contract_bytes):
+        try:
+            text, warnings = _pdf_text_and_warnings(contract_bytes, name)
+        except ValueError:
+            text = document_parse_text(contract_bytes, name)
+    elif sniff_image_type(contract_bytes):
+        text = document_parse_text(contract_bytes, name)
+    else:
+        text = contract_bytes.decode("utf-8", "replace")
+
+    audio_bytes = await audio.read()
+    audio_name = audio.filename or "recording.mp3"
+    if not guess_audio_mime(audio_name):
+        raise HTTPException(
+            status_code=415,
+            detail=f"지원하지 않는 음성 형식입니다: {audio_name}")
+    try:
+        transcript = transcribe(audio_bytes, audio_name)
+    except TranscriptUnavailableError as exc:
+        raise HTTPException(status_code=422, detail=f"녹취 전사 실패: {exc}") from exc
+
+    return _run_disclosure(text, transcript, persona, language or "ko", domain, warnings)
 
 
 @app.get("/health")

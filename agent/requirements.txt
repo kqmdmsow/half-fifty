@@ -12,3 +12,8 @@ requests>=2.31  # src/ocr.py (Upstage Document Parse 호출, 제품 경로)
 
 # eval_pairwise.py --judge {solar,nim}용 (OpenAI 호환 엔드포인트, 평가 전용)
 langchain-openai>=0.2
+
+# 상담 녹취 전사 (#175) — Gemini 멀티모달로 음성을 바로 받아쓴다.
+# 별도 STT 서비스를 붙이지 않는 이유: 키와 의존성이 하나 늘고 전사 품질
+# 대비 이득이 없다. GOOGLE_API_KEY 미설정이면 텍스트 스크립트 경로만 동작한다.
+google-genai>=1.0
