@@ -12,6 +12,7 @@ Domain은 문서 유형(주택/상가 임대차, 보험, 대출 등)을 1회 판
 from langgraph.graph import END, StateGraph
 
 import logging
+from typing import Sequence
 
 logger = logging.getLogger(__name__)
 
