@@ -94,12 +94,43 @@ def test_line_start_article_citation_with_josa_not_split():
     assert len(clauses) == 1  # 인용 줄은 제1조에 병합
 
 
-def test_byulji_removal_produces_warning():
+def test_별지는_버리지_않고_구획으로_보존한다():
+    """#174 — 예전에는 별지 이후를 통째로 버렸다.
+
+    그런데 수수료율표·위약금 기준·추가 특약이 정확히 거기 들어간다. 위험이
+    숨는 자리를 스스로 잘라내고 사용자에게 "따로 붙여넣으라"고 떠넘기고
+    있었던 셈이라, 분석 대상에 포함하도록 바꿨다.
+    """
     from src.nodes.parser import split_clauses_with_warnings
     text = "제1조(목적) 계약의 목적을 정한다.\n별지1)\n첨부 수수료율 표"
     clauses, warnings = split_clauses_with_warnings(text)
+    assert len(clauses) == 2
+    assert clauses[0]["section"] == "본문"
+    assert clauses[1]["section"] == "별지1"
+    assert "수수료율" in clauses[1]["text"]
+    assert any("부속문서" in w for w in warnings)
+
+
+def test_별표_부록_부칙도_각각_구획이_된다():
+    from src.nodes.parser import split_clauses_with_warnings
+    text = ("제1조(목적) 계약의 목적을 정한다.\n"
+            "별표 2\n위약금은 계약금액의 30%로 한다.\n"
+            "부칙\n제1조(시행일) 이 약관은 즉시 시행한다.")
+    clauses, _ = split_clauses_with_warnings(text)
+    sections = [c["section"] for c in clauses]
+    assert "별표2" in sections and "부칙" in sections
+    # 부속문서 안의 "제N조"도 조항 단위로 갈린다
+    assert any("시행일" in c["text"] for c in clauses)
+
+
+def test_문장_중간의_별지_참조는_구획_경계가_아니다():
+    # "(별지1)을 확인하세요"처럼 본문에 섞인 참조로 문서가 쪼개지면 안 된다.
+    from src.nodes.parser import split_clauses_with_warnings
+    text = "제1조(목적) 자세한 내용은 별지1)을 확인하세요. 계약의 목적을 정한다."
+    clauses, warnings = split_clauses_with_warnings(text)
     assert len(clauses) == 1
-    assert any("별지" in w for w in warnings)
+    assert clauses[0]["section"] == "본문"
+    assert not any("부속문서" in w for w in warnings)
 
 
 def test_normal_document_no_warnings():

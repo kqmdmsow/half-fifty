@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { reexplainClause } from '../api'
 import type { ClauseResult, Persona } from '../api'
 import { Button, CopyButton, FirewallChip, RiskBadge, RiskIcon, WithheldBadge } from '../components/ui'
+import { HighlightedText } from '../components/HighlightedText'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
@@ -334,10 +335,20 @@ export function DetailScreen({
 
           <div className="mt-6 rounded-2xl border border-danger-500/20 bg-danger-50 p-5">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
+                {/* 부속문서에서 나온 조항은 출처를 밝힌다 — 본문과 법적 성격이 다르다 */}
+                {clause.section && clause.section !== '본문' && (
+                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[12px] font-semibold text-ink-500">
+                    {clause.section}
+                  </span>
+                )}
+              </div>
               <CopyButton text={clause.original_text} copiedText={t(language, 'copied')} className="!bg-white">{t(language, 'copy')}</CopyButton>
             </div>
-            <p className="mt-2.5 text-[15px] leading-loose text-ink-700">{clause.original_text}</p>
+            <p className="mt-2.5 text-[15px] leading-loose text-ink-700">
+              <HighlightedText text={clause.original_text} spans={clause.evidence_spans} />
+            </p>
             {clause.original_text_translated && (
               <div className="mt-3 border-t border-danger-500/10 pt-3">
                 <p className="text-[12px] font-bold text-ink-400">{t(language, 'translationLabel')}</p>

@@ -36,6 +36,10 @@ public record ClauseResult(
         /** 격리 후 근거가 남지 않아 판정을 거부했는가 (#174, fail-closed). */
         @JsonProperty("verdict_withheld") boolean verdictWithheld,
         /** 판정 안전장치가 등급을 올렸다면 모델의 원래 판정 (#174, 감사 추적). */
-        @JsonProperty("original_risk_level") String originalRiskLevel
+        @JsonProperty("original_risk_level") String originalRiskLevel,
+        /** 판정 근거 인용의 원문 위치 [[start, end], ...] — 화면 하이라이트용 (#174). */
+        @JsonProperty("evidence_spans") List<List<Integer>> evidenceSpans,
+        /** 이 조항이 나온 문서 구획 ("본문"·"특약사항"·"별지2"·"부칙" 등) (#174). */
+        @JsonProperty("section") String section
 ) {
 }

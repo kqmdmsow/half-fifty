@@ -46,6 +46,10 @@ export interface ClauseResult {
   verdict_withheld?: boolean
   /** 판정 안전장치가 등급을 올렸다면 모델의 원래 판정 (감사 추적) */
   original_risk_level?: string | null
+  /** 판정 근거 인용이 original_text의 어느 구간인지 [start, end] 목록 */
+  evidence_spans?: number[][]
+  /** 이 조항이 나온 문서 구획 ("본문"·"특약사항"·"별지2"·"부칙" 등) */
+  section?: string
 }
 
 export interface AnalyzeResponse {

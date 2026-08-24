@@ -24,7 +24,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from src.llm import get_worker_llm, invoke_json
-from src.citation_check import find_fabricated_quotes
+from src.citation_check import find_fabricated_quotes, locate_quotes
 from src.injection_check import (detect_injection, is_analyzable, quarantine,
                                  quarantine_notice, sanitize)
 from src.schemas import AnalysisOutput
@@ -285,6 +285,12 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
                 risk_evidence=data.risk_evidence,
                 check_questions=data.check_questions,
             )
+            # 근거 위치는 **격리 전 전체 조항**(text) 기준으로 찾는다.
+            # 화면에 보이는 original_text가 전체 조항이므로 그것과 맞춰야
+            # 하이라이트 위치가 어긋나지 않는다.
+            spans = locate_quotes(data.risk_evidence, text)
+            if spans:
+                result["evidence_spans"] = spans
             if removed:
                 result["quarantined"] = len(removed)
                 result["check_questions"] = [quarantine_notice(removed),

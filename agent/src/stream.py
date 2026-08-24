@@ -71,6 +71,7 @@ def _emit_clauses(
     """
     done = 0
     clause_text = {c["clause_id"]: c["text"] for c in clauses}
+    clause_section = {c["clause_id"]: c.get("section", "본문") for c in clauses}
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
         futures = [
             pool.submit(_analyze_and_adapt, c, persona, language, domain, domain_evidence)
@@ -87,6 +88,7 @@ def _emit_clauses(
                 "result": {
                     **result,
                     "original_text": clause_text[result["clause_id"]],
+                    "section": clause_section.get(result["clause_id"], "본문"),
                     **(translation or {}),
                     "related_cases": get_related_cases(result["risk_type"]),
                 },
@@ -107,6 +109,7 @@ def _emit_persona_only(
     """
     done = 0
     clause_text = {c["clause_id"]: c["text"] for c in clauses}
+    clause_section = {c["clause_id"]: c.get("section", "본문") for c in clauses}
     with ThreadPoolExecutor(max_workers=_MAX_CONCURRENCY) as pool:
         futures = [
             pool.submit(_persona_only_adapt, c, prior_results[c["clause_id"]], persona, language)
@@ -123,6 +126,7 @@ def _emit_persona_only(
                 "result": {
                     **result,
                     "original_text": clause_text[result["clause_id"]],
+                    "section": clause_section.get(result["clause_id"], "본문"),
                     **(translation or {}),
                     "related_cases": get_related_cases(result["risk_type"]),
                 },

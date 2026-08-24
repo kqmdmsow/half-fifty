@@ -114,6 +114,10 @@ class ClauseResult(BaseModel):
     quarantined: int = 0                   # 격리해 LLM에 넣지 않은 조작 문장 수
     verdict_withheld: bool = False         # 근거 부족으로 판정 거부 (fail-closed)
     original_risk_level: Optional[str] = None  # 안전장치가 상향했다면 모델의 원래 판정
+    # 판정 근거 인용의 원문 위치 [[start, end], ...] — 화면 하이라이트용
+    evidence_spans: List[List[int]] = []
+    # 이 조항이 나온 문서 구획 ("본문"·"특약사항"·"별지2"·"부칙" 등)
+    section: str = "본문"
 
 
 class AnalyzeResponse(BaseModel):
@@ -129,6 +133,7 @@ class AnalyzeResponse(BaseModel):
 
 def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     clause_text = {c["clause_id"]: c["text"] for c in state["clauses"]}
+    clause_section = {c["clause_id"]: c.get("section", "본문") for c in state["clauses"]}
     translations = state.get("translations", {})
     results = [
         ClauseResult(
@@ -148,6 +153,8 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
             quarantined=int(r.get("quarantined", 0)),
             verdict_withheld=bool(r.get("verdict_withheld")),
             original_risk_level=r.get("original_risk_level"),
+            evidence_spans=r.get("evidence_spans", []),
+            section=clause_section.get(r["clause_id"], "본문"),
         )
         for r in state["adapted_results"]
     ]

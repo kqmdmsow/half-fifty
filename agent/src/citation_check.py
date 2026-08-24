@@ -156,3 +156,59 @@ def find_fabricated_quotes(evidence: str, clause_text: str) -> List[str]:
             if norm_part not in norm_clause:
                 fabricated.append(part)
     return fabricated
+
+
+# ── 인용 위치 찾기 (#174) ─────────────────────────────────────────────
+#
+# find_fabricated_quotes는 "인용이 원문에 있는가"만 보고 **어디에** 있는지는
+# 버린다. 그런데 사용자가 판정을 검증하려면 근거가 원문 어느 대목인지 눈으로
+# 짚을 수 있어야 한다. "AI가 그렇다니까 그런가 보다"에서 "여기 이 문장 때문에
+# 위험하구나"로 넘어가는 차이다.
+#
+# 정규화 비교(공백·따옴표 무시)로 존재 여부를 판정하므로, 위치는 원문에서
+# 다시 찾아야 한다. 공백이 끼어 있어도 찾도록 문자 사이에 공백 허용 패턴을 쓴다
+# (PDF 추출 텍스트는 단어 중간에 개행·공백이 들어가는 일이 흔하다).
+
+
+def _loose_pattern(quote: str) -> "re.Pattern | None":
+    """인용문을 공백 삽입에 관대한 정규식으로 바꾼다."""
+    chars = [c for c in quote if not c.isspace()]
+    if len(chars) < 5:
+        return None
+    return re.compile(r"\s*".join(re.escape(c) for c in chars))
+
+
+def locate_quotes(evidence: str, clause_text: str) -> List[List[int]]:
+    """근거 인용이 조항 원문의 어느 구간인지 [start, end] 목록으로 돌려준다.
+
+    찾지 못한 인용은 건너뛴다 — 창작 인용은 이미 find_fabricated_quotes가
+    걸러 재시도시키므로, 여기서 못 찾은 것은 표기 차이가 큰 경우다. 위치를
+    모르면 하이라이트를 안 할 뿐 판정에는 영향이 없다.
+
+    구간이 겹치면 병합한다. 하이라이트가 중첩되면 화면에서 깨진다.
+    """
+    spans: List[List[int]] = []
+    for quote in extract_quotes(evidence):
+        for piece in _ELLIPSIS_SPLIT.split(quote):
+            piece = piece.strip()
+            if len(piece.replace(" ", "")) < 5:
+                continue
+            idx = clause_text.find(piece)
+            if idx >= 0:
+                spans.append([idx, idx + len(piece)])
+                continue
+            pattern = _loose_pattern(piece)
+            m = pattern.search(clause_text) if pattern else None
+            if m:
+                spans.append([m.start(), m.end()])
+
+    if not spans:
+        return []
+    spans.sort()
+    merged = [spans[0]]
+    for start, end in spans[1:]:
+        if start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return merged
