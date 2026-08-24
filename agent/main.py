@@ -26,11 +26,13 @@ from pathlib import Path
 from typing import List, Literal, Optional
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from src.case_footnotes import CaseFootnote, get_related_cases
+from src.guardrails import (budget_ok, check_service_token, rate_limit_ok,
+                            record_spend, status as guardrail_status)
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
 from src.injection_check import detect_injection
@@ -74,6 +76,45 @@ async def access_log(request, call_next):
         time.perf_counter() - start,
     )
     return response
+
+# 분석 계열 엔드포인트 — 무겁고 비용이 드는 경로에만 가드레일을 건다.
+# /health와 /learn 같은 조회는 막지 않는다 (모니터링이 죽으면 안 된다).
+_GUARDED_PREFIXES = ("/analyze", "/quiz", "/reexplain", "/learn-chat")
+
+
+@app.middleware("http")
+async def guardrails(request, call_next):
+    """서비스 토큰·호출 제한·비용 상한 (#174).
+
+    막을 때는 조용히 실패하지 않고 이유를 분명히 알린다. 분석이 조용히
+    실패하면 "판정을 못 받았다"가 사용자에게 "문제 없다"로 읽힌다.
+    """
+    path = request.url.path
+    if not path.startswith(_GUARDED_PREFIXES):
+        return await call_next(request)
+
+    if not check_service_token(request.headers):
+        logger.warning("서비스 토큰 불일치 — 백엔드 우회 시도 가능성 (%s)", path)
+        return JSONResponse(
+            {"detail": "이 서비스는 백엔드를 통해서만 호출할 수 있습니다."},
+            status_code=403)
+
+    client = request.headers.get("x-forwarded-for", "").split(",")[0].strip() \
+        or (request.client.host if request.client else "unknown")
+    if not rate_limit_ok(client):
+        return JSONResponse(
+            {"detail": "요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요."},
+            status_code=429)
+
+    if not budget_ok():
+        logger.error("일일 비용 상한 도달 — 분석 요청 거부")
+        return JSONResponse(
+            {"detail": "오늘 처리 한도에 도달했습니다. 내일 다시 이용해 주세요. "
+                       "분석 결과를 받지 못했으니 계약서가 안전하다는 뜻이 아닙니다."},
+            status_code=503)
+
+    return await call_next(request)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -287,7 +328,13 @@ def learn_chat(req: LearnChatRequest) -> dict:
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    """헬스체크 + 운영 가드레일 상태 (#174).
+
+    외부 모니터링이 5분마다 때리는 곳이라 가드레일에서 제외돼 있다. 비용
+    상한 소진 같은 상태를 여기서 노출해야, 심사 기간에 서비스가 살아 있는지가
+    아니라 **분석이 가능한 상태인지**를 감시할 수 있다.
+    """
+    return {"status": "ok", "guardrails": guardrail_status()}
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)

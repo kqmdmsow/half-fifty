@@ -25,6 +25,9 @@ spring:
 
 # Python 에이전트 서비스 주소 (배포 시 AGENT_BASE_URL 환경변수로 주입)
 agent:
+  # 에이전트 서비스 토큰 (#174) — 미설정이면 헤더를 붙이지 않고,
+  # 에이전트도 검사하지 않는다 (로컬 개발 호환).
+  service-token: ${AGENT_SERVICE_TOKEN:}
   base-url: ${AGENT_BASE_URL:http://localhost:8000}
 
 # 프론트 오리진 (배포 시 CORS_ALLOWED_ORIGIN 환경변수로 주입)

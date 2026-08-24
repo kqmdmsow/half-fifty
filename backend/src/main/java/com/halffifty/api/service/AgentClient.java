@@ -37,6 +37,9 @@ import org.springframework.web.client.RestClient;
 @Service
 public class AgentClient {
 
+    /** 에이전트가 백엔드 경유 여부를 판별하는 헤더 (#174). */
+    private static final String SERVICE_TOKEN_HEADER = "X-Service-Token";
+
     private final RestClient restClient;
     private final String agentBaseUrl;
     private final ObjectMapper objectMapper;
@@ -44,18 +47,32 @@ public class AgentClient {
             .connectTimeout(Duration.ofSeconds(10))
             .build(); // 스트리밍은 읽기 타임아웃 없음 — async 600s(application.yml)가 상한
 
-    public AgentClient(@Value("${agent.base-url}") String agentBaseUrl, ObjectMapper objectMapper) {
+    /**
+     * 에이전트 서비스 토큰 (#174). 에이전트가 공개 URL이면 프론트→백엔드→에이전트
+     * 구조를 우회해 직접 때릴 수 있고, 그러면 백엔드의 용량·형식 검사가 전부
+     * 무의미해진다. 미설정이면 빈 문자열이고 에이전트도 검사하지 않는다 —
+     * 로컬 개발과 기존 배포가 토큰 없이도 돌아가야 하기 때문이다.
+     */
+    private final String serviceToken;
+
+    public AgentClient(@Value("${agent.base-url}") String agentBaseUrl,
+            @Value("${agent.service-token:}") String serviceToken,
+            ObjectMapper objectMapper) {
         this.agentBaseUrl = agentBaseUrl;
+        this.serviceToken = serviceToken;
         this.objectMapper = objectMapper;
         // 타임아웃 (#52): 미설정 시 에이전트가 죽으면 요청이 무한 대기했다.
         // read 7분 = 최악 케이스(21조항 + judge 재시도 2회 ≈ 5분) + 여유.
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(10))
                 .withReadTimeout(Duration.ofMinutes(7));
-        this.restClient = RestClient.builder()
+        RestClient.Builder builder = RestClient.builder()
                 .baseUrl(agentBaseUrl)
-                .requestFactory(ClientHttpRequestFactories.get(settings))
-                .build();
+                .requestFactory(ClientHttpRequestFactories.get(settings));
+        if (!serviceToken.isBlank()) {
+            builder = builder.defaultHeader(SERVICE_TOKEN_HEADER, serviceToken);
+        }
+        this.restClient = builder.build();
     }
 
     public AnalyzeResponse analyze(AnalyzeRequest request) {
@@ -138,9 +155,11 @@ public class AgentClient {
      * 지원하지 않아 JDK HttpClient를 사용한다.
      */
     public void streamAnalyze(AnalyzeRequest request, OutputStream out) throws IOException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(request)))
+        HttpRequest httpRequest = withServiceToken(
+                HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(
+                                objectMapper.writeValueAsString(request))))
                 .build();
         pipeStream(httpRequest, out);
     }
@@ -167,11 +186,18 @@ public class AgentClient {
         body.write(bytes);
         body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
 
-        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-file-stream"))
-                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+        HttpRequest httpRequest = withServiceToken(
+                HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-file-stream"))
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())))
                 .build();
         pipeStream(httpRequest, out);
+    }
+
+    /** RestClient와 달리 JDK HttpClient는 기본 헤더가 없어 매번 붙여야 한다. */
+    private HttpRequest.Builder withServiceToken(HttpRequest.Builder builder) {
+        return serviceToken.isBlank() ? builder
+                : builder.header(SERVICE_TOKEN_HEADER, serviceToken);
     }
 
     private static void writeFormField(ByteArrayOutputStream body, String boundary,
