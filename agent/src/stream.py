@@ -23,10 +23,10 @@ failing_aspects/shortcut_eligible로 공유해 드리프트를 막는다. Judge 
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, Iterator, List
+from typing import Dict, Iterator, List, Sequence
 
 from src.case_footnotes import get_related_cases
-from src.injection_check import detect_injection, injection_warning
+from src.injection_check import detect_injection, injection_warning, sanitize, sanitize_notice
 from src.masking import mask_pii, masking_notice
 from src.nodes.analysis import _MAX_CONCURRENCY, _analyze_clause
 from src.nodes.domain import domain_node
@@ -130,15 +130,25 @@ def _emit_persona_only(
 
 
 def stream_analysis(
-    raw_text: str, persona: str, language: str = "ko", domain: str = ""
+    raw_text: str, persona: str, language: str = "ko", domain: str = "",
+    extra_warnings: Sequence[str] = (),
 ) -> Iterator[dict]:
     masked, pii_counts = mask_pii(raw_text)
+    # 인젝션 1층 탐지 + 2층 무력화 (#67·#174). 순서가 중요하다:
+    # ① 탐지는 무력화 이전 원문으로 — 지우고 나면 알릴 근거가 사라진다.
+    # ② 무력화는 조항 분할 **이전**에 — 분할 후에 하면 조항 경계를 조작하는
+    #    구획 표지 위장이 이미 파서를 통과한 뒤가 된다.
+    injections = detect_injection(masked)
+    masked, report = sanitize(masked)
     clauses, warnings = split_clauses_with_warnings(masked)
     if pii_counts:
         warnings = [masking_notice(pii_counts)] + warnings
-    # 인젝션 1층 방어 (#67): 조작 문구 탐지 시 경고를 최상단에 — 분석은
-    # 계속하되 사용자가 판정을 의심하고 원문을 대조하게 만든다
-    injections = detect_injection(masked)
+    # PDF 은닉 텍스트 격리 등 파이프라인 진입 전 경고 (#174)
+    warnings = list(extra_warnings) + warnings
+    if report.changed:
+        warnings = [sanitize_notice(report)] + warnings
+    # 조작 문구 탐지 시 경고를 최상단에 — 분석은 계속하되 사용자가 판정을
+    # 의심하고 원문을 대조하게 만든다
     if injections:
         warnings = [injection_warning(injections)] + warnings
 

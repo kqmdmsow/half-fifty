@@ -2,6 +2,7 @@ import { Button, RiskBadge } from '../components/ui'
 import { Reveal } from '../components/Reveal'
 import { RotatingTitle } from '../components/RotatingTitle'
 import { LANGUAGES, riskLevelLabel, t, type LangCode } from '../i18n'
+import { VERIFICATION } from '../data/verification'
 
 export function LandingScreen({
   onStart,
@@ -39,6 +40,28 @@ export function LandingScreen({
               {t(language, 'heroNote')}
             </span>
           </div>
+
+          {/* 신뢰 지표 (#169) — 심사위원·사용자가 분석을 돌리기 전에 "왜 이 판정을
+              믿나"를 볼 수 있게 한다. 결과 화면의 AI 검증 리포트(#53)·사건
+              각주(#91)는 분석을 끝까지 돌려야 보이는데, 그 전에 이탈하면 우리
+              강점이 전달되지 않는다. 숫자는 data/verification.ts가 단일 출처. */}
+          <ul
+            aria-label={t(language, 'trAria')}
+            className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-[13px] font-semibold text-ink-500"
+          >
+            {[
+              t(language, 'trGolden', { n: VERIFICATION.goldenRows }),
+              t(language, 'trNormalFp', { n: VERIFICATION.normalClauses }),
+              t(language, 'trJudge', { n: VERIFICATION.judgeFamilies }),
+            ].map((label) => (
+              <li
+                key={label}
+                className="rounded-full border border-ink-100 bg-white/70 px-3.5 py-1.5"
+              >
+                {label}
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* 실물 계약서 목업 — 국토부·법무부 표준계약서 실제 문안 + 법 조항 칩.

@@ -26,6 +26,23 @@ class AnalysisResult(TypedDict):
     # 재시도 소진 폴백 여부 — 프론트가 이 코드로 안내 문구를 현지화한다 (#100).
     # persona._adapt의 dict(result) 복사로 이벤트 payload까지 살아서 전달된다.
     analysis_failed: NotRequired[bool]
+    # 이 조항에서 프롬프트 인젝션 흔적이 탐지됐는지 (#174). analysis_failed와
+    # 같은 경로로 프론트까지 전달되며, 판정 안전장치가 '안전'을 '주의'로
+    # 올린 경우 그 사실을 사용자에게 설명하는 근거가 된다.
+    injection_suspected: NotRequired[bool]
+    # 판정 안전장치가 실제로 등급을 올린 경우, 모델이 원래 내놓은 등급 (#174).
+    # ① 감사 추적: "안전장치가 언제 발동했는가"를 사후에 증명할 수 있어야 한다
+    #    (금융보안원 평가 프레임워크의 '보안 검증 및 운영관리' 영역 대응).
+    # ② 정직한 측정: 방어 효과를 잴 때 '모델이 뚫렸는가'와 '사용자가 본 결과가
+    #    뚫렸는가'를 분리해야 한다. 이 필드가 없으면 안전장치 때문에 관통이
+    #    항상 0으로 나와 측정이 순환논리가 된다.
+    original_risk_level: NotRequired[str]
+    # 이 조항에서 격리해 LLM에 넣지 않은 조작 문장 수 (#174).
+    quarantined: NotRequired[int]
+    # 격리 후 판정 근거가 남지 않아 판정을 보류한 경우 (#174, fail-closed).
+    # 프론트는 이 플래그를 '주의' 배지보다 강하게 표시해야 한다 — 조용히
+    # 넘어가면 공격자가 지시문 한 줄로 경고를 억제할 수 있게 된다.
+    verdict_withheld: NotRequired[bool]
 
 
 class JudgeScores(TypedDict):

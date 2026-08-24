@@ -36,7 +36,8 @@ from src.graph import run_pipeline
 from src.injection_check import detect_injection
 from src.learn_content import content_as_context, localized_learn
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
-from src.pdf_extract import extract_text_from_pdf
+from src.pdf_extract import (_EMPTY_PDF_ERROR, extract_with_hidden_report,
+                             hidden_text_notice)
 from src.quiz import generate_quiz
 from src.reexplain import reexplain
 from src.state import PipelineState
@@ -172,6 +173,18 @@ class ReexplainRequest(BaseModel):
     language: Optional[Language] = "ko"
 
 
+def _pdf_text_and_warnings(raw: bytes) -> tuple[str, list[str]]:
+    """PDF에서 사람이 볼 수 있는 텍스트만 뽑고, 격리 고지를 함께 돌려준다 (#174).
+
+    은닉 텍스트(백색 글자·극소 활자·화면 밖 배치)는 추출 단계에서 이미
+    제외된다. 여기서는 그 사실을 사용자에게 전달할 경고 문구만 만든다.
+    """
+    text, hidden = extract_with_hidden_report(raw)
+    if not text.strip():
+        raise ValueError(_EMPTY_PDF_ERROR)
+    return text, ([hidden_text_notice(hidden)] if hidden else [])
+
+
 @app.post("/quiz")
 def quiz(req: QuizRequest) -> dict:
     """객관식 3문항 생성 — 코드 가드 통과분만, 미달 시 빈 목록 (src/quiz.py)."""
@@ -283,10 +296,11 @@ async def analyze_file_stream(
 
     def gen():
         yield _ndjson({"event": "extract"})
+        hidden_warnings: list[str] = []
         try:
             if pdf:
                 try:
-                    text = extract_text_from_pdf(raw)
+                    text, hidden_warnings = _pdf_text_and_warnings(raw)
                 except ValueError:
                     # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
                     text = document_parse_text(raw, filename)
@@ -296,7 +310,8 @@ async def analyze_file_stream(
             yield _ndjson({"event": "error", "status": 422,
                            "message": f"파일에서 글자를 읽지 못했습니다: {exc}"})
             return
-        for event in stream_analysis(text, persona, language or "ko", domain):
+        for event in stream_analysis(text, persona, language or "ko", domain,
+                                     extra_warnings=hidden_warnings):
             yield _ndjson(event)
 
     return StreamingResponse(gen(), media_type="application/x-ndjson")
@@ -320,8 +335,9 @@ async def analyze_pdf(
     if not is_pdf_magic(pdf_bytes):
         raise HTTPException(status_code=415, detail="PDF 파일이 아닙니다.")
 
+    hidden_warnings: list[str] = []
     try:
-        text = extract_text_from_pdf(pdf_bytes)
+        text, hidden_warnings = _pdf_text_and_warnings(pdf_bytes)
     except ValueError as exc:
         # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
         try:
@@ -330,7 +346,8 @@ async def analyze_pdf(
             raise HTTPException(
                 status_code=422, detail=f"{exc} / OCR 폴백 실패: {ocr_exc}") from ocr_exc
 
-    state = run_pipeline(text, persona=persona, language=language or "ko", domain=domain)
+    state = run_pipeline(text, persona=persona, language=language or "ko", domain=domain,
+                         extra_warnings=hidden_warnings)
     return _state_to_response(state)
 
 
