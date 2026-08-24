@@ -1,0 +1,877 @@
+{
+  "repeats": 3,
+  "condition": "조항별 3회 실행 후 risk_level 다수결 / 과반 없음 0건 / 폴백 3/111건 (2.7%) / 전체 폴백으로 집계 제외 1건",
+  "sets": {
+    "임대차 확장 (ext, 34건)": [
+      {
+        "case_id": "68959",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "신탁관계·소유권 불안정 고지",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "신탁관계·소유권 불안정 고지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "97263",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "책임 면제",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "신탁관계·소유권 불안정 고지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "20911",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "신탁관계·소유권 불안정 고지",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "신탁관계·소유권 불안정 고지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "76821",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "31071",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "책임 면제",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "신탁관계·소유권 불안정 고지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "56646",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "134275",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "과도한 위약금",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "과도한 위약금",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "138033",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "보증금 반환 지연"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "보증금 반환 지연"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "보증금 반환 지연"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "보증금 반환 지연",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "146502",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "신탁관계·소유권 불안정 고지",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "85054",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "과도한 위약금",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "과도한 위약금",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2025_주택16",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2025_상가13",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "책임 면제"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "책임 면제"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "책임 면제",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2023_주요08",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "책임 면제",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "권리행사 제한",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "sn1254",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "124151",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 계약 해지"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 계약 해지"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "일방적 계약 해지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "23513",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 계약 해지"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 계약 해지"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 계약 해지"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "일방적 계약 해지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "29445",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "과도한 위약금"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "과도한 위약금",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "65051",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "불명확한 수수료·이자 조건",
+        "tie": false,
+        "fallback_count": 0
+      }
+    ],
+    "금융 전이 (finance, 33행)": [
+      {
+        "case_id": "2019-18b",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "권리행사 제한",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "권리행사 제한",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2005-41",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "권리행사 제한",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "일방적 계약 해지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "일방적 계약 해지"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "일방적 계약 해지"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "일방적 계약 해지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2018-9",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2009-42",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "불명확한 수수료·이자 조건",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2008-49",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2011-60",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2026-1",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "청약철회권 제한"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "청약철회권 제한"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "청약철회권 제한",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2001_리스인수특약",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2004_포괄근보증기간",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 계약 해지"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "일방적 계약 해지",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2002_자유적립이율",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2003_근로자우대이율",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2006_위조카드책임",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2015_할부항변배제",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "권리행사 제한",
+        "runs": [
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          },
+          {
+            "risk_level": "위험",
+            "risk_type": "권리행사 제한"
+          }
+        ],
+        "final_risk_level": "위험",
+        "final_risk_type": "권리행사 제한",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2010_ELS조건조정",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "일방적 급부·조건 변경",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "일방적 급부·조건 변경"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2009_주식매수연기",
+        "split": "test",
+        "gold_risk_level": "위험",
+        "gold_risk_type": "일방적 급부·조건 변경",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2010_PF대물변제",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "주의",
+            "risk_type": "불명확한 수수료·이자 조건"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          },
+          {
+            "risk_level": "주의",
+            "risk_type": "신탁관계·소유권 불안정 고지"
+          }
+        ],
+        "final_risk_level": "주의",
+        "final_risk_type": "불명확한 수수료·이자 조건",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2010_기한이익통지형",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      },
+      {
+        "case_id": "2010_텔레뱅킹면책",
+        "split": "test",
+        "gold_risk_level": "안전",
+        "gold_risk_type": "해당 없음",
+        "runs": [
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          },
+          {
+            "risk_level": "안전",
+            "risk_type": "해당 없음"
+          }
+        ],
+        "final_risk_level": "안전",
+        "final_risk_type": "해당 없음",
+        "tie": false,
+        "fallback_count": 0
+      }
+    ]
+  },
+  "fully_fallback": [
+    "2019-18a"
+  ]
+}
