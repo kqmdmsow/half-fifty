@@ -104,6 +104,16 @@ class ClauseResult(BaseModel):
     # 시그니처 기능 ① 실제 사건 각주 (#91) — 표시 전용, Judge 채점에는
     # 안 쓰인다 (state에 안 실리고 여기서 응답 조립 시점에만 조회).
     related_cases: List[CaseFootnote] = []
+    # 재시도 소진 폴백 마커 (#100). 스트리밍 경로는 dict를 그대로 흘려 이 값이
+    # 살아갔지만 이 스키마에는 없어서 REST 경로(/analyze·/analyze-pdf)에서만
+    # 조용히 사라지고 있었다 — 같은 서비스가 경로에 따라 다른 정보를 주면 안 된다.
+    analysis_failed: bool = False
+    # 방화벽 상태 (#174). 이 값들이 없으면 사용자는 방어가 동작했다는 사실 자체를
+    # 알 수 없고, 감사 관점에서도 언제 무엇이 발동했는지 증명할 수 없다.
+    injection_suspected: bool = False      # 이 조항에서 조작 흔적 탐지
+    quarantined: int = 0                   # 격리해 LLM에 넣지 않은 조작 문장 수
+    verdict_withheld: bool = False         # 근거 부족으로 판정 거부 (fail-closed)
+    original_risk_level: Optional[str] = None  # 안전장치가 상향했다면 모델의 원래 판정
 
 
 class AnalyzeResponse(BaseModel):
@@ -133,6 +143,11 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
             check_questions_translated=translations.get(r["clause_id"], {}).get("check_questions_translated"),
             risk_evidence_translated=translations.get(r["clause_id"], {}).get("risk_evidence_translated"),
             related_cases=get_related_cases(r["risk_type"]),
+            analysis_failed=bool(r.get("analysis_failed")),
+            injection_suspected=bool(r.get("injection_suspected")),
+            quarantined=int(r.get("quarantined", 0)),
+            verdict_withheld=bool(r.get("verdict_withheld")),
+            original_risk_level=r.get("original_risk_level"),
         )
         for r in state["adapted_results"]
     ]
