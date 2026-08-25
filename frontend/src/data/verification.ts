@@ -23,7 +23,7 @@ export const VERIFICATION = {
   judgeFamilies: 4,
 
   /** A등급(정부·법원이 실제로 판정) 서브셋 리콜.
-   *  근거: docs/eval_real_labels_pr174_repeats3_test40.md — 27건 중 FN 1 (2026-08-23,
-   *  #174 6층 인젝션 방화벽 프롬프트 반영 재측정) */
-  gradeARecall: 0.9,
+   *  근거: docs/eval_real_labels_pr156_case37fix_test40.md — 27건 중 FN 0 (2026-08-25,
+   *  #156 "외부 법령 참조는 요율 명시 아님" 예외 정밀화 반영 재측정) */
+  gradeARecall: 1.0,
 } as const
