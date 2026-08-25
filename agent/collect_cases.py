@@ -356,6 +356,21 @@ def main() -> None:
             lv.get(r["gold_risk_level_candidate"] or "(미상)", 0) + 1
     print(f"\n조항 후보 {len(rows)}건 저장: {out}")
     print(f"  판정 후보 분포: {lv}")
+
+    # 표본 편향 경고 (#180). 사건명 '불공정약관조항'으로 검색하면 공정위가
+    # **불공정하다고 판단한 건만** 모인다. 공정위는 "이 조항은 괜찮다"는 심결을
+    # 따로 내지 않기 때문이다. 그대로 골든셋에 넣으면 리콜은 부풀고 정밀도
+    # 측정이 무너진다 — 안전 표본이 없으면 오탐을 잴 수가 없다.
+    danger = lv.get("위험", 0) + lv.get("주의", 0)
+    if rows and danger / len(rows) > 0.8:
+        print(f"\n  ⚠️ 표본 편향: 위험·주의가 {danger}/{len(rows)} "
+              f"({danger / len(rows) * 100:.0f}%)다.")
+        print("     이 소스는 '불공정 판정을 받은 조항'만 담고 있어 안전 표본이 없다.")
+        print("     안전 조항은 다른 경로로 채워야 한다:")
+        print("       · 정부·공정위 표준계약서 (이미 data/normal_contracts/에 있다)")
+        print("       · 판례에서 '부당하다고 볼 수 없다'고 판단한 조항")
+        print("         (--target prec 로 수집 후 유효 판정만 골라낼 것)")
+        print("     불균형 상태로 골든셋에 넣으면 리콜은 부풀고 정밀도는 못 잰다.")
     print(f"  사건 중복 건너뜀 {skipped}건 · 조항 중복 제거 {dup_clause}건 "
           f"· 조항 블록 미검출 {no_block}건")
     print("\n※ 이 파일은 후보일 뿐 골든셋이 아니다. clause_text가 비어 있고")
