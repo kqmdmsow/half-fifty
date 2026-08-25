@@ -98,3 +98,71 @@ def test_법원의_판단_서술은_조항이_아니다():
 def test_같은_인용은_한_번만_낸다():
     q = '이 사건 계약 제5조는 "보증금은 어떠한 경우에도 반환하지 아니한다"라고 정한다. '
     assert len(extract_precedent_clauses(q * 3)) == 1
+
+
+# ---- 판례 판정 추론 (#180 안전 표본) ---------------------------------
+
+def test_유효_판정을_안전으로_읽는다():
+    """수집 후보가 99% 위험이라 정밀도를 잴 수 없다. 안전 표본이 필요하다."""
+    from collect_cases import _precedent_verdict
+
+    assert _precedent_verdict("이는 부당하다고 볼 수 없다.")[0] == "안전"
+    assert _precedent_verdict("약관법 제9조 제1호에 해당된다.")[0] == "위험"
+
+
+def test_주장과_판단이_섞이면_뒤에_온_것을_결론으로_본다():
+    """판결문은 "원고는 무효라 주장하나 … 부당하다고 볼 수 없다" 형태가 흔하다.
+
+    앞 신호만 보면 정반대 라벨이 붙고, 섞였다고 전부 버리면 안전 표본을
+    거의 못 건진다. 결론이 뒤에 온다는 구조를 쓰되 확신도로 표시한다.
+    """
+    from collect_cases import _precedent_verdict
+
+    v, how = _precedent_verdict("원고는 무효라고 주장하나, 부당하다고 볼 수 없다.")
+    assert (v, how) == ("안전", "신호 혼재")
+    v, how = _precedent_verdict("피고는 유효하다고 주장하나, 신의성실의 원칙에 반한다.")
+    assert (v, how) == ("위험", "신호 혼재")
+
+
+def test_판단_신호가_없으면_판정하지_않는다():
+    from collect_cases import _precedent_verdict
+
+    assert _precedent_verdict("이 사건 계약 제3조는 보증금을 정하고 있다.") == ("", "")
+
+
+def test_조_번호가_없어도_조항을_뽑는다():
+    """판결문은 "이 사건 조항은 …라고 정한다"처럼 번호 없이 쓰는 일이 흔하다.
+
+    번호를 요구했더니 실측 수율이 79건 중 1건으로 떨어졌다.
+    """
+    body = ('이 사건 조항은 "회원이 탈퇴하는 경우 잔여 기간에 대한 환불은 '
+            '하지 아니한다"라고 정하고 있다. 이는 부당하다고 볼 수 없다.')
+    out = extract_precedent_clauses(body)
+    assert out and out[0]["verdict"] == "안전"
+    assert out[0]["article_no"] == ""
+
+
+def test_인용문_앞의_조사와_따옴표를_떼어_낸다():
+    # '제9조**는 "**어떠한 경우에도…' 처럼 군더더기가 딸려 오면 원문 대조가 깨진다.
+    body = '이 사건 약관 제9조는 "어떠한 경우에도 보증금을 반환하지 아니한다"라고 규정한다.'
+    out = extract_precedent_clauses(body)
+    assert out[0]["clause_text"].startswith("어떠한 경우에도")
+    assert not out[0]["clause_text"].endswith('"')
+
+
+def test_판결문_서술_조각은_조항으로_보지_않는다():
+    """앵커가 문장 중간에 걸리면 판결문 서술이 딸려 온다."""
+    from collect_cases import is_clause_like
+
+    assert not is_clause_like("라 한다), 2020. 1. 29. 피고와 사이에 분담금을 정하여")
+    assert not is_clause_like("2019. 1. 15. 계약을 체결하였다")
+
+
+def test_원고_피고가_들어가도_조항일_수_있다():
+    """판결문은 계약 당사자를 원고·피고로 바꿔 인용한다.
+
+    이걸 서술 신호로 쓰면 정상 약관 조항이 대량으로 날아간다.
+    """
+    from collect_cases import is_clause_like
+
+    assert is_clause_like("기타 원고의 단독 재량으로 계정의 해지가 필요하다고 판단하는 경우")

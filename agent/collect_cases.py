@@ -202,7 +202,7 @@ def parse_decision(body: str) -> list:
 # 계약 조항으로 잘못 수집하면 골든셋이 오염되므로, 앵커와 배제 목록을 함께 쓴다.
 
 # 계약 문서를 가리키는 앵커. 이 말 뒤의 "제N조"만 계약 조항으로 본다.
-_CONTRACT_ANCHOR = (r"(?:이\s*사건\s*[가-힣]{0,8}?(?:이용약관|약관|계약서|계약|특약)"
+_CONTRACT_ANCHOR = (r"(?:이\s*사건\s*[가-힣]{0,8}?(?:이용약관|약관|계약서|계약|특약|조항|규정)"
                     r"|[가-힣]{2,12}(?:이용약관|약관|계약서))")
 # 법령 이름. 앵커처럼 보여도 이것이면 버린다.
 _STATUTE_WORDS = (
@@ -211,13 +211,58 @@ _STATUTE_WORDS = (
     "할부거래", "보험업법", "자본시장", "금융소비자보호", "공정거래", "독점규제",
     "소비자기본법", "신탁법", "민사집행법", "부동산등기법",
 )
-# 앵커 뒤 조항 번호 + 인용문. 「」·『』·따옴표 인용, 또는 "…라고 규정하고 있다".
+# 앵커 뒤 인용문. 조 번호는 **선택**이다 — 판결문은 "이 사건 조항은 …라고
+# 정하고 있다"처럼 번호 없이 쓰는 경우가 흔하고, 번호를 요구하면 수율이
+# 급락한다(실측 79건 → 1건).
+#
+# 수율에 대한 실측 메모: **하급심 판결문이 조항을 그대로 인용한다.** 대법원
+# 판결은 판결요지 중심이라 조항을 풀어 쓰기만 하는 경우가 많다. 조항 원문을
+# 노리면 지방법원·고등법원 사건을 우선 볼 것.
 _PREC_CLAUSE = re.compile(
-    _CONTRACT_ANCHOR + r"\s*제\s*(\d{1,3})\s*조(?:\s*제\s*\d{1,2}\s*항)?"
-    r"[^\n]{0,50}?"
-    r"(?:[\u201c\u201d\"\u300c\u300e]\s*(.{20,400}?)\s*[\u201c\u201d\"\u300d\u300f]"
-    r"|(.{20,300}?)\s*라고\s*(?:규정|정하|기재)\S*)",
+    _CONTRACT_ANCHOR + r"(?:\s*제\s*(\d{1,3})\s*조(?:\s*제\s*\d{1,2}\s*항)?"
+    r"(?:\s*(?:본문|단서|각\s*호))?)?"
+    r"[^\n]{0,40}?"
+    r"(?:[\u201c\u201d\"\u300c\u300e\u2018\u2019]\s*(.{20,400}?)\s*"
+    r"[\u201c\u201d\"\u300d\u300f\u2018\u2019]"
+    r"|(.{20,300}?)\s*라고\s*(?:규정|정하|기재|약정)\S*)",
     re.S)
+
+
+# 법원이 조항을 어떻게 판단했는가. 인용 주변 문맥에서 읽는다.
+#
+# 안전 표본이 특히 값지다. 수집 후보가 99% 위험이라 **정밀도를 잴 수가 없고**,
+# 법원까지 간 조항인데 유효 판정을 받았다면 그것은 "위험해 보이지만 유효한
+# 경계 사례"다 — 오탐을 잡는 데 가장 값진 표본이다.
+_PREC_INVALID = re.compile(
+    r"(무효(?:이다|라고|로\s*보|에\s*해당)|효력이\s*없"
+    r"|약관법\s*제\s*\d+\s*조[^.]{0,30}?해당(?!되지)(?!하지)"
+    r"|부당하게\s*(?:불리|과중)|신의성실의?\s*원칙에\s*(?:반|위배)|공정성을\s*잃)")
+_PREC_VALID = re.compile(
+    r"(부당하다고\s*(?:볼\s*수\s*없|보기\s*어렵)|무효라고\s*(?:할\s*수\s*없|볼\s*수\s*없)"
+    r"|유효(?:하다|한\s*것)|효력이\s*있|해당한다고\s*볼\s*수\s*없|해당하지\s*않"
+    r"|위반된다고\s*보기\s*어렵|불공정하다고\s*보기(?:는)?\s*어렵)")
+
+
+def _precedent_verdict(context: str) -> tuple:
+    """인용 주변 문맥에서 법원의 판단을 읽는다. 반환: (판정, 확신도).
+
+    판결문은 "원고는 무효라고 주장하나 … 부당하다고 볼 수 없다"처럼 **주장과
+    판단이 한 문단에 섞이는 일이 흔하다.** 양쪽 신호가 있다고 전부 포기하면
+    안전 표본을 거의 못 건진다.
+
+    그래서 **결론이 뒤에 온다**는 판결문의 구조를 쓴다: 마지막에 나온 신호를
+    법원의 판단으로 본다. 다만 신호가 섞였다는 사실은 확신도로 남겨
+    검수자가 그 건을 먼저 보게 한다.
+    """
+    bads = [m.end() for m in _PREC_INVALID.finditer(context)]
+    goods = [m.end() for m in _PREC_VALID.finditer(context)]
+    if not bads and not goods:
+        return "", ""
+    if not goods:
+        return "위험", "단일 신호"
+    if not bads:
+        return "안전", "단일 신호"
+    return ("위험" if bads[-1] > goods[-1] else "안전"), "신호 혼재"
 
 
 # 판결 서술이 인용문에 섞여 들어온 경우를 거른다. 조항은 규범을 정하는 문장이고
@@ -225,6 +270,28 @@ _PREC_CLAUSE = re.compile(
 _JUDGMENT_WORDS = ("따라서", "인정된다", "판단된다", "보인다", "할 것이다",
                    "이 사건 이용제한조치", "원고의 주장", "피고의 주장",
                    "이유 없다", "해당한다고", "볼 수 없다")
+
+
+# 뽑은 문자열이 실제로 "조항"처럼 읽히는가. 앵커가 문장 중간에 걸리면
+# 판결문의 서술("…라 한다), 2020. 1. 29. 피고와 사이에 …")이 딸려 온다.
+# 조항은 규범을 정하는 문장이고 서술은 사실을 적는 문장이라 신호가 다르다.
+_CLAUSE_ENDING = re.compile(r"(한다|된다|없다|있다|아니한다|하여야|하도록|한다\.|"
+                            r"以下|경우|때에는|바에\s*따라)")
+# 판결문 서술의 흔적. 구체 날짜와 정의구 잔여물은 조항 문언에 나올 이유가 없다.
+#
+# 원고·피고는 서술 신호로 쓰지 않는다. **판결문은 계약 당사자를 원고·피고로
+# 바꿔 인용하기 때문이다** — "기타 원고의 단독 재량으로 계정의 해지가 필요하다고
+# 판단하는 경우"는 엄연한 약관 조항이다. 이걸 걸러 내면 정상 조항이 대량으로
+# 날아간다(실측 회귀 테스트에서 잡혔다).
+_NARRATIVE = re.compile(r"^\s*(라\s*한다|라\s*하고|이라\s*한다)|"
+                        r"\d{4}\.\s*\d{1,2}\.\s*\d{0,2}\.?")
+
+
+def is_clause_like(text: str) -> bool:
+    """조항 문언으로 볼 만한가. 아니면 판결문 서술이 딸려 온 것이다."""
+    if _NARRATIVE.search(text):
+        return False
+    return bool(_CLAUSE_ENDING.search(text))
 
 
 def extract_precedent_clauses(body: str) -> list:
@@ -236,14 +303,24 @@ def extract_precedent_clauses(body: str) -> list:
             continue                      # 법령 인용이다
         quote = (m.group(2) or m.group(3) or "").strip()
         quote = re.sub(r"\s+", " ", quote)
+        # 라고-분기가 먼저 걸리면 조사와 여는 따옴표까지 딸려 온다
+        # ('제9조**는 "**어떠한 경우에도…'). 양끝의 군더더기를 떼어 낸다.
+        quote = re.sub(r"^[는은이가을를에의도\s]*[\u201c\u201d\"\u300c\u300e\u2018\u2019]?\s*", "", quote)
+        quote = re.sub(r"\s*[\u201c\u201d\"\u300d\u300f\u2018\u2019]?[\s,.]*$", "", quote)
         if len(quote) < 20 or quote in seen:
             continue
         if any(w in quote for w in _JUDGMENT_WORDS):
             continue                      # 조항이 아니라 법원의 판단 서술이다
+        if not is_clause_like(quote):
+            continue                      # 서술문 조각이 딸려 온 것이다
         seen.add(quote)
-        out.append({"article_no": m.group(1), "clause_text": quote[:400],
-                    "context": re.sub(r"\s+", " ", body[max(0, m.start() - 120):
-                                                        m.end() + 200])[:600]})
+        # 판정 신호를 찾는 창. 400자로 잡았더니 181건 중 161건이 판정 미상이었다 —
+        # 판결문은 조항을 인용한 뒤 사실관계를 길게 쓰고 한참 뒤에 결론을 낸다.
+        # 다만 무한정 넓히면 옆 조항의 판단을 끌어오므로 1,600자에서 끊는다.
+        ctx = re.sub(r"\s+", " ", body[max(0, m.start() - 200):m.end() + 1600])[:2000]
+        verdict, how = _precedent_verdict(ctx)
+        out.append({"article_no": m.group(1) or "", "clause_text": quote[:400],
+                    "context": ctx, "verdict": verdict, "verdict_how": how})
     return out
 
 
@@ -268,6 +345,9 @@ def main() -> None:
     ap.add_argument("--section", default="1", choices=["1", "2"],
                     help="1=사건명, 2=본문")
     ap.add_argument("--limit", type=int, default=30)
+    ap.add_argument("--verdict", default="all", choices=["all", "safe", "risky"],
+                    help="판례 경로에서 유효(safe)/무효(risky) 판정만 골라 담는다. "
+                         "지금 수집 후보가 99%% 위험이라 safe가 특히 필요하다.")
     args = ap.parse_args()
     if args.target == "prec" and args.query == "불공정약관조항":
         args.query, args.section = "불공정약관", "2"   # 판례는 본문 검색이 실효적
@@ -300,14 +380,20 @@ def main() -> None:
         body = _plain(doc)
         if args.target == "prec":
             found = [{
-                "clause_title": f"제{c['article_no']}조",
-                "opinion": "", "opinion_source": "판례 인용",
-                "gold_risk_level_candidate": "",   # 판례는 조항별 판정이 명시되지 않는다
+                "clause_title": (f"제{c['article_no']}조" if c["article_no"]
+                                 else "(조 번호 미표기)"),
+                "opinion": c["verdict"] or "(판단 불명확)",
+                "opinion_source": (f"판례 문맥 추론 · {c['verdict_how']}"
+                                   if c["verdict"] else "판단 불명확"),
+                "gold_risk_level_candidate": c["verdict"],
                 "articles": "",
                 "gold_risk_type_candidates": "",
                 "rationale": c["context"],
                 "_clause_text": c["clause_text"],
-            } for c in extract_precedent_clauses(body)]
+            } for c in extract_precedent_clauses(body)
+                if args.verdict == "all"
+                or (args.verdict == "safe" and c["verdict"] == "안전")
+                or (args.verdict == "risky" and c["verdict"] == "위험")]
         else:
             found = parse_decision(body)
         if not found:
