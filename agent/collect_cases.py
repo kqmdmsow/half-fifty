@@ -191,6 +191,62 @@ def parse_decision(body: str) -> list:
     return [e] if e["opinion"] else []
 
 
+# ── 판례에서 계약 조항 원문 뽑기 (#180) ────────────────────────────
+#
+# 공정위 심결은 조항 원문이 표로 조판돼 API에서 탈락한다. 판결문은 다르다 —
+# 법원은 판단 근거를 대기 위해 **조항을 본문에 그대로 인용한다.** 그래서
+# 심결이 못 주는 clause_text를 판례가 준다.
+#
+# 문제는 법령 인용과 섞여 있다는 것이다. "민법 제741조는 …라고 정하고 있다"와
+# "이 사건 이용약관 제23조는 …라고 정하고 있다"가 같은 문형이다. 법령을
+# 계약 조항으로 잘못 수집하면 골든셋이 오염되므로, 앵커와 배제 목록을 함께 쓴다.
+
+# 계약 문서를 가리키는 앵커. 이 말 뒤의 "제N조"만 계약 조항으로 본다.
+_CONTRACT_ANCHOR = (r"(?:이\s*사건\s*[가-힣]{0,8}?(?:이용약관|약관|계약서|계약|특약)"
+                    r"|[가-힣]{2,12}(?:이용약관|약관|계약서))")
+# 법령 이름. 앵커처럼 보여도 이것이면 버린다.
+_STATUTE_WORDS = (
+    "민법", "상법", "형법", "헌법", "국제사법", "약관법", "약관의 규제에 관한 법률",
+    "주택임대차보호법", "상가건물임대차보호법", "전자상거래", "방문판매",
+    "할부거래", "보험업법", "자본시장", "금융소비자보호", "공정거래", "독점규제",
+    "소비자기본법", "신탁법", "민사집행법", "부동산등기법",
+)
+# 앵커 뒤 조항 번호 + 인용문. 「」·『』·따옴표 인용, 또는 "…라고 규정하고 있다".
+_PREC_CLAUSE = re.compile(
+    _CONTRACT_ANCHOR + r"\s*제\s*(\d{1,3})\s*조(?:\s*제\s*\d{1,2}\s*항)?"
+    r"[^\n]{0,50}?"
+    r"(?:[\u201c\u201d\"\u300c\u300e]\s*(.{20,400}?)\s*[\u201c\u201d\"\u300d\u300f]"
+    r"|(.{20,300}?)\s*라고\s*(?:규정|정하|기재)\S*)",
+    re.S)
+
+
+# 판결 서술이 인용문에 섞여 들어온 경우를 거른다. 조항은 규범을 정하는 문장이고
+# 판결 서술은 그 조항을 평가하는 문장이라, 아래 표현이 들어 있으면 조항이 아니다.
+_JUDGMENT_WORDS = ("따라서", "인정된다", "판단된다", "보인다", "할 것이다",
+                   "이 사건 이용제한조치", "원고의 주장", "피고의 주장",
+                   "이유 없다", "해당한다고", "볼 수 없다")
+
+
+def extract_precedent_clauses(body: str) -> list:
+    """판결문 본문 -> 계약 조항 인용 목록. 법령 인용과 판결 서술은 배제한다."""
+    out, seen = [], set()
+    for m in _PREC_CLAUSE.finditer(body):
+        head = body[max(0, m.start() - 40):m.start() + 30]
+        if any(w in head for w in _STATUTE_WORDS):
+            continue                      # 법령 인용이다
+        quote = (m.group(2) or m.group(3) or "").strip()
+        quote = re.sub(r"\s+", " ", quote)
+        if len(quote) < 20 or quote in seen:
+            continue
+        if any(w in quote for w in _JUDGMENT_WORDS):
+            continue                      # 조항이 아니라 법원의 판단 서술이다
+        seen.add(quote)
+        out.append({"article_no": m.group(1), "clause_text": quote[:400],
+                    "context": re.sub(r"\s+", " ", body[max(0, m.start() - 120):
+                                                        m.end() + 200])[:600]})
+    return out
+
+
 def existing_case_ids() -> set:
     """이미 골든셋에 있는 사건 식별자. 중복 수집을 막는다."""
     ids = set()
@@ -213,6 +269,8 @@ def main() -> None:
                     help="1=사건명, 2=본문")
     ap.add_argument("--limit", type=int, default=30)
     args = ap.parse_args()
+    if args.target == "prec" and args.query == "불공정약관조항":
+        args.query, args.section = "불공정약관", "2"   # 판례는 본문 검색이 실효적
 
     STAGING.mkdir(parents=True, exist_ok=True)
     known = existing_case_ids()
@@ -240,7 +298,18 @@ def main() -> None:
             print(f"  [실패] {seq}: {type(exc).__name__}")
             continue
         body = _plain(doc)
-        found = parse_decision(body)
+        if args.target == "prec":
+            found = [{
+                "clause_title": f"제{c['article_no']}조",
+                "opinion": "", "opinion_source": "판례 인용",
+                "gold_risk_level_candidate": "",   # 판례는 조항별 판정이 명시되지 않는다
+                "articles": "",
+                "gold_risk_type_candidates": "",
+                "rationale": c["context"],
+                "_clause_text": c["clause_text"],
+            } for c in extract_precedent_clauses(body)]
+        else:
+            found = parse_decision(body)
         if not found:
             no_block += 1
         # 내용 기준 중복 제거. 같은 심결이 피심인 수만큼 별개 사건번호로
@@ -262,8 +331,10 @@ def main() -> None:
                 "source": f"법제처 OPEN API/{args.target}",
                 "case_seq": seq, "case_no": no, "case_name": name,
                 "doc_url": f"{_SERVICE}?OC={_OC}&target={args.target}&ID={seq}&type=HTML",
-                **c,
-                "clause_text": "",          # 원문 표는 API에 없다 — 검수자가 채운다
+                **{k: v for k, v in c.items() if not k.startswith("_")},
+                # 공정위 심결은 조항 원문 표가 API에 없어 공란이고, 판례는
+                # 본문에 인용된 조항을 그대로 담는다 — 판례 경로를 만든 이유다.
+                "clause_text": c.get("_clause_text", ""),
                 "review_status": "미검수",
             })
         print(f"  {no or seq}: 조항 후보 {len(found)}건  {name[:40]}")
