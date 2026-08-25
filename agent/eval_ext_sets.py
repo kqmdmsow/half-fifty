@@ -67,6 +67,12 @@ SETS = [
 # "train,val"로 실행해 test 오염을 피한다.
 _splits = set(_args.splits.split(",")) if _args.splits else {"test"}
 
+# note 필드에 이 마커가 있으면 측정은 하되(감사 추적용) 집계(TP/FP/FN/TN)에서는
+# 뺀다 — 텍스트 자체가 원 조항이 아니라 재구성/부분인용이라 라벨 근거가 텍스트
+# 안에 없는 행 (#56, fss_사례집1권 2010_ELS조건조정·2009_주식매수연기). 삭제가
+# 아니라 보류: 원문을 확보하면 마커를 떼고 다시 집계에 넣는다.
+_LABEL_HOLD_MARKER = "[라벨 품질 보류"
+
 
 def run_set(name, path, runner):
     # 공식 집계는 held-out(test)만 — train/val 행은 프롬프트 튜닝용이라 제외
@@ -76,6 +82,7 @@ def run_set(name, path, runner):
     if len(all_rows) != len(rows):
         print(f"({name}: train/val {len(all_rows) - len(rows)}행은 집계 제외)")
     results = []
+    held = 0
     for r in rows:
         outcome = runner.run(
             lambda text=r["clause_text"]: _analyze_clause("clause_001", text),
@@ -90,14 +97,23 @@ def run_set(name, path, runner):
         gold_pos = r["gold_risk_level"] == "위험"
         pred_pos = pred["risk_level"] in ("주의", "위험")
         ok = gold_pos == pred_pos
-        results.append({"row": r, "pred": pred, "ok": ok, "runs": outcome.runs,
-                        "tie": outcome.tie, "fallback_count": outcome.fallback_count})
         mark = "O" if ok else "X"
         spread = "" if runner.repeats == 1 else f" ({'/'.join(p['risk_level'] for p in outcome.runs)})"
         flag = " [과반없음]" if outcome.tie else ""
         fb = f" [폴백 {outcome.fallback_count}/{runner.repeats}]" if outcome.fallback_count else ""
+        hold = _LABEL_HOLD_MARKER in r["note"]
+        if hold:
+            held += 1
+            print(f"[{mark}] {r['case_id']}: gold={r['gold_risk_level']}/{r['gold_risk_type']}"
+                  f" -> pred={pred['risk_level']}/{pred['risk_type']}{spread}{flag}{fb}"
+                  f" [라벨 품질 보류 — 집계 제외]")
+            continue
+        results.append({"row": r, "pred": pred, "ok": ok, "runs": outcome.runs,
+                        "tie": outcome.tie, "fallback_count": outcome.fallback_count})
         print(f"[{mark}] {r['case_id']}: gold={r['gold_risk_level']}/{r['gold_risk_type']}"
               f" -> pred={pred['risk_level']}/{pred['risk_type']}{spread}{flag}{fb}")
+    if held:
+        print(f"({name}: 라벨 품질 보류 {held}건은 집계 제외 — 측정 결과는 위에 기록)")
     tp = sum(1 for x in results if x["row"]["gold_risk_level"] == "위험" and x["pred"]["risk_level"] in ("주의", "위험"))
     fn = sum(1 for x in results if x["row"]["gold_risk_level"] == "위험" and x["pred"]["risk_level"] == "안전")
     fp = sum(1 for x in results if x["row"]["gold_risk_level"] == "안전" and x["pred"]["risk_level"] in ("주의", "위험"))
