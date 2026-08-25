@@ -20,6 +20,8 @@ import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -37,6 +39,9 @@ import org.springframework.web.client.RestClient;
 @Service
 public class AgentClient {
 
+    /** 에이전트가 백엔드 경유 여부를 판별하는 헤더 (#174). */
+    private static final String SERVICE_TOKEN_HEADER = "X-Service-Token";
+
     private final RestClient restClient;
     private final String agentBaseUrl;
     private final ObjectMapper objectMapper;
@@ -44,18 +49,32 @@ public class AgentClient {
             .connectTimeout(Duration.ofSeconds(10))
             .build(); // 스트리밍은 읽기 타임아웃 없음 — async 600s(application.yml)가 상한
 
-    public AgentClient(@Value("${agent.base-url}") String agentBaseUrl, ObjectMapper objectMapper) {
+    /**
+     * 에이전트 서비스 토큰 (#174). 에이전트가 공개 URL이면 프론트→백엔드→에이전트
+     * 구조를 우회해 직접 때릴 수 있고, 그러면 백엔드의 용량·형식 검사가 전부
+     * 무의미해진다. 미설정이면 빈 문자열이고 에이전트도 검사하지 않는다 —
+     * 로컬 개발과 기존 배포가 토큰 없이도 돌아가야 하기 때문이다.
+     */
+    private final String serviceToken;
+
+    public AgentClient(@Value("${agent.base-url}") String agentBaseUrl,
+            @Value("${agent.service-token:}") String serviceToken,
+            ObjectMapper objectMapper) {
         this.agentBaseUrl = agentBaseUrl;
+        this.serviceToken = serviceToken;
         this.objectMapper = objectMapper;
         // 타임아웃 (#52): 미설정 시 에이전트가 죽으면 요청이 무한 대기했다.
         // read 7분 = 최악 케이스(21조항 + judge 재시도 2회 ≈ 5분) + 여유.
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withConnectTimeout(Duration.ofSeconds(10))
                 .withReadTimeout(Duration.ofMinutes(7));
-        this.restClient = RestClient.builder()
+        RestClient.Builder builder = RestClient.builder()
                 .baseUrl(agentBaseUrl)
-                .requestFactory(ClientHttpRequestFactories.get(settings))
-                .build();
+                .requestFactory(ClientHttpRequestFactories.get(settings));
+        if (!serviceToken.isBlank()) {
+            builder = builder.defaultHeader(SERVICE_TOKEN_HEADER, serviceToken);
+        }
+        this.restClient = builder.build();
     }
 
     public AnalyzeResponse analyze(AnalyzeRequest request) {
@@ -133,14 +152,79 @@ public class AgentClient {
     }
 
     /**
+     * 설명·서명 대조 검증 프록시 (#175) — JSON 그대로 중계한다.
+     *
+     * <p>응답을 DTO로 받지 않고 문자열로 흘리는 이유: findings의 필드가 아직
+     * 굳지 않았고, record로 받으면 매핑 안 된 필드를 조용히 버려 프론트에서만
+     * 정보가 사라진다(#175에서 실제로 그 사고가 났다). 스키마가 안정되면 DTO로 옮긴다.
+     */
+    public String verifyDisclosure(String requestJson) {
+        return restClient.post()
+                .uri("/verify-disclosure")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
+    /**
+     * 계약서 파일 + 상담 녹취(음성) 대조 검증 프록시 (#175).
+     * 파일 두 개를 multipart로 조립해 전달한다 — 둘 다 메모리에서만 중계하고
+     * 저장하지 않는다.
+     */
+    public String verifyDisclosureAudio(
+            byte[] contract, String contractName, byte[] audio, String audioName,
+            String persona, String language, String domain) throws IOException {
+        String boundary = "----jomokjomok" + UUID.randomUUID();
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        writeFormField(body, boundary, "persona", persona);
+        writeFormField(body, boundary, "language", language);
+        writeFormField(body, boundary, "domain", domain);
+        writeFilePart(body, boundary, "contract", contractName, contract);
+        writeFilePart(body, boundary, "audio", audioName, audio);
+        body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+
+        HttpRequest request = withServiceToken(
+                HttpRequest.newBuilder(URI.create(agentBaseUrl + "/verify-disclosure-audio"))
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .timeout(Duration.ofMinutes(9))   // 전사 + 분석 + 대조
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())))
+                .build();
+        try {
+            HttpResponse<String> response =
+                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                throw new ResponseStatusException(
+                        HttpStatus.valueOf(response.statusCode()), response.body());
+            }
+            return response.body();
+        } catch (InterruptedException exc) {
+            Thread.currentThread().interrupt();
+            throw new IOException("대조 검증이 중단됐습니다.", exc);
+        }
+    }
+
+    /** multipart 파일 파트 조립 — 파일명의 따옴표·개행만 치환해 헤더 문법을 지킨다. */
+    private static void writeFilePart(ByteArrayOutputStream body, String boundary,
+            String name, String filename, byte[] bytes) throws IOException {
+        String safe = (filename == null ? "upload" : filename).replaceAll("[\"\\r\\n]", "_");
+        body.write(("--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + safe + "\"\r\n"
+                + "Content-Type: application/octet-stream\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+        body.write(bytes);
+    }
+
+    /**
      * 조항별 점진 스트리밍 프록시 — 에이전트 /analyze-stream의 NDJSON을
      * 버퍼링 없이 곧바로 클라이언트로 흘려보낸다. RestClient는 응답 스트리밍을
      * 지원하지 않아 JDK HttpClient를 사용한다.
      */
     public void streamAnalyze(AnalyzeRequest request, OutputStream out) throws IOException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(request)))
+        HttpRequest httpRequest = withServiceToken(
+                HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(
+                                objectMapper.writeValueAsString(request))))
                 .build();
         pipeStream(httpRequest, out);
     }
@@ -167,11 +251,18 @@ public class AgentClient {
         body.write(bytes);
         body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
 
-        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-file-stream"))
-                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+        HttpRequest httpRequest = withServiceToken(
+                HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-file-stream"))
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())))
                 .build();
         pipeStream(httpRequest, out);
+    }
+
+    /** RestClient와 달리 JDK HttpClient는 기본 헤더가 없어 매번 붙여야 한다. */
+    private HttpRequest.Builder withServiceToken(HttpRequest.Builder builder) {
+        return serviceToken.isBlank() ? builder
+                : builder.header(SERVICE_TOKEN_HEADER, serviceToken);
     }
 
     private static void writeFormField(ByteArrayOutputStream body, String boundary,

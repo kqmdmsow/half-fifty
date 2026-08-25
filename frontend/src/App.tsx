@@ -26,6 +26,7 @@ import { LoginScreen } from './screens/Login'
 import { RecordsScreen } from './screens/Records'
 
 import { LearnScreen } from './screens/Learn'
+import { DisclosureScreen } from './screens/Disclosure'
 
 // KRDS --krds-zoom-small/medium/large/xlarge/xxlarge (common.css)
 const ZOOM_LEVELS = [0.9, 1, 1.1, 1.3, 1.5]
@@ -34,6 +35,7 @@ type Screen =
   | 'landing'
   | 'api'
   | 'learn'
+  | 'disclosure'
   | 'records'
   | 'login'
   | 'upload'
@@ -373,6 +375,18 @@ export default function App() {
                 )}
               </button>
 
+              <button
+                type="button"
+                aria-pressed={screen === 'disclosure'}
+                onClick={() => go('disclosure')}
+                className="flex w-full items-center justify-between border-b border-ink-50 px-2 py-3.5 text-left text-[15px] font-bold text-ink-900 hover:bg-ink-25"
+              >
+                {t(language, 'dvNav')}
+                {screen === 'disclosure' && (
+                  <span aria-hidden className="text-[13px] font-bold text-brand-500">•</span>
+                )}
+              </button>
+
               <div className="flex w-full items-center justify-between gap-3 border-b border-ink-50 px-2 py-3">
                 <span className="text-[15px] font-bold text-ink-900">
                   {t(language, 'languageLabel')}
@@ -501,6 +515,9 @@ export default function App() {
           />
         )}
         {screen === 'learn' && <LearnScreen language={language} onStart={() => go('upload')} />}
+        {screen === 'disclosure' && (
+          <DisclosureScreen language={language} persona={persona} onBack={() => go('landing')} />
+        )}
         {screen === 'upload' && (
           <UploadScreen
             mode={mode}

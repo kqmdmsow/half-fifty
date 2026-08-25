@@ -70,6 +70,47 @@ public class ContractController {
         return agentClient.reexplain(request);
     }
 
+    /**
+     * 설명·서명 대조 검증 — 계약서 + 상담 스크립트(텍스트) (#175).
+     *
+     * <p>계약서만 보면 "무엇에 서명했는가"는 알 수 있지만 "무엇을 설명받았는가"는
+     * 알 수 없다. 금소법 설명의무 위반은 대부분 서류가 아니라 판매 현장에서 일어난다.
+     */
+    @PostMapping("/verify-disclosure")
+    public String verifyDisclosure(@RequestBody String requestJson) {
+        return agentClient.verifyDisclosure(requestJson);
+    }
+
+    /** 설명·서명 대조 검증 — 계약서 파일 + 상담 녹취(음성) (#175). */
+    @PostMapping(value = "/verify-disclosure-audio",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String verifyDisclosureAudio(
+            @RequestParam("contract") MultipartFile contract,
+            @RequestParam("audio") MultipartFile audio,
+            @RequestParam(value = "persona", defaultValue = "adult") String persona,
+            @RequestParam(value = "language", defaultValue = "ko") String language,
+            @RequestParam(value = "domain", defaultValue = "") String domain)
+            throws IOException {
+        if (contract.isEmpty() || audio.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "계약서와 녹취 파일을 모두 올려 주세요.");
+        }
+        if (contract.getSize() > MAX_PDF_BYTES) {
+            throw new ResponseStatusException(
+                    HttpStatus.PAYLOAD_TOO_LARGE, "계약서는 10MB 이하만 지원합니다.");
+        }
+        if (audio.getSize() > MAX_AUDIO_BYTES) {
+            throw new ResponseStatusException(
+                    HttpStatus.PAYLOAD_TOO_LARGE, "녹취는 25MB 이하만 지원합니다.");
+        }
+        return agentClient.verifyDisclosureAudio(
+                contract.getBytes(), contract.getOriginalFilename(),
+                audio.getBytes(), audio.getOriginalFilename(), persona, language, domain);
+    }
+
+    /** 녹취 업로드 상한 (에이전트 transcript._MAX_AUDIO_BYTES와 동일하게 유지). */
+    private static final long MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+
     /** 업로드 허용 최대 크기 (application.yml multipart 한도와 함께 이중 방어). */
     private static final long MAX_PDF_BYTES = 10 * 1024 * 1024;
 

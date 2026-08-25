@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { reexplainClause } from '../api'
 import type { ClauseResult, Persona } from '../api'
-import { Button, CopyButton, RiskBadge, RiskIcon } from '../components/ui'
+import { Button, CopyButton, FirewallChip, RiskBadge, RiskIcon, WithheldBadge } from '../components/ui'
+import { HighlightedText } from '../components/HighlightedText'
 import { RISK_META } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
@@ -179,7 +180,17 @@ export function DetailScreen({
         <article>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <RiskBadge level={clause.risk_level} label={riskLevelLabel(language, clause.risk_level)} />
+              {clause.verdict_withheld ? (
+                <WithheldBadge label={t(language, 'fwWithheld')} />
+              ) : (
+                <RiskBadge level={clause.risk_level} label={riskLevelLabel(language, clause.risk_level)} />
+              )}
+              {!!clause.quarantined && (
+                <FirewallChip label={t(language, 'fwQuarantined', { n: clause.quarantined })} />
+              )}
+              {clause.injection_suspected && !clause.quarantined && (
+                <FirewallChip label={t(language, 'fwTampered')} />
+              )}
               <h1 className="mt-3 text-[24px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[28px]">
                 {clauseHeading(clause.original_text, language, clause.original_text_translated) ??
                   (clause.risk_type === '해당 없음'
@@ -275,7 +286,21 @@ export function DetailScreen({
             </div>
           </Section>
 
-          {clause.risk_level !== '안전' && (
+          {/* 방화벽 상태 (#174) — 조항 원문 바로 아래에 둔다. 사용자가 원문과
+              대조하면서 "무엇이 걷어내졌는지"를 함께 봐야 하기 때문이다. */}
+          {clause.verdict_withheld && (
+            <p className="mt-4 rounded-xl border border-danger-500 bg-danger-50 px-4 py-3 text-[14px] font-semibold leading-relaxed text-danger-600">
+              {t(language, 'fwWithheldDesc')}
+            </p>
+          )}
+          {!!clause.original_risk_level && !clause.verdict_withheld && (
+            <p className="mt-4 rounded-xl bg-ink-25 px-4 py-3 text-[14px] leading-relaxed text-ink-600">
+              {t(language, 'fwOriginal', {
+                level: riskLevelLabel(language, clause.original_risk_level as '안전' | '주의' | '위험'),
+              })}
+            </p>
+          )}
+          {clause.risk_level !== '안전' && !clause.verdict_withheld && (
             <Section title={t(language, 'whyCheck')}>
               {clause.analysis_failed ? (
                 <p>{t(language, 'analysisFailedNote')}</p>
@@ -310,10 +335,20 @@ export function DetailScreen({
 
           <div className="mt-6 rounded-2xl border border-danger-500/20 bg-danger-50 p-5">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
+                {/* 부속문서에서 나온 조항은 출처를 밝힌다 — 본문과 법적 성격이 다르다 */}
+                {clause.section && clause.section !== '본문' && (
+                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[12px] font-semibold text-ink-500">
+                    {clause.section}
+                  </span>
+                )}
+              </div>
               <CopyButton text={clause.original_text} copiedText={t(language, 'copied')} className="!bg-white">{t(language, 'copy')}</CopyButton>
             </div>
-            <p className="mt-2.5 text-[15px] leading-loose text-ink-700">{clause.original_text}</p>
+            <p className="mt-2.5 text-[15px] leading-loose text-ink-700">
+              <HighlightedText text={clause.original_text} spans={clause.evidence_spans} />
+            </p>
             {clause.original_text_translated && (
               <div className="mt-3 border-t border-danger-500/10 pt-3">
                 <p className="text-[12px] font-bold text-ink-400">{t(language, 'translationLabel')}</p>

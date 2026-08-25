@@ -1,7 +1,7 @@
 import { LensMark } from '../components/Brand'
 import { useEffect, useMemo, useState } from 'react'
 import type { ClauseResult, Persona } from '../api'
-import { Button, Card, CopyButton, RiskBadge } from '../components/ui'
+import { Button, Card, CopyButton, FirewallChip, RiskBadge, WithheldBadge } from '../components/ui'
 import { RISK_META, type RiskLevel } from '../data/sample'
 import { riskLevelLabel, riskTypeLabel, t, WARNING_CODE_KEYS, type LangCode } from '../i18n'
 import { clauseHeading } from '../clauseTitle'
@@ -284,12 +284,40 @@ export function SummaryScreen({
                     {result.explanation}
                   </p>
                 </div>
-                <RiskBadge
-                  level={result.risk_level}
-                  label={riskLevelLabel(language, result.risk_level)}
-                />
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  {/* 판정 보류는 '주의'보다 강하게 보여야 한다 (#174) — 조용히
+                      넘어가면 지시문 한 줄로 경고를 억제할 수 있게 된다. */}
+                  {result.verdict_withheld ? (
+                    <WithheldBadge label={t(language, 'fwWithheld')} />
+                  ) : (
+                    <RiskBadge
+                      level={result.risk_level}
+                      label={riskLevelLabel(language, result.risk_level)}
+                    />
+                  )}
+                  {!!result.quarantined && (
+                    <FirewallChip
+                      label={t(language, 'fwQuarantined', { n: result.quarantined })}
+                    />
+                  )}
+                  {result.injection_suspected && !result.quarantined && (
+                    <FirewallChip label={t(language, 'fwTampered')} />
+                  )}
+                </div>
               </div>
-              {result.risk_level !== '안전' && (
+              {result.verdict_withheld && (
+                <p className="mt-3.5 rounded-xl border border-danger-500 bg-danger-50 px-4 py-3 text-[13px] font-semibold leading-relaxed text-danger-600">
+                  {t(language, 'fwWithheldDesc')}
+                </p>
+              )}
+              {!!result.original_risk_level && !result.verdict_withheld && (
+                <p className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] leading-relaxed text-ink-600">
+                  {t(language, 'fwOriginal', {
+                    level: riskLevelLabel(language, result.original_risk_level as '안전' | '주의' | '위험'),
+                  })}
+                </p>
+              )}
+              {result.risk_level !== '안전' && !result.verdict_withheld && (
                 <div className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] text-ink-600">
                   <p className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
                     {t(language, 'evidence')}
