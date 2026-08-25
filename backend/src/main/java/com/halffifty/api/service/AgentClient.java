@@ -20,6 +20,8 @@ import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -147,6 +149,69 @@ public class AgentClient {
                 .body(body)
                 .retrieve()
                 .body(AnalyzeResponse.class);
+    }
+
+    /**
+     * 설명·서명 대조 검증 프록시 (#175) — JSON 그대로 중계한다.
+     *
+     * <p>응답을 DTO로 받지 않고 문자열로 흘리는 이유: findings의 필드가 아직
+     * 굳지 않았고, record로 받으면 매핑 안 된 필드를 조용히 버려 프론트에서만
+     * 정보가 사라진다(#175에서 실제로 그 사고가 났다). 스키마가 안정되면 DTO로 옮긴다.
+     */
+    public String verifyDisclosure(String requestJson) {
+        return restClient.post()
+                .uri("/verify-disclosure")
+                .header("Content-Type", "application/json")
+                .body(requestJson)
+                .retrieve()
+                .body(String.class);
+    }
+
+    /**
+     * 계약서 파일 + 상담 녹취(음성) 대조 검증 프록시 (#175).
+     * 파일 두 개를 multipart로 조립해 전달한다 — 둘 다 메모리에서만 중계하고
+     * 저장하지 않는다.
+     */
+    public String verifyDisclosureAudio(
+            byte[] contract, String contractName, byte[] audio, String audioName,
+            String persona, String language, String domain) throws IOException {
+        String boundary = "----jomokjomok" + UUID.randomUUID();
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        writeFormField(body, boundary, "persona", persona);
+        writeFormField(body, boundary, "language", language);
+        writeFormField(body, boundary, "domain", domain);
+        writeFilePart(body, boundary, "contract", contractName, contract);
+        writeFilePart(body, boundary, "audio", audioName, audio);
+        body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+
+        HttpRequest request = withServiceToken(
+                HttpRequest.newBuilder(URI.create(agentBaseUrl + "/verify-disclosure-audio"))
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .timeout(Duration.ofMinutes(9))   // 전사 + 분석 + 대조
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())))
+                .build();
+        try {
+            HttpResponse<String> response =
+                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                throw new ResponseStatusException(
+                        HttpStatus.valueOf(response.statusCode()), response.body());
+            }
+            return response.body();
+        } catch (InterruptedException exc) {
+            Thread.currentThread().interrupt();
+            throw new IOException("대조 검증이 중단됐습니다.", exc);
+        }
+    }
+
+    /** multipart 파일 파트 조립 — 파일명의 따옴표·개행만 치환해 헤더 문법을 지킨다. */
+    private static void writeFilePart(ByteArrayOutputStream body, String boundary,
+            String name, String filename, byte[] bytes) throws IOException {
+        String safe = (filename == null ? "upload" : filename).replaceAll("[\"\\r\\n]", "_");
+        body.write(("--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + safe + "\"\r\n"
+                + "Content-Type: application/octet-stream\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+        body.write(bytes);
     }
 
     /**

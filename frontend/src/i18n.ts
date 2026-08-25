@@ -3196,6 +3196,12 @@ export const WARNING_CODE_KEYS: Record<string, WarnKey | FwWarnKey> = {
 
 type FirewallKey =
   | 'fwWithheld' | 'fwWithheldDesc' | 'fwQuarantined' | 'fwTampered' | 'fwOriginal'
+  | 'dvNav' | 'dvTitle' | 'dvDesc' | 'dvWhy' | 'dvContract' | 'dvContractPh'
+  | 'dvTranscript' | 'dvTranscriptPh' | 'dvAudio' | 'dvAudioHint' | 'dvRun'
+  | 'dvRunning' | 'dvSample' | 'dvBack' | 'dvNoFindings' | 'dvNoFindingsDesc'
+  | 'dvChecked' | 'dvFound' | 'dvContractSide' | 'dvSpeechSide' | 'dvNotSaid'
+  | 'dvTranscriptTitle' | 'dvLimit'
+  | 'ft미고지_비용' | 'ft미고지_위험' | 'ft설명_불일치' | 'ft근거없는_확언' | 'ft이해확인_누락'
 
 // 조항 카드·상세의 방화벽 상태 표시 (#174). ko·en 외에는 en 폴백.
 const UI_FIREWALL: Record<string, Record<FirewallKey, string>> = {
@@ -3205,6 +3211,34 @@ const UI_FIREWALL: Record<string, Record<FirewallKey, string>> = {
     fwQuarantined: '조작 문장 {n}건 격리',
     fwTampered: '조작 시도 감지',
     fwOriginal: 'AI는 이 조항을 "{level}"이라고 답했지만, 조작 흔적이 있어 그대로 받아들이지 않았어요.',
+    dvNav: '설명 대조',
+    dvTitle: '무엇을 설명받으셨나요?',
+    dvDesc: '계약서와 상담에서 들은 말을 나란히 놓고, 계약서에는 있는데 설명은 못 들은 것을 찾아드려요.',
+    dvWhy: '계약서만 보면 무엇에 서명했는지는 알 수 있어도, 무엇을 설명받았는지는 알 수 없어요. 불완전판매는 대부분 서류가 아니라 상담 현장에서 생깁니다.',
+    dvContract: '계약서 내용',
+    dvContractPh: '계약서 조항을 붙여넣으세요.',
+    dvTranscript: '상담에서 들은 말',
+    dvTranscriptPh: '상담 내용을 기억나는 대로 적거나, 녹취록을 붙여넣으세요. 누가 말했는지 적어 주시면 더 정확해요.',
+    dvAudio: '녹취 파일로 올리기',
+    dvAudioHint: 'mp3·m4a·wav 등, 25MB까지. 자동으로 받아쓴 뒤 대조해요.',
+    dvRun: '대조해 보기',
+    dvRunning: '대조하는 중이에요…',
+    dvSample: '예시로 해보기',
+    dvBack: '처음으로',
+    dvNoFindings: '설명 누락이 발견되지 않았어요',
+    dvNoFindingsDesc: '올려주신 내용 안에서는 계약서와 어긋나는 설명을 찾지 못했어요. 다만 상담 내용이 일부만 담겨 있다면 놓친 것이 있을 수 있어요.',
+    dvChecked: '조항 {n}건을 대조했어요',
+    dvFound: '짚어볼 점 {n}가지',
+    dvContractSide: '계약서에는',
+    dvSpeechSide: '상담에서는',
+    dvNotSaid: '이 내용은 상담에서 언급되지 않았어요',
+    dvTranscriptTitle: '대조에 사용한 상담 내용',
+    dvLimit: '이 결과는 올려주신 계약서와 상담 내용만 놓고 비교한 것이고, 법적 판단이 아니에요. 문제가 있다고 느끼시면 금융감독원(1332)이나 대한법률구조공단(132)에 상담하세요.',
+    ft미고지_비용: '설명 안 된 비용',
+    ft미고지_위험: '설명 안 된 위험',
+    ft설명_불일치: '계약서와 다른 설명',
+    ft근거없는_확언: '근거 없는 장담',
+    ft이해확인_누락: '이해 확인 없이 진행',
   },
   en: {
     fwWithheld: 'Verdict withheld',
@@ -3212,6 +3246,34 @@ const UI_FIREWALL: Record<string, Record<FirewallKey, string>> = {
     fwQuarantined: '{n} manipulated sentence(s) quarantined',
     fwTampered: 'Manipulation detected',
     fwOriginal: 'The AI answered "{level}" for this clause, but manipulation was detected so the answer was not accepted.',
+    dvNav: 'Disclosure check',
+    dvTitle: 'What were you actually told?',
+    dvDesc: 'We place the contract next to what you heard in the sales conversation, and find what the contract says but nobody explained.',
+    dvWhy: 'A contract shows what you signed, not what you were told. Mis-selling usually happens in the conversation, not in the paperwork.',
+    dvContract: 'Contract text',
+    dvContractPh: 'Paste the contract clauses here.',
+    dvTranscript: 'What you were told',
+    dvTranscriptPh: 'Write what you remember from the conversation, or paste a transcript. Noting who said what helps.',
+    dvAudio: 'Upload a recording instead',
+    dvAudioHint: 'mp3, m4a, wav and similar, up to 25MB. We transcribe it, then compare.',
+    dvRun: 'Compare',
+    dvRunning: 'Comparing…',
+    dvSample: 'Try an example',
+    dvBack: 'Start over',
+    dvNoFindings: 'No missing explanations found',
+    dvNoFindingsDesc: 'We found nothing in the conversation that contradicts the contract. If only part of the conversation was provided, something may have been missed.',
+    dvChecked: 'Compared {n} clauses',
+    dvFound: '{n} things to look at',
+    dvContractSide: 'The contract says',
+    dvSpeechSide: 'The conversation said',
+    dvNotSaid: 'This was never mentioned in the conversation',
+    dvTranscriptTitle: 'Conversation used for comparison',
+    dvLimit: 'This compares only the contract and conversation you provided, and is not a legal judgment. If something feels wrong, contact the Financial Supervisory Service (1332) or the Korea Legal Aid Corporation (132).',
+    ft미고지_비용: 'Undisclosed cost',
+    ft미고지_위험: 'Undisclosed risk',
+    ft설명_불일치: 'Contradicts the contract',
+    ft근거없는_확언: 'Unfounded assurance',
+    ft이해확인_누락: 'Proceeded without confirming understanding',
   },
 }
 

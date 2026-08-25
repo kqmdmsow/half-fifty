@@ -20,8 +20,12 @@ spring:
       request-timeout: 600000
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 12MB
+      # 녹취(최대 25MB, #175)가 계약서(10MB)보다 크므로 서블릿 한도를 그에 맞춘다.
+      # 파일 종류별 실제 상한은 컨트롤러가 따로 검사한다 — 서블릿 한도는 그물이지
+      # 정책이 아니다(PDF는 여기서 25MB를 통과해도 컨트롤러가 10MB로 거른다).
+      max-file-size: 25MB
+      # 대조 검증은 계약서 + 녹취 두 파일을 함께 받는다 (10 + 25 + 여유).
+      max-request-size: 40MB
 
 # Python 에이전트 서비스 주소 (배포 시 AGENT_BASE_URL 환경변수로 주입)
 agent:

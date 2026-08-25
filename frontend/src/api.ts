@@ -337,3 +337,79 @@ export async function fetchQuiz(
   const data = await res.json()
   return data.questions ?? []
 }
+
+/* ---------- 설명·서명 대조 검증 (#175) ---------- */
+
+export type DisclosureFindingType =
+  | '미고지_비용' | '미고지_위험' | '설명_불일치' | '근거없는_확언' | '이해확인_누락'
+
+export interface DisclosureFinding {
+  finding_type: DisclosureFindingType
+  clause_id: string | null
+  clause_quote: string | null
+  speech_quote: string | null
+  explanation: string
+  severity: '높음' | '보통' | '낮음'
+  /** clause_quote가 해당 조항 원문의 어느 구간인지 */
+  clause_spans: number[][]
+  /** speech_quote가 발화 전문의 어느 구간인지 */
+  speech_spans: number[][]
+}
+
+export interface DisclosureResponse {
+  clause_count: number
+  /** 실제로 대조한 조항 수 (위험·주의 + 비용 조항만 본다) */
+  checked_clauses: number
+  findings: DisclosureFinding[]
+  warnings: string[]
+  /** 정제·격리를 거친 발화 전문. 화면에서 근거를 하이라이트하는 기준이다 */
+  transcript: string
+  results: ClauseResult[]
+}
+
+async function _disclosure(path: string, init: RequestInit): Promise<DisclosureResponse> {
+  const res = await fetch(`${BASE_URL}/api/contracts/${path}`, init)
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    let message: string | null = null
+    try {
+      message = JSON.parse(body)?.detail ?? JSON.parse(body)?.message
+    } catch {
+      message = body || null
+    }
+    throw new Error(message ?? `대조 검증 실패 (${res.status})`)
+  }
+  return res.json()
+}
+
+/** 계약서 + 상담 스크립트(텍스트) 대조 */
+export async function verifyDisclosure(
+  text: string,
+  transcript: string,
+  persona: Persona,
+  language: Language = 'ko',
+  domain = '',
+): Promise<DisclosureResponse> {
+  return _disclosure('verify-disclosure', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, transcript, persona, language, domain }),
+  })
+}
+
+/** 계약서 파일 + 상담 녹취(음성) 대조 */
+export async function verifyDisclosureAudio(
+  contract: File,
+  audio: File,
+  persona: Persona,
+  language: Language = 'ko',
+  domain = '',
+): Promise<DisclosureResponse> {
+  const form = new FormData()
+  form.append('contract', contract)
+  form.append('audio', audio)
+  form.append('persona', persona)
+  form.append('language', language)
+  form.append('domain', domain)
+  return _disclosure('verify-disclosure-audio', { method: 'POST', body: form })
+}
