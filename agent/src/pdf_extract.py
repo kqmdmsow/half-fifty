@@ -28,6 +28,8 @@
 """
 
 import io
+import re
+from difflib import SequenceMatcher
 from typing import List, Tuple, TypedDict
 
 import pdfplumber
@@ -190,3 +192,68 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     if not text.strip():
         raise ValueError(_EMPTY_PDF_ERROR)
     return text
+
+
+# ── OCR 레이어 대조 (#174) ────────────────────────────────────────────
+#
+# 위협: 스캔 계약서에 **조작된 텍스트 레이어를 덧씌우는 것**. 사람은 스캔
+# 이미지를 보고, LLM은 그 위에 깔린 보이지 않는 텍스트를 읽는다. 이미지와
+# 텍스트가 다르면 사람이 서명한 문서와 AI가 판정한 문서가 완전히 갈린다.
+# 백색 글자·극소 활자보다 훨씬 은밀하고, 문자 속성만으로는 탐지되지 않는다
+# (텍스트 레이어의 글자 자체는 정상 크기·정상 색이다).
+#
+# 검사 방식: 페이지가 큰 이미지로 덮여 있는데 텍스트 레이어도 있으면
+# 스캔본+OCR 오버레이 구조다. 이때만 실제 OCR을 돌려 두 텍스트를 대조한다.
+# 모든 문서에 OCR을 돌리면 비용과 지연이 감당되지 않으므로 위험 구조에만 건다.
+
+# 이미지가 페이지 면적의 이만큼을 덮으면 "스캔 이미지 페이지"로 본다.
+_SCAN_IMAGE_COVERAGE = 0.5
+# 이 아래로 닮았으면 텍스트 레이어가 이미지 내용과 다른 것으로 본다.
+_OCR_SIMILARITY_FLOOR = 0.6
+# 대조에 의미가 있으려면 텍스트가 이 정도는 있어야 한다.
+_MIN_COMPARE_CHARS = 50
+
+
+def has_text_over_image(pdf_bytes: bytes) -> bool:
+    """페이지가 큰 이미지로 덮여 있으면서 텍스트 레이어도 있는가.
+
+    정상 스캔본(OCR 레이어 포함)도 여기 걸린다. 그래서 이 함수는 "공격이다"가
+    아니라 "대조해 볼 가치가 있다"를 뜻한다.
+    """
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        for page in pdf.pages:
+            if not page.chars:
+                continue
+            page_area = max(page.width * page.height, 1)
+            for im in page.images:
+                area = abs(im["x1"] - im["x0"]) * abs(im["bottom"] - im["top"])
+                if area / page_area >= _SCAN_IMAGE_COVERAGE:
+                    return True
+    return False
+
+
+def _compare_key(text: str) -> str:
+    """대조용 정규화 — 공백·문장부호를 지우고 내용 글자만 남긴다.
+
+    OCR은 띄어쓰기와 문장부호를 원문과 다르게 내는 일이 흔하다. 그런 차이로
+    불일치 경보를 내면 정상 스캔본마다 헛경고가 뜬다.
+    """
+    return re.sub(r"[^0-9A-Za-z가-힣]", "", text)
+
+
+def ocr_layer_mismatch(text_layer: str, ocr_text: str) -> Tuple[bool, float]:
+    """텍스트 레이어와 OCR 결과가 어긋나는가. (불일치 여부, 유사도)."""
+    a, b = _compare_key(text_layer), _compare_key(ocr_text)
+    if len(a) < _MIN_COMPARE_CHARS or len(b) < _MIN_COMPARE_CHARS:
+        return False, 1.0        # 비교할 내용이 없으면 판단하지 않는다
+    ratio = SequenceMatcher(None, a, b).ratio()
+    return ratio < _OCR_SIMILARITY_FLOOR, ratio
+
+
+def ocr_mismatch_notice(ratio: float) -> str:
+    return (
+        f"🚨 이 PDF는 화면에 보이는 이미지와 그 아래 숨은 텍스트가 서로 다릅니다 "
+        f"(일치도 {ratio * 100:.0f}%). 사람이 보는 내용과 AI가 읽는 내용이 다르게 "
+        f"만들어진 문서일 수 있습니다. 화면에 실제로 보이는 내용(OCR 결과)만으로 "
+        f"분석했지만, 이 문서는 신뢰하지 말고 발급처에 원본을 다시 요청하세요."
+    )

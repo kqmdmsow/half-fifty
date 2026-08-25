@@ -26,18 +26,23 @@ from pathlib import Path
 from typing import List, Literal, Optional
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from src.case_footnotes import CaseFootnote, get_related_cases
+from src.guardrails import (budget_ok, check_service_token, rate_limit_ok,
+                            record_spend, status as guardrail_status)
 from src.file_validation import MAX_UPLOAD_BYTES, is_pdf_magic, sniff_image_type
 from src.graph import run_pipeline
 from src.injection_check import detect_injection
 from src.learn_content import content_as_context, localized_learn
+from src.nodes.disclosure import TranscriptTooShortError, verify_disclosure
+from src.transcript import TranscriptUnavailableError, guess_audio_mime, transcribe
 from src.ocr import SUPPORTED_IMAGE_TYPES, OcrUnavailableError, document_parse_text
 from src.pdf_extract import (_EMPTY_PDF_ERROR, extract_with_hidden_report,
-                             hidden_text_notice)
+                             has_text_over_image, hidden_text_notice,
+                             ocr_layer_mismatch, ocr_mismatch_notice)
 from src.quiz import generate_quiz
 from src.reexplain import reexplain
 from src.state import PipelineState
@@ -56,6 +61,7 @@ logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
+logger = logging.getLogger(__name__)
 _access_logger = logging.getLogger("access")
 
 app = FastAPI(title="Jomokjomok (조목조목) Agent Service", version="0.1.0")
@@ -72,6 +78,45 @@ async def access_log(request, call_next):
         time.perf_counter() - start,
     )
     return response
+
+# 분석 계열 엔드포인트 — 무겁고 비용이 드는 경로에만 가드레일을 건다.
+# /health와 /learn 같은 조회는 막지 않는다 (모니터링이 죽으면 안 된다).
+_GUARDED_PREFIXES = ("/analyze", "/quiz", "/reexplain", "/learn-chat")
+
+
+@app.middleware("http")
+async def guardrails(request, call_next):
+    """서비스 토큰·호출 제한·비용 상한 (#174).
+
+    막을 때는 조용히 실패하지 않고 이유를 분명히 알린다. 분석이 조용히
+    실패하면 "판정을 못 받았다"가 사용자에게 "문제 없다"로 읽힌다.
+    """
+    path = request.url.path
+    if not path.startswith(_GUARDED_PREFIXES):
+        return await call_next(request)
+
+    if not check_service_token(request.headers):
+        logger.warning("서비스 토큰 불일치 — 백엔드 우회 시도 가능성 (%s)", path)
+        return JSONResponse(
+            {"detail": "이 서비스는 백엔드를 통해서만 호출할 수 있습니다."},
+            status_code=403)
+
+    client = request.headers.get("x-forwarded-for", "").split(",")[0].strip() \
+        or (request.client.host if request.client else "unknown")
+    if not rate_limit_ok(client):
+        return JSONResponse(
+            {"detail": "요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요."},
+            status_code=429)
+
+    if not budget_ok():
+        logger.error("일일 비용 상한 도달 — 분석 요청 거부")
+        return JSONResponse(
+            {"detail": "오늘 처리 한도에 도달했습니다. 내일 다시 이용해 주세요. "
+                       "분석 결과를 받지 못했으니 계약서가 안전하다는 뜻이 아닙니다."},
+            status_code=503)
+
+    return await call_next(request)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -104,6 +149,20 @@ class ClauseResult(BaseModel):
     # 시그니처 기능 ① 실제 사건 각주 (#91) — 표시 전용, Judge 채점에는
     # 안 쓰인다 (state에 안 실리고 여기서 응답 조립 시점에만 조회).
     related_cases: List[CaseFootnote] = []
+    # 재시도 소진 폴백 마커 (#100). 스트리밍 경로는 dict를 그대로 흘려 이 값이
+    # 살아갔지만 이 스키마에는 없어서 REST 경로(/analyze·/analyze-pdf)에서만
+    # 조용히 사라지고 있었다 — 같은 서비스가 경로에 따라 다른 정보를 주면 안 된다.
+    analysis_failed: bool = False
+    # 방화벽 상태 (#174). 이 값들이 없으면 사용자는 방어가 동작했다는 사실 자체를
+    # 알 수 없고, 감사 관점에서도 언제 무엇이 발동했는지 증명할 수 없다.
+    injection_suspected: bool = False      # 이 조항에서 조작 흔적 탐지
+    quarantined: int = 0                   # 격리해 LLM에 넣지 않은 조작 문장 수
+    verdict_withheld: bool = False         # 근거 부족으로 판정 거부 (fail-closed)
+    original_risk_level: Optional[str] = None  # 안전장치가 상향했다면 모델의 원래 판정
+    # 판정 근거 인용의 원문 위치 [[start, end], ...] — 화면 하이라이트용
+    evidence_spans: List[List[int]] = []
+    # 이 조항이 나온 문서 구획 ("본문"·"특약사항"·"별지2"·"부칙" 등)
+    section: str = "본문"
 
 
 class AnalyzeResponse(BaseModel):
@@ -119,6 +178,7 @@ class AnalyzeResponse(BaseModel):
 
 def _state_to_response(state: PipelineState) -> AnalyzeResponse:
     clause_text = {c["clause_id"]: c["text"] for c in state["clauses"]}
+    clause_section = {c["clause_id"]: c.get("section", "본문") for c in state["clauses"]}
     translations = state.get("translations", {})
     results = [
         ClauseResult(
@@ -133,6 +193,13 @@ def _state_to_response(state: PipelineState) -> AnalyzeResponse:
             check_questions_translated=translations.get(r["clause_id"], {}).get("check_questions_translated"),
             risk_evidence_translated=translations.get(r["clause_id"], {}).get("risk_evidence_translated"),
             related_cases=get_related_cases(r["risk_type"]),
+            analysis_failed=bool(r.get("analysis_failed")),
+            injection_suspected=bool(r.get("injection_suspected")),
+            quarantined=int(r.get("quarantined", 0)),
+            verdict_withheld=bool(r.get("verdict_withheld")),
+            original_risk_level=r.get("original_risk_level"),
+            evidence_spans=r.get("evidence_spans", []),
+            section=clause_section.get(r["clause_id"], "본문"),
         )
         for r in state["adapted_results"]
     ]
@@ -173,16 +240,39 @@ class ReexplainRequest(BaseModel):
     language: Optional[Language] = "ko"
 
 
-def _pdf_text_and_warnings(raw: bytes) -> tuple[str, list[str]]:
+def _pdf_text_and_warnings(raw: bytes, filename: str = "upload.pdf") -> tuple[str, list[str]]:
     """PDF에서 사람이 볼 수 있는 텍스트만 뽑고, 격리 고지를 함께 돌려준다 (#174).
 
-    은닉 텍스트(백색 글자·극소 활자·화면 밖 배치)는 추출 단계에서 이미
-    제외된다. 여기서는 그 사실을 사용자에게 전달할 경고 문구만 만든다.
+    두 가지를 본다.
+    ① 은닉 텍스트(백색 글자·극소 활자·화면 밖 배치)는 추출 단계에서 제외된다.
+    ② 페이지가 큰 이미지로 덮여 있는데 텍스트 레이어도 있으면 스캔본+OCR
+       오버레이 구조다. 이때만 실제 OCR을 돌려 두 텍스트를 대조한다 —
+       **사람이 보는 이미지와 AI가 읽는 텍스트가 다르게 만들어진 문서**를
+       잡기 위해서다. 모든 문서에 OCR을 돌리면 비용·지연이 감당되지 않으므로
+       위험 구조에만 건다.
+
+    불일치가 확인되면 **OCR 결과를 채택한다.** 사람이 화면에서 보는 것이 그것이고,
+    이 서비스는 사용자가 서명하려는 그 문서를 판정해야 하기 때문이다.
     """
     text, hidden = extract_with_hidden_report(raw)
     if not text.strip():
         raise ValueError(_EMPTY_PDF_ERROR)
-    return text, ([hidden_text_notice(hidden)] if hidden else [])
+    warnings = [hidden_text_notice(hidden)] if hidden else []
+
+    if has_text_over_image(raw):
+        try:
+            ocr_text = document_parse_text(raw, filename)
+        except OcrUnavailableError as exc:
+            # OCR을 못 돌리면 대조를 못 할 뿐, 분석은 텍스트 레이어로 계속한다.
+            logger.info("OCR 레이어 대조 생략 (%s)", exc)
+        else:
+            mismatch, ratio = ocr_layer_mismatch(text, ocr_text)
+            if mismatch:
+                logger.warning("OCR 레이어 불일치 (유사도 %.2f) — OCR 결과 채택", ratio)
+                warnings.insert(0, ocr_mismatch_notice(ratio))
+                text = ocr_text
+
+    return text, warnings
 
 
 @app.post("/quiz")
@@ -238,9 +328,108 @@ def learn_chat(req: LearnChatRequest) -> dict:
         return {"ok": False, "reason": "error"}
 
 
+class DisclosureRequest(BaseModel):
+    """설명·서명 대조 검증 요청 (#175)."""
+
+    text: str = Field(..., description="계약서 원문 텍스트")
+    transcript: str = Field(..., description="상담 녹취 전사 또는 상담 스크립트")
+    persona: Literal["adult", "senior", "foreigner"] = Field("adult")
+    language: Optional[Language] = Field("ko")
+    domain: str = Field("", description="문서 유형 (선택)")
+
+
+class DisclosureResponse(BaseModel):
+    clause_count: int
+    checked_clauses: int
+    findings: List[dict]
+    warnings: List[str] = []
+    transcript: str
+    results: List[ClauseResult]
+
+
+def _run_disclosure(text: str, transcript: str, persona: str, language: str,
+                    domain: str, extra_warnings: list) -> DisclosureResponse:
+    """계약서 분석 → 발화 대조. 두 단계를 한 응답으로 묶는다.
+
+    조항 판정 없이 발화만 봐서는 "무엇을 설명하지 않았는가"를 알 수 없다.
+    무엇이 위험한 조항인지부터 정해야 그것이 설명됐는지 물을 수 있다.
+    """
+    state = run_pipeline(text, persona=persona, language=language, domain=domain,
+                         extra_warnings=extra_warnings)
+    base = _state_to_response(state)
+    try:
+        out = verify_disclosure(state["clauses"], state["adapted_results"], transcript)
+    except TranscriptTooShortError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return DisclosureResponse(
+        clause_count=base.clause_count,
+        checked_clauses=out["checked_clauses"],
+        findings=out["findings"],
+        warnings=list(base.parse_warnings) + out["warnings"],
+        transcript=out["transcript"],
+        results=base.results,
+    )
+
+
+@app.post("/verify-disclosure", response_model=DisclosureResponse)
+def verify_disclosure_text(req: DisclosureRequest) -> DisclosureResponse:
+    """계약서 + 상담 스크립트(텍스트) 대조 검증 (#175)."""
+    return _run_disclosure(req.text, req.transcript, req.persona,
+                           req.language or "ko", req.domain, [])
+
+
+@app.post("/verify-disclosure-audio", response_model=DisclosureResponse)
+async def verify_disclosure_audio(
+    contract: UploadFile,
+    audio: UploadFile,
+    persona: Literal["adult", "senior", "foreigner"] = Form("adult"),
+    language: Language = Form("ko"),
+    domain: str = Form(""),
+) -> DisclosureResponse:
+    """계약서 파일 + 상담 녹취(음성) 대조 검증 (#175).
+
+    녹취 전사에 실패하면 422로 끊는다. 전사를 못 했는데 "지적 없음"을 내면
+    사용자에게 "설명의무를 다했다"로 읽혀 정반대 결론을 준다.
+    """
+    contract_bytes = await contract.read()
+    if len(contract_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="계약서는 10MB 이하만 지원합니다.")
+
+    warnings: list = []
+    name = contract.filename or "contract.pdf"
+    if is_pdf_magic(contract_bytes):
+        try:
+            text, warnings = _pdf_text_and_warnings(contract_bytes, name)
+        except ValueError:
+            text = document_parse_text(contract_bytes, name)
+    elif sniff_image_type(contract_bytes):
+        text = document_parse_text(contract_bytes, name)
+    else:
+        text = contract_bytes.decode("utf-8", "replace")
+
+    audio_bytes = await audio.read()
+    audio_name = audio.filename or "recording.mp3"
+    if not guess_audio_mime(audio_name):
+        raise HTTPException(
+            status_code=415,
+            detail=f"지원하지 않는 음성 형식입니다: {audio_name}")
+    try:
+        transcript = transcribe(audio_bytes, audio_name)
+    except TranscriptUnavailableError as exc:
+        raise HTTPException(status_code=422, detail=f"녹취 전사 실패: {exc}") from exc
+
+    return _run_disclosure(text, transcript, persona, language or "ko", domain, warnings)
+
+
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    """헬스체크 + 운영 가드레일 상태 (#174).
+
+    외부 모니터링이 5분마다 때리는 곳이라 가드레일에서 제외돼 있다. 비용
+    상한 소진 같은 상태를 여기서 노출해야, 심사 기간에 서비스가 살아 있는지가
+    아니라 **분석이 가능한 상태인지**를 감시할 수 있다.
+    """
+    return {"status": "ok", "guardrails": guardrail_status()}
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
@@ -300,7 +489,7 @@ async def analyze_file_stream(
         try:
             if pdf:
                 try:
-                    text, hidden_warnings = _pdf_text_and_warnings(raw)
+                    text, hidden_warnings = _pdf_text_and_warnings(raw, filename)
                 except ValueError:
                     # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
                     text = document_parse_text(raw, filename)
@@ -337,7 +526,8 @@ async def analyze_pdf(
 
     hidden_warnings: list[str] = []
     try:
-        text, hidden_warnings = _pdf_text_and_warnings(pdf_bytes)
+        text, hidden_warnings = _pdf_text_and_warnings(
+            pdf_bytes, file.filename or "upload.pdf")
     except ValueError as exc:
         # 텍스트 레이어 없음(스캔본) → OCR 폴백 (Upstage Document Parse)
         try:

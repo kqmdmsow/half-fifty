@@ -12,6 +12,10 @@ class Clause(TypedDict):
 
     clause_id: str  # 예: "clause_001"
     text: str       # 조항 원문
+    # 이 조항이 나온 문서 구획 (#174). "본문"·"특약사항"·"별지2"·"부칙" 등.
+    # 별지·별표·부록의 조항은 본문과 법적 성격이 달라(첨부문서), 사용자가
+    # 어디서 나온 조건인지 알아야 원문 대조가 가능하다.
+    section: NotRequired[str]
 
 
 class AnalysisResult(TypedDict):
@@ -43,6 +47,10 @@ class AnalysisResult(TypedDict):
     # 프론트는 이 플래그를 '주의' 배지보다 강하게 표시해야 한다 — 조용히
     # 넘어가면 공격자가 지시문 한 줄로 경고를 억제할 수 있게 된다.
     verdict_withheld: NotRequired[bool]
+    # 판정 근거 인용이 조항 원문의 어느 구간인지 [start, end] 목록 (#174).
+    # 사용자가 "AI가 그렇다니까"에서 "여기 이 문장 때문에 위험하구나"로
+    # 넘어가려면 근거를 원문에서 눈으로 짚을 수 있어야 한다.
+    evidence_spans: NotRequired[list]
 
 
 class JudgeScores(TypedDict):

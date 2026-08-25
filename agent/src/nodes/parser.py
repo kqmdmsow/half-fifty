@@ -4,7 +4,9 @@
 - "제N조", "제 N 조"가 줄 시작에 있을 때만 새 조항으로 분리 (문장 중간의
   "제4조 제1항을 위반한..." 같은 조 참조나 "제6조의3" 같은 법령 인용은 제외)
 - "특약사항" 이하 목록("1." 및 "Ÿ"/"•"/"-"/"*" 불릿)도 개별 조항으로 취급
-- 별지(첨부문서)와 서명란 이후 텍스트는 계약 조항이 아니므로 파싱 전에 버린다
+- 별지·별표·부록·부칙은 **버리지 않고 별도 구획으로 파싱한다** (#174). 수수료율표,
+  위약금 기준, 추가 특약이 여기 들어가는 경우가 많아 버리면 정작 위험한 조건을
+  놓친다. 서명란 이후만 버린다 (계약 조항이 아님).
 - PDF 쪽번호 줄과, 체크박스 빈칸만 있고 문장이 없는 양식 안내 항목도 제외한다
   (무엇을 뺐는지는 항상 경고로 알린다 — 조용한 누락 금지)
 표준계약서(공정위 표준약관, 국토부 표준계약서)는 형식이 규칙적이므로 규칙 기반으로 충분하다.
@@ -37,9 +39,15 @@ _SPECIAL_ITEM_PATTERN = re.compile(
     re.MULTILINE,
 )
 
-# 별지(첨부문서) 헤더: 줄 전체가 "별지1)", "별지 2" 등으로만 이루어진 경우.
+# 부속문서 헤더: 줄 전체가 "별지1)", "별표 2", "부록", "부칙" 등으로만 이루어진 경우.
 # 본문 중 "(별지1)을 확인하세요"처럼 문장에 섞인 참조는 매칭하지 않는다.
-_BYULJI_HEADER_PATTERN = re.compile(r"^[ \t]*별지\s*\d+\s*\)?[ \t]*$", re.MULTILINE)
+#
+# 예전에는 별지 이후를 통째로 버리고 "중요한 내용이 있으면 따로 붙여넣으라"고
+# 사용자에게 떠넘겼다. 그런데 **수수료율표·위약금 기준·추가 특약이 정확히 거기
+# 들어간다.** 위험이 숨는 자리를 스스로 잘라내고 있었던 셈이라, 버리지 않고
+# 구획으로 나눠 분석 대상에 포함한다 (#174).
+_ANNEX_HEADER_PATTERN = re.compile(
+    r"^[ \t]*(별지|별표|부록|부칙|첨부)\s*(\d+)?\s*[).\]]?[ \t]*$", re.MULTILINE)
 
 # PDF에서 추출한 원문에 남는 쪽번호 줄("- 1 / 4 -", "- 2 -", "3 / 10").
 # 쪽번호가 조항 본문 한가운데 끼면 그 뒤 표 조각까지 같은 조항으로 묶여 판정
@@ -65,31 +73,35 @@ _SIGNATURE_BLOCK_MARKER = "본 계약을 증명하기 위하여"
 
 
 def _truncate_boilerplate(text: str) -> tuple[str, List[str]]:
-    """별지 첨부문서, 서명란 등 계약 조항이 아닌 꼬리 텍스트를 잘라낸다.
+    """서명란 이후처럼 계약 조항이 아닌 꼬리 텍스트만 잘라낸다.
 
-    자문 §2("추출 실패나 누락 가능성을 사용자에게 알리는지") 반영: 무엇을
-    제외했는지 경고로 수집해 사용자에게 노출한다 — 조용한 누락 금지.
+    별지·별표·부록·부칙은 여기서 자르지 않는다 — _split_sections가 별도 구획으로
+    떼어내 분석 대상에 포함한다 (#174).
     """
-    cut_points = []
     warnings: List[str] = []
-
-    byulji_match = _BYULJI_HEADER_PATTERN.search(text)
-    if byulji_match:
-        cut_points.append(byulji_match.start())
-        warnings.append(
-            "별지(첨부 문서) 이후 내용은 조항 분석에서 제외했습니다. "
-            "별지에 수수료율·특약 등 중요한 내용이 있다면 해당 부분만 "
-            "따로 붙여넣어 다시 분석해 보세요."
-        )
-
     sig_idx = text.find(_SIGNATURE_BLOCK_MARKER)
     if sig_idx != -1:
-        cut_points.append(sig_idx)
-
-    if cut_points:
-        text = text[: min(cut_points)]
-
+        text = text[:sig_idx]
     return text, warnings
+
+
+def _split_sections(text: str) -> List[tuple[str, str]]:
+    """(구획명, 본문) 목록으로 나눈다. 첫 구획은 항상 "본문"이다.
+
+    부속문서 헤더("별지1)", "별표 2", "부칙")를 경계로 삼는다. 헤더 줄 자체는
+    구획명이 되고 본문에서는 빠진다 — 조항 텍스트에 섞이면 판정 근거가 오염된다.
+    """
+    matches = list(_ANNEX_HEADER_PATTERN.finditer(text))
+    if not matches:
+        return [("본문", text)]
+
+    sections: List[tuple[str, str]] = [("본문", text[: matches[0].start()])]
+    for i, m in enumerate(matches):
+        kind, num = m.group(1), m.group(2)
+        name = f"{kind}{num}" if num else kind
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        sections.append((name, text[m.end():end]))
+    return [(n, b) for n, b in sections if b.strip()]
 
 
 def _is_form_artifact(chunk: str) -> bool:
@@ -114,6 +126,56 @@ def _is_form_artifact(chunk: str) -> bool:
     return bool(_FORM_BLANK_PATTERN.search(chunk))
 
 
+def _split_one_section(name: str, text: str) -> List[tuple[str, str]]:
+    """구획 하나를 조항 단위로 쪼갠다. 반환: (구획명, 조항 텍스트) 목록.
+
+    구획마다 규칙이 다르고, **본문 규칙은 손대지 않는다.** 본문에는 의도된
+    비대칭이 있기 때문이다: 문서에 "제N조"가 문장 중간(법령 참조)에만 있으면
+    조항 0건으로 떨어지고, "제N조"가 아예 없으면 통짜로 보존된다
+    (test_parser_real_documents.py에 고정돼 있다). 부속문서를 살리려다 이
+    규칙을 바꾸면 정상 문서의 파싱이 조용히 달라진다.
+    """
+    if name == "본문":
+        # 본문 안의 "특약사항" 이하는 별도 구획으로 뗀다 (헤더 자체는 버린다)
+        parts = re.split(r"(특약사항|특약\s*사항)", text, maxsplit=1)
+        if len(parts) > 2:
+            body = re.sub(r"[\[\]\s]+$", "", parts[0])
+            special = re.sub(r"^[\[\]\s]+", "", parts[2])
+            return (_split_one_section("본문", body)
+                    + _split_one_section("특약사항", special))
+        text = re.sub(r"[\[\]\s]+$", "", text)
+        if not text.strip():
+            return []
+        # 기존 규칙 그대로 (변경 금지)
+        has_articles = re.search(r"제\s*\d+\s*조", text) is not None
+        body_parts = [p.strip() for p in _ARTICLE_PATTERN.split(text) if p.strip()]
+        if has_articles:
+            body_parts = [p for p in body_parts if _ARTICLE_PATTERN.match(p)]
+        return [("본문", p) for p in body_parts]
+
+    if not text.strip():
+        return []
+
+    if name == "특약사항":
+        # 기존 규칙 그대로: 번호·불릿 목록 단위
+        return [("특약사항", p) for p in _SPECIAL_ITEM_PATTERN.split(text) if p.strip()]
+
+    # 부속문서(별지·별표·부록·부칙) — 형식이 제각각이라 단계적으로 시도한다.
+    # 어느 패턴에도 안 걸리면 구획 전체를 조항 하나로 둔다. 쪼개지 못했다고
+    # 버리면 수수료율표·위약금 기준을 통째로 놓치기 때문이다.
+    if re.search(r"제\s*\d+\s*조", text):
+        parts = [p.strip() for p in _ARTICLE_PATTERN.split(text) if p.strip()]
+        parts = [p for p in parts if _ARTICLE_PATTERN.match(p)]
+        if parts:
+            return [(name, p) for p in parts]
+
+    parts = [p.strip() for p in _SPECIAL_ITEM_PATTERN.split(text) if p.strip()]
+    if len(parts) > 1:
+        return [(name, p) for p in parts]
+
+    return [(name, text.strip())]
+
+
 def split_clauses(raw_text: str) -> List[Clause]:
     """원문 텍스트 -> 조항 리스트 (하위 호환 래퍼)."""
     clauses, _ = split_clauses_with_warnings(raw_text)
@@ -127,31 +189,21 @@ def split_clauses_with_warnings(raw_text: str) -> tuple[List[Clause], List[str]]
     if not text:
         return [], warnings
 
-    # 1) 특약사항 앞뒤로 분리 (헤더 자체는 버리고 그 뒤 내용만 취한다)
-    special_split = re.split(r"(특약사항|특약\s*사항)", text, maxsplit=1)
-    body = special_split[0]
-    special = special_split[2] if len(special_split) > 2 else ""
-    # "[특약사항]"처럼 대괄호로 감싼 헤더의 괄호 잔여물 제거
-    # (여는 괄호는 본문 끝에, 닫는 괄호는 특약 텍스트 앞에 남는다)
-    body = re.sub(r"[\[\]\s]+$", "", body)
-    special = re.sub(r"^[\[\]\s]+", "", special)
+    # 부속문서(별지·별표·부록·부칙)를 버리지 않고 구획으로 나눈다 (#174)
+    chunks: List[tuple[str, str]] = []          # (구획명, 조항 텍스트)
+    for section_name, section_text in _split_sections(text):
+        chunks.extend(_split_one_section(section_name, section_text))
 
-    chunks: List[str] = []
+    annex_names = sorted({n for n, _ in chunks} - {"본문", "특약사항"})
+    if annex_names:
+        warnings.append(
+            f"부속문서({', '.join(annex_names)})도 분석에 포함했습니다. "
+            "수수료율·위약금 기준 같은 실질 조건이 부속문서에 들어가는 경우가 "
+            "많아 함께 확인합니다."
+        )
 
-    # 2) 본문: 제N조 단위 분리 (조항 패턴이 있다면, 첫 조항 앞의 제목/전문은 버린다)
-    has_articles = re.search(r"제\s*\d+\s*조", body) is not None
-    body_parts = [p.strip() for p in _ARTICLE_PATTERN.split(body) if p.strip()]
-    if has_articles:
-        body_parts = [p for p in body_parts if _ARTICLE_PATTERN.match(p)]
-    chunks.extend(body_parts)
-
-    # 3) 특약: 번호/불릿 목록 단위 분리
-    if special:
-        special_parts = [p.strip() for p in _SPECIAL_ITEM_PATTERN.split(special) if p.strip()]
-        chunks.extend(special_parts)
-
-    # 4) 양식 빈칸·안내 조각 제외 (조용한 누락 금지 원칙에 따라 경고로 알린다)
-    kept = [c for c in chunks if not _is_form_artifact(c)]
+    # 양식 빈칸·안내 조각 제외 (조용한 누락 금지 원칙에 따라 경고로 알린다)
+    kept = [(n, c) for n, c in chunks if not _is_form_artifact(c)]
     dropped = len(chunks) - len(kept)
     if dropped:
         logger.info("양식 빈칸·안내 조각 %d개 제외", dropped)
@@ -163,8 +215,8 @@ def split_clauses_with_warnings(raw_text: str) -> tuple[List[Clause], List[str]]
     chunks = kept
 
     clauses = [
-        Clause(clause_id=f"clause_{i + 1:03d}", text=chunk)
-        for i, chunk in enumerate(chunks)
+        Clause(clause_id=f"clause_{i + 1:03d}", text=chunk, section=name)
+        for i, (name, chunk) in enumerate(chunks)
     ]
 
     # 커버리지 점검: 분리된 조항이 (보일러플레이트 제거 후) 본문의 70% 미만이면

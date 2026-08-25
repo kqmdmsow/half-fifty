@@ -98,3 +98,60 @@ def test_실제_표준_문서는_한_글자도_잃지_않는다(rel):
     after, hidden = extract_with_hidden_report(raw)
     assert hidden == [], f"정상 문서에서 은닉 오탐: {hidden}"
     assert len(after) == len(before), "정상 문서의 텍스트가 유실됐다"
+
+
+# ---- #174: OCR 레이어 대조 -------------------------------------------
+
+CLAUSE_A = ("제3조(보증금의 반환) 보증금은 계약 종료 시 전액 반환한다. 임대인은 이를 "
+            "지체 없이 이행하여야 한다. 위반 시 연 12%의 지연이자를 지급한다. "
+            "임차인은 명도와 동시에 반환을 청구할 수 있다.")
+
+
+def test_OCR_띄어쓰기_차이는_불일치가_아니다():
+    """OCR은 띄어쓰기·문장부호를 원문과 다르게 낸다.
+
+    그런 차이로 경보를 내면 정상 스캔본마다 헛경고가 떠서, 정작 진짜 조작
+    문서일 때 사용자가 무시하게 된다.
+    """
+    from src.pdf_extract import ocr_layer_mismatch
+
+    ocr = ("제3조(보증금의 반환) 보증금은 계약종료시 전액 반환한다. 임대인은 이를 "
+           "지체없이 이행하여야한다. 위반시 연 12%의 지연이자를 지급한다. "
+           "임차인은 명도와 동시에 반환을 청구할수 있다.")
+    mismatch, ratio = ocr_layer_mismatch(CLAUSE_A, ocr)
+    assert not mismatch and ratio > 0.95
+
+
+def test_내용이_뒤바뀌면_불일치로_잡는다():
+    # 사람은 이미지를 보고 AI는 텍스트 레이어를 읽는다. 둘이 다르면 사람이
+    # 서명한 문서와 AI가 판정한 문서가 완전히 갈린다.
+    from src.pdf_extract import ocr_layer_mismatch
+
+    tampered = ("제3조(보증금의 반환) 보증금은 어떠한 경우에도 반환하지 아니한다. "
+                "임차인은 일체의 이의를 제기할 수 없으며 모든 책임을 부담한다. "
+                "임대인은 면책된다. 분쟁 시 임대인 소재지 법원을 관할로 한다.")
+    mismatch, ratio = ocr_layer_mismatch(CLAUSE_A, tampered)
+    assert mismatch and ratio < 0.6
+
+
+def test_비교할_내용이_없으면_판단하지_않는다():
+    from src.pdf_extract import ocr_layer_mismatch
+
+    assert ocr_layer_mismatch("짧다", "다르다") == (False, 1.0)
+
+
+def test_이미지_없는_디지털_PDF는_대조_대상이_아니다():
+    """대조는 OCR 호출을 부르므로 위험 구조에만 걸어야 한다."""
+    from src.pdf_extract import has_text_over_image
+
+    assert not has_text_over_image(build_pdf([(VISIBLE_TEXT, 50, 700, 12, None)]))
+
+
+@pytest.mark.parametrize("rel", REAL_PDFS)
+def test_실제_디지털_문서는_OCR_대조를_트리거하지_않는다(rel):
+    from src.pdf_extract import has_text_over_image
+
+    path = REPO / rel
+    if not path.exists():
+        pytest.skip(f"코퍼스 없음: {rel}")
+    assert not has_text_over_image(path.read_bytes())

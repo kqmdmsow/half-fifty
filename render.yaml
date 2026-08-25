@@ -18,6 +18,15 @@ services:
         value: claude-sonnet-4-6
       - key: LLM_CONCURRENCY
         value: "10"        # 조항 분석·페르소나 병렬 폭 (기본 5, 실측 90s→70s)
+      # 운영 가드레일 (#174). 배포 URL은 심사 기간에 누구나 접근할 수 있다.
+      # 분석 1건이 약 282원이라, 스크립트로 수천 건을 돌리면 크레딧이 말라
+      # 심사위원 접속 시 서비스가 죽는다 — 결격 사유로 직결된다.
+      - key: AGENT_SERVICE_TOKEN
+        generateValue: true   # 백엔드와 같은 값을 넣을 것 (대시보드에서 복사)
+      - key: ANALYZE_RATE_PER_MIN
+        value: "6"            # 분석은 70~90초짜리라 정상 사용자는 넘길 일이 없다
+      - key: DAILY_OUTPUT_TOKEN_BUDGET
+        value: "400000"       # 일일 출력 토큰 상한. 0이면 무제한
       - key: CORS_ALLOWED_ORIGINS
         value: https://halffifty.onrender.com
 
@@ -30,6 +39,10 @@ services:
     envVars:
       - key: AGENT_BASE_URL
         value: https://halffifty-agent.onrender.com
+      # 에이전트와 **같은 값**이어야 한다 (#174). 다르면 모든 분석이 403이 된다.
+      # generateValue를 쓰면 서로 다른 값이 생성되므로 대시보드에서 직접 복사할 것.
+      - key: AGENT_SERVICE_TOKEN
+        sync: false
       - key: CORS_ALLOWED_ORIGIN
         value: https://halffifty.onrender.com
       # 로그인 세션 서명 키 (#102). 미주입 시 재시작마다 전원 로그아웃된다.

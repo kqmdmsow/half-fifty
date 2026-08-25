@@ -31,7 +31,7 @@ def _fake_stream(text, persona, language, domain, extra_warnings=()):
 
 def test_pdf_extract_후_스트림_이벤트_순서(monkeypatch):
     monkeypatch.setattr(agent_main, "_pdf_text_and_warnings",
-                        lambda raw: ("제1조 텍스트", []))
+                        lambda raw, name="f.pdf": ("제1조 텍스트", []))
     monkeypatch.setattr(agent_main, "stream_analysis", _fake_stream)
 
     res = client.post("/analyze-file-stream",
@@ -78,7 +78,7 @@ def test_pdf_은닉_텍스트_격리_고지가_스트림에_실린다(monkeypatc
     """
     notice = "🚫 이 PDF에 사람 눈에 보이지 않게 숨긴 AI 조작 지시문이 1곳 있습니다."
     monkeypatch.setattr(agent_main, "_pdf_text_and_warnings",
-                        lambda raw: ("제1조 텍스트", [notice]))
+                        lambda raw, name="f.pdf": ("제1조 텍스트", [notice]))
     monkeypatch.setattr(agent_main, "stream_analysis", _fake_stream)
 
     res = client.post("/analyze-file-stream",
@@ -88,7 +88,7 @@ def test_pdf_은닉_텍스트_격리_고지가_스트림에_실린다(monkeypatc
 
 
 def test_스캔본_pdf는_ocr_폴백(monkeypatch):
-    def no_text_layer(raw):
+    def no_text_layer(raw, name="f.pdf"):
         raise ValueError("텍스트 레이어 없음")
 
     monkeypatch.setattr(agent_main, "_pdf_text_and_warnings", no_text_layer)

@@ -36,6 +36,20 @@ export interface ClauseResult {
   revision?: number
   // 실제 사건 각주 (#91) — 매핑이 없는 risk_type이면 빈 배열 또는 undefined
   related_cases?: RelatedCase[]
+  // 방화벽 상태 (#174). 이 값들이 없으면 사용자는 방어가 동작했다는 사실을
+  // 볼 수 없다. 스트리밍·REST 양쪽 경로에서 모두 내려온다.
+  /** 이 조항에서 조작 흔적이 탐지됐는가 */
+  injection_suspected?: boolean
+  /** 격리해 LLM 입력에서 제외한 조작 문장 수 */
+  quarantined?: number
+  /** 격리 후 근거가 남지 않아 판정을 거부했는가 (fail-closed) */
+  verdict_withheld?: boolean
+  /** 판정 안전장치가 등급을 올렸다면 모델의 원래 판정 (감사 추적) */
+  original_risk_level?: string | null
+  /** 판정 근거 인용이 original_text의 어느 구간인지 [start, end] 목록 */
+  evidence_spans?: number[][]
+  /** 이 조항이 나온 문서 구획 ("본문"·"특약사항"·"별지2"·"부칙" 등) */
+  section?: string
 }
 
 export interface AnalyzeResponse {

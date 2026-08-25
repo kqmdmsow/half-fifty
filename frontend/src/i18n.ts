@@ -3162,8 +3162,57 @@ const UI_WARNINGS: Record<LangCode, Record<WarnKey, string>> = {
   },
 }
 
-export const WARNING_CODE_KEYS: Record<string, WarnKey> = {
+type FwWarnKey =
+  | 'wnNeutralized' | 'wnPdfHiddenAttack' | 'wnPdfHiddenBenign' | 'wnQuarantined'
+  | 'wnOcrMismatch'
+
+// #174 방화벽 경고. UI_WARNINGS와 달리 Record<LangCode, ...>로 두지 않는다 —
+// 그러면 TypeScript가 16개 언어를 전부 요구하고, 원어민 검수 없이 기계 번역을
+// 채워 넣게 된다. 저자원 언어는 검수 후에 넣는다는 팀 원칙(#82 후속)에 따라
+// ko·en만 채우고 나머지는 t()의 en 폴백에 맡긴다.
+const UI_WARNINGS_FW: Record<string, Record<FwWarnKey, string>> = {
+  ko: {
+    wnNeutralized: '이 문서에 숨겨져 있던 문자와 위장 표기를 분석 전에 무력화했어요. 계약 내용 자체는 그대로예요.',
+    wnPdfHiddenAttack: '이 PDF에 사람 눈에 보이지 않게 숨긴 AI 조작 지시문이 있어요. 분석에서 제외했어요. 정상적인 계약서에는 이런 게 들어갈 이유가 없으니 상대방에게 꼭 확인하세요.',
+    wnPdfHiddenBenign: '이 PDF에서 화면에 보이지 않는 텍스트를 분석에서 제외했어요. 서식 안내 문구로 보이며 조작 지시문은 아니에요.',
+    wnQuarantined: '이 문서에서 AI에게 내리는 지시로 보이는 문장을 격리했어요. 그 부분을 빼고 나머지 계약 내용만으로 판정했어요.',
+    wnOcrMismatch: '이 PDF는 화면에 보이는 이미지와 그 아래 숨은 텍스트가 서로 달라요. 사람이 보는 내용과 AI가 읽는 내용이 다르게 만들어진 문서일 수 있어요. 화면에 실제로 보이는 내용만으로 분석했지만, 이 문서는 신뢰하지 말고 발급처에 원본을 다시 요청하세요.',
+  },
+  en: {
+    wnNeutralized: 'Hidden characters and disguised markers were neutralized before analysis. The contract text itself is unchanged.',
+    wnPdfHiddenAttack: 'This PDF contains AI-manipulation instructions hidden from human eyes. They were excluded from analysis. A legitimate contract has no reason to contain these — ask the other party.',
+    wnPdfHiddenBenign: 'Text invisible on screen was excluded from analysis. It appears to be form guidance, not manipulation.',
+    wnQuarantined: 'Sentences that look like instructions to the AI were quarantined. The verdict used the remaining contract text only.',
+    wnOcrMismatch: 'The visible image in this PDF and the hidden text underneath do not match. The document may have been built so that what a person sees differs from what the AI reads. Analysis used only what is visibly rendered — do not trust this document; request the original from the issuer.',
+  },
+}
+
+export const WARNING_CODE_KEYS: Record<string, WarnKey | FwWarnKey> = {
   pii_masked: 'wnPii', byulji_excluded: 'wnByulji', low_coverage: 'wnLowCoverage', injection_detected: 'wnInjection',
+  injection_neutralized: 'wnNeutralized', pdf_hidden_attack: 'wnPdfHiddenAttack',
+  pdf_hidden_benign: 'wnPdfHiddenBenign', clause_quarantined: 'wnQuarantined',
+  ocr_layer_mismatch: 'wnOcrMismatch',
+}
+
+type FirewallKey =
+  | 'fwWithheld' | 'fwWithheldDesc' | 'fwQuarantined' | 'fwTampered' | 'fwOriginal'
+
+// 조항 카드·상세의 방화벽 상태 표시 (#174). ko·en 외에는 en 폴백.
+const UI_FIREWALL: Record<string, Record<FirewallKey, string>> = {
+  ko: {
+    fwWithheld: '판정 보류',
+    fwWithheldDesc: '조작 문장을 걷어내고 나니 판정할 근거가 남지 않았어요. 이 조항은 반드시 원문을 직접 확인하세요.',
+    fwQuarantined: '조작 문장 {n}건 격리',
+    fwTampered: '조작 시도 감지',
+    fwOriginal: 'AI는 이 조항을 "{level}"이라고 답했지만, 조작 흔적이 있어 그대로 받아들이지 않았어요.',
+  },
+  en: {
+    fwWithheld: 'Verdict withheld',
+    fwWithheldDesc: 'After removing the manipulated sentences, no basis for a verdict remained. Check the original text yourself.',
+    fwQuarantined: '{n} manipulated sentence(s) quarantined',
+    fwTampered: 'Manipulation detected',
+    fwOriginal: 'The AI answered "{level}" for this clause, but manipulation was detected so the answer was not accepted.',
+  },
 }
 
 type LearnKey =
@@ -3588,7 +3637,7 @@ const UI_TRUST: Partial<Record<LangCode, Record<TrustKey, string>>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey | FirewallKey | FwWarnKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3598,7 +3647,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST, UI_FIREWALL, UI_WARNINGS_FW] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {

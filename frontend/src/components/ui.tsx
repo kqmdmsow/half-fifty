@@ -93,6 +93,43 @@ export function RiskBadge({
   )
 }
 
+/* ---------- 방화벽 상태 배지 (#174) ---------- */
+
+/**
+ * 판정 보류 배지 — '주의'보다 강하게 보여야 한다.
+ *
+ * 조용히 넘어가면 공격자가 조항 뒤에 지시문 한 줄을 붙이는 것만으로 경고를
+ * 억제할 수 있다. 판정을 못 하겠다는 상태가 사용자에게 '주의'보다 약하게
+ * 읽히면 fail-closed 설계 자체가 공격 수단이 된다.
+ */
+export function WithheldBadge({ label, className = '' }: { label: string; className?: string }) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border-2 border-danger-500 bg-danger-50 px-2.5 py-1 text-[13px] font-bold text-danger-600 ${className}`}
+    >
+      <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 fill-current">
+        {/* 물음표 방패 — "막았지만 답을 못 냈다" */}
+        <path d="M8 .8 2 3v5.1c0 3.4 2.5 6.3 6 7.1 3.5-.8 6-3.7 6-7.1V3L8 .8Zm-.8 11.6v-1.5h1.6v1.5H7.2Zm2.5-5c-.3.4-.7.7-1 .9-.3.2-.4.4-.4.7v.4H6.9v-.6c0-.6.3-1.1.9-1.5.4-.3.7-.5.7-.9 0-.5-.4-.8-.9-.8-.5 0-.9.3-1 .9l-1.3-.3C5.5 5.2 6.4 4.5 7.7 4.5c1.3 0 2.2.7 2.2 1.9 0 .4-.1.7-.2 1Z" />
+      </svg>
+      {label}
+    </span>
+  )
+}
+
+/** 조작 탐지·격리 칩 — 방어가 동작했다는 사실 자체를 보여 준다. */
+export function FirewallChip({ label, className = '' }: { label: string; className?: string }) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-md bg-ink-100 px-2 py-0.5 text-[12px] font-semibold text-ink-600 ${className}`}
+    >
+      <svg aria-hidden viewBox="0 0 16 16" className="h-3 w-3 shrink-0 fill-current">
+        <path d="M8 .8 2 3v5.1c0 3.4 2.5 6.3 6 7.1 3.5-.8 6-3.7 6-7.1V3L8 .8Zm2.9 5.3-3.6 3.8-2-2 1-1.1 1 1 2.6-2.7 1 1Z" />
+      </svg>
+      {label}
+    </span>
+  )
+}
+
 /* ---------- Switch (토글) ---------- */
 
 export function Switch({
