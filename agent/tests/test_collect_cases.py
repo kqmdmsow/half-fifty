@@ -166,3 +166,63 @@ def test_원고_피고가_들어가도_조항일_수_있다():
     from collect_cases import is_clause_like
 
     assert is_clause_like("기타 원고의 단독 재량으로 계정의 해지가 필요하다고 판단하는 경우")
+
+
+# ---- 검수 파이프라인 (#180) ------------------------------------------
+
+def test_원문에_없는_제안은_통과하지_못한다():
+    """축자 원문 부재는 실측 기각 사유 2위다. 요약·의역은 골든셋에 들어가면 안 된다."""
+    from review_pipeline import _verbatim
+
+    src = "피심인은 어떠한 경우에도 환불하지 아니한다고 규정하고 있다."
+    assert _verbatim("어떠한 경우에도 환불하지 아니한다", src)
+    assert not _verbatim("환불을 전면 금지하는 조항", src)   # 의역
+
+
+def test_검수_실패는_승인이_아니다():
+    """확인하지 못한 것을 통과시키면 검수가 아니라 통과 도장이 된다."""
+    import review_pipeline as rp
+
+    orig = rp.invoke_json
+    rp.invoke_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom"))
+    rp.get_worker_llm = lambda: None
+    try:
+        assert rp.adversarial_review({}, "자료")["verdict"] == "기각"
+    finally:
+        rp.invoke_json = orig
+
+
+def test_제안_실패도_기각으로_처리한다():
+    import review_pipeline as rp
+
+    orig = rp.invoke_json
+    rp.invoke_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom"))
+    rp.get_worker_llm = lambda: None
+    try:
+        assert rp.propose({})["proposable"] is False
+    finally:
+        rp.invoke_json = orig
+
+
+def test_조항_문구가_없으면_LLM을_부르지_않고_기각한다():
+    # 비용을 아끼는 동시에, 문구 없는 후보가 통과할 여지를 원천 차단한다.
+    from review_pipeline import review_one
+
+    r = review_one({"rationale": "판단 근거"}, set())
+    assert r["verdict"] == "자동기각" and r["reason"] == "축자 원문 부재"
+
+
+def test_기존_골든셋과_중복이면_기각한다():
+    from review_pipeline import review_one
+
+    r = review_one({"clause_text": "어떠한 경우에도 환불하지 아니한다",
+                    "rationale": "x"}, {"어떠한경우에도환불하지아니한다"})
+    assert r["verdict"] == "자동기각" and "중복" in r["reason"]
+
+
+def test_검수단_2표_기각이면_탈락한다():
+    """만장일치를 요구하면 통과율이 비현실적으로 낮아지고,
+    과반만 보면 한 에이전트의 실수가 그대로 통과한다."""
+    import review_pipeline as rp
+
+    assert rp._REVIEWERS == 3 and rp._REJECT_VOTES == 2
