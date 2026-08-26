@@ -226,3 +226,24 @@ def test_검수단_2표_기각이면_탈락한다():
     import review_pipeline as rp
 
     assert rp._REVIEWERS == 3 and rp._REJECT_VOTES == 2
+
+
+def test_기관의_설명은_조항으로_보지_않는다():
+    """가장 놓치기 쉬운 유형이다. 기관이 그 조항을 설명한 말은 근거 서술에
+    그대로 있으므로 **원문 대조를 통과한다.** 실측 표본 18건 중 3건이 이것이었다.
+
+    조항은 규범을 정하고, 설명은 그 조항을 평가한다.
+    """
+    from collect_cases import is_clause_like
+
+    assert not is_clause_like(
+        "회원탈퇴에 대한 전제조건으로 3개월 이상을 사용하도록 정하여 자유로운 탈퇴를 상당히 제한하고 있으므로")
+    assert not is_clause_like("회사가 인정하는 사유가 있는 경우에만 탈퇴를 허용하는 것")
+    assert not is_clause_like("해당 시간 영업 손해에 대한 비용")   # 문구 조각
+
+
+def test_정상_조항은_통과한다():
+    from collect_cases import is_clause_like
+
+    assert is_clause_like("보증금은 어떠한 경우에도 반환하지 아니한다")
+    assert is_clause_like("임차인이 임대료 등을 연체할 경우 연체이자율은 월 5%로 하며 일할계산하여 부과한다")

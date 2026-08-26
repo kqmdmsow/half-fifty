@@ -44,6 +44,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from collect_cases import is_clause_like
 from src.citation_check import locate_quotes
 from src.llm import get_worker_llm, invoke_json
 from src.schemas import RISK_TYPES
@@ -138,6 +139,11 @@ def review_one(row: dict, known: set) -> dict:
     clause = (p.get("clause_text") or "").strip()
     if not _verbatim(clause, rationale):
         return {**out, "verdict": "기각", "reason": "축자 원문 부재 (제안이 원문과 불일치)"}
+    # 원문 대조를 통과해도 **조항이 아닐 수 있다.** 기관이 그 조항을 설명한 말은
+    # 근거 서술에 그대로 있으므로 대조를 통과한다("…탈퇴를 상당히 제한하고
+    # 있으므로"). 실측 표본 18건 중 3건이 이 유형이었다.
+    if not is_clause_like(clause):
+        return {**out, "verdict": "기각", "reason": "조항 문언이 아님 (기관의 설명·요약)"}
     if p.get("risk_level") not in _LEVELS:
         return {**out, "verdict": "기각", "reason": f"알 수 없는 판정: {p.get('risk_level')}"}
     rtype = p.get("risk_type") if p.get("risk_type") in RISK_TYPES else "해당 없음"
