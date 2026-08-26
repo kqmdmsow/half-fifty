@@ -91,9 +91,14 @@ def existing_clause_keys() -> set:
 
 def propose(row: dict) -> dict:
     """제작 에이전트 — 후보에서 라벨을 제안한다."""
+    # 이미 확보한 조항 문구를 넘긴다. 판례 경로는 판결문에서 조항을 그대로
+    # 뽑아 오는데, 제작 에이전트가 그걸 안 쓰고 rationale에서 다시 추출하면
+    # 애써 확보한 원문이 낭비되고 "조항 원문 부재"로 기각된다.
+    extracted = (row.get("clause_text") or row.get("clause_text_candidate") or "")
     prompt = _fill(_PROPOSE, case_name=row.get("case_name"), case_no=row.get("case_no"),
                    clause_title=row.get("clause_title"), opinion=row.get("opinion"),
-                   articles=row.get("articles"), rationale=row.get("rationale"))
+                   articles=row.get("articles"), rationale=row.get("rationale"),
+                   extracted=extracted)
     try:
         return invoke_json(get_worker_llm(), prompt)
     except Exception as exc:

@@ -128,7 +128,10 @@ def search_cases(target: str, query: str, section: str, limit: int) -> list:
         if not blocks:
             break
         for b in blocks:
-            seq = _tag(b, "결정문일련번호") or _tag(b, "판례일련번호")
+            # 일련번호 태그명이 target마다 다르다 (실측: prec=판례, ftc/ppc/fsc=결정문,
+            # decc=행정심판재결례). 하나라도 걸리면 그것을 쓴다.
+            seq = next((v for v in (_tag(b, t) for t in (
+                "결정문일련번호", "판례일련번호", "행정심판재결례일련번호")) if v), "")
             if seq:
                 out.append((seq, _tag(b, "사건명"), _tag(b, "사건번호")))
         page += 1
@@ -340,7 +343,10 @@ def existing_case_ids() -> set:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--target", default="ftc", choices=["ftc", "prec"])
+    ap.add_argument("--target", default="ftc",
+                    choices=["ftc", "prec", "decc", "ppc", "fsc", "acr"],
+                    help="ftc=공정위 결정문, prec=판례, decc=행정심판례, "
+                         "ppc=개인정보위, fsc=금융위, acr=국민권익위")
     ap.add_argument("--query", default="불공정약관조항")
     ap.add_argument("--section", default="1", choices=["1", "2"],
                     help="1=사건명, 2=본문")
@@ -378,7 +384,9 @@ def main() -> None:
             print(f"  [실패] {seq}: {type(exc).__name__}")
             continue
         body = _plain(doc)
-        if args.target == "prec":
+        # 결정문 계열(ftc)은 "심사의견" 구조가 있어 심결 파서를 쓰고,
+        # 나머지는 본문에 조항을 인용하는 형태라 판례식 추출을 쓴다.
+        if args.target != "ftc":
             found = [{
                 "clause_title": (f"제{c['article_no']}조" if c["article_no"]
                                  else "(조 번호 미표기)"),
