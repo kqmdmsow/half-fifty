@@ -53,9 +53,11 @@ REPO = Path(__file__).parent.parent
 STAGING = REPO / "data" / "staging" / "merged_candidates.csv"
 OUT_CSV = REPO / "data" / "real_clause_labels_sprint3.csv"
 OUT_LOG = REPO / "docs" / "review_sprint3_log.md"
+# 중복 검사 대상. **직전 실행 결과(sprint3)도 포함한다** — 그래야 이어서
+# 돌릴 때 이미 통과한 행이 자동 기각으로 걸러져 중복 적재가 생기지 않는다.
 GOLDEN = [REPO / "data" / f for f in
           ("real_clause_labels.csv", "real_clause_labels_ext.csv",
-           "real_clause_labels_finance.csv")]
+           "real_clause_labels_finance.csv", "real_clause_labels_sprint3.csv")]
 
 _PROPOSE = (Path(__file__).parent / "src" / "prompts" / "review_propose.txt"
             ).read_text(encoding="utf-8")
