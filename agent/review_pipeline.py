@@ -40,12 +40,14 @@ import csv
 import json
 import re
 import sys
+import threading
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from collect_cases import is_clause_like
 from src.citation_check import locate_quotes
+from src.eval_repeat import SystemicFailureDetected
 from src.llm import get_worker_llm, invoke_json
 from src.schemas import RISK_TYPES
 
@@ -67,6 +69,46 @@ _ADVERSARIAL = (Path(__file__).parent / "src" / "prompts" / "review_adversarial.
 _REVIEWERS = 3          # 문서에 기록된 검수 에이전트 수와 동일
 _REJECT_VOTES = 2       # 3명 중 2명 이상 기각이면 기각
 _LEVELS = ("위험", "주의", "안전")
+
+# API 이상 감지 (#180 사고 후 추가).
+#
+# 크레딧이 소진된 상태로 564건을 돌렸더니 **515건이 전부 BadRequestError였는데
+# 로그에는 '기각'으로 기록됐다.** 파이프라인이 실패를 승인으로 처리하지 않은 것은
+# 맞지만, API 이상과 진짜 기각을 구분하지 못해 로그가 통째로 오염됐다.
+# 진짜 기각 사유 통계도 못 내고, 재실행 시 무엇을 다시 봐야 하는지도 알 수 없다.
+#
+# 그래서 두 겹으로 막는다.
+# ① 사전 점검: 대량 실행 전에 호출 하나로 API가 살아 있는지 본다.
+# ② 회로 차단: 연속 실패가 한도를 넘으면 즉시 중단한다.
+#    eval_repeat.CONSECUTIVE_FULL_FALLBACK_LIMIT와 같은 사고방식이다.
+_CONSECUTIVE_API_FAILURE_LIMIT = 5
+_api_failures = {"streak": 0}
+_failure_lock = threading.Lock()
+
+
+def _note_api_result(ok: bool) -> None:
+    """API 호출 결과를 누적한다. 연속 실패가 한도를 넘으면 중단시킨다."""
+    with _failure_lock:
+        if ok:
+            _api_failures["streak"] = 0
+            return
+        _api_failures["streak"] += 1
+        if _api_failures["streak"] >= _CONSECUTIVE_API_FAILURE_LIMIT:
+            raise SystemicFailureDetected(
+                f"API 호출이 연속 {_api_failures['streak']}회 실패했다. "
+                f"크레딧 소진·인증·레이트리밋을 확인하라. "
+                f"계속 돌리면 실패가 '기각'으로 기록돼 로그가 오염된다.")
+
+
+def preflight() -> None:
+    """대량 실행 전 API 생존 확인. 실패하면 시작하지 않는다."""
+    try:
+        invoke_json(get_worker_llm(),
+                    '아래 JSON만 출력하세요: {"ok": true}')
+    except Exception as exc:
+        raise SystemicFailureDetected(
+            f"사전 점검 실패 — API를 쓸 수 없다: {type(exc).__name__}: "
+            f"{str(exc)[:200]}") from exc
 
 
 def _fill(template: str, **kw) -> str:
@@ -103,9 +145,12 @@ def propose(row: dict) -> dict:
                    articles=row.get("articles"), rationale=row.get("rationale"),
                    extracted=extracted)
     try:
-        return invoke_json(get_worker_llm(), prompt)
+        out = invoke_json(get_worker_llm(), prompt)
     except Exception as exc:
+        _note_api_result(False)
         return {"proposable": False, "reject_reason": f"제안 실패: {type(exc).__name__}"}
+    _note_api_result(True)
+    return out
 
 
 def adversarial_review(proposal: dict, rationale: str) -> dict:
@@ -115,10 +160,13 @@ def adversarial_review(proposal: dict, rationale: str) -> dict:
                    risk_type=proposal.get("risk_type"),
                    evidence=proposal.get("evidence"), rationale=rationale)
     try:
-        return invoke_json(get_worker_llm(), prompt)
+        out = invoke_json(get_worker_llm(), prompt)
     except Exception as exc:
+        _note_api_result(False)
         # 검수 실패는 승인이 아니다. 확인하지 못한 것은 통과시키지 않는다.
         return {"verdict": "기각", "reject_reason": f"검수 실패: {type(exc).__name__}"}
+    _note_api_result(True)
+    return out
 
 
 def review_one(row: dict, known: set) -> dict:
@@ -197,12 +245,24 @@ def main() -> None:
     print(f"후보 {len(rows)}건 중 {len(todo)}건 검수 "
           f"(검수 에이전트 {_REVIEWERS}명, {_REJECT_VOTES}표 기각 시 탈락)")
 
-    with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        results = []
-        for i, r in enumerate(pool.map(lambda x: review_one(x, known), todo), 1):
-            results.append(r)
-            print(f"  {i:3d}/{len(todo)} [{r['verdict']:5s}] "
-                  f"{r.get('clause_text', r.get('reason', ''))[:60]}")
+    try:
+        preflight()
+    except SystemicFailureDetected as exc:
+        print(f"\n중단: {exc}")
+        print("아무것도 기록하지 않았다. 기존 결과 파일과 로그는 그대로다.")
+        sys.exit(1)
+
+    results = []
+    try:
+        with ThreadPoolExecutor(max_workers=args.workers) as pool:
+            for i, r in enumerate(pool.map(lambda x: review_one(x, known), todo), 1):
+                results.append(r)
+                print(f"  {i:3d}/{len(todo)} [{r['verdict']:5s}] "
+                      f"{r.get('clause_text', r.get('reason', ''))[:60]}")
+    except SystemicFailureDetected as exc:
+        # 여기까지의 결과는 유효하므로 버리지 않고 기록한 뒤 중단한다.
+        print(f"\n중단: {exc}")
+        print(f"{len(results)}건까지의 결과만 기록한다.")
 
     passed = [r for r in results if r["verdict"] in ("승인", "수정승인")]
     tally = Counter(r["verdict"] for r in results)
