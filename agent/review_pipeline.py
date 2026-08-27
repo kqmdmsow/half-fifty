@@ -36,6 +36,7 @@
 """
 
 import argparse
+import os
 import csv
 import json
 import re
@@ -55,6 +56,13 @@ REPO = Path(__file__).parent.parent
 STAGING = REPO / "data" / "staging" / "merged_candidates.csv"
 OUT_CSV = REPO / "data" / "real_clause_labels_sprint3.csv"
 OUT_LOG = REPO / "docs" / "review_sprint3_log.md"
+# 검수 이력 장부 (#180 사고 후 추가).
+#
+# 이게 없으면 재실행할 때마다 **이미 기각한 것을 다시 검수한다.** 3차 실행이
+# 크레딧 소진으로 무효가 됐을 때, 무엇을 다시 해야 하고 무엇은 안 해도 되는지
+# 알 수 없었던 것이 정확히 이 문제였다. 통과분은 골든셋에 남지만 기각분은
+# 아무 데도 남지 않았다.
+LEDGER = REPO / "data" / "staging" / "review_ledger.csv"
 # 중복 검사 대상. **직전 실행 결과(sprint3)도 포함한다** — 그래야 이어서
 # 돌릴 때 이미 통과한 행이 자동 기각으로 걸러져 중복 적재가 생기지 않는다.
 GOLDEN = [REPO / "data" / f for f in
@@ -69,6 +77,49 @@ _ADVERSARIAL = (Path(__file__).parent / "src" / "prompts" / "review_adversarial.
 _REVIEWERS = 3          # 문서에 기록된 검수 에이전트 수와 동일
 _REJECT_VOTES = 2       # 3명 중 2명 이상 기각이면 기각
 _LEVELS = ("위험", "주의", "안전")
+
+# 검수에 쓸 모델. 크레딧이 없으면 무료 제공자로 갈아탄다.
+# 저장소가 이미 쓰던 패턴(eval_normal_fp.py "크레딧 소진 시 무료 워커 대체")과 같다.
+_REVIEWER = os.getenv("REVIEW_MODEL", "claude")
+
+
+def _llm():
+    """검수·제안에 쓸 LLM. REVIEW_MODEL=solar면 Upstage로 간다.
+
+    한계를 분명히 해 둔다: 제안자와 검수자가 같은 패밀리면 self-preference가
+    생긴다. Claude가 제안하고 Solar가 검수하는 교차 구성이 이상적이지만,
+    크레딧이 없으면 양쪽 다 Solar가 되어 그 이점이 사라진다. 그래서 어느
+    모델로 검수했는지 행마다 기록해 나중에 재검증할 수 있게 한다.
+    """
+    if _REVIEWER == "solar":
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(model=os.getenv("MODEL_JUDGE_SOLAR", "solar-pro3"),
+                          temperature=0, max_retries=1, timeout=90,
+                          base_url="https://api.upstage.ai/v1",
+                          api_key=os.getenv("UPSTAGE_API_KEY"))
+    return get_worker_llm()
+
+
+def load_ledger() -> dict:
+    """이미 검수한 조항의 판정 기록. {조항키: 판정}."""
+    if not LEDGER.exists():
+        return {}
+    return {r["clause_key"]: r["verdict"]
+            for r in csv.DictReader(LEDGER.open(encoding="utf-8"))}
+
+
+def append_ledger(entries: list) -> None:
+    exists = LEDGER.exists()
+    LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    with LEDGER.open("a" if exists else "w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=["clause_key", "verdict", "reviewer", "reason"])
+        if not exists:
+            w.writeheader()
+        w.writerows(entries)
+
+
+def clause_key(text: str) -> str:
+    return re.sub(r"\s+", "", text)[:60]
 
 # API 이상 감지 (#180 사고 후 추가).
 #
@@ -103,8 +154,7 @@ def _note_api_result(ok: bool) -> None:
 def preflight() -> None:
     """대량 실행 전 API 생존 확인. 실패하면 시작하지 않는다."""
     try:
-        invoke_json(get_worker_llm(),
-                    '아래 JSON만 출력하세요: {"ok": true}')
+        invoke_json(_llm(), '아래 JSON만 출력하세요: {"ok": true}')
     except Exception as exc:
         raise SystemicFailureDetected(
             f"사전 점검 실패 — API를 쓸 수 없다: {type(exc).__name__}: "
@@ -145,7 +195,7 @@ def propose(row: dict) -> dict:
                    articles=row.get("articles"), rationale=row.get("rationale"),
                    extracted=extracted)
     try:
-        out = invoke_json(get_worker_llm(), prompt)
+        out = invoke_json(_llm(), prompt)
     except Exception as exc:
         _note_api_result(False)
         return {"proposable": False, "reject_reason": f"제안 실패: {type(exc).__name__}"}
@@ -160,7 +210,7 @@ def adversarial_review(proposal: dict, rationale: str) -> dict:
                    risk_type=proposal.get("risk_type"),
                    evidence=proposal.get("evidence"), rationale=rationale)
     try:
-        out = invoke_json(get_worker_llm(), prompt)
+        out = invoke_json(_llm(), prompt)
     except Exception as exc:
         _note_api_result(False)
         # 검수 실패는 승인이 아니다. 확인하지 못한 것은 통과시키지 않는다.
@@ -169,7 +219,7 @@ def adversarial_review(proposal: dict, rationale: str) -> dict:
     return out
 
 
-def review_one(row: dict, known: set) -> dict:
+def review_one(row: dict, known: set, ledger: dict) -> dict:
     """후보 1건 -> 판정 결과 dict."""
     out = {"case_no": row.get("case_no", ""), "case_name": row.get("case_name", ""),
            "source_file": row.get("_source_file", "")}
@@ -177,8 +227,14 @@ def review_one(row: dict, known: set) -> dict:
     text = (row.get("clause_text") or row.get("clause_text_candidate") or "").strip()
     if not text:
         return {**out, "verdict": "자동기각", "reason": "축자 원문 부재"}
-    if re.sub(r"\s+", "", text)[:60] in known:
+    key = clause_key(text)
+    if key in known:
         return {**out, "verdict": "자동기각", "reason": "기존 골든셋과 중복"}
+    # 이미 검수해서 기각한 것을 다시 부르지 않는다. 재실행 비용의 대부분이
+    # 여기서 나온다 — 3차 실행이 무효가 됐을 때 이 장부가 없어서 무엇을
+    # 다시 해야 하는지 알 수 없었다.
+    if key in ledger:
+        return {**out, "verdict": "건너뜀", "reason": f"이전 검수 {ledger[key]}"}
 
     rationale = row.get("rationale", "")
     p = propose(row)
@@ -241,6 +297,9 @@ def main() -> None:
         rows = [r for r in rows
                 if (r.get("clause_text") or r.get("clause_text_candidate"))]
     known = existing_clause_keys()
+    ledger = load_ledger()
+    if ledger:
+        print(f"검수 이력 {len(ledger)}건 — 이미 판정한 조항은 건너뛴다")
     todo = rows[args.offset:args.offset + args.limit]
     print(f"후보 {len(rows)}건 중 {len(todo)}건 검수 "
           f"(검수 에이전트 {_REVIEWERS}명, {_REJECT_VOTES}표 기각 시 탈락)")
@@ -255,7 +314,7 @@ def main() -> None:
     results = []
     try:
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
-            for i, r in enumerate(pool.map(lambda x: review_one(x, known), todo), 1):
+            for i, r in enumerate(pool.map(lambda x: review_one(x, known, ledger), todo), 1):
                 results.append(r)
                 print(f"  {i:3d}/{len(todo)} [{r['verdict']:5s}] "
                       f"{r.get('clause_text', r.get('reason', ''))[:60]}")
@@ -263,6 +322,18 @@ def main() -> None:
         # 여기까지의 결과는 유효하므로 버리지 않고 기록한 뒤 중단한다.
         print(f"\n중단: {exc}")
         print(f"{len(results)}건까지의 결과만 기록한다.")
+
+    # 이번에 실제로 판정한 것만 장부에 남긴다 (건너뜀·API 실패는 제외 —
+    # 실패를 기록하면 다음 실행에서 영영 건너뛰게 된다).
+    append_ledger([
+        {"clause_key": clause_key(r.get("clause_text")
+                                  or r.get("_text", "") or r["case_no"]),
+         "verdict": r["verdict"], "reviewer": _REVIEWER,
+         "reason": r.get("reason", "")[:120]}
+        for r in results
+        if r["verdict"] in ("승인", "수정승인", "기각")
+        and "실패" not in r.get("reason", "")
+    ])
 
     passed = [r for r in results if r["verdict"] in ("승인", "수정승인")]
     tally = Counter(r["verdict"] for r in results)
@@ -287,7 +358,8 @@ def main() -> None:
                     "gold_risk_level": r["gold_risk_level"],
                     "gold_risk_type": r["gold_risk_type"],
                     "label_grade": "A",   # 정부·법원 판정 기반
-                    "note": f"sprint3 {r['verdict']} · {r['evidence'][:120]}",
+                    "note": (f"sprint3 {r['verdict']} · 검수 {_REVIEWER} · "
+                             f"{r['evidence'][:100]}"),
                 })
 
     lines = [f"# 검수 스프린트 3 — {len(results)}건 중 {len(passed)}건 반영",

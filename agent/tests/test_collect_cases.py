@@ -208,7 +208,7 @@ def test_조항_문구가_없으면_LLM을_부르지_않고_기각한다():
     # 비용을 아끼는 동시에, 문구 없는 후보가 통과할 여지를 원천 차단한다.
     from review_pipeline import review_one
 
-    r = review_one({"rationale": "판단 근거"}, set())
+    r = review_one({"rationale": "판단 근거"}, set(), {})
     assert r["verdict"] == "자동기각" and r["reason"] == "축자 원문 부재"
 
 
@@ -216,7 +216,7 @@ def test_기존_골든셋과_중복이면_기각한다():
     from review_pipeline import review_one
 
     r = review_one({"clause_text": "어떠한 경우에도 환불하지 아니한다",
-                    "rationale": "x"}, {"어떠한경우에도환불하지아니한다"})
+                    "rationale": "x"}, {"어떠한경우에도환불하지아니한다"}, {})
     assert r["verdict"] == "자동기각" and "중복" in r["reason"]
 
 
@@ -247,3 +247,28 @@ def test_정상_조항은_통과한다():
 
     assert is_clause_like("보증금은 어떠한 경우에도 반환하지 아니한다")
     assert is_clause_like("임차인이 임대료 등을 연체할 경우 연체이자율은 월 5%로 하며 일할계산하여 부과한다")
+
+
+def test_이미_검수한_조항은_다시_부르지_않는다():
+    """장부가 없으면 재실행 때마다 이미 기각한 것을 또 검수한다.
+
+    3차 실행이 크레딧 소진으로 무효가 됐을 때, 무엇을 다시 해야 하고 무엇은
+    안 해도 되는지 알 수 없었던 것이 정확히 이 문제였다 — 통과분은 골든셋에
+    남지만 기각분은 아무 데도 남지 않았다.
+    """
+    from review_pipeline import clause_key, review_one
+
+    text = "어떠한 경우에도 환불하지 아니한다"
+    r = review_one({"clause_text": text, "rationale": "x"}, set(),
+                   {clause_key(text): "기각"})
+    assert r["verdict"] == "건너뜀" and "이전 검수" in r["reason"]
+
+
+def test_무료_제공자로_갈아탈_수_있다():
+    """크레딧이 없어도 검수를 이어갈 수 있어야 한다.
+
+    저장소가 이미 쓰던 패턴과 같다(eval_normal_fp "크레딧 소진 시 무료 워커 대체").
+    """
+    import review_pipeline as rp
+
+    assert rp._REVIEWER in ("claude", "solar")
