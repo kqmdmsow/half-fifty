@@ -3699,7 +3699,7 @@ const UI_TRUST: Partial<Record<LangCode, Record<TrustKey, string>>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey | FirewallKey | FwWarnKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey | FirewallKey | FwWarnKey | PrecomputedKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3709,7 +3709,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST, UI_FIREWALL, UI_WARNINGS_FW] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST, UI_FIREWALL, UI_WARNINGS_FW, UI_PRECOMPUTED] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
@@ -3728,4 +3728,74 @@ export function riskTypeLabel(lang: LangCode, koreanType: string): string {
 export function riskLevelLabel(lang: LangCode, level: '안전' | '주의' | '위험'): string {
   const key = level === '위험' ? 'danger' : level === '주의' ? 'caution' : 'safe'
   return t(lang, key)
+}
+
+/* --- 데모 샘플 사전 분석 캐시 고지 배너 (Summary.tsx) --- */
+type PrecomputedKey = 'pcNotice' | 'pcReanalyze'
+
+const UI_PRECOMPUTED: Record<LangCode, Record<PrecomputedKey, string>> = {
+  ko: {
+    pcNotice: '이 예시는 미리 분석해 둔 결과예요. 버튼을 누르면 같은 계약서를 지금 실시간으로 다시 분석해요.',
+    pcReanalyze: '실시간으로 다시 분석',
+  },
+  en: {
+    pcNotice: 'This sample shows a pre-analyzed result. Press the button to re-run the analysis live on the same contract now.',
+    pcReanalyze: 'Re-analyze live',
+  },
+  zh: {
+    pcNotice: '这是提前分析好的示例结果。点击按钮即可对同一合同立即进行实时重新分析。',
+    pcReanalyze: '实时重新分析',
+  },
+  vi: {
+    pcNotice: 'Đây là kết quả mẫu đã được phân tích sẵn. Bấm nút để phân tích lại hợp đồng này theo thời gian thực ngay bây giờ.',
+    pcReanalyze: 'Phân tích lại theo thời gian thực',
+  },
+  th: {
+    pcNotice: 'นี่คือผลลัพธ์ตัวอย่างที่วิเคราะห์ไว้ล่วงหน้า กดปุ่มเพื่อวิเคราะห์สัญญาเดิมใหม่แบบเรียลไทม์ทันที',
+    pcReanalyze: 'วิเคราะห์ใหม่แบบเรียลไทม์',
+  },
+  id: {
+    pcNotice: 'Ini hasil contoh yang sudah dianalisis sebelumnya. Tekan tombol untuk menganalisis ulang kontrak yang sama secara real-time sekarang.',
+    pcReanalyze: 'Analisis ulang secara real-time',
+  },
+  tl: {
+    pcNotice: 'Resulta ito ng sample na inanalisa nang maaga. Pindutin ang button para muling suriin ang parehong kontrata nang real-time ngayon.',
+    pcReanalyze: 'Muling suriin nang real-time',
+  },
+  ne: {
+    pcNotice: 'यो नमूनाको पहिले नै विश्लेषण गरिएको नतिजा हो। बटन थिच्दा उही सम्झौता अहिले नै वास्तविक समयमा फेरि विश्लेषण हुन्छ।',
+    pcReanalyze: 'वास्तविक समयमा फेरि विश्लेषण',
+  },
+  km: {
+    pcNotice: 'នេះជាលទ្ធផលគំរូដែលបានវិភាគទុកជាមុន។ ចុចប៊ូតុងដើម្បីវិភាគកិច្ចសន្យាដដែលឡើងវិញតាមពេលវេលាជាក់ស្តែងឥឡូវនេះ។',
+    pcReanalyze: 'វិភាគឡើងវិញតាមពេលជាក់ស្តែង',
+  },
+  my: {
+    pcNotice: 'ဤသည်မှာ ကြိုတင်ခွဲခြမ်းစိတ်ဖြာထားသော နမူနာရလဒ်ဖြစ်သည်။ ခလုတ်နှိပ်လျှင် တူညီသောစာချုပ်ကို ယခုချက်ချင်း အချိန်နှင့်တပြေးညီ ပြန်လည်ခွဲခြမ်းစိတ်ဖြာပါမည်။',
+    pcReanalyze: 'အချိန်နှင့်တပြေးညီ ပြန်လည်ခွဲခြမ်းစိတ်ဖြာရန်',
+  },
+  mn: {
+    pcNotice: 'Энэ бол урьдчилан шинжилсэн жишээний үр дүн. Товч дарвал ижил гэрээг яг одоо бодит цагт дахин шинжилнэ.',
+    pcReanalyze: 'Бодит цагт дахин шинжлэх',
+  },
+  uz: {
+    pcNotice: 'Bu — oldindan tahlil qilib qoʻyilgan namuna natijasi. Tugmani bossangiz, xuddi shu shartnoma hozir real vaqtda qayta tahlil qilinadi.',
+    pcReanalyze: 'Real vaqtda qayta tahlil qilish',
+  },
+  si: {
+    pcNotice: 'මෙය කලින් විශ්ලේෂණය කර තැබූ නියැදි ප්‍රතිඵලයකි. බොත්තම එබූ විට එම ගිවිසුමම දැන් තත්‍ය කාලීනව නැවත විශ්ලේෂණය කරයි.',
+    pcReanalyze: 'තත්‍ය කාලීනව නැවත විශ්ලේෂණය',
+  },
+  bn: {
+    pcNotice: 'এটি আগে থেকে বিশ্লেষণ করে রাখা নমুনার ফলাফল। বোতাম চাপলে একই চুক্তি এখনই রিয়েল-টাইমে আবার বিশ্লেষণ হবে।',
+    pcReanalyze: 'রিয়েল-টাইমে আবার বিশ্লেষণ',
+  },
+  ru: {
+    pcNotice: 'Это заранее проанализированный результат примера. Нажмите кнопку, чтобы заново проанализировать тот же договор в реальном времени прямо сейчас.',
+    pcReanalyze: 'Проанализировать заново в реальном времени',
+  },
+  ja: {
+    pcNotice: 'これはあらかじめ分析しておいたサンプルの結果です。ボタンを押すと、同じ契約書を今すぐリアルタイムで再分析します。',
+    pcReanalyze: 'リアルタイムで再分析',
+  },
 }

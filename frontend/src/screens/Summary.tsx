@@ -20,6 +20,8 @@ export function SummaryScreen({
   language = 'ko',
   liveProgress = null,
   retrying = false,
+  precomputed = false,
+  onReanalyze,
   recordSaved = false,
   onSaveRecord,
   domain = '',
@@ -38,6 +40,9 @@ export function SummaryScreen({
   /** 스트리밍 분석 중이면 {done,total} — 완료 조항부터 이 화면에 바로 쌓인다 */
   liveProgress?: { done: number; total: number } | null
   retrying?: boolean
+  /** 데모 샘플의 사전 분석 캐시 결과인지 — 정직한 고지 배너 + 실시간 재분석 버튼 */
+  precomputed?: boolean
+  onReanalyze?: () => void
   recordSaved?: boolean
   onSaveRecord?: () => void
   domain?: string
@@ -81,6 +86,23 @@ export function SummaryScreen({
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up px-6 py-12 md:py-16">
+      {/* 사전 분석 캐시 고지 — 데모 샘플을 즉시 보여줄 때 심사위원 기만이 되지
+          않도록 명시하고, 버튼 한 번으로 같은 입력을 실시간 재분석한다.
+          스타일은 App.tsx의 언어 불일치 배너와 동일 (겹칠 땐 언어 배너 우선). */}
+      {precomputed && onReanalyze && (
+        <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-brand-500/20 bg-brand-50 px-5 py-4 md:flex-row md:items-center md:justify-between">
+          <p className="text-[14px] font-semibold leading-relaxed text-ink-700">
+            {t(language, 'pcNotice')}
+          </p>
+          <button
+            type="button"
+            onClick={onReanalyze}
+            className="shrink-0 rounded-xl bg-brand-500 px-4 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-brand-600"
+          >
+            {t(language, 'pcReanalyze')}
+          </button>
+        </div>
+      )}
       {warnings.map((warning, wi) => {
         const code = warningCodes[wi]
         const key = code ? WARNING_CODE_KEYS[code] : undefined

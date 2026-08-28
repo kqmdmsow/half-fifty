@@ -12,6 +12,7 @@ import { DocMark, Wordmark } from './components/Brand'
 import { saveRecord, type SavedRecord } from './records'
 import { currentSession, pushServerRecord, signOut, type Session } from './auth'
 import type { DemoSample } from './data/samples'
+import { cachedSampleResult } from './data/sampleCache'
 import type { ClauseResult as ClauseResultType } from './api'
 import { DetailScreen } from './screens/Detail'
 import { DoneScreen } from './screens/Done'
@@ -86,6 +87,10 @@ export default function App() {
   // judge 재시도로 조항이 다시 생성되는 중 — 카드가 소리 없이 교체되는 대신
   // 배너로 알린다 (#101 '새로고침 느낌' 피드백)
   const [retrying, setRetrying] = useState(false)
+  // 현재 결과가 데모 샘플의 사전 분석 캐시인지 — 심사위원 기만이 되지 않게
+  // Summary 상단에 "미리 분석해 둔 예시" 고지 배너 + 실시간 재분석 버튼을
+  // 띄운다. 실분석이 시작되면(runAnalysis) 반드시 꺼진다.
+  const [precomputed, setPrecomputed] = useState(false)
   // 옵트인 로컬 기록 (#102 v1) — 현재 결과의 저장 여부
   const [recordSaved, setRecordSaved] = useState(false)
   const [savedRecordId, setSavedRecordId] = useState<string | null>(null)
@@ -184,6 +189,7 @@ export default function App() {
     setData(null)
     setAnalyzedLanguage(language)
     setRetrying(false)
+    setPrecomputed(false) // 실분석이므로 사전 분석 고지 배너 해제
     setRecordSaved(false)
     setSavedRecordId(null)
     setSavedToAccount(false)
@@ -244,6 +250,7 @@ export default function App() {
     setText('')
     setDomain('')
     setSelectedClauseId(null)
+    setPrecomputed(false)
     go('upload')
   }
 
@@ -265,12 +272,35 @@ export default function App() {
       setMode('text')
       setFile(null)
       setText(sample.text ?? '')
+
+      // 사전 분석 캐시: ko + 캐시 존재 시 클릭 즉시 결과 화면으로.
+      // 입력 상태(mode·text·persona·domain)는 위에서 이미 채웠으므로
+      // 배너의 '실시간으로 다시 분석'이 기존 runAnalysis 경로를 그대로 탄다.
+      // 캐시가 없거나 언어가 ko가 아니면 기존 동작(입력 폼 채우기)만 하고,
+      // 분석이 진행 중이면(뒤로가기로 재진입) 스트림 완료가 캐시 화면을
+      // 덮어쓰며 배너만 남는 꼬임을 피하기 위해 캐시를 쓰지 않는다.
+      const cached = !loading && language === 'ko' ? cachedSampleResult(sample.id) : null
+      if (cached) {
+        setError(null)
+        setStreamProgress(null)
+        setStreamedClauses([])
+        setSelectedClauseId(null)
+        setData(cached)
+        setAnalyzedLanguage('ko') // 캐시는 ko로 생성 — 언어 전환 시 재분석 배너가 뜬다
+        setRetrying(false)
+        setRecordSaved(false)
+        setSavedRecordId(null)
+        setSavedToAccount(false)
+        setPrecomputed(true)
+        go('summary')
+      }
     }
   }
 
   const openRecord = (record: SavedRecord) => {
     setData(record.data)
     setDomain(record.domain)
+    setPrecomputed(false) // 기록 열람은 캐시가 아니다 — 고지 배너 잔존 방지
     setRecordSaved(true) // 이미 저장된 기록이므로 중복 저장 버튼 숨김
     setSavedRecordId(record.id) // Done 화면 '삭제' 시 이 기록도 함께 지우기 위해
     go('summary')
@@ -578,6 +608,14 @@ export default function App() {
             language={language}
             liveProgress={streamingLive ? streamProgress : null}
             retrying={retrying}
+            // 사전 분석 캐시 고지 — 언어 불일치 배너(위 langMismatch)와 겹치면
+            // 언어 배너가 우선한다: 어느 쪽이든 재분석 버튼이 실분석을 돌리므로
+            // 같은 화면에 재분석 배너 두 개를 쌓지 않는다.
+            precomputed={precomputed && language === analyzedLanguage}
+            onReanalyze={() => {
+              setPrecomputed(false)
+              void runAnalysis()
+            }}
             recordSaved={recordSaved}
             onSaveRecord={
               data
