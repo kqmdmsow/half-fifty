@@ -83,7 +83,11 @@ function evidenceQuote(
   clause: Pick<ClauseResult, 'risk_evidence' | 'original_text' | 'evidence_spans'>,
 ): string {
   const span = clause.evidence_spans?.[0]
-  if (span && span.length === 2) {
+  // HighlightedText.tsx와 동일한 경계 검사 — 비정상 구간이면 폴백 체인으로.
+  // 이 인용은 복사되어 계약 상대방에게 전송되는 텍스트라 방어 수준을 맞춘다.
+  if (span && span.length === 2
+      && Number.isInteger(span[0]) && Number.isInteger(span[1])
+      && span[0] >= 0 && span[0] < span[1] && span[1] <= clause.original_text.length) {
     const sliced = clause.original_text.slice(span[0], span[1]).trim()
     if (sliced) return truncate(sliced)
   }
@@ -98,10 +102,18 @@ function evidenceQuote(
  *  첫 번째 알려진 유형으로 매칭한다. */
 function normalizeRiskType(riskType: string): string | null {
   if (riskType in NEGOTIATION_DEMANDS) return riskType
+  // 다중값이면 문자열에서 가장 먼저 언급된 유형이 주 유형이다
+  // (taxonomy v2 §부작용의 "3. A, 4. B" 사례에서 A가 주 판정).
+  let best: string | null = null
+  let bestIdx = Infinity
   for (const known of Object.keys(NEGOTIATION_DEMANDS)) {
-    if (riskType.includes(known)) return known
+    const idx = riskType.indexOf(known)
+    if (idx !== -1 && idx < bestIdx) {
+      best = known
+      bestIdx = idx
+    }
   }
-  return null
+  return best
 }
 
 /** 상대방(한국인)에게 보여줄 협상 문구 — 조항 근거 인용 + 유형별 요구.
@@ -119,7 +131,9 @@ export function buildNegotiation(
 
 /** 기관 한 줄 설명의 i18n 키 — doSvc*는 Done 화면(UI_SCREENS)과 공용,
  *  agSvc*는 이 기능에서 추가(UI_ACTION). */
-export type AgencyDescKey = 'doSvcKlac' | 'doSvcJeonse' | 'doSvcFss' | 'agSvcHldcc' | 'agSvcKca'
+export type AgencyDescKey =
+  | 'doSvcKlac' | 'doSvcJeonse' | 'doSvcFss'
+  | 'agSvcHldcc' | 'agSvcKca' | 'agSvcKofair' | 'agSvcMoel'
 
 export interface RescueAgency {
   /** 기관명 — 고유명사라 한국어 유지 (번역 방침) */
@@ -162,6 +176,18 @@ export const AGENCIES = {
     url: 'https://www.kca.go.kr',
     descKey: 'agSvcKca',
   },
+  kofair: {
+    name: '한국공정거래조정원',
+    phone: '1588-1490',
+    url: 'https://www.kofair.or.kr',
+    descKey: 'agSvcKofair',
+  },
+  moel: {
+    name: '고용노동부 고객상담센터',
+    phone: '1350',
+    url: 'https://www.moel.go.kr',
+    descKey: 'agSvcMoel',
+  },
 } as const satisfies Record<string, RescueAgency>
 
 // Upload.tsx DOMAINS(= agent ALLOWED_DOMAINS)의 값 기준 그룹.
@@ -171,12 +197,14 @@ const FINANCE_DOMAINS = ['대출·여신', '보험', '신용카드', '예금·�
 /** 문서 도메인 → 구제기관 목록.
  *  - 임대차: 분쟁조정위(조정) + 전세피해지원센터 + 법률구조공단
  *  - 금융: 금융감독원(1332) + 법률구조공단
- *  - 근로계약: 소비자 계약이 아니라 한국소비자원 안내가 어긋난다 —
- *    범용 무료 법률상담인 법률구조공단만 안내
+ *  - 가맹: 가맹점주는 소비자가 아니라 사업자라 1372가 어긋난다 —
+ *    사업자 간 분쟁 조정 기관인 공정거래조정원(1588-1490)으로 안내
+ *  - 근로계약: 같은 이유로 소비자원 대신 고용노동부(1350)로 안내
  *  - 그 외(모름 포함): 한국소비자원(1372) + 법률구조공단 */
 export function agenciesForDomain(domain: string): RescueAgency[] {
   if (LEASE_DOMAINS.includes(domain)) return [AGENCIES.hldcc, AGENCIES.jeonse, AGENCIES.klac]
   if (FINANCE_DOMAINS.includes(domain)) return [AGENCIES.fss, AGENCIES.klac]
-  if (domain === '근로계약') return [AGENCIES.klac]
+  if (domain === '가맹(프랜차이즈)') return [AGENCIES.kofair, AGENCIES.klac]
+  if (domain === '근로계약') return [AGENCIES.moel, AGENCIES.klac]
   return [AGENCIES.kca, AGENCIES.klac]
 }

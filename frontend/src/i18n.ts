@@ -3736,7 +3736,7 @@ export function riskLevelLabel(lang: LangCode, level: '안전' | '주의' | '위
 // 기관명은 고유명사라 원문 유지, 한 줄 설명(agSvc*)만 번역한다.
 type ActionKey =
   | 'agNext' | 'agAskTitle' | 'agKoreanHint' | 'agAgencyTitle' | 'agDisclaimer'
-  | 'agSvcHldcc' | 'agSvcKca'
+  | 'agSvcHldcc' | 'agSvcKca' | 'agSvcKofair' | 'agSvcMoel'
 
 const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
   ko: {
@@ -3747,6 +3747,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: '법률 자문이 아니라 요구·확인을 돕는 참고 문구예요',
     agSvcHldcc: '보증금·수선 등 임대차 분쟁을 소송 없이 조정 (국토교통부)',
     agSvcKca: '소비자 계약 피해 상담·분쟁 조정 (소비자상담센터 1372)',
+    agSvcKofair: '가맹·하도급 등 사업자 간 불공정 거래 분쟁 조정 (한국공정거래조정원)',
+    agSvcMoel: '임금·근로계약 상담 (고용노동부 고객상담센터 1350)',
   },
   en: {
     agNext: 'Next steps',
@@ -3756,6 +3758,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Not legal advice — a reference phrase to help you ask and check',
     agSvcHldcc: 'Mediates lease disputes (deposit, repairs) without going to court (MOLIT)',
     agSvcKca: 'Consumer contract damage counseling & dispute mediation (hotline 1372)',
+    agSvcKofair: 'Mediates franchise and subcontracting disputes between businesses (KOFAIR)',
+    agSvcMoel: 'Wage and employment contract counseling (Ministry of Employment and Labor, 1350)',
   },
   zh: {
     agNext: '下一步行动',
@@ -3765,6 +3769,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: '这不是法律咨询，仅是帮助您提出要求和确认的参考文句',
     agSvcHldcc: '不经诉讼调解押金、修缮等租赁纠纷（国土交通部）',
     agSvcKca: '消费者合同受害咨询与纠纷调解（咨询中心 1372）',
+    agSvcKofair: '调解加盟、分包等企业间不公平交易纠纷（韩国公正交易调解院）',
+    agSvcMoel: '工资与劳动合同咨询（雇佣劳动部客服中心 1350）',
   },
   vi: {
     agNext: 'Bước tiếp theo',
@@ -3774,6 +3780,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Không phải tư vấn pháp lý — chỉ là câu tham khảo giúp bạn yêu cầu và xác nhận',
     agSvcHldcc: 'Hòa giải tranh chấp thuê nhà (tiền cọc, sửa chữa) không cần kiện tụng (Bộ Đất đai)',
     agSvcKca: 'Tư vấn thiệt hại hợp đồng tiêu dùng & hòa giải tranh chấp (tổng đài 1372)',
+    agSvcKofair: 'Hòa giải tranh chấp nhượng quyền, thầu phụ giữa các doanh nghiệp (KOFAIR)',
+    agSvcMoel: 'Tư vấn tiền lương và hợp đồng lao động (Bộ Việc làm và Lao động, 1350)',
   },
   th: {
     agNext: 'ขั้นตอนถัดไป',
@@ -3783,6 +3791,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'ไม่ใช่คำปรึกษากฎหมาย — เป็นข้อความอ้างอิงช่วยในการเรียกร้องและตรวจสอบ',
     agSvcHldcc: 'ไกล่เกลี่ยข้อพิพาทเช่า (เงินมัดจำ ซ่อมแซม) โดยไม่ต้องฟ้องร้อง (กระทรวงที่ดิน)',
     agSvcKca: 'ปรึกษาความเสียหายสัญญาผู้บริโภคและไกล่เกลี่ยข้อพิพาท (สายด่วน 1372)',
+    agSvcKofair: 'ไกล่เกลี่ยข้อพิพาทแฟรนไชส์และรับช่วงงานระหว่างธุรกิจ (KOFAIR)',
+    agSvcMoel: 'ให้คำปรึกษาค่าจ้างและสัญญาจ้างงาน (กระทรวงแรงงาน 1350)',
   },
   id: {
     agNext: 'Langkah berikutnya',
@@ -3792,6 +3802,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Bukan nasihat hukum — kalimat referensi untuk membantu meminta dan memastikan',
     agSvcHldcc: 'Mediasi sengketa sewa (deposit, perbaikan) tanpa ke pengadilan (MOLIT)',
     agSvcKca: 'Konsultasi kerugian kontrak konsumen & mediasi sengketa (hotline 1372)',
+    agSvcKofair: 'Mediasi sengketa waralaba dan subkontrak antar pelaku usaha (KOFAIR)',
+    agSvcMoel: 'Konsultasi upah dan kontrak kerja (Kementerian Ketenagakerjaan, 1350)',
   },
   tl: {
     agNext: 'Susunod na hakbang',
@@ -3801,6 +3813,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Hindi ito legal na payo — sanggunian lang para makahiling at makapag-check',
     agSvcHldcc: 'Namamagitan sa alitan sa upa (deposito, pagkukumpuni) nang walang kaso (MOLIT)',
     agSvcKca: 'Konsultasyon sa pinsala sa kontrata ng mamimili at pamamagitan (hotline 1372)',
+    agSvcKofair: 'Namamagitan sa mga alitan sa prangkisa at subcontracting ng mga negosyo (KOFAIR)',
+    agSvcMoel: 'Konsultasyon sa sahod at kontrata sa trabaho (Ministry of Employment and Labor, 1350)',
   },
   ne: {
     agNext: 'अर्को कदम',
@@ -3810,6 +3824,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'यो कानुनी सल्लाह होइन — माग र पुष्टिमा सघाउने सन्दर्भ वाक्य मात्र हो',
     agSvcHldcc: 'भाडा विवाद (धरौटी, मर्मत) मुद्दा नगरी मिलाउँछ (भूमि मन्त्रालय)',
     agSvcKca: 'उपभोक्ता सम्झौता क्षति परामर्श र विवाद समाधान (हटलाइन 1372)',
+    agSvcKofair: 'व्यवसायबीच फ्रान्चाइज र उपठेक्का विवाद मिलाउँछ (KOFAIR)',
+    agSvcMoel: 'तलब र रोजगार सम्झौता परामर्श (रोजगार तथा श्रम मन्त्रालय, 1350)',
   },
   km: {
     agNext: 'ជំហានបន្ទាប់',
@@ -3819,6 +3835,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'មិនមែនជាការប្រឹក្សាច្បាប់ទេ — គ្រាន់តែជាឃ្លាយោងជួយទាមទារនិងផ្ទៀងផ្ទាត់',
     agSvcHldcc: 'សម្រុះសម្រួលវិវាទជួល (ប្រាក់កក់ ជួសជុល) ដោយមិនប្តឹង (MOLIT)',
     agSvcKca: 'ប្រឹក្សាការខូចខាតកិច្ចសន្យាអ្នកប្រើប្រាស់ និងសម្រុះសម្រួលវិវាទ (លេខ 1372)',
+    agSvcKofair: 'សម្របសម្រួលវិវាទ franchise និងកិច្ចសន្យាបន្តរវាងអាជីវកម្ម (KOFAIR)',
+    agSvcMoel: 'ប្រឹក្សាប្រាក់ឈ្នួល និងកិច្ចសន្យាការងារ (ក្រសួងការងារ 1350)',
   },
   my: {
     agNext: 'နောက်တစ်ဆင့်',
@@ -3828,6 +3846,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'ဥပဒေအကြံပေးမဟုတ်ပါ — တောင်းဆိုစစ်ဆေးရာတွင် ကူညီသောရည်ညွှန်းစာသားသာဖြစ်သည်',
     agSvcHldcc: 'ငှားရမ်းအငြင်းပွားမှု (အာမခံငွေ၊ ပြင်ဆင်ရေး) ကို တရားမစွဲဘဲ ဖြေရှင်းပေးသည် (MOLIT)',
     agSvcKca: 'စားသုံးသူစာချုပ် နစ်နာမှုအကြံပေးနှင့် အငြင်းပွားမှုဖြေရှင်းရေး (ဖုန်း 1372)',
+    agSvcKofair: 'လုပ်ငန်းများကြား franchise နှင့် တဆင့်ကန်ထရိုက် အငြင်းပွားမှုကို ဖျန်ဖြေပေးသည် (KOFAIR)',
+    agSvcMoel: 'လုပ်ခနှင့် အလုပ်ခန့်စာချုပ် ဆွေးနွေးအကြံပေး (အလုပ်သမားဝန်ကြီးဌာန 1350)',
   },
   mn: {
     agNext: 'Дараагийн алхам',
@@ -3837,6 +3857,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Хуулийн зөвлөгөө биш — шаардах, шалгахад туслах лавлагаа өгүүлбэр',
     agSvcHldcc: 'Түрээсийн маргааныг (барьцаа, засвар) шүүхгүйгээр эвлэрүүлнэ (MOLIT)',
     agSvcKca: 'Хэрэглэгчийн гэрээний хохирлын зөвлөгөө, маргаан зохицуулалт (утас 1372)',
+    agSvcKofair: 'Франчайз, туслан гүйцэтгэх зэрэг бизнес хоорондын маргааныг эвлэрүүлэн зуучилна (KOFAIR)',
+    agSvcMoel: 'Цалин, хөдөлмөрийн гэрээний зөвлөгөө (Хөдөлмөрийн яам, 1350)',
   },
   uz: {
     agNext: 'Keyingi qadam',
@@ -3846,6 +3868,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Yuridik maslahat emas — talab qilish va tekshirishga yordam beruvchi namuna matn',
     agSvcHldcc: 'Ijara nizolarini (garov, ta’mirlash) sudsiz hal qiladi (MOLIT)',
     agSvcKca: 'Iste’molchi shartnomasi zarari bo‘yicha maslahat va nizo hal qilish (telefon 1372)',
+    agSvcKofair: 'Bizneslar orasidagi franshiza va subpudrat nizolarida vositachilik qiladi (KOFAIR)',
+    agSvcMoel: 'Ish haqi va mehnat shartnomasi boʻyicha maslahat (Mehnat vazirligi, 1350)',
   },
   si: {
     agNext: 'ඊළඟ පියවර',
@@ -3855,6 +3879,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'නීති උපදෙස් නොවේ — ඉල්ලීමට සහ පරීක්ෂාවට උදව් වන යොමු වාක්‍යයක් පමණි',
     agSvcHldcc: 'කුලී ආරවුල් (තැන්පතු, අලුත්වැඩියා) නඩු නොමැතිව සමථ කරයි (MOLIT)',
     agSvcKca: 'පාරිභෝගික ගිවිසුම් හානි උපදේශන සහ ආරවුල් සමථය (දුරකථන 1372)',
+    agSvcKofair: 'ව්‍යාපාර අතර franchise සහ උප කොන්ත්‍රාත් ආරවුල් සමථ කරයි (KOFAIR)',
+    agSvcMoel: 'වැටුප් හා රැකියා ගිවිසුම් උපදේශනය (කම්කරු අමාත්‍යාංශය 1350)',
   },
   bn: {
     agNext: 'পরবর্তী পদক্ষেপ',
@@ -3864,6 +3890,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'আইনি পরামর্শ নয় — দাবি ও যাচাইয়ে সাহায্যকারী রেফারেন্স বাক্য মাত্র',
     agSvcHldcc: 'ভাড়া বিরোধ (জামানত, মেরামত) মামলা ছাড়াই মীমাংসা করে (MOLIT)',
     agSvcKca: 'ভোক্তা চুক্তির ক্ষতি পরামর্শ ও বিরোধ মীমাংসা (হটলাইন 1372)',
+    agSvcKofair: 'ব্যবসার মধ্যে ফ্র্যাঞ্চাইজি ও সাবকন্ট্রাক্ট বিরোধ মীমাংসা করে (KOFAIR)',
+    agSvcMoel: 'মজুরি ও কর্মসংস্থান চুক্তি পরামর্শ (কর্মসংস্থান ও শ্রম মন্ত্রণালয়, 1350)',
   },
   ru: {
     agNext: 'Следующие шаги',
@@ -3873,6 +3901,8 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: 'Это не юридическая консультация — справочная формулировка для требований и проверки',
     agSvcHldcc: 'Урегулирует арендные споры (депозит, ремонт) без суда (MOLIT)',
     agSvcKca: 'Консультации по ущербу от потребительских договоров и урегулирование споров (тел. 1372)',
+    agSvcKofair: 'Посредничество в спорах по франшизе и субподряду между предпринимателями (KOFAIR)',
+    agSvcMoel: 'Консультации по зарплате и трудовому договору (Министерство труда, 1350)',
   },
   ja: {
     agNext: '次の行動',
@@ -3882,5 +3912,7 @@ const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
     agDisclaimer: '法律相談ではなく、要求・確認を助ける参考文です',
     agSvcHldcc: '賃貸借紛争（保証金・修繕）を訴訟なしで調整（国土交通部）',
     agSvcKca: '消費者契約の被害相談・紛争調整（相談センター 1372）',
+    agSvcKofair: '加盟店・下請など事業者間の不公正取引紛争を調停（韓国公正取引調停院）',
+    agSvcMoel: '賃金・労働契約の相談（雇用労働部お客様センター 1350）',
   },
 }
