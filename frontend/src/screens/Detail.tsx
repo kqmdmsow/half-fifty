@@ -9,6 +9,7 @@ import { clauseHeading } from '../clauseTitle'
 import { FormattedText } from '../components/FormattedText'
 import { isVoiceSupported, startVoiceSession, type VoiceSession } from '../voiceCommands'
 import { speak, stopSpeaking, useVoiceAvailable, voiceAvailable } from '../tts'
+import { agenciesForDomain, buildNegotiation } from '../data/actionGuide'
 
 export function DetailScreen({
   clauseId,
@@ -16,6 +17,7 @@ export function DetailScreen({
   voiceGuide,
   language = 'ko',
   persona = 'adult',
+  domain = '',
   onSelectClause,
   onBack,
   onDone,
@@ -25,6 +27,8 @@ export function DetailScreen({
   voiceGuide: boolean
   language?: LangCode
   persona?: Persona
+  /** 문서 도메인 (Upload 사용자 선택, '' = 모름) — 구제기관 매칭용 */
+  domain?: string
   onSelectClause: (clauseId: string) => void
   onBack: () => void
   onDone: () => void
@@ -107,6 +111,12 @@ export function DetailScreen({
   const questions = clause.check_questions.length
     ? clause.check_questions
     : [t(language, 'fallbackQuestion')]
+
+  // 다음 행동 (과제 B) — 위험·주의이면서 판정이 유효한 조항에서만.
+  // 판정 거부·분석 실패 조항에 요구 문구를 만들면 근거 없는 요구가 된다.
+  const showNextActions =
+    clause.risk_level !== '안전' && !clause.verdict_withheld && !clause.analysis_failed
+  const negotiation = showNextActions ? buildNegotiation(clause) : ''
 
   return (
     <div className="mx-auto max-w-5xl animate-fade-up px-6 py-10 md:py-14">
@@ -403,6 +413,66 @@ export function DetailScreen({
               })}
             </div>
           </div>
+
+          {/* 다음 행동 (과제 B) — 판정을 행동으로 연결: 협상 문구 + 구제기관.
+              사람이 작성한 규칙 기반 문구(LLM 미호출)라 환각 위험이 없다
+              (data/actionGuide.ts). 안전 조항, 판정 거부(verdict_withheld),
+              분석 실패(analysis_failed) 조항에는 표시하지 않는다 — 근거 없는
+              요구 문구는 fail-closed 원칙에 어긋나기 때문.
+              TTS(#118)는 clause.explanation만 낭독하므로 이 섹션은 낭독
+              흐름에 영향이 없다. */}
+          {showNextActions && (
+            <div className="mt-7">
+              <p className="text-[16px] font-bold text-ink-900">{t(language, 'agNext')}</p>
+
+              {/* ① 협상 문구 — 근거 인용 + 유형별 요구. 한국어 유지(번역 방침:
+                  상대방에게 보여주는 용도), 비한국어 UI엔 용도 라벨을 함께. */}
+              <div className="mt-3 rounded-2xl border border-ink-100 bg-white p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[14px] font-bold text-ink-900">{t(language, 'agAskTitle')}</p>
+                  <CopyButton text={negotiation} copiedText={t(language, 'copied')}>
+                    {t(language, 'copy')}
+                  </CopyButton>
+                </div>
+                {language !== 'ko' && (
+                  <p className="mt-1 text-[13px] text-ink-400">{t(language, 'agKoreanHint')}</p>
+                )}
+                <p className="mt-2.5 rounded-xl bg-ink-25 px-4 py-3 text-[14px] leading-relaxed text-ink-700">
+                  {negotiation}
+                </p>
+                <p className="mt-2 text-[12px] text-ink-400">{t(language, 'agDisclaimer')}</p>
+              </div>
+
+              {/* ② 구제기관 — 문서 도메인 매칭 (기관 데이터는 Done 화면과
+                  actionGuide.ts AGENCIES를 공유해 어긋나지 않는다) */}
+              <div className="mt-2.5 rounded-2xl border border-ink-100 bg-white p-5">
+                <p className="text-[14px] font-bold text-ink-900">{t(language, 'agAgencyTitle')}</p>
+                <div className="mt-2.5 space-y-2.5">
+                  {agenciesForDomain(domain).map((agency) => (
+                    <div
+                      key={agency.name}
+                      className="flex flex-col gap-2 rounded-xl bg-ink-25 px-4 py-3 md:flex-row md:items-center md:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-[14px] font-bold text-ink-900">{agency.name}</p>
+                        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-500">
+                          {t(language, agency.descKey)}
+                        </p>
+                      </div>
+                      {agency.phone && (
+                        <a
+                          href={`tel:${agency.phone}`}
+                          className="shrink-0 self-start rounded-lg bg-white px-2.5 py-1.5 text-[13px] font-bold text-ink-600 hover:bg-ink-50 md:self-auto"
+                        >
+                          {t(language, 'doCall')} {agency.phone}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mt-9 flex flex-col-reverse justify-between gap-2.5 md:flex-row">
             <Button variant="secondary" onClick={onBack}>

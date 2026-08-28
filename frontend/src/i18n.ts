@@ -3699,7 +3699,7 @@ const UI_TRUST: Partial<Record<LangCode, Record<TrustKey, string>>> = {
 
 export function t(
   lang: LangCode,
-  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey | FirewallKey | FwWarnKey,
+  key: UIKey | ExtraKey | LandingKey | ScreenKey | SampleKey | PersonaKey | CalcKey | ReexplainKey | QuizKey | ZoomKey | VoiceKey | RecordKey | AuthKey | ApiKey | DownloadKey | FeedbackKey | LearnKey | WarnKey | JudgeKey | ProgKey | TrustKey | FirewallKey | FwWarnKey | ActionKey,
   vars?: Record<string, number | string>,
 ): string {
   const lookup = (dicts: Array<Record<string, Record<string, string>>>, code: LangCode) => {
@@ -3709,7 +3709,7 @@ export function t(
     }
     return undefined
   }
-  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST, UI_FIREWALL, UI_WARNINGS_FW] as Array<Record<string, Record<string, string>>>
+  const dicts = [UI, UI_EXTRA, UI_LANDING, UI_SCREENS, UI_SAMPLES, UI_PERSONA, UI_CALC, UI_REEXPLAIN, UI_QUIZ, UI_ZOOM, UI_VOICE, UI_RECORDS, UI_AUTH, UI_API, UI_DOWNLOAD, UI_FEEDBACK, UI_LEARN, UI_WARNINGS, UI_JUDGE, UI_PROG, UI_TRUST, UI_FIREWALL, UI_WARNINGS_FW, UI_ACTION] as Array<Record<string, Record<string, string>>>
   let text = lookup(dicts, lang) ?? lookup(dicts, 'en') ?? lookup(dicts, 'ko') ?? key
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
@@ -3728,4 +3728,159 @@ export function riskTypeLabel(lang: LangCode, koreanType: string): string {
 export function riskLevelLabel(lang: LangCode, level: '안전' | '주의' | '위험'): string {
   const key = level === '위험' ? 'danger' : level === '주의' ? 'caution' : 'safe'
   return t(lang, key)
+}
+
+/* --- 조항별 행동 가이드 (과제 B) — '다음 행동': 협상 문구 + 구제기관 --- */
+// 협상 문구 본문은 상대방(한국인)에게 보여주는 용도라 한국어 유지(상단 번역
+// 방침) — 비한국어 UI에서는 agKoreanHint 라벨로 용도를 설명한다.
+// 기관명은 고유명사라 원문 유지, 한 줄 설명(agSvc*)만 번역한다.
+type ActionKey =
+  | 'agNext' | 'agAskTitle' | 'agKoreanHint' | 'agAgencyTitle' | 'agDisclaimer'
+  | 'agSvcHldcc' | 'agSvcKca'
+
+const UI_ACTION: Record<LangCode, Record<ActionKey, string>> = {
+  ko: {
+    agNext: '다음 행동',
+    agAskTitle: '상대방에게 이렇게 요구해 보세요',
+    agKoreanHint: '요구 문구는 한국어예요 — 복사해서 보내거나 이 화면을 그대로 보여주세요',
+    agAgencyTitle: '조율이 안 되면 여기에 물어보세요',
+    agDisclaimer: '법률 자문이 아니라 요구·확인을 돕는 참고 문구예요',
+    agSvcHldcc: '보증금·수선 등 임대차 분쟁을 소송 없이 조정 (국토교통부)',
+    agSvcKca: '소비자 계약 피해 상담·분쟁 조정 (소비자상담센터 1372)',
+  },
+  en: {
+    agNext: 'Next steps',
+    agAskTitle: 'Ask the other party for this',
+    agKoreanHint: 'The request is in Korean — copy and send it, or show this screen directly',
+    agAgencyTitle: 'If negotiation fails, ask these agencies',
+    agDisclaimer: 'Not legal advice — a reference phrase to help you ask and check',
+    agSvcHldcc: 'Mediates lease disputes (deposit, repairs) without going to court (MOLIT)',
+    agSvcKca: 'Consumer contract damage counseling & dispute mediation (hotline 1372)',
+  },
+  zh: {
+    agNext: '下一步行动',
+    agAskTitle: '可以这样向对方要求',
+    agKoreanHint: '要求文句为韩语 — 可复制发送，或直接出示此屏幕',
+    agAgencyTitle: '协商不成时，可咨询这些机构',
+    agDisclaimer: '这不是法律咨询，仅是帮助您提出要求和确认的参考文句',
+    agSvcHldcc: '不经诉讼调解押金、修缮等租赁纠纷（国土交通部）',
+    agSvcKca: '消费者合同受害咨询与纠纷调解（咨询中心 1372）',
+  },
+  vi: {
+    agNext: 'Bước tiếp theo',
+    agAskTitle: 'Hãy yêu cầu bên kia như thế này',
+    agKoreanHint: 'Câu yêu cầu bằng tiếng Hàn — sao chép gửi đi hoặc đưa màn hình này cho họ xem',
+    agAgencyTitle: 'Nếu thương lượng không thành, hãy hỏi các cơ quan này',
+    agDisclaimer: 'Không phải tư vấn pháp lý — chỉ là câu tham khảo giúp bạn yêu cầu và xác nhận',
+    agSvcHldcc: 'Hòa giải tranh chấp thuê nhà (tiền cọc, sửa chữa) không cần kiện tụng (Bộ Đất đai)',
+    agSvcKca: 'Tư vấn thiệt hại hợp đồng tiêu dùng & hòa giải tranh chấp (tổng đài 1372)',
+  },
+  th: {
+    agNext: 'ขั้นตอนถัดไป',
+    agAskTitle: 'ลองเรียกร้องกับอีกฝ่ายแบบนี้',
+    agKoreanHint: 'ข้อเรียกร้องเป็นภาษาเกาหลี — คัดลอกส่งหรือแสดงหน้าจอนี้ได้เลย',
+    agAgencyTitle: 'หากตกลงกันไม่ได้ สอบถามหน่วยงานเหล่านี้',
+    agDisclaimer: 'ไม่ใช่คำปรึกษากฎหมาย — เป็นข้อความอ้างอิงช่วยในการเรียกร้องและตรวจสอบ',
+    agSvcHldcc: 'ไกล่เกลี่ยข้อพิพาทเช่า (เงินมัดจำ ซ่อมแซม) โดยไม่ต้องฟ้องร้อง (กระทรวงที่ดิน)',
+    agSvcKca: 'ปรึกษาความเสียหายสัญญาผู้บริโภคและไกล่เกลี่ยข้อพิพาท (สายด่วน 1372)',
+  },
+  id: {
+    agNext: 'Langkah berikutnya',
+    agAskTitle: 'Minta ini kepada pihak lain',
+    agKoreanHint: 'Kalimat permintaan dalam bahasa Korea — salin dan kirim, atau tunjukkan layar ini langsung',
+    agAgencyTitle: 'Jika negosiasi gagal, tanyakan ke lembaga ini',
+    agDisclaimer: 'Bukan nasihat hukum — kalimat referensi untuk membantu meminta dan memastikan',
+    agSvcHldcc: 'Mediasi sengketa sewa (deposit, perbaikan) tanpa ke pengadilan (MOLIT)',
+    agSvcKca: 'Konsultasi kerugian kontrak konsumen & mediasi sengketa (hotline 1372)',
+  },
+  tl: {
+    agNext: 'Susunod na hakbang',
+    agAskTitle: 'Ganito ang hilingin sa kabilang panig',
+    agKoreanHint: 'Nasa Korean ang kahilingan — kopyahin at ipadala, o ipakita ang screen na ito',
+    agAgencyTitle: 'Kung hindi magkasundo, magtanong sa mga ahensyang ito',
+    agDisclaimer: 'Hindi ito legal na payo — sanggunian lang para makahiling at makapag-check',
+    agSvcHldcc: 'Namamagitan sa alitan sa upa (deposito, pagkukumpuni) nang walang kaso (MOLIT)',
+    agSvcKca: 'Konsultasyon sa pinsala sa kontrata ng mamimili at pamamagitan (hotline 1372)',
+  },
+  ne: {
+    agNext: 'अर्को कदम',
+    agAskTitle: 'अर्को पक्षसँग यसरी माग गर्नुहोस्',
+    agKoreanHint: 'माग वाक्य कोरियालीमा छ — कपी गरेर पठाउनुहोस् वा यो स्क्रिन देखाउनुहोस्',
+    agAgencyTitle: 'सहमति नभए यी निकायमा सोध्नुहोस्',
+    agDisclaimer: 'यो कानुनी सल्लाह होइन — माग र पुष्टिमा सघाउने सन्दर्भ वाक्य मात्र हो',
+    agSvcHldcc: 'भाडा विवाद (धरौटी, मर्मत) मुद्दा नगरी मिलाउँछ (भूमि मन्त्रालय)',
+    agSvcKca: 'उपभोक्ता सम्झौता क्षति परामर्श र विवाद समाधान (हटलाइन 1372)',
+  },
+  km: {
+    agNext: 'ជំហានបន្ទាប់',
+    agAskTitle: 'សូមទាមទារពីភាគីម្ខាងទៀតបែបនេះ',
+    agKoreanHint: 'ឃ្លាទាមទារជាភាសាកូរ៉េ — ចម្លងផ្ញើ ឬបង្ហាញអេក្រង់នេះផ្ទាល់',
+    agAgencyTitle: 'បើចរចាមិនបានសម្រេច សូមសួរស្ថាប័នទាំងនេះ',
+    agDisclaimer: 'មិនមែនជាការប្រឹក្សាច្បាប់ទេ — គ្រាន់តែជាឃ្លាយោងជួយទាមទារនិងផ្ទៀងផ្ទាត់',
+    agSvcHldcc: 'សម្រុះសម្រួលវិវាទជួល (ប្រាក់កក់ ជួសជុល) ដោយមិនប្តឹង (MOLIT)',
+    agSvcKca: 'ប្រឹក្សាការខូចខាតកិច្ចសន្យាអ្នកប្រើប្រាស់ និងសម្រុះសម្រួលវិវាទ (លេខ 1372)',
+  },
+  my: {
+    agNext: 'နောက်တစ်ဆင့်',
+    agAskTitle: 'တစ်ဖက်လူကို ဤသို့တောင်းဆိုကြည့်ပါ',
+    agKoreanHint: 'တောင်းဆိုချက်သည် ကိုရီးယားဘာသာဖြစ်သည် — ကူးယူပို့ပါ သို့မဟုတ် ဤစခရင်ကိုပြပါ',
+    agAgencyTitle: 'ညှိနှိုင်း၍မရလျှင် ဤအဖွဲ့အစည်းများကိုမေးပါ',
+    agDisclaimer: 'ဥပဒေအကြံပေးမဟုတ်ပါ — တောင်းဆိုစစ်ဆေးရာတွင် ကူညီသောရည်ညွှန်းစာသားသာဖြစ်သည်',
+    agSvcHldcc: 'ငှားရမ်းအငြင်းပွားမှု (အာမခံငွေ၊ ပြင်ဆင်ရေး) ကို တရားမစွဲဘဲ ဖြေရှင်းပေးသည် (MOLIT)',
+    agSvcKca: 'စားသုံးသူစာချုပ် နစ်နာမှုအကြံပေးနှင့် အငြင်းပွားမှုဖြေရှင်းရေး (ဖုန်း 1372)',
+  },
+  mn: {
+    agNext: 'Дараагийн алхам',
+    agAskTitle: 'Нөгөө талаас ингэж шаардаарай',
+    agKoreanHint: 'Шаардлагын өгүүлбэр солонгосоор — хуулж илгээх эсвэл энэ дэлгэцийг шууд үзүүлээрэй',
+    agAgencyTitle: 'Тохиролцоо бүтэхгүй бол эдгээр байгууллагаас асуугаарай',
+    agDisclaimer: 'Хуулийн зөвлөгөө биш — шаардах, шалгахад туслах лавлагаа өгүүлбэр',
+    agSvcHldcc: 'Түрээсийн маргааныг (барьцаа, засвар) шүүхгүйгээр эвлэрүүлнэ (MOLIT)',
+    agSvcKca: 'Хэрэглэгчийн гэрээний хохирлын зөвлөгөө, маргаан зохицуулалт (утас 1372)',
+  },
+  uz: {
+    agNext: 'Keyingi qadam',
+    agAskTitle: 'Qarshi tomondan shunday talab qiling',
+    agKoreanHint: 'Talab matni koreys tilida — nusxalab yuboring yoki bu ekranni ko‘rsating',
+    agAgencyTitle: 'Kelishuv bo‘lmasa, ushbu tashkilotlardan so‘rang',
+    agDisclaimer: 'Yuridik maslahat emas — talab qilish va tekshirishga yordam beruvchi namuna matn',
+    agSvcHldcc: 'Ijara nizolarini (garov, ta’mirlash) sudsiz hal qiladi (MOLIT)',
+    agSvcKca: 'Iste’molchi shartnomasi zarari bo‘yicha maslahat va nizo hal qilish (telefon 1372)',
+  },
+  si: {
+    agNext: 'ඊළඟ පියවර',
+    agAskTitle: 'අනෙක් පාර්ශ්වයෙන් මෙසේ ඉල්ලන්න',
+    agKoreanHint: 'ඉල්ලීම කොරියානු බසින් — පිටපත් කර යවන්න, නැතහොත් මෙම තිරය පෙන්වන්න',
+    agAgencyTitle: 'එකඟ නොවුණොත් මෙම ආයතනවලින් අසන්න',
+    agDisclaimer: 'නීති උපදෙස් නොවේ — ඉල්ලීමට සහ පරීක්ෂාවට උදව් වන යොමු වාක්‍යයක් පමණි',
+    agSvcHldcc: 'කුලී ආරවුල් (තැන්පතු, අලුත්වැඩියා) නඩු නොමැතිව සමථ කරයි (MOLIT)',
+    agSvcKca: 'පාරිභෝගික ගිවිසුම් හානි උපදේශන සහ ආරවුල් සමථය (දුරකථන 1372)',
+  },
+  bn: {
+    agNext: 'পরবর্তী পদক্ষেপ',
+    agAskTitle: 'অপর পক্ষকে এভাবে দাবি জানান',
+    agKoreanHint: 'দাবির বাক্যটি কোরিয়ান ভাষায় — কপি করে পাঠান বা এই স্ক্রিন দেখান',
+    agAgencyTitle: 'সমঝোতা না হলে এই সংস্থাগুলোতে জিজ্ঞাসা করুন',
+    agDisclaimer: 'আইনি পরামর্শ নয় — দাবি ও যাচাইয়ে সাহায্যকারী রেফারেন্স বাক্য মাত্র',
+    agSvcHldcc: 'ভাড়া বিরোধ (জামানত, মেরামত) মামলা ছাড়াই মীমাংসা করে (MOLIT)',
+    agSvcKca: 'ভোক্তা চুক্তির ক্ষতি পরামর্শ ও বিরোধ মীমাংসা (হটলাইন 1372)',
+  },
+  ru: {
+    agNext: 'Следующие шаги',
+    agAskTitle: 'Попросите другую сторону об этом',
+    agKoreanHint: 'Текст требования на корейском — скопируйте и отправьте или покажите этот экран',
+    agAgencyTitle: 'Если договориться не удалось, обратитесь в эти организации',
+    agDisclaimer: 'Это не юридическая консультация — справочная формулировка для требований и проверки',
+    agSvcHldcc: 'Урегулирует арендные споры (депозит, ремонт) без суда (MOLIT)',
+    agSvcKca: 'Консультации по ущербу от потребительских договоров и урегулирование споров (тел. 1372)',
+  },
+  ja: {
+    agNext: '次の行動',
+    agAskTitle: '相手にこう要求してみましょう',
+    agKoreanHint: '要求文は韓国語です — コピーして送るか、この画面をそのまま見せてください',
+    agAgencyTitle: '調整できない場合はこちらに相談',
+    agDisclaimer: '法律相談ではなく、要求・確認を助ける参考文です',
+    agSvcHldcc: '賃貸借紛争（保証金・修繕）を訴訟なしで調整（国土交通部）',
+    agSvcKca: '消費者契約の被害相談・紛争調整（相談センター 1372）',
+  },
 }

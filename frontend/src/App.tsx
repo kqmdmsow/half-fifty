@@ -606,6 +606,7 @@ export default function App() {
             voiceGuide={voiceGuide}
             language={language}
             persona={persona}
+            domain={domain}
             onSelectClause={setSelectedClauseId}
             onBack={() => go('summary')}
             onDone={() => go('done')}
