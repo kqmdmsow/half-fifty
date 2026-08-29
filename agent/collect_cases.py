@@ -128,7 +128,10 @@ def search_cases(target: str, query: str, section: str, limit: int) -> list:
         if not blocks:
             break
         for b in blocks:
-            seq = _tag(b, "결정문일련번호") or _tag(b, "판례일련번호")
+            # 일련번호 태그명이 target마다 다르다 (실측: prec=판례, ftc/ppc/fsc=결정문,
+            # decc=행정심판재결례). 하나라도 걸리면 그것을 쓴다.
+            seq = next((v for v in (_tag(b, t) for t in (
+                "결정문일련번호", "판례일련번호", "행정심판재결례일련번호")) if v), "")
             if seq:
                 out.append((seq, _tag(b, "사건명"), _tag(b, "사건번호")))
         page += 1
@@ -287,9 +290,31 @@ _NARRATIVE = re.compile(r"^\s*(라\s*한다|라\s*하고|이라\s*한다)|"
                         r"\d{4}\.\s*\d{1,2}\.\s*\d{0,2}\.?")
 
 
+# 기관·법원이 조항을 **설명하는** 말투. 조항 문언은 규범을 정하지, 그 조항을
+# 평가하지 않는다. 원문 대조는 통과하지만(근거 서술에 그대로 있으므로) 조항이
+# 아닌 것들이 이 어미로 끝난다.
+_DESCRIPTION_ENDING = re.compile(
+    r"(하고\s*있으므로|하고\s*있어|있으므로|점을\s*감안|것으로\s*보인다"
+    r"|하는\s*것$|한\s*것$|규정한\s*것|정한\s*것|해당된다|해당한다"
+    r"|판단된다|볼\s*수\s*있다|것이다$)")
+
+
 def is_clause_like(text: str) -> bool:
-    """조항 문언으로 볼 만한가. 아니면 판결문 서술이 딸려 온 것이다."""
-    if _NARRATIVE.search(text):
+    """조항 문언으로 볼 만한가. 아니면 서술·요약이 딸려 온 것이다.
+
+    두 가지를 본다.
+    - 판결문 서술의 흔적(날짜·정의구 잔여물)이 있으면 조항이 아니다.
+    - **기관이 그 조항을 설명하는 말투**로 끝나면 조항이 아니다. 이쪽이 특히
+      까다롭다 — 원문 대조는 통과하기 때문이다. 공정위 근거 서술에 있는
+      "…탈퇴를 상당히 제한하고 있으므로"는 조항이 아니라 공정위의 평가다.
+    """
+    text = text.strip()
+    if _NARRATIVE.search(text) or _DESCRIPTION_ENDING.search(text):
+        return False
+    # 길이 기준은 낮게 잡는다. 조각은 아래 어미 검사가 이미 걸러 내고
+    # ("해당 시간 영업 손해에 대한 비용"은 서술 어미가 없다), 길이를 높이면
+    # "보증금은 어떠한 경우에도 반환하지 아니한다"(19자) 같은 정상 조항이 날아간다.
+    if len(text.replace(" ", "")) < 15:
         return False
     return bool(_CLAUSE_ENDING.search(text))
 
@@ -340,7 +365,10 @@ def existing_case_ids() -> set:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--target", default="ftc", choices=["ftc", "prec"])
+    ap.add_argument("--target", default="ftc",
+                    choices=["ftc", "prec", "decc", "ppc", "fsc", "acr"],
+                    help="ftc=공정위 결정문, prec=판례, decc=행정심판례, "
+                         "ppc=개인정보위, fsc=금융위, acr=국민권익위")
     ap.add_argument("--query", default="불공정약관조항")
     ap.add_argument("--section", default="1", choices=["1", "2"],
                     help="1=사건명, 2=본문")
@@ -378,7 +406,9 @@ def main() -> None:
             print(f"  [실패] {seq}: {type(exc).__name__}")
             continue
         body = _plain(doc)
-        if args.target == "prec":
+        # 결정문 계열(ftc)은 "심사의견" 구조가 있어 심결 파서를 쓰고,
+        # 나머지는 본문에 조항을 인용하는 형태라 판례식 추출을 쓴다.
+        if args.target != "ftc":
             found = [{
                 "clause_title": (f"제{c['article_no']}조" if c["article_no"]
                                  else "(조 번호 미표기)"),

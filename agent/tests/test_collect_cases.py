@@ -166,3 +166,109 @@ def test_원고_피고가_들어가도_조항일_수_있다():
     from collect_cases import is_clause_like
 
     assert is_clause_like("기타 원고의 단독 재량으로 계정의 해지가 필요하다고 판단하는 경우")
+
+
+# ---- 검수 파이프라인 (#180) ------------------------------------------
+
+def test_원문에_없는_제안은_통과하지_못한다():
+    """축자 원문 부재는 실측 기각 사유 2위다. 요약·의역은 골든셋에 들어가면 안 된다."""
+    from review_pipeline import _verbatim
+
+    src = "피심인은 어떠한 경우에도 환불하지 아니한다고 규정하고 있다."
+    assert _verbatim("어떠한 경우에도 환불하지 아니한다", src)
+    assert not _verbatim("환불을 전면 금지하는 조항", src)   # 의역
+
+
+def test_검수_실패는_승인이_아니다():
+    """확인하지 못한 것을 통과시키면 검수가 아니라 통과 도장이 된다."""
+    import review_pipeline as rp
+
+    orig = rp.invoke_json
+    rp.invoke_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom"))
+    rp.get_worker_llm = lambda: None
+    try:
+        assert rp.adversarial_review({}, "자료")["verdict"] == "기각"
+    finally:
+        rp.invoke_json = orig
+
+
+def test_제안_실패도_기각으로_처리한다():
+    import review_pipeline as rp
+
+    orig = rp.invoke_json
+    rp.invoke_json = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom"))
+    rp.get_worker_llm = lambda: None
+    try:
+        assert rp.propose({})["proposable"] is False
+    finally:
+        rp.invoke_json = orig
+
+
+def test_조항_문구가_없으면_LLM을_부르지_않고_기각한다():
+    # 비용을 아끼는 동시에, 문구 없는 후보가 통과할 여지를 원천 차단한다.
+    from review_pipeline import review_one
+
+    r = review_one({"rationale": "판단 근거"}, set(), {})
+    assert r["verdict"] == "자동기각" and r["reason"] == "축자 원문 부재"
+
+
+def test_기존_골든셋과_중복이면_기각한다():
+    from review_pipeline import review_one
+
+    r = review_one({"clause_text": "어떠한 경우에도 환불하지 아니한다",
+                    "rationale": "x"}, {"어떠한경우에도환불하지아니한다"}, {})
+    assert r["verdict"] == "자동기각" and "중복" in r["reason"]
+
+
+def test_검수단_2표_기각이면_탈락한다():
+    """만장일치를 요구하면 통과율이 비현실적으로 낮아지고,
+    과반만 보면 한 에이전트의 실수가 그대로 통과한다."""
+    import review_pipeline as rp
+
+    assert rp._REVIEWERS == 3 and rp._REJECT_VOTES == 2
+
+
+def test_기관의_설명은_조항으로_보지_않는다():
+    """가장 놓치기 쉬운 유형이다. 기관이 그 조항을 설명한 말은 근거 서술에
+    그대로 있으므로 **원문 대조를 통과한다.** 실측 표본 18건 중 3건이 이것이었다.
+
+    조항은 규범을 정하고, 설명은 그 조항을 평가한다.
+    """
+    from collect_cases import is_clause_like
+
+    assert not is_clause_like(
+        "회원탈퇴에 대한 전제조건으로 3개월 이상을 사용하도록 정하여 자유로운 탈퇴를 상당히 제한하고 있으므로")
+    assert not is_clause_like("회사가 인정하는 사유가 있는 경우에만 탈퇴를 허용하는 것")
+    assert not is_clause_like("해당 시간 영업 손해에 대한 비용")   # 문구 조각
+
+
+def test_정상_조항은_통과한다():
+    from collect_cases import is_clause_like
+
+    assert is_clause_like("보증금은 어떠한 경우에도 반환하지 아니한다")
+    assert is_clause_like("임차인이 임대료 등을 연체할 경우 연체이자율은 월 5%로 하며 일할계산하여 부과한다")
+
+
+def test_이미_검수한_조항은_다시_부르지_않는다():
+    """장부가 없으면 재실행 때마다 이미 기각한 것을 또 검수한다.
+
+    3차 실행이 크레딧 소진으로 무효가 됐을 때, 무엇을 다시 해야 하고 무엇은
+    안 해도 되는지 알 수 없었던 것이 정확히 이 문제였다 — 통과분은 골든셋에
+    남지만 기각분은 아무 데도 남지 않았다.
+    """
+    from review_pipeline import clause_key, review_one
+
+    text = "어떠한 경우에도 환불하지 아니한다"
+    r = review_one({"clause_text": text, "rationale": "x"}, set(),
+                   {clause_key(text): "기각"})
+    assert r["verdict"] == "건너뜀" and "이전 검수" in r["reason"]
+
+
+def test_무료_제공자로_갈아탈_수_있다():
+    """크레딧이 없어도 검수를 이어갈 수 있어야 한다.
+
+    저장소가 이미 쓰던 패턴과 같다(eval_normal_fp "크레딧 소진 시 무료 워커 대체").
+    """
+    import review_pipeline as rp
+
+    assert rp._REVIEWER in ("claude", "solar")
