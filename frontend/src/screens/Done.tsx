@@ -5,6 +5,7 @@ import { riskLevelLabel, riskLevelLabel as rl, riskTypeLabel, t, type LangCode }
 import { clauseHeading } from '../clauseTitle'
 import { FeedbackCard } from '../components/FeedbackCard'
 import { deleteRecord } from '../records'
+import { AGENCIES } from '../data/actionGuide'
 
 
 /** 점역기가 헷갈리는 기호를 평이한 문자로 바꾼다 (#126).
@@ -321,15 +322,13 @@ function consultKeyword(results: ClauseResult[]): string {
   return '계약'
 }
 
+// 기관 이름·전화·URL은 data/actionGuide.ts AGENCIES가 단일 원천 —
+// 조항 상세의 '다음 행동' 구제기관 카드(과제 B)와 데이터를 공유한다.
 function buildConsultServices(results: ClauseResult[], language: LangCode = 'ko') {
   const keyword = consultKeyword(results)
+  const { klac, jeonse, fss } = AGENCIES
   return [
-    {
-      name: '대한법률구조공단',
-      desc: t(language, 'doSvcKlac'),
-      phone: '132',
-      url: 'https://www.klac.or.kr',
-    },
+    { name: klac.name, desc: t(language, klac.descKey), phone: klac.phone, url: klac.url },
     {
       name: '나의 변호사 (대한변호사협회)',
       // klaw는 검색 상태를 URL에 싣지 않는 SPA라 딥링크 필터가 불가능 —
@@ -339,18 +338,8 @@ function buildConsultServices(results: ClauseResult[], language: LangCode = 'ko'
       url: 'https://www.klaw.or.kr/search',
       copyKeyword: keyword,
     },
-    {
-      name: '전세피해지원센터',
-      desc: t(language, 'doSvcJeonse'),
-      phone: '1533-8119',
-      url: 'https://www.khug.or.kr/jeonse',
-    },
-    {
-      name: '금융감독원 금융민원센터',
-      desc: t(language, 'doSvcFss'),
-      phone: '1332',
-      url: 'https://www.fss.or.kr',
-    },
+    { name: jeonse.name, desc: t(language, jeonse.descKey), phone: jeonse.phone, url: jeonse.url },
+    { name: fss.name, desc: t(language, fss.descKey), phone: fss.phone, url: fss.url },
   ]
 }
 
