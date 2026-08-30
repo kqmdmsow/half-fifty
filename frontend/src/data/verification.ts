@@ -10,8 +10,8 @@
 
 export const VERIFICATION = {
   /** 정부·법원·공정위 판정 기반 골든셋 총 행수.
-   *  근거: data/real_clause_labels.csv(44) + _ext(34) + _finance(33) + _sprint3(51) + _sprint4(4) = 166 */
-  goldenRows: 166,
+   *  근거: data/real_clause_labels.csv(44) + _ext(34) + _finance(33) + _sprint3(51) + _sprint4(4) + _sprint5(4) = 170 */
+  goldenRows: 170,
 
   /** 정부·공정위 제정 표준계약서 오탐 벤치마크.
    *  근거: docs/eval_normal_fp_after_174.md — 5문서 94조항에서 '위험' 판정 0건 */
