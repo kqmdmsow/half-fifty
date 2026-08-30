@@ -82,6 +82,9 @@ export function DetailScreen({
   const voiceRef = useRef<VoiceSession | null>(null)
   const stateRef = useRef({ clauseId: '', results: [] as ClauseResult[] })
   stateRef.current = { clauseId: clause?.clause_id ?? '', results }
+  // 음성 콜백은 마이크 켠 시점의 클로저를 계속 쓰므로, 최신 requestReexplain을 ref로 전달
+  const reexplainRef = useRef(requestReexplain)
+  reexplainRef.current = requestReexplain
 
   const toggleVoice = () => {
     if (voiceRef.current) {
@@ -98,7 +101,7 @@ export function DetailScreen({
       else if (cmd === 'read' && current) speak(current.explanation, language)
       else if (cmd === 'stop') stopSpeaking()
       else if (cmd === 'summary') onBack()
-      // 'easier' 명령은 #133(다시 설명) 머지 후 requestReexplain('easier')로 연결
+      else if (cmd === 'easier') reexplainRef.current('easier')
     }, setMicOn)
   }
 

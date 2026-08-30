@@ -238,7 +238,9 @@ export function DisclosureScreen({
               {t(language, 'dvTranscriptTitle')}
             </summary>
             <p className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-ink-600">
-              {result.transcript}
+              {/* speech_spans는 발화 전문 기준 좌표다(api.ts DisclosureFinding) — 인용문이 아니라 여기서 하이라이트한다 */}
+              <HighlightedText text={result.transcript}
+                               spans={result.findings.flatMap((f) => f.speech_spans)} />
             </p>
           </details>
 

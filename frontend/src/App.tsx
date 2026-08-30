@@ -105,7 +105,7 @@ export default function App() {
   const [streamedClauses, setStreamedClauses] = useState<ClauseResult[]>([])
 
   // 스트리밍 중엔 완료된 조항(clause_id 순 정렬)을, 완료 후엔 확정 결과를 쓴다.
-  // 실패 시 가짜 예시(SAMPLE_RESULTS)를 보여주던 경로는 제거 — 오류는 오류로
+  // 실패 시 가짜 예시를 보여주던 경로는 제거 — 오류는 오류로
   // 안내하고 다시 시도하게 한다 (심사 중 가짜 결과 노출 방지).
   const sortedStreamed = [...streamedClauses].sort((a, b) =>
     a.clause_id.localeCompare(b.clause_id),
