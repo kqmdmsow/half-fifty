@@ -28,7 +28,7 @@ from typing import List, Literal, Optional
 from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from src.case_footnotes import CaseFootnote, get_related_cases
 from src.guardrails import (budget_ok, check_service_token, rate_limit_ok,
@@ -126,12 +126,21 @@ app.add_middleware(
 )
 
 
+def _none_to_empty(v: str | None) -> str:
+    """도메인 미선택 시 백엔드(Java record)가 null을 그대로 보낸다 — str 필드가
+    None을 거부해 422가 나던 실배포 장애를 막는다 (domain은 선택 입력이라
+    없으면 빈 문자열이 맞다)."""
+    return v or ""
+
+
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., description="계약서 원문 텍스트")
     persona: Literal["adult", "senior", "foreigner"] = Field("adult", description="사용자 페르소나")
     # Optional — 백엔드(Java record)가 필드를 안 보내거나 null을 보내도 허용
     language: Optional[Language] = Field("ko", description="설명 출력 언어 (foreigner 페르소나용)")
     domain: str = Field("", description="사용자가 선택한 문서 유형 (선택 입력, 예: 주택임대차)")
+
+    _normalize_domain = field_validator("domain", mode="before")(_none_to_empty)
 
 
 class ClauseResult(BaseModel):
@@ -336,6 +345,8 @@ class DisclosureRequest(BaseModel):
     persona: Literal["adult", "senior", "foreigner"] = Field("adult")
     language: Optional[Language] = Field("ko")
     domain: str = Field("", description="문서 유형 (선택)")
+
+    _normalize_domain = field_validator("domain", mode="before")(_none_to_empty)
 
 
 class DisclosureResponse(BaseModel):
