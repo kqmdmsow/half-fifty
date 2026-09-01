@@ -42,8 +42,8 @@ public class ContractController {
     }
 
     @PostMapping("/analyze")
-    public AnalyzeResponse analyze(@RequestBody AnalyzeRequest request) {
-        return agentClient.analyze(request);
+    public AnalyzeResponse analyze(@RequestBody AnalyzeRequest request, HttpServletRequest httpRequest) {
+        return agentClient.analyze(request, clientIp(httpRequest));
     }
 
     /**
@@ -51,8 +51,10 @@ public class ContractController {
      * 그대로 중계한다 — 조항이 끝나는 대로 프론트에 결과가 도착한다.
      */
     @PostMapping(value = "/analyze-stream", produces = "application/x-ndjson")
-    public ResponseEntity<StreamingResponseBody> analyzeStream(@RequestBody AnalyzeRequest request) {
-        StreamingResponseBody body = out -> agentClient.streamAnalyze(request, out);
+    public ResponseEntity<StreamingResponseBody> analyzeStream(
+            @RequestBody AnalyzeRequest request, HttpServletRequest httpRequest) {
+        String ip = clientIp(httpRequest);
+        StreamingResponseBody body = out -> agentClient.streamAnalyze(request, out, ip);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/x-ndjson"))
                 .body(body);
@@ -60,14 +62,14 @@ public class ContractController {
 
     /** 이해 확인 퀴즈 프록시 (#92) — 에이전트 /quiz 중계. */
     @PostMapping("/quiz")
-    public String quiz(@RequestBody String request) {
-        return agentClient.quiz(request);
+    public String quiz(@RequestBody String request, HttpServletRequest httpRequest) {
+        return agentClient.quiz(request, clientIp(httpRequest));
     }
 
     /** 재설명 프록시 (#76) — 에이전트 /reexplain 중계. */
     @PostMapping("/reexplain")
-    public String reexplain(@RequestBody String request) {
-        return agentClient.reexplain(request);
+    public String reexplain(@RequestBody String request, HttpServletRequest httpRequest) {
+        return agentClient.reexplain(request, clientIp(httpRequest));
     }
 
     /**
@@ -125,7 +127,8 @@ public class ContractController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "persona", defaultValue = "adult") String persona,
             @RequestParam(value = "language", defaultValue = "ko") String language,
-            @RequestParam(value = "domain", defaultValue = "") String domain)
+            @RequestParam(value = "domain", defaultValue = "") String domain,
+            HttpServletRequest httpRequest)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -144,7 +147,8 @@ public class ContractController {
         if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
         }
-        return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona, language, domain);
+        return agentClient.analyzePdf(bytes, file.getOriginalFilename(), persona, language, domain,
+                clientIp(httpRequest));
     }
 
     /**
@@ -156,7 +160,8 @@ public class ContractController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "persona", defaultValue = "adult") String persona,
             @RequestParam(value = "language", defaultValue = "ko") String language,
-            @RequestParam(value = "domain", defaultValue = "") String domain)
+            @RequestParam(value = "domain", defaultValue = "") String domain,
+            HttpServletRequest httpRequest)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -174,7 +179,8 @@ public class ContractController {
         if (!"adult".equals(persona) && !"senior".equals(persona) && !"foreigner".equals(persona)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 페르소나입니다.");
         }
-        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona, language, domain);
+        return agentClient.analyzeImage(bytes, file.getOriginalFilename(), type, persona, language, domain,
+                clientIp(httpRequest));
     }
 
     /**
@@ -188,7 +194,8 @@ public class ContractController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "persona", defaultValue = "adult") String persona,
             @RequestParam(value = "language", defaultValue = "ko") String language,
-            @RequestParam(value = "domain", defaultValue = "") String domain)
+            @RequestParam(value = "domain", defaultValue = "") String domain,
+            HttpServletRequest httpRequest)
             throws IOException {
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 비어 있습니다.");
@@ -210,8 +217,9 @@ public class ContractController {
         }
         MediaType contentType = isPdf ? MediaType.APPLICATION_PDF : imageType;
         String filename = file.getOriginalFilename();
+        String ip = clientIp(httpRequest);
         StreamingResponseBody body = out -> agentClient.streamAnalyzeFile(
-                bytes, filename, contentType, persona, language, domain, out);
+                bytes, filename, contentType, persona, language, domain, out, ip);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/x-ndjson"))
                 .body(body);
@@ -236,7 +244,7 @@ public class ContractController {
             throw new ResponseStatusException(
                     HttpStatus.TOO_MANY_REQUESTS, "질문이 너무 많아요. 잠시 후 다시 시도해주세요.");
         }
-        return ResponseEntity.ok(agentClient.learnChat(request));
+        return ResponseEntity.ok(agentClient.learnChat(request, clientIp(httpRequest)));
     }
 
     /** X-Forwarded-For(프록시·CDN 경유 시)를 우선하고, 없으면 원격 주소. */

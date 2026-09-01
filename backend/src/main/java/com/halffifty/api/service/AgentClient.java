@@ -42,6 +42,17 @@ public class AgentClient {
     /** 에이전트가 백엔드 경유 여부를 판별하는 헤더 (#174). */
     private static final String SERVICE_TOKEN_HEADER = "X-Service-Token";
 
+    /**
+     * 원 클라이언트 IP 전달용 헤더 (#84 후속).
+     *
+     * <p>이 헤더를 안 보내면 에이전트의 호출 제한(rate_limit_ok, 분당 6건)이
+     * 항상 "이 백엔드 서버"라는 하나의 발신자로만 보여, 실제로는 사용자별
+     * 한도가 아니라 **서비스 전체가 나눠 쓰는 공유 한도**가 된다. 배포에서
+     * "분석 서버에 연결하지 못했어요"가 반복 재현된 실제 원인 — 심사위원 몇
+     * 명만 몇 분 안에 각자 분석해도 서로의 한도를 깎아 먹는다.
+     */
+    private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
+
     private final RestClient restClient;
     private final String agentBaseUrl;
     private final ObjectMapper objectMapper;
@@ -77,29 +88,32 @@ public class AgentClient {
         this.restClient = builder.build();
     }
 
-    public AnalyzeResponse analyze(AnalyzeRequest request) {
+    public AnalyzeResponse analyze(AnalyzeRequest request, String clientIp) {
         return restClient.post()
                 .uri("/analyze")
+                .header(FORWARDED_FOR_HEADER, clientIp)
                 .body(request)
                 .retrieve()
                 .body(AnalyzeResponse.class);
     }
 
     /** 이해 확인 퀴즈 프록시 (#92) — JSON 그대로 중계. */
-    public String quiz(String requestJson) {
+    public String quiz(String requestJson, String clientIp) {
         return restClient.post()
                 .uri("/quiz")
                 .header("Content-Type", "application/json")
+                .header(FORWARDED_FOR_HEADER, clientIp)
                 .body(requestJson)
                 .retrieve()
                 .body(String.class);
     }
 
     /** 재설명 프록시 (#76) — JSON 그대로 중계. */
-    public String reexplain(String requestJson) {
+    public String reexplain(String requestJson, String clientIp) {
         return restClient.post()
                 .uri("/reexplain")
                 .header("Content-Type", "application/json")
+                .header(FORWARDED_FOR_HEADER, clientIp)
                 .body(requestJson)
                 .retrieve()
                 .body(String.class);
@@ -111,20 +125,21 @@ public class AgentClient {
      * 파일은 메모리에서만 전달하며 백엔드에 저장하지 않는다.
      */
     public AnalyzeResponse analyzePdf(byte[] pdfBytes, String filename, String persona, String language,
-            String domain) {
-        return forwardFile("/analyze-pdf", pdfBytes, filename, MediaType.APPLICATION_PDF, persona, language, domain);
+            String domain, String clientIp) {
+        return forwardFile("/analyze-pdf", pdfBytes, filename, MediaType.APPLICATION_PDF, persona, language,
+                domain, clientIp);
     }
 
     /** 계약서 사진(OCR) 프록시 — 에이전트 /analyze-image로 전달. */
     public AnalyzeResponse analyzeImage(
             byte[] imageBytes, String filename, MediaType contentType, String persona, String language,
-            String domain) {
-        return forwardFile("/analyze-image", imageBytes, filename, contentType, persona, language, domain);
+            String domain, String clientIp) {
+        return forwardFile("/analyze-image", imageBytes, filename, contentType, persona, language, domain, clientIp);
     }
 
     private AnalyzeResponse forwardFile(
             String uri, byte[] bytes, String filename, MediaType contentType, String persona,
-            String language, String domain) {
+            String language, String domain, String clientIp) {
         // MultipartBodyBuilder는 내부에서 reactive-streams(Publisher)를 참조해
         // WebFlux 없는 클래스패스에서는 NoClassDefFoundError로 죽는다 —
         // 블로킹 스택 표준인 MultiValueMap + HttpEntity 방식으로 구성한다.
@@ -146,6 +161,7 @@ public class AgentClient {
         return restClient.post()
                 .uri(uri)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header(FORWARDED_FOR_HEADER, clientIp)
                 .body(body)
                 .retrieve()
                 .body(AnalyzeResponse.class);
@@ -219,10 +235,11 @@ public class AgentClient {
      * 버퍼링 없이 곧바로 클라이언트로 흘려보낸다. RestClient는 응답 스트리밍을
      * 지원하지 않아 JDK HttpClient를 사용한다.
      */
-    public void streamAnalyze(AnalyzeRequest request, OutputStream out) throws IOException {
+    public void streamAnalyze(AnalyzeRequest request, OutputStream out, String clientIp) throws IOException {
         HttpRequest httpRequest = withServiceToken(
                 HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-stream"))
                         .header("Content-Type", "application/json")
+                        .header(FORWARDED_FOR_HEADER, clientIp)
                         .POST(HttpRequest.BodyPublishers.ofString(
                                 objectMapper.writeValueAsString(request))))
                 .build();
@@ -235,7 +252,7 @@ public class AgentClient {
      * 않으므로 바디를 직접 조립한다 (파일은 메모리에서만 전달, 저장하지 않음).
      */
     public void streamAnalyzeFile(byte[] bytes, String filename, MediaType contentType,
-            String persona, String language, String domain, OutputStream out) throws IOException {
+            String persona, String language, String domain, OutputStream out, String clientIp) throws IOException {
         String boundary = "----jomokjomok" + UUID.randomUUID();
         // 파일명은 multipart 헤더 문법을 깨는 문자(따옴표·개행)만 치환해 전달
         String safeName = (filename == null || filename.isBlank() ? "upload" : filename)
@@ -254,6 +271,7 @@ public class AgentClient {
         HttpRequest httpRequest = withServiceToken(
                 HttpRequest.newBuilder(URI.create(agentBaseUrl + "/analyze-file-stream"))
                         .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .header(FORWARDED_FOR_HEADER, clientIp)
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())))
                 .build();
         pipeStream(httpRequest, out);
@@ -281,10 +299,11 @@ public class AgentClient {
     }
 
     /** 교육 챗봇 프록시 (#103) — JSON 그대로 중계. 비용 상한은 컨트롤러가 처리. */
-    public String learnChat(String requestJson) {
+    public String learnChat(String requestJson, String clientIp) {
         return restClient.post()
                 .uri("/learn-chat")
                 .header("Content-Type", "application/json")
+                .header(FORWARDED_FOR_HEADER, clientIp)
                 .body(requestJson)
                 .retrieve()
                 .body(String.class);
