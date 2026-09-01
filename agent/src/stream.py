@@ -184,6 +184,10 @@ def stream_analysis(
             "original_text", "original_text_translated",
             "check_questions_translated", "risk_evidence_translated",
             "related_cases",
+            # 하이라이트 좌표·문서 구획 라벨(#174) — 화면 표시 전용. judge가
+            # 채점 근거로 잘못 읽지 않도록 related_cases와 동일하게 제외한다
+            # (#179가 빠뜨렸던 부분, #190 배포 점검 중 발견).
+            "evidence_spans", "section",
         }
         if persona_only:
             events = _emit_persona_only(clauses, persona, language, revision=retry,
