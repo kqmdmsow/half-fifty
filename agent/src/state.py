@@ -6,6 +6,19 @@ LangGraph의 모든 노드는 이 PipelineState를 입력받고 일부 필드를
 
 from typing import NotRequired, Dict, List, Literal, TypedDict
 
+# 화면 표시 전용이라 Judge 채점 입력에서 반드시 빼야 하는 필드 (#174·#179·#192).
+# original_text·번역·related_cases는 이벤트 조립 시점(stream.py)에만 붙는 필드라
+# graph.py 경로(비스트리밍)엔 애초에 존재하지 않는다. evidence_spans는 반대로
+# _analyze_clause가 AnalysisResult 자체에 직접 써 넣으므로 스트리밍·비스트리밍
+# **양쪽 다** 여기서 걸러야 한다 — 두 경로가 같은 목록을 공유해야 하나를 고치고
+# 다른 하나를 빠뜨리는 사고(#179가 evidence_spans를, 그 후 graph.py 쪽을 또
+# 빠뜨렸던 것처럼)가 재발하지 않는다.
+JUDGE_EXCLUDED_KEYS = frozenset({
+    "original_text", "original_text_translated",
+    "check_questions_translated", "risk_evidence_translated",
+    "related_cases", "evidence_spans", "section",
+})
+
 
 class Clause(TypedDict):
     """Parser Module의 출력 단위 (조항)."""
