@@ -36,6 +36,7 @@ from src.warning_codes import classify_all
 from src.nodes.persona import _adapt
 from src.state import (
     FAITHFULNESS_MIN,
+    JUDGE_EXCLUDED_KEYS,
     JUDGE_THRESHOLD,
     MAX_RETRIES,
     AnalysisResult,
@@ -178,17 +179,10 @@ def stream_analysis(
     persona_only = False  # clarity-only 단축 여부 (#75)
 
     while True:
-        # related_cases(#91)는 표시 전용 — 빠지면 judge_state["adapted_results"]로
-        # 새어 들어가 Judge가 채점 근거로 잘못 읽을 위험이 있다(격리 원칙).
-        _EVENT_ONLY_KEYS = {
-            "original_text", "original_text_translated",
-            "check_questions_translated", "risk_evidence_translated",
-            "related_cases",
-            # 하이라이트 좌표·문서 구획 라벨(#174) — 화면 표시 전용. judge가
-            # 채점 근거로 잘못 읽지 않도록 related_cases와 동일하게 제외한다
-            # (#179가 빠뜨렸던 부분, #190 배포 점검 중 발견).
-            "evidence_spans", "section",
-        }
+        # 표시 전용 필드(related_cases·evidence_spans 등)는 judge_state
+        # ["adapted_results"]로 새어 들어가면 Judge가 채점 근거로 잘못 읽을
+        # 위험이 있다(격리 원칙) — src.state.JUDGE_EXCLUDED_KEYS를 judge.py와
+        # 공유해 두 경로(스트리밍·비스트리밍)가 어긋나지 않게 한다.
         if persona_only:
             events = _emit_persona_only(clauses, persona, language, revision=retry,
                                         prior_results=results_by_id)
@@ -197,7 +191,7 @@ def stream_analysis(
                                    domain=resolved_domain, domain_evidence=domain_evidence)
         for event in events:
             results_by_id[event["result"]["clause_id"]] = {
-                k: v for k, v in event["result"].items() if k not in _EVENT_ONLY_KEYS
+                k: v for k, v in event["result"].items() if k not in JUDGE_EXCLUDED_KEYS
             }  # type: ignore[assignment]
             yield event
 

@@ -21,7 +21,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from src.llm import get_judge_llm, invoke_json
-from src.state import JudgeScores, PipelineState
+from src.state import JUDGE_EXCLUDED_KEYS, JudgeScores, PipelineState
 
 PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "judge_rubric.txt"
 _PROMPT_TEMPLATE = PROMPT_PATH.read_text(encoding="utf-8")
@@ -98,7 +98,15 @@ def _judge(state: PipelineState) -> JudgeScores:
     original_clauses = "\n".join(
         f"[{c['clause_id']}] {c['text']}" for c in state["clauses"]
     )
-    final_output = json.dumps(state["adapted_results"], ensure_ascii=False, indent=2)
+    # 표시 전용 필드(evidence_spans 등)는 채점 근거로 잘못 읽히지 않도록 뺀다
+    # (#174·#179·#192 — 스트리밍 경로 stream.py와 동일 원칙, JUDGE_EXCLUDED_KEYS
+    # 공유로 두 경로가 어긋나지 않게 한다). graph.py(비스트리밍) 경로는 이
+    # 필터링 지점이 여기뿐이다 — stream.py처럼 별도 이벤트 조립 단계가 없다.
+    judge_input = [
+        {k: v for k, v in r.items() if k not in JUDGE_EXCLUDED_KEYS}
+        for r in state["adapted_results"]
+    ]
+    final_output = json.dumps(judge_input, ensure_ascii=False, indent=2)
 
     # aspect 나열 순서를 매 호출마다 무작위화 (position bias 대응,
     # docs/human_llm_judge_agreement_design.md 10.2절 (3))
