@@ -142,6 +142,14 @@ def _require_nonblank(v: str) -> str:
     return v
 
 
+def _none_to_adult(v: str | None) -> str:
+    """persona도 domain과 같은 계열 위험 — Literal 필드라 null을 주면 422다.
+    실제 프론트는 항상 값을 보내 도달하지 않는 경로지만(TS에서 필수 파라미터),
+    domain 사고와 동일한 방어를 페르소나에도 적용해 API 직접 호출 등 다른
+    경로도 안전하게 만든다."""
+    return v or "adult"
+
+
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., description="계약서 원문 텍스트")
     persona: Literal["adult", "senior", "foreigner"] = Field("adult", description="사용자 페르소나")
@@ -150,6 +158,7 @@ class AnalyzeRequest(BaseModel):
     domain: str = Field("", description="사용자가 선택한 문서 유형 (선택 입력, 예: 주택임대차)")
 
     _normalize_domain = field_validator("domain", mode="before")(_none_to_empty)
+    _normalize_persona = field_validator("persona", mode="before")(_none_to_adult)
     _require_text = field_validator("text")(_require_nonblank)
 
 
@@ -357,6 +366,7 @@ class DisclosureRequest(BaseModel):
     domain: str = Field("", description="문서 유형 (선택)")
 
     _normalize_domain = field_validator("domain", mode="before")(_none_to_empty)
+    _normalize_persona = field_validator("persona", mode="before")(_none_to_adult)
     _require_text = field_validator("text")(_require_nonblank)
     _require_transcript = field_validator("transcript")(_require_nonblank)
 

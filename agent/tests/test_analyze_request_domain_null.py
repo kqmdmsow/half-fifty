@@ -34,3 +34,11 @@ def test_domain_생략해도_기본값_빈_문자열():
 def test_disclosure_request도_domain_null_허용():
     req = DisclosureRequest(text="t", transcript="상담 내용입니다", domain=None)
     assert req.domain == ""
+
+
+def test_persona_null이면_adult로_정규화된다():
+    # persona도 domain과 같은 계열(Literal 필드가 null을 거부해 422) — 실제
+    # 프론트는 TS 필수 파라미터라 도달하지 않지만 API 직접 호출 등 다른
+    # 경로도 안전하게 만든다.
+    req = AnalyzeRequest(text="제1조 테스트", persona=None)
+    assert req.persona == "adult"
