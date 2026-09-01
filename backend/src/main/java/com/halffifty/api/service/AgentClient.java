@@ -8,7 +8,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -38,6 +41,8 @@ import org.springframework.web.client.RestClient;
  */
 @Service
 public class AgentClient {
+
+    private static final Logger log = LoggerFactory.getLogger(AgentClient.class);
 
     /** 에이전트가 백엔드 경유 여부를 판별하는 헤더 (#174). */
     private static final String SERVICE_TOKEN_HEADER = "X-Service-Token";
@@ -309,11 +314,25 @@ public class AgentClient {
                 .body(String.class);
     }
 
-    /** 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다. */
+    /**
+     * 요청을 보내고 응답 바디를 버퍼링 없이 클라이언트로 흘려보낸다.
+     *
+     * <p>스트리밍은 이미 HTTP 200으로 헤더가 커밋된 뒤라 상태 코드를 바꿀 수
+     * 없다 — 에이전트가 4xx/5xx(호출 제한·크레딧 소진 등)를 반환해도 예전엔
+     * 그 에러 바디(JSON이든 플랫폼 차단 페이지든)를 그대로 NDJSON인 척 흘려
+     * 보냈다. 프론트는 그걸 JSON.parse 하다 알 수 없는 예외로 죽어 "분석
+     * 서버에 연결하지 못했어요"가 원인 불명으로 뜬다. 상태 코드를 보고
+     * 에러면 프론트가 이미 처리하는 {"event":"error"} 한 줄로 바꿔 보낸다.
+     */
     private void pipeStream(HttpRequest httpRequest, OutputStream out) throws IOException {
         try {
             HttpResponse<InputStream> response =
                     httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+            if (response.statusCode() >= 400) {
+                log.warn("에이전트 스트리밍 요청이 {}를 반환했다 — 에러 이벤트로 변환", response.statusCode());
+                writeErrorEvent(out, response.statusCode());
+                return;
+            }
             try (InputStream in = response.body()) {
                 byte[] buffer = new byte[8192];
                 int read;
@@ -326,5 +345,18 @@ public class AgentClient {
             Thread.currentThread().interrupt();
             throw new IOException("에이전트 스트리밍 중단", e);
         }
+    }
+
+    /** 스트림 중간 에러를 프론트가 이미 처리하는 {"event":"error"} 한 줄로 내보낸다. */
+    private void writeErrorEvent(OutputStream out, int upstreamStatus) throws IOException {
+        String message = upstreamStatus == 429
+                ? "요청이 몰려 잠시 지연되고 있어요. 잠시 후 다시 시도해주세요."
+                : "분석 서버에 일시적인 문제가 있어요. 잠시 후 다시 시도해주세요.";
+        Map<String, Object> event = new java.util.LinkedHashMap<>();
+        event.put("event", "error");
+        event.put("status", upstreamStatus);
+        event.put("message", message);
+        out.write((objectMapper.writeValueAsString(event) + "\n").getBytes(StandardCharsets.UTF_8));
+        out.flush();
     }
 }
