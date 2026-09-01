@@ -133,6 +133,15 @@ def _none_to_empty(v: str | None) -> str:
     return v or ""
 
 
+def _require_nonblank(v: str) -> str:
+    """빈 문자열(공백뿐인 것 포함)은 파이프라인이 재시도 2회+judge까지 다 태우고서야
+    빈 결과로 끝난다 — 프론트가 이미 text.trim()으로 막고 있지만, 다른 경로(직접
+    API 호출 등)에서 크레딧이 새지 않도록 요청 단계에서 빠르게 거절한다."""
+    if not v.strip():
+        raise ValueError("빈 텍스트는 분석할 수 없습니다")
+    return v
+
+
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., description="계약서 원문 텍스트")
     persona: Literal["adult", "senior", "foreigner"] = Field("adult", description="사용자 페르소나")
@@ -141,6 +150,7 @@ class AnalyzeRequest(BaseModel):
     domain: str = Field("", description="사용자가 선택한 문서 유형 (선택 입력, 예: 주택임대차)")
 
     _normalize_domain = field_validator("domain", mode="before")(_none_to_empty)
+    _require_text = field_validator("text")(_require_nonblank)
 
 
 class ClauseResult(BaseModel):
@@ -347,6 +357,8 @@ class DisclosureRequest(BaseModel):
     domain: str = Field("", description="문서 유형 (선택)")
 
     _normalize_domain = field_validator("domain", mode="before")(_none_to_empty)
+    _require_text = field_validator("text")(_require_nonblank)
+    _require_transcript = field_validator("transcript")(_require_nonblank)
 
 
 class DisclosureResponse(BaseModel):

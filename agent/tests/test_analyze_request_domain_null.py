@@ -6,7 +6,18 @@
 (2026-08-31, "Failed to fetch" 신고 조사 중 발견·재현·수정).
 """
 
+import pytest
+from pydantic import ValidationError
+
 from main import AnalyzeRequest, DisclosureRequest
+
+
+def test_공백만_있는_텍스트는_거절된다():
+    # 빈 텍스트를 그대로 통과시키면 파이프라인이 재시도 2회+judge까지 태우고서야
+    # 빈 결과로 끝난다 — 프론트가 text.trim()으로 막고 있지만 요청 단계에서도
+    # 방어해 다른 호출 경로의 크레딧 낭비를 막는다.
+    with pytest.raises(ValidationError):
+        AnalyzeRequest(text="   ", persona="adult")
 
 
 def test_domain_null이면_빈_문자열로_정규화된다():
