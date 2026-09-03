@@ -24,10 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
  *
  * 프론트(React, localhost:5173) -> 백엔드(8080) -> 에이전트(8000) 흐름의 관문.
  *
- * TODO(동훈):
- *  - JWT 인증 필터 적용
- *  - 계약 문서 저장 (MySQL) 및 분석 이력 조회 API
- *  - CORS 설정을 WebMvcConfigurer로 분리 (지금은 개발용으로 컨트롤러에 임시 지정)
+ * JWT 인증 필터·CORS 분리는 security/SecurityConfig에서 처리한다.
+ * 계약 문서 원문 저장은 하지 않는다 — 무저장 원칙(RecordController는 암호문만 보관).
  */
 @RestController
 @RequestMapping("/api/contracts")

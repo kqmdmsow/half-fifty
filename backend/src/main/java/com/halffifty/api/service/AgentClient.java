@@ -34,10 +34,12 @@ import org.springframework.web.client.RestClient;
 /**
  * Python Agent Service(FastAPI) 호출 클라이언트.
  *
+ * 타임아웃은 아래 httpClient·application.yml(async 600s)에서, 에러 응답 표준화는
+ * GlobalExceptionHandler에서 처리한다.
+ *
  * TODO(동훈):
- *  - 타임아웃/재시도 설정
+ *  - 재시도 설정
  *  - 비동기 처리 (분석이 오래 걸릴 경우 @Async 또는 작업 큐)
- *  - 에러 응답 표준화 (@ControllerAdvice)
  */
 @Service
 public class AgentClient {

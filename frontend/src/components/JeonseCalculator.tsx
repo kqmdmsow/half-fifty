@@ -36,14 +36,27 @@ function parseAmount(value: string): number {
   return Number.isFinite(n) && n >= 0 ? n : 0
 }
 
-// 위험 가중 요인 (표10 Exp(B), 부채비율과 같은 단일 모형의 조정 승산비)
+// 위험 가중·완화 요인 (표10 Exp(B), 부채비율과 같은 단일 모형의 조정 승산비).
+// data/jeonse_risk_reference.json의 위험_가중_요인·위험_완화_요인 전항목과 1:1 대응.
+// group이 같은 요인은 상호배타(주택 유형, 지역) — 하나를 체크하면 다른 하나는 해제된다.
 const RISK_FACTORS = [
-  { key: 'corp', labelKey: 'jcFCorp', odds: 3.6 },
-  { key: 'multi', labelKey: 'jcFMulti', odds: 5.8 },
-  { key: 'offi', labelKey: 'jcFOffi', odds: 2.3 },
-  { key: 'appraisal', labelKey: 'jcFAppraisal', odds: 4.8 },
-  { key: 'region', labelKey: 'jcFRegion', odds: 7.0 },
+  { key: 'corp', labelKey: 'jcFCorp', odds: 3.6, group: undefined },
+  { key: 'landlordMulti', labelKey: 'jcFLandlordMulti', odds: 2.5, group: undefined },
+  { key: 'multi', labelKey: 'jcFMulti', odds: 5.8, group: 'building' },
+  { key: 'offi', labelKey: 'jcFOffi', odds: 2.3, group: 'building' },
+  { key: 'appraisal', labelKey: 'jcFAppraisal', odds: 4.8, group: undefined },
+  { key: 'incheon', labelKey: 'jcFIncheon', odds: 7.0, group: 'region' },
+  { key: 'gyeonggi', labelKey: 'jcFGyeonggi', odds: 3.6, group: 'region' },
 ] as const
+
+const MITIGATION_FACTORS = [
+  { key: 'wolse', labelKey: 'jcMWolse', odds: 0.28, group: undefined },
+  { key: 'loan', labelKey: 'jcMLoan', odds: 0.26, group: undefined },
+  { key: 'seniorDisclosed', labelKey: 'jcMSenior', odds: 0.48, group: undefined },
+  { key: 'registered', labelKey: 'jcMRegistered', odds: 0.96, group: undefined },
+] as const
+
+const ALL_FACTORS = [...RISK_FACTORS, ...MITIGATION_FACTORS]
 
 export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
   const [deposit, setDeposit] = useState('')
@@ -54,8 +67,13 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
   const toggleFactor = (key: string) =>
     setFactors((prev) => {
       const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
+      if (next.has(key)) {
+        next.delete(key)
+        return next
+      }
+      const group = ALL_FACTORS.find((f) => f.key === key)?.group
+      if (group) for (const f of ALL_FACTORS) if (f.group === group) next.delete(f.key)
+      next.add(key)
       return next
     })
 
@@ -66,6 +84,18 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
   const ready = depositN > 0 && priceN > 0
   const ratio = ready ? (seniorN + depositN) / priceN : null
   const grade = ratio === null ? null : THRESHOLDS.find((g) => ratio >= g.min) ?? THRESHOLDS[THRESHOLDS.length - 1]
+
+  // 요인 반영 추정: 구간 실측 사고율을 승산(odds)으로 바꿔 체크된 요인의
+  // 조정 승산비를 곱한 뒤 확률로 되돌린다. 같은 모형의 Exp(B) 결합이라
+  // 근사치이며, 화면에는 jcAdjNote로 한계를 함께 고지한다.
+  const oddsMultiplier = ALL_FACTORS.filter((f) => factors.has(f.key)).reduce((m, f) => m * f.odds, 1)
+  const adjustedRate = (() => {
+    if (!grade || oddsMultiplier === 1) return null
+    const odds = (grade.rate / (100 - grade.rate)) * oddsMultiplier
+    return (100 * odds) / (1 + odds)
+  })()
+  const fmtRate = (r: number) => (r < 1 ? r.toFixed(2) : r.toFixed(1))
+  const riskCount = RISK_FACTORS.filter((f) => factors.has(f.key)).length
 
   const field = (
     labelKey: 'jcDeposit' | 'jcPrice' | 'jcSenior',
@@ -145,12 +175,43 @@ export function JeonseCalculator({ language = 'ko' }: { language?: LangCode }) {
             </label>
           ))}
         </div>
-        {factors.size > 0 && (
+        {riskCount > 0 && (
           <p className="mt-2.5 rounded-xl bg-danger-50 px-3 py-2 text-[13px] font-bold text-danger-600">
-            {t(language, 'jcFactorWarn', { n: factors.size })}
+            {t(language, 'jcFactorWarn', { n: riskCount })}
           </p>
         )}
       </div>
+
+      {/* 위험 완화 요인 체크 (②) — 같은 모형의 1 미만 승산비, 위험만 올리고 못 낮추던 비대칭 해소 */}
+      <div className="mt-3 rounded-2xl bg-ink-25 px-4 py-3.5">
+        <p className="text-[13px] font-bold text-ink-700">{t(language, 'jcMitTitle')}</p>
+        <div className="mt-2.5 grid gap-1.5 md:grid-cols-2">
+          {MITIGATION_FACTORS.map((f) => (
+            <label key={f.key} className="flex cursor-pointer items-center gap-2 text-[13px] text-ink-600">
+              <input
+                type="checkbox"
+                checked={factors.has(f.key)}
+                onChange={() => toggleFactor(f.key)}
+                className="h-4 w-4 shrink-0 cursor-pointer rounded border-ink-200 accent-brand-500"
+              />
+              <span className="min-w-0 flex-1">{t(language, f.labelKey)}</span>
+              <span className="shrink-0 rounded bg-safe-50 px-1.5 py-0.5 text-[11px] font-bold text-safe-700">
+                ×{f.odds}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* 요인 반영 추정 사고율 — 체크된 요인이 있고 금액이 입력됐을 때만 */}
+      {grade && adjustedRate !== null && (
+        <div className={`mt-3 rounded-2xl px-4 py-3.5 ${adjustedRate > grade.rate ? 'bg-danger-50' : 'bg-safe-50'}`}>
+          <p className={`text-[13px] font-bold ${adjustedRate > grade.rate ? 'text-danger-600' : 'text-safe-700'}`}>
+            {t(language, 'jcAdjusted', { base: fmtRate(grade.rate), adj: fmtRate(adjustedRate) })}
+          </p>
+          <p className="mt-1 text-[12px] leading-relaxed text-ink-400">{t(language, 'jcAdjNote')}</p>
+        </div>
+      )}
 
       {/* HUG 보증 가입 유도 (④) — 부채비율 90% 이하일 때만 (초과 구간은 가입 불가) */}
       {ratio !== null && ratio <= 0.9 && (

@@ -1,1 +1,754 @@
-{}
+{
+ "loan-acceleration": {
+  "clause_count": 4,
+  "parse_warnings": [],
+  "parse_warning_codes": [],
+  "retry_count": 0,
+  "needs_review": false,
+  "judge_scores": {
+   "clarity": 4.0,
+   "faithfulness": 5.0,
+   "risk_coverage": 4.0,
+   "actionability": 5.0
+  },
+  "results": [
+   {
+    "clause_id": "clause_001",
+    "original_text": "제1조(거래조건) 대출금액은 금 20,000,000원, 대출기간은 계약일로부터 36개월로 한다.",
+    "explanation": "이 조항은 대출의 기본적인 거래 조건을 정하는 부분입니다. 구체적으로 2천만 원을 빌려주고, 이를 36개월(3년) 동안 갚기로 약속하는 내용입니다. 금액과 기간이 명확한 숫자로 적혀 있어서 계약에 참여하는 양쪽이 정확히 무엇을 약속하는지 알 수 있습니다. 금액이나 기간을 한쪽이 마음대로 바꿀 수 있는 권한도 없고, 불명확한 부분도 없어서 안전한 조항입니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항에서 대출금액과 대출기간이 구체적인 수치로 명시되어 있으며, 계약의 기본 거래 조건을 정하는 표준적인 조항입니다. 금액이나 기간에 대한 불명확성이나 일방적 변경 권한이 없습니다.",
+    "check_questions": [
+     "대출금 20,000,000원의 상환 방식(원리금균등분할, 만기일시상환 등)은 별도 조항에서 정해지나요?",
+     "36개월 대출기간 중 거치기간이 있는지, 상환 시작 시점은 언제인지 확인하셨나요?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_002",
+    "original_text": "제2조(이자) 이자율은 갑의 내부 사정에 따라 수시로 변경될 수 있다. 변경된 이자율은 갑의 홈페이지 공지로 갈음한다.",
+    "explanation": "이 조항은 돈을 빌려주는 쪽(갑)이 이자율을 언제든지 자기 마음대로 바꿀 수 있다는 내용입니다. 문제는 이자율을 왜 바꾸는지에 대한 구체적인 이유가 없고, 단지 갑의 내부 사정에 따라 결정된다는 점입니다. 또한 이자율이 바뀌었을 때 미리 알려주지 않고 홈페이지 공지만으로 처리하기 때문에, 돈을 빌린 사람(을)은 미리 알 기회도 없고 반대할 기회도 없습니다. 이렇게 되면 을이 앞으로 얼마나 많은 이자를 내야 할지 전혀 예측할 수 없게 되어 매우 불리합니다.",
+    "risk_level": "위험",
+    "risk_type": "일방적 급부·조건 변경",
+    "risk_evidence": "조항에서 이자율을 갑의 내부 사정에 따라 수시로 변경할 수 있다고 규정하고 있으며, 변경 사유가 객관적·한정적으로 열거되지 않고 갑의 재량적 판단(내부 사정)에만 의존합니다. 또한 변경된 이자율을 홈페이지 공지로만 알리도록 하여 차용인에게 사전 통지나 이의제기 기회를 제공하지 않고 있습니다. 이는 금융거래의 핵심 조건인 이자율을 사업자가 일방적으로 결정·변경할 수 있게 하는 구조로, 차용인의 이자 부담을 예측 불가능하게 만듭니다.",
+    "check_questions": [
+     "이자율 변경의 구체적 사유(예: 기준금리 인상, 신용등급 변동 등)가 무엇인지 명확히 정의되어 있는지 확인하세요.",
+     "이자율 변경 시 차용인에게 사전 통지 기간(예: 30일)을 주고 이의제기 또는 계약 해지 선택권을 제공하는지 확인하세요.",
+     "현재 적용 중인 이자율이 정확히 얼마이며, 과거 변경 이력이 있다면 어떤 사유로 변경되었는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [
+     {
+      "case_id": "2008_약관변경동의간주",
+      "agency": "금융감독원",
+      "citation": "분쟁조정 사례집",
+      "result": "일정 기간 이의가 없으면 약관 변경에 동의한 것으로 보는 조항 — 약관규제법 제12조 위반으로 구속력 부정",
+      "source": "real_clause_labels_finance.csv:2008_약관변경동의간주",
+      "grade": "A"
+     },
+     {
+      "case_id": "2010_ELS조건조정",
+      "agency": "금융감독원",
+      "citation": "분쟁조정 사례집",
+      "result": "발행사 재량으로 지급조건을 조정할 수 있다는 조항 — 확장 적용을 제한해석으로 통제하고 지급 명령",
+      "source": "real_clause_labels_finance.csv:2010_ELS조건조정",
+      "grade": "A"
+     }
+    ],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_003",
+    "original_text": "제3조(기한의 이익 상실) 을이 이자 지급을 1회라도 지체한 경우 갑은 즉시 대출금 전액의 상환을 청구할 수 있다.",
+    "explanation": "이 조항은 돈을 빌린 사람(을)이 이자를 단 한 번이라도 늦게 내면, 돈을 빌려준 사람(갑)이 즉시 남은 대출금 전체를 한 번에 갚으라고 요구할 수 있다는 내용입니다. 이는 문제가 있는 조항입니다. 일반적인 은행 대출 약관에서는 원리금(빌린 돈과 이자) 납부가 3개월 이상 계속 늦어지거나 2회 이상 반복해서 늦을 때만 이런 조치를 취합니다. 그런데 이 조항은 이자를 단 1회만 늦어도 바로 전체 상환을 청구할 수 있도록 하고 있어서, 차용인(을)에게 매우 불리합니다. 더욱이 미리 알려주거나 이의를 제기할 기회 없이 자동으로 이 조항이 적용되는 구조라는 점이 문제입니다. 따라서 이자 1회 지체만으로 정말 즉시 전액 상환을 청구할 수 있는지, 통상적으로는 얼마나 오래 또는 몇 번 늦어야 하는지, 그리고 지체 시 사전 통지나 이의제기 기회가 있는지 반드시 확인해야 합니다.",
+    "risk_level": "위험",
+    "risk_type": "일방적 계약 해지",
+    "risk_evidence": "조항은 「을이 이자 지급을 1회라도 지체한 경우 갑은 즉시 대출금 전액의 상환을 청구할 수 있다」고 규정합니다. 은행 여신약관의 표준 기한이익 상실 조항은 일반적으로 원리금 지급 연체가 일정 기간(통상 3개월 이상) 지속되거나 2회 이상 반복될 때 발동되는데, 이 조항은 이자 1회 지체만으로도 즉시 전액 상환 청구권을 부여합니다. 이는 차용인에게 과도하게 불리한 일방적 해지 조항으로, 독촉이나 이의제기 기회 없이 자동으로 기한이익을 상실시키는 구조입니다.",
+    "check_questions": [
+     "이자 지급 1회 지체로 즉시 전액 상환을 청구하는 것이 맞는지, 통상적으로는 몇 개월 이상 연체되거나 2회 이상 반복되어야 하는 것 아닌지 확인하세요.",
+     "이자 지급이 지체되었을 때 차용인에게 사전 통지나 이의제기 기회를 주는 절차가 있는지 확인하세요.",
+     "이 조항이 적용되기 전에 독촉 절차나 합의 기회가 있는지, 아니면 자동으로 기한이익이 상실되는지 명확히 하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [
+     {
+      "case_id": "2019-18a",
+      "agency": "금융분쟁조정위원회",
+      "citation": "제2019-18호",
+      "result": "여신거래기본약관의 일방적 해지 조항 — 공정거래위원회 무효 판단을 인용해 해지 근거성 부정",
+      "source": "real_clause_labels_finance.csv:2019-18a",
+      "grade": "A"
+     },
+     {
+      "case_id": "990",
+      "agency": "대한법률구조공단 주택임대차분쟁조정위원회(대구지부)",
+      "citation": "2022년 사례",
+      "result": "임차인의 계약갱신요구권 포기 특약 — 주택임대차보호법 제6조의3 제1항 위반으로 특별한 사정 없이 무효",
+      "source": "real_clause_labels.csv:hldcc_990",
+      "grade": "A"
+     }
+    ],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [
+     [
+      15,
+      63
+     ]
+    ],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_004",
+    "original_text": "제4조(중도상환수수료) 중도상환수수료는 상환원금의 1.5%로 하며, 대출일로부터 3년 경과 시 면제한다.",
+    "explanation": "이 조항은 빌린 돈을 약속한 기간보다 먼저 갚을 때 내야 하는 수수료(중도상환수수료)에 대해 정한 것입니다. 수수료는 갚는 금액의 1.5%이며, 돈을 빌린 날로부터 3년이 지나면 이 수수료를 내지 않아도 됩니다. 수수료율과 면제되는 조건이 구체적으로 명시되어 있어서 나중에 분쟁이 생길 여지가 적습니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "중도상환수수료의 요율과 면제 조건이 구체적으로 명시되어 있습니다. 「상환원금의 1.5%」라는 명확한 산출 기준과 「대출일로부터 3년 경과 시 면제」라는 객관적 면제 조건이 규정되어 있어, 금융거래기본약관의 표준적 중도상환수수료 조항에 해당합니다.",
+    "check_questions": [
+     "3년 경과 후 중도상환 시 수수료가 완전히 면제되는지, 아니면 다른 수수료(예: 사무처리비)가 별도로 부과되는지 확인하세요.",
+     "1.5% 수수료가 상환원금 전체에 적용되는지, 아니면 특정 기간 이후 잔여원금에만 적용되는지 명확히 하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [
+     [
+      22,
+      32
+     ],
+     [
+      38,
+      55
+     ]
+    ],
+    "section": "본문"
+   }
+  ]
+ },
+ "insurance-coverage": {
+  "clause_count": 3,
+  "parse_warnings": [],
+  "parse_warning_codes": [],
+  "retry_count": 0,
+  "needs_review": false,
+  "judge_scores": {
+   "clarity": 4.0,
+   "faithfulness": 5.0,
+   "risk_coverage": 3.0,
+   "actionability": 4.0
+  },
+  "results": [
+   {
+    "clause_id": "clause_001",
+    "original_text": "제1조(보험계약의 성립) 이 계약은 보험계약자의 청약과 회사의 승낙으로 성립합니다.",
+    "explanation": "이 조항은 보험계약이 어떻게 성립하는지를 설명하는 기본 규칙입니다. 보험에 가입하려는 사람이 신청(청약)을 하고, 보험회사가 이를 동의(승낙)할 때 계약이 성립한다는 뜻입니다. 이는 일반적인 계약 원칙을 보험에 적용한 표준적인 규정으로, 특별히 위험한 내용은 없습니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 보험계약 성립의 요건을 청약과 승낙의 합의로 정의하고 있으며, 이는 민법 제527조(계약의 성립)에 부합하는 표준적 법정 원칙입니다. 일방적 계약 해지, 조건 변경, 책임 면제, 비용 전가 등 위험 유형에 해당하는 내용이 없습니다.",
+    "check_questions": [
+     "보험계약 청약 후 회사의 승낙까지 소요되는 기간이 정해져 있는지 확인하세요.",
+     "청약 철회나 승낙 거절 시 계약금이나 선납보험료의 반환 조건이 별도로 규정되어 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_002",
+    "original_text": "제2조(보험금의 지급) 회사는 피보험자가 보험기간 중 진단확정된 질병으로 장애인복지법 시행령의 지체장애 등 장애가 발생하고 1급 또는 2급 장애인이 되었을 때 최초 1회에 한하여 10년간 매년 생활자금을 보험수익자에게 지급합니다",
+    "explanation": "이 조항은 보험사가 보험에 가입한 사람이 보험 기간 중 질병으로 인해 1급 또는 2급 장애인으로 판정받았을 때, 처음 한 번만 인정하여 10년 동안 매해마다 생활자금을 지급하겠다는 내용입니다. 보험금을 받을 수 있는 조건(질병으로 인한 1급 또는 2급 장애 진단), 지급 횟수(최초 1회만), 지급 기간(10년간 매년)이 명확하게 정해져 있어 보험 상품의 기본적인 보장 조건을 규정하는 표준적인 조항입니다. 보험 가입자에게 불리한 일방적인 변경이나 불명확한 조건이 없으므로 안전한 조항입니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 보험금 지급의 요건(질병으로 인한 1급 또는 2급 장애 진단확정), 지급 횟수(최초 1회에 한하여), 지급 기간(10년간 매년)을 구체적으로 명시하고 있습니다. 보험 상품의 기본적인 급부 조건을 정하는 표준적인 조항으로, 보험수익자에게 불리한 일방적 변경이나 불명확한 조건이 없습니다.",
+    "check_questions": [
+     "매년 지급되는 생활자금의 구체적인 금액이나 산정 기준은 별도로 정해져 있습니까?",
+     "10년 지급 기간 중 피보험자가 사망한 경우, 남은 기간의 생활자금 지급이나 상속 처리는 어떻게 됩니까?",
+     "장애인복지법 시행령의 지체장애 외에 다른 장애 유형(시각장애, 청각장애 등)도 보험금 지급 대상에 포함됩니까?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_003",
+    "original_text": "제3조(보험료의 납입) 보험계약자는 보험료를 매월 약정한 날짜에 납입하여야 합니다.",
+    "explanation": "이 조항은 보험에 가입한 사람이 매달 정해진 날짜에 보험료를 내야 한다는 기본적인 의무를 정한 규정입니다. 보험료를 언제, 어떻게 내야 하는지를 명확하게 정해놓은 표준적인 조항으로, 특별히 문제가 될 만한 내용은 없습니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 보험료 납입 시기(매월 약정한 날짜)를 명확히 규정하고 있으며, 보험계약자의 기본 의무를 정한 표준적 조항입니다. 일방적 변경, 불명확한 수수료, 책임 면제, 비용 전가 등 10가지 위험 유형에 해당하는 내용이 없습니다.",
+    "check_questions": [
+     "보험료 납입 방법(자동이체, 계좌이체, 현금 등)은 어떻게 되나요?",
+     "보험료 납입이 지연되었을 때의 효력(예: 보장 중단, 연체료 부과)은 어떻게 규정되어 있나요?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   }
+  ]
+ },
+ "card-liability": {
+  "clause_count": 4,
+  "parse_warnings": [],
+  "parse_warning_codes": [],
+  "retry_count": 0,
+  "needs_review": false,
+  "judge_scores": {
+   "clarity": 4.0,
+   "faithfulness": 5.0,
+   "risk_coverage": 5.0,
+   "actionability": 4.0
+  },
+  "results": [
+   {
+    "clause_id": "clause_001",
+    "original_text": "제1조(카드의 발급) 회사는 회원의 신청에 따라 심사를 거쳐 카드를 발급합니다.",
+    "explanation": "신용카드 회사가 고객의 카드 발급 신청을 받아서 심사한 후 카드를 발급하는 절차를 정한 조항입니다. 카드를 발급할지 말지는 회사의 심사 결과에 따라 결정하도록 하는 일반적인 내용입니다. 이 조항은 금융기관이 고객의 신용도를 확인하는 것이 당연한 권한이므로 문제가 없습니다. 발급을 거절하는 이유가 불분명하거나, 회사가 일방적으로 조건을 바꿀 수 있도록 하는 내용도 없고, 고객에게 부당한 비용을 지우거나 권리를 제한하는 내용도 없습니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 신용카드 발급의 기본 절차(신청 → 심사 → 발급)를 규정하는 것으로, 발급사의 신용심사권은 금융기관의 통상적 권한입니다. 발급 거절 사유나 조건이 불명확하거나 일방적 변경 권한을 부여하는 내용이 없으며, 회원의 권리를 제한하거나 부당한 비용을 전가하는 조항도 없습니다.",
+    "check_questions": [
+     "카드 발급이 거절될 경우 거절 사유를 통지받을 수 있는지 확인하세요.",
+     "심사 기준이나 소요 기간에 대해 별도로 안내받을 사항이 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_002",
+    "original_text": "제2조(연회비) 연회비는 카드 종류에 따라 회사가 정한 금액으로 하며, 카드 발급 시 안내합니다.",
+    "explanation": "이 조항은 신용카드를 발급할 때 회사가 정하는 금액의 연회비(매년 내야 하는 수수료)를 내야 한다는 내용입니다. 다만 구체적으로 얼마를 내야 하는지, 어떻게 계산하는지, 언제 면제받을 수 있는지 등은 이 조항에 적혀 있지 않고, 카드를 받을 때 따로 알려주겠다고만 되어 있습니다. 이는 계약서에 서명할 때 연회비가 정확히 얼마인지 미리 알 수 없다는 뜻이므로 주의가 필요합니다.",
+    "risk_level": "주의",
+    "risk_type": "불명확한 수수료·이자 조건",
+    "risk_evidence": "조항에서 연회비를 '회사가 정한 금액'이라고만 표현하고 구체적 금액, 산정 기준, 면제 조건 등을 명시하지 않았습니다. '카드 발급 시 안내합니다'는 사후 통지 방식이므로, 계약 체결 시점에 이용자가 연회비 부담을 명확히 알 수 없습니다.",
+    "check_questions": [
+     "카드 종류별 연회비 금액이 얼마인지, 그리고 면제 조건(예: 연 사용액 기준, 할인 대상)이 있는지 구체적으로 확인하세요.",
+     "연회비가 변경될 경우 사전 통지 기간과 이의제기 기회가 있는지 확인하세요.",
+     "발급 후 연회비 부과 전에 동의 절차나 거절 기회가 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [
+     {
+      "case_id": "즉시연금_2017-17",
+      "agency": "금융분쟁조정위원회",
+      "citation": "제2017-17호",
+      "result": "최저보증이율 미만으로 연금을 지급한 것은 약관 위반으로 판정",
+      "source": "real_clause_labels.csv:즉시연금_2017-17",
+      "grade": "A"
+     },
+     {
+      "case_id": "바로연금보험_2018-8",
+      "agency": "금융분쟁조정위원회",
+      "citation": "제2018-8호",
+      "result": "만기보험금 차감 근거가 불명확한 조항 — 작성자불이익 원칙에 따라 소비자에게 유리하게 해석",
+      "source": "real_clause_labels.csv:바로연금보험_2018-8",
+      "grade": "A"
+     },
+     {
+      "case_id": "37",
+      "agency": "대한법률구조공단 주택·상가건물임대차분쟁조정위원회",
+      "citation": "2018년 사례",
+      "result": "특약의 '판결 시 정하는 법정이자' 문구를 임대인이 연 15%로 임의 해석·공제 — 조정위는 민법 제379조 법정이율 연 5%를 의미한다고 판단(춘천지법 강릉지원 2008나2606 인용), 초과 공제분 반환",
+      "source": "real_clause_labels.csv:37",
+      "grade": "A"
+     }
+    ],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [
+     [
+      24,
+      33
+     ],
+     [
+      40,
+      53
+     ]
+    ],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_003",
+    "original_text": "제3조(부정사용의 보상) 대여, 양도, 담보제공, 불법대출, 제3자 보관 등으로 인한 부정사용의 경우 카드사는 보상하지 않습니다",
+    "explanation": "이 조항은 신용카드가 부정하게 사용되었을 때 카드사가 얼마나 책임을 져야 하는지를 정하는 내용입니다. 카드를 다른 사람에게 빌려주거나 맡기는 등 카드 소유자의 부주의로 인해 카드가 잘못 사용된 경우에는 카드사가 손해를 보상해주지 않겠다는 뜻입니다.\n\n문제점은 보상을 받지 못하는 경우를 '카드 대여, 양도, 담보제공, 불법대출, 제3자 보관 등'으로 매우 넓게 정해놓았다는 것입니다. 특히 '등'이라는 표현 때문에 명시되지 않은 다양한 상황까지도 보상 제외 범위에 포함될 수 있습니다. 이는 단순히 카드사가 비밀번호 확인이나 서명 확인 같은 정상적인 확인 절차를 했을 때 책임을 지지 않는 것이 아니라, 카드사가 자신의 책임을 지나치게 넓게 회피하려는 조항으로 볼 수 있습니다.",
+    "risk_level": "위험",
+    "risk_type": "책임 면제",
+    "risk_evidence": "조항이 부정사용 보상 제외 사유를 '대여, 양도, 담보제공, 불법대출, 제3자 보관 등'으로 광범위하게 열거하고 있습니다. 특히 '등'이라는 포괄 문구를 사용하여 명시되지 않은 다양한 상황까지 보상 제외 범위에 포함시킬 수 있는 구조입니다. 이는 카드사의 정상적인 본인확인 절차(인감·서명·비밀번호 대조 등) 이행에 따른 통상적 면책이 아니라, 사업자가 자신의 책임을 부당하게 회피하는 광범위한 면책 조항에 해당합니다.",
+    "check_questions": [
+     "카드를 분실했거나 도난당한 경우, 카드사가 본인확인 절차를 정상적으로 이행했다면 보상받을 수 있는지 명확히 확인하세요.",
+     "'제3자 보관 등'의 '등'에 구체적으로 어떤 상황들이 포함되는지 카드사에 문의하여 보상 제외 범위를 명확히 하세요.",
+     "카드사의 보상 책임이 면제되는 경우와 보상받을 수 있는 경우의 구체적인 판단 기준이 약관의 다른 조항에 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [
+     {
+      "case_id": "20",
+      "agency": "대한법률구조공단 주택·상가건물임대차분쟁조정위원회",
+      "citation": "2018년 사례",
+      "result": "주택 수리비용 전액을 임차인 책임으로 하는 특약 — 임대인의 법정 유지수선의무를 포괄전가해 무효 확인",
+      "source": "real_clause_labels.csv:hldcc_20",
+      "grade": "A"
+     },
+     {
+      "case_id": "2008_직불카드양도",
+      "agency": "금융감독원",
+      "citation": "분쟁조정 사례집",
+      "result": "카드 양도 시 전액 책임을 지우는 조항 — 기여도 분배 판례에 따라 회원 책임을 40%로 제한",
+      "source": "real_clause_labels_finance.csv:2008_직불카드양도",
+      "grade": "A"
+     },
+     {
+      "case_id": "2023_주요08",
+      "agency": "대한법률구조공단 주택·상가건물임대차분쟁조정위원회",
+      "citation": "2023 조정사례집 주요사례",
+      "result": "'상가 신축·증축·철거 시 이의제기 불가, 권리금·시설비 청구 불가' 특약 — 임차인에게 일방적으로 불리하여 무효로 볼 여지가 크다고 판단, 임대인이 수용해 보상금 2,000만원 합의 성립",
+      "source": "real_clause_labels_ext.csv:2023_주요08",
+      "grade": "A"
+     }
+    ],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [
+     [
+      14,
+      42
+     ]
+    ],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_004",
+    "original_text": "제4조(이용대금의 결제) 회원은 이용대금을 지정된 결제일에 결제계좌를 통하여 납부합니다.",
+    "explanation": "이 조항은 신용카드를 사용한 후 발생한 이용 금액을 정해진 날짜에 지정된 계좌에서 자동으로 납부하도록 정한 내용입니다. 언제, 어떤 방식으로 돈을 내야 하는지를 명확하게 규정한 기본적인 의무 조항으로, 신용카드 약관에서 표준적으로 포함되는 조항입니다. 이 조항에는 수수료나 이자 계산 기준이 불명확하거나, 카드사가 일방적으로 조건을 바꿀 수 있거나, 카드사가 책임을 회피하거나, 비용을 고객에게 부당하게 넘기는 등의 위험한 요소가 없어 안전한 것으로 판단됩니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 결제일과 결제 방법(결제계좌)을 명시하고 있으며, 회원의 기본적인 납부 의무를 정하는 표준적인 신용카드 약관 조항입니다. 수수료·이자 산정 기준의 불명확성, 일방적 변경 권한, 책임 면제, 비용 전가 등 위험 유형에 해당하는 요소가 없습니다.",
+    "check_questions": [
+     "결제계좌는 회원이 지정하는 것인지, 아니면 카드사가 지정하는 것인지 확인하세요.",
+     "결제일이 변경될 수 있는 경우가 있다면, 사전 통지와 이의제기 기회가 보장되는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   }
+  ]
+ },
+ "efinance-standard": {
+  "clause_count": 3,
+  "parse_warnings": [],
+  "parse_warning_codes": [],
+  "retry_count": 1,
+  "needs_review": false,
+  "judge_scores": {
+   "clarity": 4.0,
+   "faithfulness": 4.0,
+   "risk_coverage": 2.0,
+   "actionability": 4.0
+  },
+  "results": [
+   {
+    "clause_id": "clause_001",
+    "original_text": "제1조(적용범위) 이 약관은 이용자가 회사가 제공하는 전자금융거래 서비스를 이용함에 있어 적용됩니다.",
+    "explanation": "이 조항은 약관이 어디에 적용되는지를 정하는 기본 조항입니다. 회사가 제공하는 전자금융거래 서비스(인터넷이나 휴대폰으로 하는 금융 거래)를 이용하는 모든 고객에게 이 약관의 내용이 적용된다는 뜻입니다. 이 조항은 고객의 권리를 제한하거나 회사에만 유리한 내용이 없으며, 계약이 어디까지 미치는지를 명확하게 알려주는 보호 조항이므로 안전합니다. 다만 이 약관 외에 별도로 정한 특별한 약정이 있는지, 그리고 전자금융거래 서비스의 구체적인 범위(입금, 출금, 이체, 예금 등)가 약관의 다른 조항에서 명확하게 설명되어 있는지 확인해 두시기 바랍니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 약관의 적용 대상과 범위를 명확하게 정의하는 표준적인 서두 조항입니다. 이용자의 권리를 제한하거나 사업자에게 일방적 이익을 주는 내용이 없으며, 계약의 효력 범위를 투명하게 고지하는 보호 조항입니다.",
+    "check_questions": [
+     "이 약관 외에 별도의 개별 약정이나 특약이 있는지 확인하세요.",
+     "전자금융거래 서비스의 구체적 범위(입금, 출금, 이체, 예금 등)가 약관의 다른 조항에서 명시되어 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_002",
+    "original_text": "제2조(본인확인) 자금이체비밀번호, 보안카드 비밀번호 등 등록된 자료와 일치할 경우 서비스 이용자를 본인으로 인정하며, 이용자의 고의나 중대한 과실이 있는 경우 금융기관은 책임을 지지 아니합니다",
+    "explanation": "금융기관이 자금이체 비밀번호, 보안카드 비밀번호 등 미리 등록해둔 정보와 일치하는지 확인하여 본인임을 인정한다는 조항입니다. 다만 고객이 고의로 또는 매우 부주의하게 행동하여 발생한 손해에 대해서는 금융기관이 책임을 지지 않는다는 내용입니다. 이는 은행이 정상적인 본인확인 절차를 거친 후 책임을 제한하는 표준적인 조항으로, 금융기관이 자신의 잘못을 부당하게 피하는 것이 아니라 고객의 부주의로 인한 손해는 고객이 책임진다는 의미입니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "본 조항은 금융기관의 정상적인 본인확인 절차(자금이체비밀번호, 보안카드 비밀번호 등 등록된 자료 대조)를 이행한 후의 책임 면제를 규정하고 있습니다. 이는 금융거래 안전성을 위한 표준적 조항으로, 금융기관이 자신의 귀책사유에 대한 책임을 부당하게 회피하는 것이 아니라, 이용자의 고의나 중대한 과실로 인한 손해에 대한 면책을 정한 것입니다. 따라서 책임 면제 위험(유형 4)에 해당하지 않습니다.",
+    "check_questions": [
+     "본인확인 절차 실패 시(예: 비밀번호 오류로 거래 거부) 금융기관의 책임 범위는 어떻게 되는지 확인하세요.",
+     "이용자의 '중대한 과실'의 구체적 범위(예: 비밀번호를 타인에게 알려준 경우, 공용 PC에서 로그인한 경우 등)가 약관 다른 조항에서 정의되어 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_003",
+    "original_text": "제3조(이용시간) 서비스 이용시간은 연중무휴 24시간을 원칙으로 하되, 시스템 점검 시 사전 공지 후 중단할 수 있습니다.",
+    "explanation": "이 조항은 예금·수신 서비스(돈을 맡기고 찾는 서비스)를 연중무휴 24시간 이용할 수 있다고 정하고 있습니다. 다만 시스템 점검(컴퓨터 시스템을 정비하고 보수하는 것)이 필요한 경우에는 미리 알려준 후에 서비스를 일시적으로 중단할 수 있다는 내용입니다. 이는 금융회사가 일반적으로 운영하는 표준적인 조항이며, 고객에게 불공정한 피해를 주지 않습니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 기본 이용시간을 명확히 정하고(연중무휴 24시간), 예외 사유를 객관적으로 한정하며(시스템 점검), 사전 공지라는 절차 요건을 규정하고 있습니다. 이는 금융서비스의 통상적 운영 조항으로, 사용자에게 불합리한 불이익을 주지 않습니다.",
+    "check_questions": [
+     "시스템 점검 시 사전 공지는 몇 일 전에 이루어지는지, 공지 방법(앱 알림, 문자, 이메일 등)은 무엇인지 확인하세요.",
+     "긴급 장애 상황에서 사전 공지 없이 서비스가 중단될 수 있는지, 그 경우 사후 공지 절차가 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   }
+  ]
+ },
+ "jeonse-trust": {
+  "clause_count": 4,
+  "parse_warnings": [],
+  "parse_warning_codes": [],
+  "retry_count": 0,
+  "needs_review": false,
+  "judge_scores": {
+   "clarity": 4.0,
+   "faithfulness": 5.0,
+   "risk_coverage": 4.0,
+   "actionability": 5.0
+  },
+  "results": [
+   {
+    "clause_id": "clause_001",
+    "original_text": "제1조(목적) 임대인과 임차인은 아래 표시 주택에 관하여 다음 계약 내용과 같이 임대차계약을 체결한다.",
+    "explanation": "이 조항은 임대인(집주인)과 임차인(세입자)이 특정 주택을 빌리고 빌려주기로 약속하는 계약의 기본 내용을 정하는 부분입니다. 계약에 참여하는 사람들이 누구인지, 그리고 어떤 집을 대상으로 하는지를 명확히 적어두는 표준적인 시작 조항입니다. 이 조항에는 세입자의 권리를 제한하거나 의무를 과하게 부담시키는 내용이 없어 안전합니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 임대차계약의 목적을 명시하는 기본 조항으로, 당사자(임대인·임차인)와 계약 대상(표시 주택)을 정의하는 표준적 내용입니다. 임차인의 권리를 제한하거나 의무를 부당하게 가중하는 내용이 없습니다.",
+    "check_questions": [
+     "계약서의 '아래 표시 주택'에 정확한 주소, 면적, 건물 구조 등이 명기되어 있는지 확인하셨나요?",
+     "임대인의 성명(또는 상호)과 임차인의 성명이 정확하게 기재되어 있는지 확인하셨나요?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_002",
+    "original_text": "제2조(보증금) 임차인은 보증금 금 150,000,000원을 임대인에게 지급한다.",
+    "explanation": "이 조항은 세입자가 집주인에게 맡겨야 할 보증금의 액수를 1억 5천만 원으로 정하는 내용입니다. 보증금이 얼마인지를 명확하게 정한 기본적인 조항으로, 이 계약에서 가장 중요한 금전 거래 내용을 담고 있습니다. 보증금의 구체적인 금액이 명시되어 있고, 세입자가 얼마를 내야 하는지가 분명하므로 이 조항 자체에는 특별한 위험 요소가 없습니다. 다만 보증금을 돌려받을 때 이자나 손해배상금이 빠지는지, 언제까지 돌려받을 수 있는지, 그리고 보증금이 안전한 신탁계좌(제3자가 보관하는 계좌)에 들어가는지 아니면 집주인이 직접 보관하는지 등은 다른 조항에서 확인해야 합니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 보증금의 구체적 금액을 명시하고 있으며, 보증금 지급 의무의 범위와 조건이 명확합니다. 보증금 반환 기한, 공제 사유, 반환 방식 등에 대한 불리한 규정이 없으므로 이 조항 자체만으로는 위험 요소가 없습니다.",
+    "check_questions": [
+     "보증금 반환 시 이자나 손해배상금이 공제되는 경우가 있는지, 있다면 그 기준과 한도는 무엇인지 확인하세요.",
+     "계약 해지 시 보증금을 언제까지 반환받을 수 있는지, 반환 기한이 명시되어 있는지 확인하세요.",
+     "보증금이 신탁계좌에 예치되는지, 아니면 임대인이 직접 보관하는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_003",
+    "original_text": "제3조(특약) 당사는 부동산담보신탁계약의 수탁자로서 임대차보증금 반환책임 및 임대부동산의 수선의무 등에 대하여 일체의 책임이 없으며",
+    "explanation": "이 조항은 부동산을 신탁(다른 사람에게 맡겨 관리하게 하는 것)받은 수탁자(신탁받은 사람)가 세입자의 보증금 반환과 건물 수리에 대해 책임이 없다고 정하고 있습니다. 이는 위험한 내용입니다. 왜냐하면 세입자 입장에서는 보증금을 돌려받아야 할 때 누구에게 청구해야 할지 불명확해지기 때문입니다. 특히 보증금은 세입자를 보호하는 가장 중요한 것인데, 수탁자가 책임을 지지 않으면 실제로 보증금을 돌려받기 어려워질 수 있습니다. 또한 건물에 문제가 생겼을 때도 누가 수리해야 하는지 불분명해집니다. 따라서 다음 사항들을 반드시 확인해야 합니다: 보증금 반환 책임은 정확히 누가 지는지(수탁자가 아니라면 신탁을 맡긴 사람이나 신탁회사 등 누구인지), 신탁계약이 끝나거나 건물이 팔릴 때 세입자의 보증금이 어떻게 보호되는지, 그리고 건물 수리가 필요할 때 세입자가 누구에게 청구해야 하는지 명확히 해야 합니다.",
+    "risk_level": "위험",
+    "risk_type": "신탁관계·소유권 불안정 고지",
+    "risk_evidence": "조항에서 수탁자가 임대차보증금 반환책임 및 임대부동산의 수선의무에 대하여 일체의 책임이 없다고 규정함으로써, 신탁구조 하에서 임차인이 보증금 반환을 청구할 실질적 책임자가 불명확해집니다. 특히 보증금 반환은 임차인의 핵심 보호 대상인데, 수탁자가 이에 대한 책임을 전면 면제받으면 임차인의 보증금 회수가 구조적으로 취약해질 수 있습니다. 이는 신탁 구조를 고지하면서 임차인의 보호를 실질적으로 축소하는 경우에 해당합니다.",
+    "check_questions": [
+     "보증금 반환책임은 누가 지는가? 수탁자가 아니라면 실제 책임자(위탁자, 신탁회사 등)가 누구인지 명확히 해주세요.",
+     "신탁계약이 해지되거나 신탁부동산이 처분될 경우, 임차인의 보증금 반환청구권은 어떻게 보호되는가?",
+     "임대부동산의 하자나 수선이 필요할 때 임차인은 누구에게 청구해야 하는가? 수탁자가 책임이 없다면 실제 책임자는 누구인가?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_004",
+    "original_text": "제4조(원상회복) 임대차계약이 종료된 경우 임차인은 위 주택을 원상으로 회복하여 임대인에게 반환한다.",
+    "explanation": "이 조항은 세입자가 임대차 계약이 끝날 때 집을 원래 상태로 되돌려서 반환해야 한다는 내용입니다. 즉, 세입자가 직접 설치하거나 변경한 부분들을 원래대로 복구할 책임이 있다는 뜻입니다. 이는 임대차 계약에서 일반적으로 볼 수 있는 표준적인 규정입니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항은 임차인이 자신의 점유·사용으로 인한 변경 부분을 원상복구하여 반환하도록 정하는 것으로, 임대차 종료 시 표준적인 의무입니다. 임대인의 수선의무를 포괄적으로 임차인에게 전가하거나, 정상적인 마모·노후까지 임차인 책임으로 돌리는 조항이 아니므로 책임 면제 위험이 없습니다.",
+    "check_questions": [
+     "원상복구의 범위가 구체적으로 무엇인지 확인하세요. 예를 들어 정상적인 마모·노후 부분까지 포함되는지, 아니면 임차인이 설치·개조한 부분만 해당하는지 명확히 하세요.",
+     "원상복구 비용을 임차인이 전액 부담하는지, 아니면 임대인이 일부를 부담하는지 확인하세요.",
+     "계약서의 다른 조항에서 수선의무나 수리비 부담에 대해 추가로 정하고 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   }
+  ]
+ },
+ "senior-mode": {
+  "clause_count": 4,
+  "parse_warnings": [],
+  "parse_warning_codes": [],
+  "retry_count": 0,
+  "needs_review": false,
+  "judge_scores": {
+   "clarity": 4.0,
+   "faithfulness": 5.0,
+   "risk_coverage": 3.0,
+   "actionability": 4.0
+  },
+  "results": [
+   {
+    "clause_id": "clause_001",
+    "original_text": "제1조(거래조건) 대출금액은 금 20,000,000원, 대출기간은 계약일로부터 36개월로 한다.",
+    "explanation": "은행에서 2천만 원을 빌려주고, 3년(36개월) 동안 갚기로 하는 기본 약속을 정하는 부분입니다. 빌리는 돈의 액수와 갚는 기간이 명확하게 적혀 있어서 안전합니다. 마치 이웃에게 돈을 빌릴 때 '2천만 원을 3년 안에 갚겠습니다'라고 약속하는 것처럼, 기본적인 내용이 분명하게 정해져 있습니다. 이자가 얼마인지, 매달 얼마씩 갚을지 같은 다른 조건들은 계약서의 다른 부분에서 따로 정하게 됩니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항에서 대출금액과 대출기간이 구체적 수치로 명시되어 있으며, 거래의 기본 조건을 명확하게 정의하는 표준적 조항입니다. 금리, 상환방식, 수수료 등 다른 거래 조건이 이 조항에 포함되지 않았으므로, 불명확성이나 일방적 변경 가능성이 없습니다.",
+    "check_questions": [
+     "대출금 상환 방식(원리금균등분할, 만기일시상환 등)은 별도 조항에서 정해지나요?",
+     "대출금리와 이자 계산 방식은 어느 조항에 명시되어 있나요?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_002",
+    "original_text": "제2조(이자) 이자율은 갑의 내부 사정에 따라 수시로 변경될 수 있다. 변경된 이자율은 갑의 홈페이지 공지로 갈음한다.",
+    "explanation": "은행(갑)이 빌려준 돈의 이자를 마음대로 자주 바꿀 수 있다는 조항입니다. 마치 물건을 사고 나중에 가격을 일방적으로 올리는 것처럼 불공평합니다. 은행이 이자를 바꾸기 전에 미리 알려주지 않습니다. 홈페이지에만 몰래 올려놓는 식입니다. 당신이 이의를 제기할 기회도 주지 않습니다. 은행이 자기 사정만 생각해서 이자를 올렸다 내렸다 할 수 있다는 뜻입니다. 이건 법에서 금지하는 불공정한 계약입니다.",
+    "risk_level": "위험",
+    "risk_type": "일방적 급부·조건 변경",
+    "risk_evidence": "조항에서 이자율을 갑의 내부 사정에 따라 수시로 변경할 수 있다고 규정하고 있으며, 변경 사유가 객관적·한정적으로 열거되지 않고 갑의 재량적 판단(내부 사정)에만 의존합니다. 또한 변경된 이자율을 홈페이지 공지로만 알리도록 하여 차용인에게 사전 통지나 변경에 대한 이의제기 기회를 제공하지 않고 있습니다. 이는 금융거래에서 차용인이 부담할 이자 비용을 사업자가 자의로 결정·변경할 수 있게 하는 구조로, 약관규제법상 부당한 일방적 변경에 해당합니다.",
+    "check_questions": [
+     "이자율 변경 시 변경 전에 차용인에게 서면으로 통지하고 이의제기 기회를 주는지 확인하세요.",
+     "이자율 변경의 구체적 사유(예: 기준금리 변동, 신용등급 변경 등)가 객관적으로 정해져 있는지 확인하세요.",
+     "이자율 변경에 동의하지 않을 경우 계약을 해지할 수 있는 권리가 있는지 확인하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [
+     {
+      "case_id": "2008_약관변경동의간주",
+      "agency": "금융감독원",
+      "citation": "분쟁조정 사례집",
+      "result": "일정 기간 이의가 없으면 약관 변경에 동의한 것으로 보는 조항 — 약관규제법 제12조 위반으로 구속력 부정",
+      "source": "real_clause_labels_finance.csv:2008_약관변경동의간주",
+      "grade": "A"
+     },
+     {
+      "case_id": "2010_ELS조건조정",
+      "agency": "금융감독원",
+      "citation": "분쟁조정 사례집",
+      "result": "발행사 재량으로 지급조건을 조정할 수 있다는 조항 — 확장 적용을 제한해석으로 통제하고 지급 명령",
+      "source": "real_clause_labels_finance.csv:2010_ELS조건조정",
+      "grade": "A"
+     }
+    ],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_003",
+    "original_text": "제3조(기한의 이익 상실) 을이 이자 지급을 1회라도 지체한 경우 갑은 즉시 대출금 전액의 상환을 청구할 수 있다.",
+    "explanation": "돈을 빌려준 사람이 이자를 한 번이라도 늦게 내면 바로 남은 돈을 다 갚으라고 할 수 있다는 뜻입니다. 이건 너무 엄격한 조건이에요. 보통 은행에서는 두 번 이상 늦거나 독촉을 받은 후에야 이렇게 하거든요. 이 계약은 한 번 늦은 것만으로도 미리 알려주지도 않고 바로 돈을 다 갚으라고 할 수 있어서 돈을 빌린 사람한테 매우 불리해요.",
+    "risk_level": "위험",
+    "risk_type": "일방적 계약 해지",
+    "risk_evidence": "조항은 이자 지급 1회 지체만으로 즉시 기한이익을 상실시키고 전액 상환을 청구할 수 있도록 규정하고 있습니다. 은행 여신거래기본약관의 표준 조항은 통상 2기 이상의 연체나 독촉 후 일정 기간 경과 등 객관적이고 한정된 사유를 열거하며, 독촉·통지 절차를 거치도록 합니다. 그러나 본 조항은 단 1회 지체에 대해 사전 통지나 이의제기 기회 없이 자동으로 기한이익을 상실시키는 구조로, 차용인에게 과도하게 불리운 일방적 해지 조항입니다.",
+    "check_questions": [
+     "이자 지급이 며칠 지연되면 '지체'로 간주되는지, 그리고 지체 통지 후 상환 청구 전에 이의제기나 납부 기회가 있는지 확인하세요.",
+     "금융기관의 표준 약관에서는 보통 2기 이상 연체 시 기한이익을 상실하도록 하는데, 이 계약에서 1회 지체로 즉시 전액 상환을 청구하는 이유가 무엇인지 설명을 요청하세요.",
+     "기한이익 상실 전에 차용인에게 독촉 통지를 하고 일정 기간(예: 10일) 내 납부 기회를 주는 조항으로 수정할 수 있는지 협의하세요."
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [
+     {
+      "case_id": "2019-18a",
+      "agency": "금융분쟁조정위원회",
+      "citation": "제2019-18호",
+      "result": "여신거래기본약관의 일방적 해지 조항 — 공정거래위원회 무효 판단을 인용해 해지 근거성 부정",
+      "source": "real_clause_labels_finance.csv:2019-18a",
+      "grade": "A"
+     },
+     {
+      "case_id": "990",
+      "agency": "대한법률구조공단 주택임대차분쟁조정위원회(대구지부)",
+      "citation": "2022년 사례",
+      "result": "임차인의 계약갱신요구권 포기 특약 — 주택임대차보호법 제6조의3 제1항 위반으로 특별한 사정 없이 무효",
+      "source": "real_clause_labels.csv:hldcc_990",
+      "grade": "A"
+     }
+    ],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   },
+   {
+    "clause_id": "clause_004",
+    "original_text": "제4조(중도상환수수료) 중도상환수수료는 상환원금의 1.5%로 하며, 대출일로부터 3년 경과 시 면제한다.",
+    "explanation": "이 조항은 빌린 돈을 약속한 기간보다 일찍 갚을 때 내야 하는 수수료에 대해 정한 것입니다. 마치 전세금을 약속 기간보다 일찍 돌려받을 때 수수료를 내는 것처럼요. 수수료는 갚는 돈의 1.5%이고, 빌린 지 3년이 지나면 이 수수료를 내지 않아도 된다고 명확하게 써 있습니다. 수수료 비율도 명확하고 면제되는 조건도 명확해서 안전한 조항입니다.",
+    "risk_level": "안전",
+    "risk_type": "해당 없음",
+    "risk_evidence": "조항에서 중도상환수수료의 요율을 상환원금의 1.5%로 구체적으로 명시하고, 면제 사유를 대출일로부터 3년 경과로 명확하게 규정하고 있습니다. 요율과 면제 조건이 모두 명시된 통상 수준의 중도상환수수료 조항으로, 표준 조항 예외에 해당하는 안전한 조항입니다.",
+    "check_questions": [
+     "중도상환수수료 1.5%는 동종 금융상품의 시장 수준과 비교했을 때 합리적인 수준인지 확인하고 싶으신가요?",
+     "3년 경과 후 전액 면제되는지, 아니면 감액되는지 명확히 하고 싶으신가요?"
+    ],
+    "original_text_translated": null,
+    "check_questions_translated": null,
+    "risk_evidence_translated": null,
+    "related_cases": [],
+    "analysis_failed": false,
+    "injection_suspected": false,
+    "quarantined": 0,
+    "verdict_withheld": false,
+    "original_risk_level": null,
+    "evidence_spans": [],
+    "section": "본문"
+   }
+  ]
+ }
+}

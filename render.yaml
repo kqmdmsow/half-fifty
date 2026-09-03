@@ -12,6 +12,8 @@ services:
         sync: false        # 대시보드에서 직접 입력
       - key: UPSTAGE_API_KEY
         sync: false        # OCR(사진·스캔 PDF) 필수 — 누락 시 /analyze-image 전면 비작동
+      - key: GOOGLE_API_KEY
+        sync: false        # 상담 녹취 전사(STT) 필수 — 누락 시 음성 업로드 전면 비작동 (텍스트 녹취는 무관)
       - key: MODEL_WORKER
         value: claude-haiku-4-5
       - key: MODEL_JUDGE
