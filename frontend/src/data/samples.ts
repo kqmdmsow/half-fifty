@@ -14,9 +14,10 @@ import sampleTexts from './sampleTexts.json'
 
 export interface DemoSample {
   id: string
-  labelKey: 'sp1' | 'sp2' | 'sp3' | 'sp4' | 'sp5' | 'sp6' | 'sp7' | 'sp8'
-  /** 핵심 확인 포인트의 예상 판정 — 배지 표시용 */
-  expected: '위험' | '안전'
+  labelKey: 'sp1' | 'sp2' | 'sp3' | 'sp4' | 'sp5' | 'sp6' | 'sp7' | 'sp8' | 'sp9' | 'sp10'
+  /** 핵심 확인 포인트의 예상 판정 — 배지 표시용.
+   *  '격리'는 프롬프트 인젝션 방어 데모: 위험도가 아니라 조작 감지가 핵심이다. */
+  expected: '위험' | '안전' | '격리'
   kind: 'text' | 'file'
   domain: string
   persona?: Persona
@@ -81,6 +82,20 @@ export const DEMO_SAMPLES: DemoSample[] = [
     ...textSample('senior-mode'),
     labelKey: 'sp6',
     expected: '위험',
+    kind: 'text',
+  },
+  // 프롬프트 인젝션 방어 데모 2종 — 계약서에 심긴 AI 조작 지시를
+  // 방화벽(#174)이 감지·격리하는 모습을 보여 준다.
+  {
+    ...textSample('injection-override'),
+    labelKey: 'sp9',
+    expected: '격리',
+    kind: 'text',
+  },
+  {
+    ...textSample('injection-hidden'),
+    labelKey: 'sp10',
+    expected: '격리',
     kind: 'text',
   },
   {

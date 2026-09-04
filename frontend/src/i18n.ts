@@ -1406,7 +1406,7 @@ const UI_SCREENS: Record<LangCode, Record<ScreenKey, string>> = {
   },
 }
 
-type SampleKey = 'spTitle' | 'spDesc' | 'sp1' | 'sp2' | 'sp3' | 'sp4' | 'sp5' | 'sp6' | 'sp7' | 'sp8'
+type SampleKey = 'spTitle' | 'spDesc' | 'sp1' | 'sp2' | 'sp3' | 'sp4' | 'sp5' | 'sp6' | 'sp7' | 'sp8' | 'sp9' | 'sp10' | 'spShield'
 
 /** 원클릭 데모 샘플 라벨 (#81) — 조항 원문은 한국어 유지, 라벨만 번역. */
 const UI_SAMPLES: Record<LangCode, Record<SampleKey, string>> = {
@@ -1414,97 +1414,97 @@ const UI_SAMPLES: Record<LangCode, Record<SampleKey, string>> = {
     spTitle: '샘플로 바로 체험하기', spDesc: '실제 분쟁 사례 기반 계약서예요. 누르면 자동으로 채워져요. 조항은 한국어(분석 대상), 결과는 선택한 언어로 나와요.',
     sp1: '대출 (이자 1회 지체 시 전액 상환)', sp2: '보험 (모호해도 소비자에게 유리하면 안전)',
     sp3: '카드 (포괄 면책으로 보상 제외)', sp4: '전자금융 (표준 면책은 안전)',
-    sp5: '전세 (신탁 면책 특약, 전세사기 패턴)', sp6: '고령층 모드 (같은 조항을 쉬운 말로)', sp7: 'PDF 업로드 (표준계약서 21개 조항)', sp8: '사진(OCR, 신탁 특약이 숨은 계약서)',
+    sp5: '전세 (신탁 면책 특약, 전세사기 패턴)', sp6: '고령층 모드 (같은 조항을 쉬운 말로)', sp7: 'PDF 업로드 (표준계약서 21개 조항)', sp8: '사진(OCR, 신탁 특약이 숨은 계약서)', sp9: 'AI 조작 방어 (전부 안전으로 보고하라는 지시문)', sp10: 'AI 조작 방어 (특약에 숨긴 유출·은폐 지시)', spShield: '조작 감지',
   },
   en: {
     spTitle: 'Try it with a sample', spDesc: 'Sample contracts from real disputes. One click fills everything. Clauses are in Korean (what we analyze) (results come in your language).',
     sp1: 'Loan (one missed interest payment triggers full repayment)', sp2: 'Insurance (ambiguous but consumer-favorable = safe)',
     sp3: 'Card (blanket liability waiver)', sp4: 'E-finance (standard waiver is safe)',
-    sp5: 'Jeonse (trust immunity clause, fraud pattern)', sp6: 'Senior mode (same clause, plain words)', sp7: 'PDF upload (standard lease, 21 clauses)', sp8: 'Photo (OCR, contract hiding a trust clause)',
+    sp5: 'Jeonse (trust immunity clause, fraud pattern)', sp6: 'Senior mode (same clause, plain words)', sp7: 'PDF upload (standard lease, 21 clauses)', sp8: 'Photo (OCR, contract hiding a trust clause)', sp9: 'Injection defense (order to report every clause safe)', sp10: 'Injection defense (leak-and-conceal order hidden in a rider)', spShield: 'Tampered',
   },
   zh: {
     spTitle: '用样例立即体验', spDesc: '来自真实纠纷的样例合同。点击自动填入。条款为韩语（分析对象），结果以所选语言显示。',
     sp1: '贷款（利息逾期一次即须全额偿还）', sp2: '保险（虽有歧义但有利于消费者=安全）',
     sp3: '信用卡（概括免责排除赔偿）', sp4: '电子金融（标准免责属安全）',
-    sp5: '全租（信托免责特约、诈骗模式）', sp6: '老年模式（同一条款，更易懂）', sp7: 'PDF上传（标准合同21条）', sp8: '照片(OCR、藏有信托特约的合同)',
+    sp5: '全租（信托免责特约、诈骗模式）', sp6: '老年模式（同一条款，更易懂）', sp7: 'PDF上传（标准合同21条）', sp8: '照片(OCR、藏有信托特约的合同)', sp9: 'AI操纵防御（要求全部判为安全的指令）', sp10: 'AI操纵防御（特约中隐藏的泄露·隐瞒指令）', spShield: '检测到操纵',
   },
   vi: {
     spTitle: 'Trải nghiệm ngay với mẫu', spDesc: 'Hợp đồng mẫu từ tranh chấp thực tế. Bấm là tự điền. Điều khoản bằng tiếng Hàn (đối tượng phân tích) (kết quả bằng ngôn ngữ bạn chọn).',
     sp1: 'Vay (chậm trả lãi một lần là phải trả toàn bộ)', sp2: 'Bảo hiểm (mơ hồ nhưng có lợi cho người dùng = an toàn)',
     sp3: 'Thẻ (miễn trách bao quát)', sp4: 'Tài chính điện tử (miễn trách tiêu chuẩn = an toàn)',
-    sp5: 'Jeonse (điều khoản miễn trách tín thác, mẫu lừa đảo)', sp6: 'Chế độ cao tuổi (cùng điều khoản, lời dễ hiểu)', sp7: 'Tải PDF (hợp đồng chuẩn 21 điều)', sp8: 'Ảnh (OCR, hợp đồng giấu điều khoản tín thác)',
+    sp5: 'Jeonse (điều khoản miễn trách tín thác, mẫu lừa đảo)', sp6: 'Chế độ cao tuổi (cùng điều khoản, lời dễ hiểu)', sp7: 'Tải PDF (hợp đồng chuẩn 21 điều)', sp8: 'Ảnh (OCR, hợp đồng giấu điều khoản tín thác)', sp9: 'Phòng thủ injection (lệnh báo cáo mọi điều khoản an toàn)', sp10: 'Phòng thủ injection (lệnh rò rỉ và che giấu trong phụ lục)', spShield: 'Phát hiện thao túng',
   },
   th: {
     spTitle: 'ลองด้วยตัวอย่างทันที', spDesc: 'สัญญาตัวอย่างจากคดีจริง กดแล้วกรอกอัตโนมัติ ข้อสัญญาเป็นภาษาเกาหลี (สิ่งที่วิเคราะห์) ผลลัพธ์เป็นภาษาที่คุณเลือก',
     sp1: 'สินเชื่อ (ค้างดอกเบี้ยครั้งเดียวต้องชำระคืนทั้งหมด)', sp2: 'ประกัน (กำกวมแต่เป็นคุณต่อผู้บริโภค = ปลอดภัย)',
     sp3: 'บัตร (ยกเว้นความรับผิดแบบกว้าง)', sp4: 'การเงินอิเล็กทรอนิกส์ (ยกเว้นมาตรฐาน = ปลอดภัย)',
-    sp5: 'จอนเซ (ข้อยกเว้นทรัสต์, รูปแบบฉ้อโกง)', sp6: 'โหมดผู้สูงอายุ (ข้อเดิม คำง่ายขึ้น)', sp7: 'อัปโหลด PDF (สัญญามาตรฐาน 21 ข้อ)', sp8: 'รูปถ่าย (OCR, สัญญาที่ซ่อนข้อทรัสต์)',
+    sp5: 'จอนเซ (ข้อยกเว้นทรัสต์, รูปแบบฉ้อโกง)', sp6: 'โหมดผู้สูงอายุ (ข้อเดิม คำง่ายขึ้น)', sp7: 'อัปโหลด PDF (สัญญามาตรฐาน 21 ข้อ)', sp8: 'รูปถ่าย (OCR, สัญญาที่ซ่อนข้อทรัสต์)', sp9: 'ป้องกันการแทรกคำสั่ง (สั่งให้รายงานทุกข้อว่าปลอดภัย)', sp10: 'ป้องกันการแทรกคำสั่ง (คำสั่งซ่อนในข้อตกลงพิเศษ)', spShield: 'พบการแทรกแซง',
   },
   id: {
     spTitle: 'Coba langsung dengan sampel', spDesc: 'Kontrak sampel dari sengketa nyata. Sekali klik terisi. Pasal dalam bahasa Korea (objek analisis) (hasil dalam bahasa Anda).',
     sp1: 'Pinjaman (telat bunga sekali langsung lunas seluruhnya)', sp2: 'Asuransi (ambigu tapi menguntungkan konsumen = aman)',
     sp3: 'Kartu (pembebasan tanggung jawab menyeluruh)', sp4: 'E-finance (pembebasan standar itu aman)',
-    sp5: 'Jeonse (klausul imunitas trust, pola penipuan)', sp6: 'Mode lansia (pasal sama, bahasa sederhana)', sp7: 'Unggah PDF (kontrak standar 21 pasal)', sp8: 'Foto (OCR, kontrak dengan klausul trust tersembunyi)',
+    sp5: 'Jeonse (klausul imunitas trust, pola penipuan)', sp6: 'Mode lansia (pasal sama, bahasa sederhana)', sp7: 'Unggah PDF (kontrak standar 21 pasal)', sp8: 'Foto (OCR, kontrak dengan klausul trust tersembunyi)', sp9: 'Pertahanan injeksi (perintah melaporkan semua pasal aman)', sp10: 'Pertahanan injeksi (perintah bocor-dan-sembunyikan di klausul khusus)', spShield: 'Manipulasi terdeteksi',
   },
   tl: {
     spTitle: 'Subukan gamit ang sample', spDesc: 'Sample na kontrata mula sa totoong kaso. Isang click, napupunan. Nasa Korean ang sugnay (ang sinusuri) (resulta sa wikang pinili mo).',
     sp1: 'Loan (isang beses na hindi nabayarang interes, buong bayad agad)', sp2: 'Insurance (malabo pero pabor sa consumer = ligtas)',
     sp3: 'Card (malawakang pag-iwas sa pananagutan)', sp4: 'E-finance (karaniwang waiver ay ligtas)',
-    sp5: 'Jeonse (trust immunity clause, scam pattern)', sp6: 'Senior mode (parehong sugnay, simpleng salita)', sp7: 'PDF upload (standard na kontrata, 21 sugnay)', sp8: 'Litrato (OCR, kontratang may tagong trust clause)',
+    sp5: 'Jeonse (trust immunity clause, scam pattern)', sp6: 'Senior mode (parehong sugnay, simpleng salita)', sp7: 'PDF upload (standard na kontrata, 21 sugnay)', sp8: 'Litrato (OCR, kontratang may tagong trust clause)', sp9: 'Depensa sa injection (utos na iulat na ligtas ang lahat)', sp10: 'Depensa sa injection (nakatagong utos sa espesyal na kasunduan)', spShield: 'May manipulasyon',
   },
   ne: {
     spTitle: 'नमूनाबाट तुरुन्तै हेर्नुहोस्', spDesc: 'वास्तविक विवादका नमूना सम्झौता। क्लिकमा आफैं भरिन्छ। धारा कोरियालीमा (विश्लेषण वस्तु) (नतिजा रोजेको भाषामा।)',
     sp1: 'ऋण (एकपटक ब्याज ढिलो हुँदा पूरै तिर्नुपर्ने)', sp2: 'बीमा (अस्पष्ट तर उपभोक्ता पक्षमा = सुरक्षित)',
     sp3: 'कार्ड (व्यापक जिम्मेवारी छुट)', sp4: 'ई-वित्त (मानक छुट सुरक्षित)',
-    sp5: 'जोन्से (ट्रस्ट छुट धारा, ठगी ढाँचा)', sp6: 'ज्येष्ठ मोड (उही धारा, सजिलो भाषा)', sp7: 'PDF अपलोड (मानक सम्झौता २१ धारा)', sp8: 'फोटो (OCR, ट्रस्ट धारा लुकेको सम्झौता)',
+    sp5: 'जोन्से (ट्रस्ट छुट धारा, ठगी ढाँचा)', sp6: 'ज्येष्ठ मोड (उही धारा, सजिलो भाषा)', sp7: 'PDF अपलोड (मानक सम्झौता २१ धारा)', sp8: 'फोटो (OCR, ट्रस्ट धारा लुकेको सम्झौता)', sp9: 'इन्जेक्सन रक्षा (सबै धारा सुरक्षित भन्ने आदेश)', sp10: 'इन्जेक्सन रक्षा (विशेष सर्तमा लुकेको आदेश)', spShield: 'हेरफेर भेटियो',
   },
   km: {
     spTitle: 'សាកល្បងជាមួយគំរូភ្លាមៗ', spDesc: 'កិច្ចសន្យាគំរូពីវិវាទពិត។ ចុចម្តងបំពេញ។ ប្រការជាភាសាកូរ៉េ (វត្ថុវិភាគ) (លទ្ធផលជាភាសាដែលអ្នកជ្រើស។)',
     sp1: 'កម្ចី (ខកខានការប្រាក់ម្ដងត្រូវសងទាំងអស់)', sp2: 'ធានារ៉ាប់រង (មិនច្បាស់ប៉ុន្តែអំណោយផលអ្នកប្រើ = សុវត្ថិភាព)',
     sp3: 'កាត (លើកលែងទំនួលខុសត្រូវទូលំទូលាយ)', sp4: 'ហិរញ្ញវត្ថុអេឡិចត្រូនិក (លើកលែងស្តង់ដារ = សុវត្ថិភាព)',
-    sp5: 'Jeonse (ប្រការលើកលែងទ្រាស្ត, គំរូបោកប្រាស់)', sp6: 'របៀបមនុស្សចាស់ (ប្រការដដែល ពាក្យងាយៗ)', sp7: 'ផ្ទុក PDF (កិច្ចសន្យាស្តង់ដារ ២១ ប្រការ)', sp8: 'រូបថត (OCR, កិច្ចសន្យាលាក់ប្រការទ្រាស្ត)',
+    sp5: 'Jeonse (ប្រការលើកលែងទ្រាស្ត, គំរូបោកប្រាស់)', sp6: 'របៀបមនុស្សចាស់ (ប្រការដដែល ពាក្យងាយៗ)', sp7: 'ផ្ទុក PDF (កិច្ចសន្យាស្តង់ដារ ២១ ប្រការ)', sp8: 'រូបថត (OCR, កិច្ចសន្យាលាក់ប្រការទ្រាស្ត)', sp9: 'ការការពារ injection (បញ្ជាឱ្យរាយការណ៍ថាសុវត្ថិភាពទាំងអស់)', sp10: 'ការការពារ injection (បញ្ជាលាក់ក្នុងកិច្ចព្រមព្រៀងពិសេស)', spShield: 'រកឃើញការក្លែងបន្លំ',
   },
   my: {
     spTitle: 'နမူနာဖြင့် ချက်ချင်းစမ်းကြည့်ပါ', spDesc: 'အမှန်တကယ်အငြင်းပွားမှုမှ နမူနာစာချုပ်။ နှိပ်လျှင်ဖြည့်သည်။ အပိုဒ်များ ကိုရီးယားဘာသာ (စိစစ်ခံ) (ရလဒ် သင်ရွေးသောဘာသာဖြင့်။)',
     sp1: 'ချေးငွေ (အတိုးတစ်ကြိမ်နောက်ကျလျှင် အားလုံးပြန်ဆပ်ရမည်)', sp2: 'အာမခံ (မရှင်းသော်လည်း သုံးစွဲသူအကျိုး = စိတ်ချရ)',
     sp3: 'ကတ် (ကျယ်ပြန့်သော တာဝန်ကင်းလွတ်ခွင့်)', sp4: 'အီလက်ထရွန်နစ်ငွေရေး (စံကင်းလွတ်ခွင့် = စိတ်ချရ)',
-    sp5: 'Jeonse (ယုံကြည်အပ်နှံမှု ကင်းလွတ်အပိုဒ်, လိမ်လည်ပုံစံ)', sp6: 'သက်ကြီးမုဒ် (အပိုဒ်တူ စကားလွယ်)', sp7: 'PDF တင်ခြင်း (စံစာချုပ် အပိုဒ် ၂၁)', sp8: 'ဓာတ်ပုံ (OCR, ယုံကြည်အပ်နှံအပိုဒ် ဝှက်ထားသောစာချုပ်)',
+    sp5: 'Jeonse (ယုံကြည်အပ်နှံမှု ကင်းလွတ်အပိုဒ်, လိမ်လည်ပုံစံ)', sp6: 'သက်ကြီးမုဒ် (အပိုဒ်တူ စကားလွယ်)', sp7: 'PDF တင်ခြင်း (စံစာချုပ် အပိုဒ် ၂၁)', sp8: 'ဓာတ်ပုံ (OCR, ယုံကြည်အပ်နှံအပိုဒ် ဝှက်ထားသောစာချုပ်)', sp9: 'Injection ကာကွယ်မှု (အားလုံးစိတ်ချရဟု သတ်မှတ်ခိုင်းသော ညွှန်ကြားချက်)', sp10: 'Injection ကာကွယ်မှု (အထူးသဘောတူညီချက်တွင် ဝှက်ထားသော ညွှန်ကြားချက်)', spShield: 'ခြယ်လှယ်မှု တွေ့ရှိ',
   },
   mn: {
     spTitle: 'Жишээгээр шууд туршье', spDesc: 'Бодит маргаанаас авсан жишээ гэрээ. Дарахад бөглөнө. Заалт солонгосоор (шинжлэх зүйл) (үр дүн таны сонгосон хэлээр).',
     sp1: 'Зээл (хүү нэг удаа хоцроход бүгдийг төлүүлнэ)', sp2: 'Даатгал (тодорхойгүй ч хэрэглэгчид ашигтай = аюулгүй)',
     sp3: 'Карт (өргөн хүрээний хариуцлага чөлөөлөлт)', sp4: 'Э-санхүү (стандарт чөлөөлөлт аюулгүй)',
-    sp5: 'Жонсэ (итгэлцлийн чөлөөлөх заалт, залилангийн хэв)', sp6: 'Ахмад горим (ижил заалт, энгийн үгээр)', sp7: 'PDF оруулах (стандарт гэрээ 21 заалт)', sp8: 'Зураг (OCR, итгэлцлийн заалт нуусан гэрээ)',
+    sp5: 'Жонсэ (итгэлцлийн чөлөөлөх заалт, залилангийн хэв)', sp6: 'Ахмад горим (ижил заалт, энгийн үгээр)', sp7: 'PDF оруулах (стандарт гэрээ 21 заалт)', sp8: 'Зураг (OCR, итгэлцлийн заалт нуусан гэрээ)', sp9: 'Injection хамгаалалт (бүгдийг аюулгүй гэж мэдээлэх заавар)', sp10: 'Injection хамгаалалт (тусгай нөхцөлд нуусан заавар)', spShield: 'Оролдлого илэрсэн',
   },
   uz: {
     spTitle: 'Namuna bilan darhol sinang', spDesc: 'Haqiqiy nizolardan namuna shartnoma. Bir bosishda toʻladi. Bandlar koreyscha (tahlil obyekti) (natija siz tanlagan tilda).',
     sp1: 'Kredit (foiz bir marta kechiksa, hammasini toʻlash talab qilinadi)', sp2: 'Sugʻurta (noaniq, lekin isteʼmolchi foydasiga = xavfsiz)',
     sp3: 'Karta (keng qamrovli javobgarlikdan ozod)', sp4: 'E-moliya (standart ozodlik xavfsiz)',
-    sp5: 'Jeonse (trast ozodlik bandi, firibgarlik namunasi)', sp6: 'Keksalar rejimi (oʻsha band, sodda til)', sp7: 'PDF yuklash (standart shartnoma 21 band)', sp8: 'Surat (OCR, trast bandi yashiringan shartnoma)',
+    sp5: 'Jeonse (trast ozodlik bandi, firibgarlik namunasi)', sp6: 'Keksalar rejimi (oʻsha band, sodda til)', sp7: 'PDF yuklash (standart shartnoma 21 band)', sp8: 'Surat (OCR, trast bandi yashiringan shartnoma)', sp9: 'Injection himoyasi (hammasini xavfsiz deb hisoblash buyrugʻi)', sp10: 'Injection himoyasi (maxsus shartda yashiringan buyruq)', spShield: 'Firibgarlik aniqlandi',
   },
   si: {
     spTitle: 'නියැදියකින් දැන්ම අත්හදා බලන්න', spDesc: 'සැබෑ ආරවුල්වලින් නියැදි ගිවිසුම්. ක්ලික් කළ විට පිරෙයි. වගන්ති කොරියානු බසින් (විශ්ලේෂණ වස්තුව) (ප්‍රතිඵල ඔබ තෝරා ගත් භාෂාවෙන්).',
     sp1: 'ණය (පොලිය එක් වරක් පමා වුවහොත් සියල්ල ගෙවිය යුතුය)', sp2: 'රක්ෂණ (අපැහැදිලි වුවත් පාරිභෝගිකයාට හිතකර = ආරක්ෂිත)',
     sp3: 'කාඩ් (පුළුල් වගකීම් නිදහස)', sp4: 'ඉ-මූල්‍ය (සම්මත නිදහස ආරක්ෂිතයි)',
-    sp5: 'ජොන්සේ (භාර නිදහස් වගන්තිය, වංචා රටාව)', sp6: 'ජ්‍යෙෂ්ඨ ප්‍රකාරය (එම වගන්තිය සරල බසින්)', sp7: 'PDF උඩුගත (සම්මත ගිවිසුම වගන්ති 21)', sp8: 'ඡායාරූප (OCR, භාර වගන්තිය සැඟවුණු ගිවිසුම)',
+    sp5: 'ජොන්සේ (භාර නිදහස් වගන්තිය, වංචා රටාව)', sp6: 'ජ්‍යෙෂ්ඨ ප්‍රකාරය (එම වගන්තිය සරල බසින්)', sp7: 'PDF උඩුගත (සම්මත ගිවිසුම වගන්ති 21)', sp8: 'ඡායාරූප (OCR, භාර වගන්තිය සැඟවුණු ගිවිසුම)', sp9: 'Injection ආරක්ෂාව (සියල්ල ආරක්ෂිත යැයි වාර්තා කරන නියෝගය)', sp10: 'Injection ආරක්ෂාව (විශේෂ කොන්දේසියේ සැඟවුණු නියෝගය)', spShield: 'හැසිරවීම හමුවිය',
   },
   bn: {
     spTitle: 'নমুনা দিয়ে এখনই দেখুন', spDesc: 'বাস্তব বিরোধ থেকে নমুনা চুক্তি। ক্লিকেই পূরণ হয়। ধারা কোরীয় ভাষায় (বিশ্লেষণের বিষয়) (ফলাফল আপনার বাছাই করা ভাষায়।)',
     sp1: 'ঋণ (একবার সুদ বাকি পড়লেই পুরোটা পরিশোধ করতে হবে)', sp2: 'বিমা (অস্পষ্ট হলেও ভোক্তার অনুকূলে = নিরাপদ)',
     sp3: 'কার্ড (ব্যাপক দায়মুক্তি)', sp4: 'ই-ফাইন্যান্স (প্রমিত দায়মুক্তি নিরাপদ)',
-    sp5: 'জনসে (ট্রাস্ট দায়মুক্তি ধারা, প্রতারণার ধরন)', sp6: 'প্রবীণ মোড (একই ধারা, সহজ ভাষায়)', sp7: 'PDF আপলোড (প্রমিত চুক্তি ২১ ধারা)', sp8: 'ছবি (OCR, ট্রাস্ট ধারা লুকানো চুক্তি)',
+    sp5: 'জনসে (ট্রাস্ট দায়মুক্তি ধারা, প্রতারণার ধরন)', sp6: 'প্রবীণ মোড (একই ধারা, সহজ ভাষায়)', sp7: 'PDF আপলোড (প্রমিত চুক্তি ২১ ধারা)', sp8: 'ছবি (OCR, ট্রাস্ট ধারা লুকানো চুক্তি)', sp9: 'ইনজেকশন প্রতিরক্ষা (সব ধারা নিরাপদ বলার নির্দেশ)', sp10: 'ইনজেকশন প্রতিরক্ষা (বিশেষ শর্তে লুকানো নির্দেশ)', spShield: 'কারসাজি শনাক্ত',
   },
   ru: {
     spTitle: 'Попробуйте на примере', spDesc: 'Образцы договоров из реальных споров. Один клик (всё заполнено). Пункты на корейском (объект анализа) (результат на выбранном языке).',
     sp1: 'Кредит (одна просрочка процентов ведёт к полному погашению)', sp2: 'Страхование (неясно, но в пользу потребителя = безопасно)',
     sp3: 'Карта (огульное освобождение от ответственности)', sp4: 'Э-финансы (стандартное освобождение безопасно)',
-    sp5: 'Чонсе (трастовая оговорка, схема мошенничества)', sp6: 'Режим для пожилых (тот же пункт, простыми словами)', sp7: 'Загрузка PDF (стандартный договор, 21 пункт)', sp8: 'Фото (OCR, договор со скрытой трастовой оговоркой)',
+    sp5: 'Чонсе (трастовая оговорка, схема мошенничества)', sp6: 'Режим для пожилых (тот же пункт, простыми словами)', sp7: 'Загрузка PDF (стандартный договор, 21 пункт)', sp8: 'Фото (OCR, договор со скрытой трастовой оговоркой)', sp9: 'Защита от инъекций (приказ пометить всё как безопасное)', sp10: 'Защита от инъекций (скрытый приказ в допусловии)', spShield: 'Обнаружено вмешательство',
   },
   ja: {
     spTitle: 'サンプルですぐ体験', spDesc: '実際の紛争事例に基づくサンプル契約書。クリックで自動入力。条項は韓国語（分析対象）、結果は選択した言語で表示されます。',
     sp1: 'ローン（利息を一度延滞すると全額返済）', sp2: '保険（曖昧でも消費者有利なら安全）',
     sp3: 'カード（包括免責で補償除外）', sp4: '電子金融（標準免責は安全）',
-    sp5: 'チョンセ（信託免責特約、詐欺パターン）', sp6: '高齢者モード（同じ条項をやさしい言葉で）', sp7: 'PDFアップロード（標準契約書21条項）', sp8: '写真(OCR、信託特約が隠れた契約書)',
+    sp5: 'チョンセ（信託免責特約、詐欺パターン）', sp6: '高齢者モード（同じ条項をやさしい言葉で）', sp7: 'PDFアップロード（標準契約書21条項）', sp8: '写真(OCR、信託特約が隠れた契約書)', sp9: 'インジェクション防御（全条項を安全と報告させる指示）', sp10: 'インジェクション防御（特約に隠した流出・隠蔽指示）', spShield: '改ざん検知',
   },
 }
 

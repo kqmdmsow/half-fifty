@@ -97,10 +97,14 @@ export function UploadScreen({
                 className={`shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-bold ${
                   sample.expected === '위험'
                     ? 'bg-danger-50 text-danger-600'
-                    : 'bg-safe-50 text-safe-700'
+                    : sample.expected === '격리'
+                      ? 'bg-caution-50 text-caution-700'
+                      : 'bg-safe-50 text-safe-700'
                 }`}
               >
-                {riskLevelLabel(language ?? 'ko', sample.expected)}
+                {sample.expected === '격리'
+                  ? t(language, 'spShield')
+                  : riskLevelLabel(language ?? 'ko', sample.expected)}
               </span>
             </button>
           ))}
