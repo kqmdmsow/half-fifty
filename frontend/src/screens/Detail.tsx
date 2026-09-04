@@ -352,7 +352,7 @@ export function DetailScreen({
                 <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
                 {/* 부속문서에서 나온 조항은 출처를 밝힌다 — 본문과 법적 성격이 다르다 */}
                 {clause.section && clause.section !== '본문' && (
-                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[12px] font-semibold text-ink-500">
+                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[12px] font-semibold text-ink-600">
                     {clause.section}
                   </span>
                 )}
@@ -458,7 +458,7 @@ export function DetailScreen({
                     >
                       <div className="min-w-0">
                         <p className="text-[14px] font-bold text-ink-900">{agency.name}</p>
-                        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-500">
+                        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-600">
                           {t(language, agency.descKey)}
                         </p>
                       </div>

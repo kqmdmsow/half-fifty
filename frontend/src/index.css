@@ -21,9 +21,12 @@
   --c-white: 255 255 255; /* #ffffff — --krds-color-light-gray-0 */
   --c-ink-900: 19 20 22; /* #131416 — --krds-light-color-text-bolder (gray-95) */
   --c-ink-700: 30 33 36; /* #1e2124 — --krds-light-color-text-basic (gray-90) */
-  --c-ink-600: 70 76 83; /* #464c53 — --krds-light-color-text-subtle (gray-70) */
-  --c-ink-400: 88 97 106; /* #58616a — --krds-color-light-gray-60 */
-  --c-ink-300: 109 120 130; /* #6d7882 — --krds-color-light-gray-50 (4.68:1 — gray-40은 3.1:1이라 미채택) */
+  /* 보조 회색 3종은 KRDS 사다리에서 한 단계씩 진하게 쓴다(2026-09-04 가독성
+     피드백: 회색 텍스트가 잘 안 보임). 슬롯 이름은 유지 — 클래스 전면 치환 없이
+     여기 값만으로 전 화면이 조정된다. */
+  --c-ink-600: 51 54 61; /* #33363d — --krds-color-light-gray-80 */
+  --c-ink-400: 70 76 83; /* #464c53 — --krds-light-color-text-subtle (gray-70, 8.6:1) */
+  --c-ink-300: 88 97 106; /* #58616a — --krds-color-light-gray-60 (6.4:1) */
   --c-ink-200: 205 209 213; /* #cdd1d5 — --krds-light-color-border-gray-light (gray-20) */
   --c-ink-100: 230 232 234; /* #e6e8ea — --krds-color-light-gray-10 */
   --c-ink-50: 244 245 246; /* #f4f5f6 — --krds-light-color-surface-gray-subtler (gray-5) */
