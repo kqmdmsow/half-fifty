@@ -40,7 +40,9 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/health", "/api/contracts/**").permitAll()
+                        // /error를 막으면 컨트롤러가 던진 409·401·429가 전부 403으로
+                        // 바뀌어 나간다 — 오류 재전달(error dispatch)도 익명으로 온다.
+                        .requestMatchers("/error", "/health", "/api/contracts/**").permitAll()
                         .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
