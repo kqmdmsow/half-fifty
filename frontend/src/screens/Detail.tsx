@@ -333,7 +333,7 @@ export function DetailScreen({
                 {clause.related_cases.map((c) => (
                   <div
                     key={c.case_id}
-                    className="rounded-2xl border border-ink-100 bg-white p-4"
+                    className="rounded-2xl border border-ink-100 bg-white px-5 py-4"
                   >
                     <p className="text-[13px] font-bold text-brand-600">
                       {c.agency} {c.citation}
@@ -352,7 +352,7 @@ export function DetailScreen({
                 <p className="text-[14px] font-bold text-ink-900">{t(language, 'originalText')}</p>
                 {/* 부속문서에서 나온 조항은 출처를 밝힌다 — 본문과 법적 성격이 다르다 */}
                 {clause.section && clause.section !== '본문' && (
-                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[12px] font-semibold text-ink-500">
+                  <span className="rounded-md bg-white px-1.5 py-0.5 text-[12px] font-semibold text-ink-600">
                     {clause.section}
                   </span>
                 )}
@@ -372,12 +372,12 @@ export function DetailScreen({
             )}
           </div>
 
-          <div className="mt-7">
-            <p className="text-[16px] font-bold text-ink-900">{t(language, 'askOther')}</p>
+          <div className="mt-6">
+            <h2 className="text-[14px] font-bold text-ink-400">{t(language, 'askOther')}</h2>
             {language !== 'ko' && (
               <p className="mt-1 text-[13px] text-ink-400">{t(language, 'askKoreanHint')}</p>
             )}
-            <div className="mt-3 space-y-2.5">
+            <div className="mt-2 space-y-2.5">
               {questions.map((question, index) => {
                 const translated = clause.check_questions_translated?.[index]
                 return (
@@ -425,12 +425,12 @@ export function DetailScreen({
               TTS(#118)는 clause.explanation만 낭독하므로 이 섹션은 낭독
               흐름에 영향이 없다. */}
           {showNextActions && (
-            <div className="mt-7">
-              <p className="text-[16px] font-bold text-ink-900">{t(language, 'agNext')}</p>
+            <div className="mt-6">
+              <h2 className="text-[14px] font-bold text-ink-400">{t(language, 'agNext')}</h2>
 
               {/* ① 협상 문구 — 근거 인용 + 유형별 요구. 한국어 유지(번역 방침:
                   상대방에게 보여주는 용도), 비한국어 UI엔 용도 라벨을 함께. */}
-              <div className="mt-3 rounded-2xl border border-ink-100 bg-white p-5">
+              <div className="mt-2 rounded-2xl border border-ink-100 bg-white p-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-[14px] font-bold text-ink-900">{t(language, 'agAskTitle')}</p>
                   <CopyButton text={negotiation} copiedText={t(language, 'copied')}>
@@ -458,7 +458,7 @@ export function DetailScreen({
                     >
                       <div className="min-w-0">
                         <p className="text-[14px] font-bold text-ink-900">{agency.name}</p>
-                        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-500">
+                        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-600">
                           {t(language, agency.descKey)}
                         </p>
                       </div>

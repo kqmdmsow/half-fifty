@@ -135,7 +135,7 @@ export function DisclosureScreen({
   return (
     <div className="mx-auto max-w-3xl px-4 pb-16">
       <PageTitle title={t(language, 'dvTitle')} desc={t(language, 'dvDesc')} />
-      <p className="mt-3 rounded-xl bg-ink-25 px-4 py-3 text-[14px] leading-relaxed text-ink-500">
+      <p className="mt-3 rounded-xl bg-ink-25 px-4 py-3 text-[14px] leading-relaxed text-ink-600">
         {t(language, 'dvWhy')}
       </p>
 

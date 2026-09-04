@@ -47,7 +47,7 @@ export function LandingScreen({
               강점이 전달되지 않는다. 숫자는 data/verification.ts가 단일 출처. */}
           <ul
             aria-label={t(language, 'trAria')}
-            className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-[13px] font-semibold text-ink-500"
+            className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-[13px] font-semibold text-ink-600"
           >
             {[
               t(language, 'trGolden', { n: VERIFICATION.goldenRows }),

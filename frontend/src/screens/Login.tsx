@@ -26,6 +26,11 @@ export function LoginScreen({
   const submit = async () => {
     if (busy) return
     setError(null)
+    // 서버도 @Email로 거절하지만 400이라 화면에는 일반 오류로만 보인다 — 여기서 먼저 안내
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError(t(language, 'lgErrEmail'))
+      return
+    }
     if (password.length < 8) {
       setError(t(language, 'lgErrWeak'))
       return
@@ -110,13 +115,8 @@ export function LoginScreen({
           {t(language, 'lgSubmit')}
         </Button>
 
-        {/* 영지식 설계 고지 — 가입 시에는 복구 불가 경고까지 함께 */}
+        {/* 영지식 설계 고지 */}
         <p className="mt-4 text-[12px] leading-relaxed text-ink-400">{t(language, 'lgPrivacy')}</p>
-        {mode === 'signup' && (
-          <p className="mt-2 rounded-xl bg-caution-50 px-3.5 py-2.5 text-[12px] leading-relaxed text-caution-700">
-            {t(language, 'lgWarnNoReset')}
-          </p>
-        )}
         {!isCryptoAvailable() && (
           <p role="alert" className="mt-2 text-[12px] font-semibold text-danger-600">
             {t(language, 'lgErrNetwork')}

@@ -168,7 +168,7 @@ export function LearnScreen({
                             <span className="font-semibold text-ink-600">
                               {c.agency} {c.citation}
                             </span>{' '}
-                            — {c.result}
+                            ({c.result})
                           </li>
                         ))}
                       </ul>
