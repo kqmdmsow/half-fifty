@@ -139,7 +139,7 @@ export function SummaryScreen({
           <LensMark size={22} className="animate-lens-scan shrink-0" />
           <p className="text-[14px] font-bold text-brand-600">
             {t(language, 'analyzingLive', { done: liveProgress.done, total: liveProgress.total })}{' '}
-            <span className="font-semibold text-ink-400">— {t(language, 'liveHint')}</span>
+            <span className="font-semibold text-ink-400">({t(language, 'liveHint')})</span>
           </p>
         </div>
       ) : (
@@ -195,9 +195,11 @@ export function SummaryScreen({
           <div>
             <p className="text-[13px] font-bold text-danger-600">{t(language, 'checkFirst')}</p>
             <p className="mt-1 text-[16px] font-bold text-ink-900">
-              {[clauseHeading(topRisk.original_text, language, topRisk.original_text_translated), riskTypeLabel(language, topRisk.risk_type)]
-                .filter(Boolean)
-                .join(' — ')}
+              {(() => {
+                const heading = clauseHeading(topRisk.original_text, language, topRisk.original_text_translated)
+                const risk = riskTypeLabel(language, topRisk.risk_type)
+                return heading && risk ? `${heading} (${risk})` : heading || risk
+              })()}
             </p>
             <FormattedText
               text={topRisk.explanation}
