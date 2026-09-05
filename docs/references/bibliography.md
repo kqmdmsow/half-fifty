@@ -74,3 +74,12 @@
 | AI Hub 71834 / 71610 | 계약 서식·기계독해 | 신청 병목 (기존 조사) |
 | korean-law-mcp (github.com/chrisryugj/korean-law-mcp) | 법제처 법령·판례 MCP | 법령 인용 검증 기능 후보 |
 | 국토부 실거래가 공개 API / HUG 보증사고 통계 / KOSIS | 공공 데이터 | 깡통전세 자동화 로드맵 재료 |
+
+## 학계 대조 (기획서 §7-3)
+
+- Braun, D., & Matthes, F. (2024). **AGB-DE: A Corpus for the Automated Legal
+  Assessment of Clauses in German Consumer Contracts.** Proceedings of ACL 2024.
+  독일 소비자 계약 3,764개 조항에 법률 전문가 라벨을 붙인 코퍼스. SVM·파인튜닝
+  오픈모델·GPT-3.5 비교에서 어느 것도 좋은 성적을 내지 못했다는 결과를,
+  "이 과제가 원래 어렵다"는 근거로만 인용한다(순위 주장 아님).
+  활용처: 기획서 §7-3, 기능명세서 제한사항.
