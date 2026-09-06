@@ -313,8 +313,8 @@ export function DetailScreen({
               })}
             </p>
           )}
-          {clause.risk_level !== '안전' && !clause.verdict_withheld && (
-            <Section title={t(language, 'whyCheck')}>
+          {!clause.verdict_withheld && (clause.analysis_failed || clause.risk_evidence) && (
+            <Section title={t(language, clause.risk_level === '안전' ? 'whySafe' : 'whyCheck')}>
               {clause.analysis_failed ? (
                 <p>{t(language, 'analysisFailedNote')}</p>
               ) : (

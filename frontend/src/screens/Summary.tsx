@@ -341,10 +341,10 @@ export function SummaryScreen({
                   })}
                 </p>
               )}
-              {result.risk_level !== '안전' && !result.verdict_withheld && (
+              {!result.verdict_withheld && (result.analysis_failed || result.risk_evidence) && (
                 <div className="mt-3.5 rounded-xl bg-ink-25 px-4 py-3 text-[13px] text-ink-600">
                   <p className={`font-bold ${RISK_META[result.risk_level].badge.split(' ')[1]}`}>
-                    {t(language, 'evidence')}
+                    {t(language, result.risk_level === '안전' ? 'evidenceSafe' : 'evidence')}
                   </p>
                   {result.analysis_failed ? (
                     <p className="mt-1 leading-relaxed">{t(language, 'analysisFailedNote')}</p>
