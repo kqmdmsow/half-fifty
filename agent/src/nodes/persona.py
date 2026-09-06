@@ -75,25 +75,34 @@ def _adapt(
     prompt = prompt.replace("{language}", LANGUAGE_NAMES.get(language, language))
 
     translation = None
-    try:
-        data = invoke_json(llm := get_worker_llm(), prompt)
-        explanation = data["explanation"]
-        if language != "ko":
-            questions = data.get("check_questions_translated")
-            translation = {
-                "original_text_translated": data.get("original_text_translated") or "",
-                "check_questions_translated": questions if isinstance(questions, list) else [],
-                # 근거도 번역 병기 (#99 후속) — 한국어 원본 risk_evidence는 judge
-                # 입력·citation_check용으로 그대로 유지되고, 번역은 표시 전용이다
-                "risk_evidence_translated": data.get("risk_evidence_translated") or "",
-            }
-    except Exception as exc:
-        # 페르소나 적응 실패는 치명적이지 않다 — 원문 explanation을 그대로 쓰고
-        # 파이프라인은 계속 간다 (analysis/judge와 동일한 방어 원칙, PR#43 참조).
-        # exc는 LLM 원응답 일부(최대 200자, src/llm.py invoke_json)를 담을 수
-        # 있어 종류만 WARNING, 전체 내용은 DEBUG로만 남긴다 (#58).
-        logger.warning("%s 적응 실패, 원본 설명 유지: %s", result["clause_id"], type(exc).__name__)
-        logger.debug("%s 적응 실패 상세", result["clause_id"], exc_info=exc)
+    explanation = None
+    # 1회 재시도 (#162 후속): 단발 실패가 조용히 한국어 폴백으로 이어지면
+    # 비한국어 화면에서 해당 조항만 한국어로 남는다 — judge 재생성이 걸린
+    # 조항에서 실측으로 재현된 문제라, 폴백 전에 한 번 더 시도한다.
+    for attempt in (1, 2):
+        try:
+            data = invoke_json(get_worker_llm(), prompt)
+            explanation = data["explanation"]
+            if language != "ko":
+                questions = data.get("check_questions_translated")
+                translation = {
+                    "original_text_translated": data.get("original_text_translated") or "",
+                    "check_questions_translated": questions if isinstance(questions, list) else [],
+                    # 근거도 번역 병기 (#99 후속) — 한국어 원본 risk_evidence는 judge
+                    # 입력·citation_check용으로 그대로 유지되고, 번역은 표시 전용이다
+                    "risk_evidence_translated": data.get("risk_evidence_translated") or "",
+                }
+            break
+        except Exception as exc:
+            # 페르소나 적응 실패는 치명적이지 않다 — 재시도 소진 시 원문
+            # explanation을 그대로 쓰고 파이프라인은 계속 간다 (analysis/judge와
+            # 동일한 방어 원칙, PR#43 참조). exc는 LLM 원응답 일부(최대 200자,
+            # src/llm.py invoke_json)를 담을 수 있어 종류만 WARNING,
+            # 전체 내용은 DEBUG로만 남긴다 (#58).
+            logger.warning("%s 적응 실패(%d/2)%s: %s", result["clause_id"], attempt,
+                           "" if attempt < 2 else " — 원본 설명 유지", type(exc).__name__)
+            logger.debug("%s 적응 실패 상세", result["clause_id"], exc_info=exc)
+    if explanation is None:
         explanation = result["explanation"]
 
     adapted = dict(result)
