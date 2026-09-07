@@ -285,8 +285,9 @@ export function SummaryScreen({
             // 카드 제목은 조항 표제(제N조…) — 유형은 괄호 보조 표기.
             // 표제가 없으면 기존처럼 유형만 표시한다.
             const heading = clauseHeading(result.original_text, language, result.original_text_translated)
-            const typeLabel =
-              result.risk_type === '해당 없음'
+            const typeLabel = result.analysis_failed
+              ? t(language, 'analysisFailedLabel')
+              : result.risk_type === '해당 없음'
                 ? t(language, 'standardClause')
                 : riskTypeLabel(language, result.risk_type)
             return (

@@ -179,9 +179,11 @@ export function DetailScreen({
                   />
                   <span className="whitespace-nowrap lg:whitespace-normal">
                     {clauseHeading(result.original_text, language, result.original_text_translated) ??
-                      (result.risk_type === '해당 없음'
-                        ? t(language, 'standardClause')
-                        : riskTypeLabel(language, result.risk_type))}
+                      (result.analysis_failed
+                        ? t(language, 'analysisFailedLabel')
+                        : result.risk_type === '해당 없음'
+                          ? t(language, 'standardClause')
+                          : riskTypeLabel(language, result.risk_type))}
                   </span>
                 </button>
               )
@@ -206,15 +208,19 @@ export function DetailScreen({
               )}
               <h1 className="mt-3 text-[24px] font-bold leading-snug tracking-[-0.02em] text-ink-900 md:text-[28px]">
                 {clauseHeading(clause.original_text, language, clause.original_text_translated) ??
-                  (clause.risk_type === '해당 없음'
-                    ? t(language, 'standardClauseLong')
-                    : riskTypeLabel(language, clause.risk_type))}
+                  (clause.analysis_failed
+                    ? t(language, 'analysisFailedLabel')
+                    : clause.risk_type === '해당 없음'
+                      ? t(language, 'standardClauseLong')
+                      : riskTypeLabel(language, clause.risk_type))}
               </h1>
               {clauseHeading(clause.original_text, language, clause.original_text_translated) && (
                 <p className="mt-1.5 text-[14px] font-bold text-ink-400">
-                  {clause.risk_type === '해당 없음'
-                    ? t(language, 'standardClauseLong')
-                    : riskTypeLabel(language, clause.risk_type)}
+                  {clause.analysis_failed
+                    ? t(language, 'analysisFailedLabel')
+                    : clause.risk_type === '해당 없음'
+                      ? t(language, 'standardClauseLong')
+                      : riskTypeLabel(language, clause.risk_type)}
                 </p>
               )}
             </div>

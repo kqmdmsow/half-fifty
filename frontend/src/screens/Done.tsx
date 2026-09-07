@@ -292,7 +292,11 @@ function PrintReport({ results, language = 'ko' }: { results: ClauseResult[]; la
         >
           <p className="text-[13px] font-bold text-ink-900">
             [{riskLevelLabel(language, r.risk_level)}]{' '}
-            {r.risk_type !== '해당 없음' ? riskTypeLabel(language, r.risk_type) : t(language, 'standardClause')}
+            {r.analysis_failed
+              ? t(language, 'analysisFailedLabel')
+              : r.risk_type !== '해당 없음'
+                ? riskTypeLabel(language, r.risk_type)
+                : t(language, 'standardClause')}
           </p>
           <p className="mt-1 text-[11px] leading-relaxed text-ink-700">{t(language, 'prOriginal')}: {r.original_text}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-ink-900">{t(language, 'prExplain')}: {r.explanation}</p>
