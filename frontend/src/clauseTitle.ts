@@ -35,8 +35,12 @@ const ARTICLE_LABEL: Record<LangCode, (n: string) => string> = {
   ru: (n) => `Статья ${n}`,
 }
 
+// 표제 없는 원문 앞의 목록 기호(·•‣▪ 등, 대시·별표 뒤 공백 포함)는 조항
+// 내용이 아니라 서식 잔여물이므로 제목에 노출하지 않는다.
+const LEADING_BULLET = /^[\s·•‣▪◦*]+|^-\s+/
+
 function snippet(text: string): string | null {
-  const s = text.trim().replace(/\s+/g, ' ')
+  const s = text.trim().replace(LEADING_BULLET, '').replace(/\s+/g, ' ').trim()
   if (!s) return null
   return s.length > 18 ? `${s.slice(0, 18)}…` : s
 }
