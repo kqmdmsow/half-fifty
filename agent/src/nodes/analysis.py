@@ -34,6 +34,18 @@ PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "analysis.txt"
 _PROMPT_TEMPLATE = PROMPT_PATH.read_text(encoding="utf-8")
 
 _PARSE_ATTEMPTS = 2  # 최초 시도 + 재시도 1회
+
+
+class _FabricatedQuoteError(ValueError):
+    """인용 검증 실패를 재시도/폴백 흐름에는 손대지 않고 그대로 전달하되,
+    진단에 필요한 전체 정보(잘리지 않은 fabricated 리스트와 원본
+    risk_evidence)를 예외 객체에 함께 실어 나른다 — 판정 로직·재시도 횟수·
+    폴백 조건은 기존과 완전히 동일, 실패했을 때 남는 기록만 풍부해진다."""
+
+    def __init__(self, fabricated: List[str], risk_evidence: str):
+        super().__init__(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")
+        self.fabricated = fabricated
+        self.risk_evidence = risk_evidence
 _FALLBACK_EVIDENCE = "분석 실패 (수동 확인 필요)"
 
 # 구조적 위험 체크리스트 본체는 제거됐지만(#65) eval.py가 이 clause_id로
@@ -276,7 +288,7 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             # 원문 전체로 넓히면 격리한 지시문을 근거로 인용해도 통과한다.
             fabricated = find_fabricated_quotes(data.risk_evidence, body)
             if fabricated:
-                raise ValueError(f"원문에 없는 인용 {len(fabricated)}건: {fabricated[0][:30]}…")
+                raise _FabricatedQuoteError(fabricated, data.risk_evidence)
             result = AnalysisResult(
                 clause_id=clause_id,
                 explanation=data.explanation,
@@ -298,11 +310,19 @@ def _analyze_clause(clause_id: str, text: str, domain: str = "",
             return _apply_tamper_floor(result, tampered)
         except Exception as exc:  # JSON 파싱 실패, 키 누락, 스키마 검증 실패 등
             if attempt + 1 == _PARSE_ATTEMPTS:
-                # exc는 창작 인용 30자(위 ValueError)나 LLM 원응답 일부(최대 200자,
-                # src/llm.py invoke_json)를 담을 수 있어 종류만 WARNING, 전체
-                # 내용은 DEBUG로만 남긴다 (#58, privacy_data_handling.md 정합).
+                # exc는 창작 인용 일부나 LLM 원응답 일부(src/llm.py invoke_json)를
+                # 담을 수 있어 종류만 WARNING, 전체 내용은 DEBUG로만 남긴다
+                # (#58, privacy_data_handling.md 정합).
                 logger.warning("%s 분석 실패, 폴백 처리: %s", clause_id, type(exc).__name__)
-                logger.debug("%s 분석 실패 상세", clause_id, exc_info=exc)
+                # _FabricatedQuoteError면 잘리지 않은 fabricated 전체와 원본
+                # risk_evidence를 구조화 필드로 함께 남긴다 — 사후 재현(오프라인
+                # 재분류)에 필요한 정보. extra의 존재만으로 판정 로직에는 아무
+                # 영향이 없다(로그 전용 부가 데이터).
+                extra = (
+                    {"fabricated_quotes": exc.fabricated, "pre_fallback_risk_evidence": exc.risk_evidence}
+                    if isinstance(exc, _FabricatedQuoteError) else {}
+                )
+                logger.debug("%s 분석 실패 상세", clause_id, exc_info=exc, extra=extra)
 
     return _apply_tamper_floor(
         AnalysisResult(
