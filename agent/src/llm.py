@@ -94,11 +94,26 @@ def invoke_json(llm: ChatAnthropic, prompt: str, cached_prefix: str | None = Non
     return _extract_json(content)
 
 
+def _diagnostic(text: str) -> str:
+    """파싱 실패 시 원인 추정용 진단 문자열 — 머리·꼬리·길이를 함께 남긴다.
+
+    머리만 남기면 "잘림(truncation)"과 "형식 오류(malformed)"를 구분할 수
+    없다 — 잘림은 꼬리가 닫는 중괄호 없이 문장 중간에서 끊긴다. 원문 자체는
+    DEBUG에서만 소비되고 WARNING에는 종류만 남는 기존 원칙(#58,
+    privacy_data_handling.md)을 그대로 따른다.
+    """
+    return f"길이={len(text)}자, 앞={text[:150]!r}, 뒤={text[-150:]!r}"
+
+
 def _extract_json(text: str) -> dict:
     """```json 코드펜스 유무와 무관하게 첫 { ~ 마지막 } 구간을 파싱한다."""
     text = text.strip()
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end == -1:
-        raise ValueError(f"응답에서 JSON 객체를 찾을 수 없습니다: {text[:200]!r}")
-    return json.loads(text[start : end + 1])
+        raise ValueError(f"응답에서 JSON 객체를 찾을 수 없습니다 ({_diagnostic(text)})")
+    candidate = text[start : end + 1]
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"JSON 파싱 실패: {exc} ({_diagnostic(candidate)})") from exc

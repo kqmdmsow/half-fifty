@@ -19,10 +19,31 @@ data/labels.md 기반 5건(자작 위험 삽입)과 이 44건(정부·법원이 
 """
 
 import csv
+import glob
+import logging
+import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 
 from src.nodes.analysis import _FALLBACK_EVIDENCE, _analyze_clause
+
+# 폴백 원인(잘림 vs 형식 오류) 진단용 — analysis._analyze_clause는 실패를
+# 삼켜서 '주의' 폴백으로 돌려주므로, 원응답 머리/꼬리는 로그에서만 건질 수
+# 있다. WARNING 레코드의 args[0]가 clause_id, DEBUG 레코드의 exc_info가
+# src/llm.py _extract_json이 던진 진단 문자열(길이·머리·꼬리 포함)을 담고
+# 있다 — 그 둘을 clause_id로 이어붙인다.
+_fallback_diagnostics: dict[str, str] = {}
+
+
+class _FallbackDiagnosticHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        if record.name != "src.nodes.analysis" or record.levelno != logging.DEBUG:
+            return
+        if not record.args:
+            return
+        clause_id = record.args[0] if isinstance(record.args, tuple) else record.args
+        if record.exc_info and record.exc_info[1] is not None:
+            _fallback_diagnostics[str(clause_id)] = str(record.exc_info[1])
 
 # EVAL_WORKER=solar — 크레딧 소진 시 무료 워커로 대체 실행 (평가 전용 주입).
 # 주의: 개별 조항의 폴백은 정상 집계되지만(폴백 현황 표 참고), 여러 조항이
@@ -61,15 +82,28 @@ _ap.add_argument("--repeats", type=int, default=1, metavar="N",
 _ap.add_argument("--out", default=None, metavar="results.json",
                  help="회차별 원자료 JSON 저장 경로. 수치가 움직였을 때 "
                       "재실행 없이 원인을 되짚으려면 반드시 남길 것 (#161)")
+_ap.add_argument("--all-labels", action="store_true",
+                 help="real_clause_labels.csv 하나가 아니라 data/real_clause_labels*.csv "
+                      "전부(211행)를 합쳐서 돈다. 정확도 공식 수치용이 아니라 "
+                      "폴백 길이 상관관계처럼 표본 크기가 더 필요한 진단용 측정 전용 — "
+                      "split 오염 방지 원칙과 무관(정확도 튜닝에 안 씀)")
 _args = _ap.parse_args()
 
 OUT_PATH = Path(__file__).parent.parent / "docs" / _args.out_name
 _splits = set(_args.splits.split(",")) if _args.splits else None
+_DATA_DIR = Path(__file__).parent.parent / "data"
 
 
 def _load_labels() -> list:
-    with open(LABELS_PATH, encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
+    if _args.all_labels:
+        paths = sorted(_DATA_DIR.glob("real_clause_labels*.csv"))
+        rows = []
+        for p in paths:
+            with open(p, encoding="utf-8") as f:
+                rows.extend(list(csv.DictReader(f)))
+    else:
+        with open(LABELS_PATH, encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
     if _splits:
         rows = [r for r in rows if r["split"] in _splits]
     return rows
@@ -112,13 +146,21 @@ def run_eval(repeats: int = 1) -> list:
     consecutive_full_fallback = 0
     for i, row in enumerate(rows):
         clause_id = f"real_{i:03d}_{row['case_id']}"
+        clause_len = len(row["clause_text"])
         attempts = []
         for attempt in range(repeats):
-            prediction = _analyze_clause(clause_id, row["clause_text"])
+            # 회차마다 clause_id를 구분해야 진단 로그가 재시도끼리 안 덮어씀.
+            run_id = clause_id if repeats == 1 else f"{clause_id}#{attempt}"
+            prediction = _analyze_clause(run_id, row["clause_text"])
             attempts.append(prediction)
 
         runs = [p for p in attempts if not _is_fallback(p)]
         fallback_count = len(attempts) - len(runs)
+        diagnostics = [
+            _fallback_diagnostics[cid] for cid in
+            ([clause_id] if repeats == 1 else [f"{clause_id}#{a}" for a in range(repeats)])
+            if cid in _fallback_diagnostics
+        ]
 
         if not runs:
             # 이 조항은 전 회차가 폴백 — 확정 불가, 정확도 집계에서 제외.
@@ -126,6 +168,7 @@ def run_eval(repeats: int = 1) -> list:
             results.append({
                 "row": row, "prediction": None, "runs": [], "attempts": attempts,
                 "tie": False, "fallback_count": fallback_count, "fully_fallback": True,
+                "clause_len": clause_len, "diagnostics": diagnostics,
             })
             print(f"[!] {clause_id}: 전체 폴백 {fallback_count}/{repeats} — 정확도 집계 제외")
             if consecutive_full_fallback >= _CONSECUTIVE_FULL_FALLBACK_LIMIT:
@@ -146,6 +189,7 @@ def run_eval(repeats: int = 1) -> list:
         results.append({
             "row": row, "prediction": prediction, "runs": runs, "attempts": attempts,
             "tie": tie, "fallback_count": fallback_count, "fully_fallback": False,
+            "clause_len": clause_len, "diagnostics": diagnostics,
         })
         gold = row["gold_risk_level"]
         match = "O" if (level != "안전") == (gold != "안전") else "X"
@@ -305,6 +349,51 @@ def render_report(results: list) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _length_report(results: list) -> str:
+    """폴백 조항이 유독 길었는지, 아니면 길이와 무관하게 흩어져 있는지 비교한다.
+
+    겹치면 배경 실패율(조항과 무관), 폴백 쪽 분포가 뚜렷하게 위로 몰려 있으면
+    길이 의존(≈max_tokens 잘림 가능성)이다.
+    """
+    all_lens = [r["clause_len"] for r in results]
+    # fallback_count > 0인 조항 — 전체 폴백이든 일부 폴백이든 "그 조항에서
+    # 한 번이라도 폴백이 났다"를 기준으로 삼는다.
+    fb_lens = [r["clause_len"] for r in results if r["fallback_count"] > 0]
+
+    def _stats(xs: list) -> str:
+        if not xs:
+            return "N=0"
+        xs_sorted = sorted(xs)
+        return (f"N={len(xs)}, 최소={xs_sorted[0]}, 중앙값={statistics.median(xs_sorted):.0f}, "
+                f"평균={statistics.mean(xs_sorted):.0f}, 최대={xs_sorted[-1]}")
+
+    lines = [
+        "## 폴백-길이 상관 (조항 글자 수 기준)",
+        "",
+        f"- 전체 조항: {_stats(all_lens)}",
+        f"- 폴백 발생 조항: {_stats(fb_lens)}",
+        "",
+        "폴백 쪽 중앙값·평균이 전체보다 뚜렷하게 높으면 길이 의존(≈max_tokens 잘림) "
+        "가설을 지지한다. 겹치면 조항과 무관한 배경 실패율에 가깝다.",
+        "",
+    ]
+
+    diag_rows = [(r["row"]["case_id"], r["clause_len"], d)
+                 for r in results for d in r.get("diagnostics", [])]
+    if diag_rows:
+        lines += ["### 폴백 원응답 진단 (머리/꼬리로 잘림 vs 형식오류 구분)", "",
+                  "| 조항 | 글자수 | 진단 |", "|---|---|---|"]
+        for case_id, clen, diag in diag_rows:
+            lines.append(f"| {case_id} | {clen} | {diag.replace('|', '/')} |")
+        lines.append("")
+        lines.append("꼬리가 닫는 중괄호 `}` 없이 문장 중간에서 끊기면 잘림, "
+                     "완결된 문장인데 JSON 문법만 깨졌으면 형식 오류다.")
+    else:
+        lines.append("(이번 실행에서는 폴백 원응답 진단이 잡히지 않음 — "
+                     "DEBUG 로깅이 꺼져 있거나 폴백이 없었을 수 있음)")
+    return "\n".join(lines) + "\n"
+
+
 def _dump_raw(results: list, path: Path, repeats: int) -> None:
     """회차별 원자료 저장 — 수치가 움직였을 때 재실행 없이 대조하기 위한 것 (#161)."""
     payload = {
@@ -328,6 +417,8 @@ def _dump_raw(results: list, path: Path, repeats: int) -> None:
                 "final_risk_level": r["prediction"]["risk_level"] if r["prediction"] else None,
                 "final_risk_type": r["prediction"]["risk_type"] if r["prediction"] else None,
                 "tie": r["tie"],
+                "clause_len": r.get("clause_len"),
+                "diagnostics": r.get("diagnostics", []),
             }
             for r in results
         ],
@@ -337,12 +428,21 @@ def _dump_raw(results: list, path: Path, repeats: int) -> None:
 
 
 def main() -> None:
+    # 폴백 원응답 진단(머리/꼬리)을 잡으려면 analysis 로거가 DEBUG를 흘려보내야
+    # 한다 — 기본 레벨(WARNING)이면 exc_info가 담긴 DEBUG 레코드가 애초에
+    # 안 만들어진다.
+    logging.getLogger("src.nodes.analysis").setLevel(logging.DEBUG)
+    logging.getLogger("src.nodes.analysis").addHandler(_FallbackDiagnosticHandler())
+
     repeats = _args.repeats
     if repeats < 1:
         sys.exit("--repeats는 1 이상이어야 한다")
     if repeats == 1:
         print("주의: --repeats 1은 단발 측정이다. temperature=0에서도 판정이 회차마다 "
               "뒤집히므로(±1~2건) 보고용 수치는 --repeats 3 이상으로 낼 것 (#161).")
+    if _args.all_labels:
+        print("--all-labels: real_clause_labels*.csv 211행 전부 로드 "
+              "(길이·폴백 상관 진단용, 정확도 공식 수치 아님)")
 
     try:
         results = run_eval(repeats)
@@ -354,7 +454,10 @@ def main() -> None:
         _dump_raw(results, raw_path, repeats)
         print(f"원자료 저장: {raw_path}")
 
-    report = render_report(results)
+    length_report = _length_report(results)
+    print(length_report)
+
+    report = render_report(results) + "\n" + length_report
     ties = sum(1 for r in results if r["tie"])
     total_attempts = sum(len(r["attempts"]) for r in results)
     total_fallback = sum(r["fallback_count"] for r in results)
