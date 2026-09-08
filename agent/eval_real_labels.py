@@ -33,6 +33,9 @@ from src.nodes.analysis import _FALLBACK_EVIDENCE, _analyze_clause
 # src/llm.py _extract_json이 던진 진단 문자열(길이·머리·꼬리 포함)을 담고
 # 있다 — 그 둘을 clause_id로 이어붙인다.
 _fallback_diagnostics: dict[str, str] = {}
+# _FabricatedQuoteError일 때만 채워짐 — 잘리지 않은 fabricated 리스트 전체와
+# 폴백 placeholder로 덮어써지기 전의 원본 risk_evidence (사후 오프라인 재현용).
+_fallback_extra: dict[str, dict] = {}
 
 
 class _FallbackDiagnosticHandler(logging.Handler):
@@ -44,6 +47,13 @@ class _FallbackDiagnosticHandler(logging.Handler):
         clause_id = record.args[0] if isinstance(record.args, tuple) else record.args
         if record.exc_info and record.exc_info[1] is not None:
             _fallback_diagnostics[str(clause_id)] = str(record.exc_info[1])
+        fabricated = getattr(record, "fabricated_quotes", None)
+        pre_fallback_evidence = getattr(record, "pre_fallback_risk_evidence", None)
+        if fabricated is not None or pre_fallback_evidence is not None:
+            _fallback_extra[str(clause_id)] = {
+                "fabricated_quotes": fabricated,
+                "pre_fallback_risk_evidence": pre_fallback_evidence,
+            }
 
 # EVAL_WORKER=solar — 크레딧 소진 시 무료 워커로 대체 실행 (평가 전용 주입).
 # 주의: 개별 조항의 폴백은 정상 집계되지만(폴백 현황 표 참고), 여러 조항이
@@ -156,11 +166,11 @@ def run_eval(repeats: int = 1) -> list:
 
         runs = [p for p in attempts if not _is_fallback(p)]
         fallback_count = len(attempts) - len(runs)
-        diagnostics = [
-            _fallback_diagnostics[cid] for cid in
-            ([clause_id] if repeats == 1 else [f"{clause_id}#{a}" for a in range(repeats)])
-            if cid in _fallback_diagnostics
-        ]
+        run_ids = [clause_id] if repeats == 1 else [f"{clause_id}#{a}" for a in range(repeats)]
+        diagnostics = [_fallback_diagnostics[cid] for cid in run_ids if cid in _fallback_diagnostics]
+        # _FabricatedQuoteError로 폴백한 회차만 채워짐 — 잘리지 않은 fabricated
+        # 전체와 placeholder로 덮이기 전의 원본 risk_evidence (사후 재현용, #182).
+        fallback_extras = [_fallback_extra[cid] for cid in run_ids if cid in _fallback_extra]
 
         if not runs:
             # 이 조항은 전 회차가 폴백 — 확정 불가, 정확도 집계에서 제외.
@@ -168,7 +178,7 @@ def run_eval(repeats: int = 1) -> list:
             results.append({
                 "row": row, "prediction": None, "runs": [], "attempts": attempts,
                 "tie": False, "fallback_count": fallback_count, "fully_fallback": True,
-                "clause_len": clause_len, "diagnostics": diagnostics,
+                "clause_len": clause_len, "diagnostics": diagnostics, "fallback_extras": fallback_extras,
             })
             print(f"[!] {clause_id}: 전체 폴백 {fallback_count}/{repeats} — 정확도 집계 제외")
             if consecutive_full_fallback >= _CONSECUTIVE_FULL_FALLBACK_LIMIT:
@@ -189,7 +199,7 @@ def run_eval(repeats: int = 1) -> list:
         results.append({
             "row": row, "prediction": prediction, "runs": runs, "attempts": attempts,
             "tie": tie, "fallback_count": fallback_count, "fully_fallback": False,
-            "clause_len": clause_len, "diagnostics": diagnostics,
+            "clause_len": clause_len, "diagnostics": diagnostics, "fallback_extras": fallback_extras,
         })
         gold = row["gold_risk_level"]
         match = "O" if (level != "안전") == (gold != "안전") else "X"
@@ -419,6 +429,12 @@ def _dump_raw(results: list, path: Path, repeats: int) -> None:
                 "tie": r["tie"],
                 "clause_len": r.get("clause_len"),
                 "diagnostics": r.get("diagnostics", []),
+                # 잘리지 않은 fabricated 리스트 전체 + 폴백 placeholder로 덮이기
+                # 전의 원본 risk_evidence(_FabricatedQuoteError일 때만 채워짐).
+                "fallback_extras": r.get("fallback_extras", []),
+                # 원문은 폴백 건에 한해서만 남긴다 — 211건 전체를 담으면
+                # 불필요하게 커지고, 나머지는 CSV에서 그대로 다시 찾을 수 있다.
+                **({"clause_text": r["row"]["clause_text"]} if r["fallback_count"] > 0 else {}),
             }
             for r in results
         ],
